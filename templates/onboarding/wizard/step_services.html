@@ -1,24 +1,28 @@
 {% extends "onboarding/wizard/base.html" %}
-{% block title %}خدمات{% endblock %}
-{% block wizard_content %}
-<h1 class="text-xl font-semibold text-espresso">خدمات پیشنهادی</h1>
-<p class="mt-1 text-sm text-ink-secondary">فقط خدماتی که انتخاب کنید ایجاد می‌شوند.</p>
-<form method="post" class="mt-6 space-y-6">
+{% block title %}خدمات · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block wizard_heading %}خدمات سالن{% endblock %}
+{% block wizard_subtitle %}خدمات پیشنهادی را انتخاب کنید یا یک مورد سفارشی اضافه کنید. فقط موارد انتخاب‌شده ایجاد می‌شوند.{% endblock %}
+{% block wizard_form %}
+<form method="post" class="space-y-5">
   {% csrf_token %}
   <ul class="space-y-2">
     {% for choice in form.selected_presets %}
-    <li class="flex items-center gap-2 rounded-xl border border-line px-3 py-2">{{ choice.tag }} <span class="text-sm">{{ choice.choice_label }}</span></li>
+    <li class="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5">{{ choice.tag }} <span class="text-sm">{{ choice.choice_label }}</span></li>
+    {% empty %}
+    <li class="text-sm text-charcoal/60">برای این نوع سالن پیشنهادی ثبت نشده؛ خدمت سفارشی اضافه کنید.</li>
     {% endfor %}
   </ul>
-  <fieldset class="rounded-2xl border border-dashed border-line p-4">
-    <legend class="px-2 text-sm font-medium">خدمت سفارشی (اختیاری)</legend>
+  <div class="rounded-2xl border border-dashed border-line p-4">
+    <p class="text-sm font-medium text-aubergine">خدمت سفارشی (اختیاری)</p>
     <div class="mt-3 grid gap-2 sm:grid-cols-3">
-      <input type="text" name="custom_name" class="input-field" placeholder="نام خدمت">
-      <input type="number" name="custom_duration" class="input-field" placeholder="دقیقه" value="30">
-      <input type="number" name="custom_price" class="input-field" placeholder="قیمت (تومان)">
+      <input type="text" name="custom_name" class="input-field" placeholder="نام خدمت" autocomplete="off">
+      <input type="number" name="custom_duration" class="input-field" placeholder="دقیقه" value="30" min="5" inputmode="numeric">
+      <input type="number" name="custom_price" class="input-field" placeholder="قیمت (تومان)" min="0" inputmode="numeric">
     </div>
-  </fieldset>
-  <button type="submit" class="btn-primary">ادامه</button>
-  <a href="{% url 'salons_onboarding:wizard' step=5 %}" class="btn-secondary text-xs">رد کردن خدمات</a>
+  </div>
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <button type="submit" class="btn-primary min-h-[48px] flex-1">ذخیره و ادامه</button>
+    <button type="submit" name="action" value="skip" class="btn-secondary min-h-[48px] px-4 text-sm">بعداً تکمیل می‌کنم</button>
+  </div>
 </form>
 {% endblock %}

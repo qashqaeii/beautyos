@@ -1,29 +1,13 @@
-{% extends "base.html" %}
-{% block body %}
-<div class="min-h-screen px-4 py-8" style="background: var(--color-background);">
-  <div class="mx-auto max-w-3xl">
-    <div class="mb-8 text-center">
-      <div class="mb-5 flex justify-center">
-        <span class="inline-flex rounded-xl border border-line bg-surface-elevated px-3 py-2">
-          {% include "partials/site_logo.html" with logo_class="h-9 w-auto max-w-[9rem] object-contain" %}
-        </span>
-      </div>
-      <p class="text-xs font-medium uppercase tracking-widest" style="color: var(--color-text-muted);">راه‌اندازی سالن · مرحله {{ step }} از {{ steps_total }}</p>
-      <div class="mx-auto mt-4 flex max-w-md gap-1">
-        {% for i in "12345"|make_list %}
-        <span class="h-1 flex-1 rounded-full" style="{% if forloop.counter <= step %}background: var(--color-accent);{% else %}background: var(--color-border);{% endif %}"></span>
-        {% endfor %}
-      </div>
-    </div>
-    <div class="premium-card">
-      {% block wizard_content %}{% endblock %}
-    </div>
-    <div class="mt-4 flex justify-between text-sm">
-      {% if step > 1 %}
-      <a href="{% url 'salons_onboarding:wizard' step=step|add:'-1' %}" class="btn-secondary text-xs">بازگشت</a>
-      {% else %}<span></span>{% endif %}
-    </div>
-  </div>
+{% extends "layouts/public_wizard.html" %}
+{% block wizard_steps %}{% include "onboarding/wizard/_steps.html" %}{% endblock %}
+{% block wizard_content %}
+{% if form and form.non_field_errors %}
+<div class="mb-4">{% include "accounts/partials/auth_flash.html" with message=form.non_field_errors.0 variant="error" %}</div>
+{% endif %}
+{% block wizard_form %}{% endblock %}
+<div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+  {% if step > 1 %}
+  <a href="{% url 'salons_onboarding:wizard' step=step|add:'-1' %}" class="btn-secondary min-h-[44px] px-4 text-sm">بازگشت</a>
+  {% else %}<span aria-hidden="true"></span>{% endif %}
 </div>
-<script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons();});</script>
 {% endblock %}

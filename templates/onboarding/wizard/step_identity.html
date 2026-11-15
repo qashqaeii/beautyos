@@ -1,17 +1,24 @@
 {% extends "onboarding/wizard/base.html" %}
-{% block title %}هویت سالن{% endblock %}
-{% block wizard_content %}
-<h1 class="text-xl font-semibold text-espresso">هویت سالن</h1>
-<form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+{% block title %}هویت سالن · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block wizard_heading %}هویت سالن{% endblock %}
+{% block wizard_subtitle %}
+{% if salon %}<span class="font-medium text-aubergine">{{ salon.name }}</span> — اطلاعات تماس و صفحه عمومی را تکمیل کنید.{% else %}اطلاعات تماس و آدرس صفحه عمومی سالن را وارد کنید.{% endif %}
+{% endblock %}
+{% block wizard_form %}
+{% if salon_name and not salon %}
+<p class="mb-4 text-sm text-charcoal/70">نام سالن: <strong class="text-aubergine">{{ salon_name }}</strong></p>
+{% endif %}
+<form method="post" enctype="multipart/form-data" class="space-y-5">
   {% csrf_token %}
   {% for field in form %}
-  <div>
-    <label class="mb-1 block text-sm font-medium">{{ field.label }}</label>
+  <div class="public-auth-field">
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
     {{ field }}
-    {% if field.errors %}<p class="mt-1 text-xs text-danger">{{ field.errors.0 }}</p>{% endif %}
+    {% if field.name == "logo" %}<p class="field-hint">لوگو اختیاری است؛ بعداً هم قابل تغییر است.</p>{% endif %}
+    {% if field.name == "slug" %}<p class="field-hint">آدرس صفحه رزرو عمومی سالن شما.</p>{% endif %}
+    {% if field.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ field.errors.0 }}</p>{% endif %}
   </div>
   {% endfor %}
-  {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
-  <button type="submit" class="btn-primary">ادامه</button>
+  <button type="submit" class="btn-primary min-h-[48px] w-full">ادامه</button>
 </form>
 {% endblock %}

@@ -1,0 +1,53 @@
+{% extends "onboarding/wizard/base.html" %}
+{% block title %}ساعات کاری · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block wizard_heading %}ساعات کاری{% endblock %}
+{% block wizard_subtitle %}برنامه هفتگی {{ owner_staff.display_name|default:"مالک" }} را تنظیم کنید. فرمت ساعت: ۰۹:۰۰{% endblock %}
+{% block wizard_form %}
+{% if hours_errors %}
+<div class="mb-4 space-y-1">
+  {% for err in hours_errors %}
+  <p class="text-xs text-coral" role="alert">{{ err }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+<form method="post" class="space-y-4">
+  {% csrf_token %}
+  <ul class="space-y-3">
+    {% for row in hours_rows %}
+    <li class="rounded-xl border border-line p-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <span class="text-sm font-medium text-aubergine">{{ row.label }}</span>
+        <label class="flex items-center gap-2 text-xs text-charcoal/70">
+          <input type="checkbox" name="wh_{{ row.weekday }}_closed" {% if row.is_closed %}checked{% endif %} class="rounded" data-hours-closed>
+          تعطیل
+        </label>
+      </div>
+      <div class="mt-2 grid grid-cols-2 gap-2" data-hours-times>
+        <input type="text" name="wh_{{ row.weekday }}_start" value="{{ row.start }}" class="input-field input-field--time24" placeholder="شروع" dir="ltr" inputmode="numeric" maxlength="5" {% if row.is_closed %}disabled{% endif %}>
+        <input type="text" name="wh_{{ row.weekday }}_end" value="{{ row.end }}" class="input-field input-field--time24" placeholder="پایان" dir="ltr" inputmode="numeric" maxlength="5" {% if row.is_closed %}disabled{% endif %}>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  <section class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <button type="submit" class="btn-primary min-h-[48px] flex-1">ذخیره و ادامه</button>
+    <button type="submit" name="action" value="skip" class="btn-secondary min-h-[48px] px-4 text-sm">استفاده از پیش‌فرض (۹–۲۱)</button>
+  </section>
+</form>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("[data-hours-closed]").forEach(function (cb) {
+    function sync() {
+      var row = cb.closest("li");
+      var inputs = row ? row.querySelectorAll("[data-hours-times] input") : [];
+      inputs.forEach(function (inp) {
+        inp.disabled = cb.checked;
+        if (cb.checked) inp.value = "";
+      });
+    }
+    cb.addEventListener("change", sync);
+    sync();
+  });
+});
+</script>
+{% endblock %}

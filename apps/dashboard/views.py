@@ -34,7 +34,7 @@ def _finance_range(day, range_key: str):
 def home(request):
     membership = request.membership
     if not membership:
-        return redirect("salons:onboarding_start")
+        return redirect("salons_onboarding:create")
 
     if not can_see_overview(membership):
         if can_see_calendar(membership):

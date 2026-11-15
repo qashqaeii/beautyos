@@ -1,10 +1,37 @@
 {% extends "onboarding/wizard/base.html" %}
-{% block title %}تیم{% endblock %}
-{% block wizard_content %}
-<h1 class="text-xl font-semibold text-espresso">تیم سالن</h1>
-<p class="mt-3 text-sm text-ink-secondary">افزودن متخصص نیازمند حساب کاربری جداست. پس از راه‌اندازی از بخش «کارکنان» تیم را کامل کنید.</p>
-<form method="post">
+{% block title %}متخصصان · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block wizard_heading %}متخصصان و رزروپذیری{% endblock %}
+{% block wizard_subtitle %}پروفایل شما به‌عنوان متخصص قابل رزرو ثبت می‌شود. دعوت سایر اعضا پس از ورود به پنل از بخش «کارکنان» انجام می‌شود.{% endblock %}
+{% block wizard_form %}
+<form method="post" class="space-y-5">
   {% csrf_token %}
-  <button type="submit" class="btn-primary mt-6">ادامه</button>
+  <div class="public-auth-field">
+    <label for="id_display_name">{{ form.display_name.label }}</label>
+    {{ form.display_name }}
+    {% if form.display_name.errors %}<p class="mt-1.5 text-xs text-coral">{{ form.display_name.errors.0 }}</p>{% endif %}
+  </div>
+  <div class="public-auth-field">
+    <label for="id_title">{{ form.title.label }}</label>
+    {{ form.title }}
+    <p class="field-hint">مثال: آرایشگر، لاین استایلیست — اختیاری</p>
+  </div>
+  <div class="flex items-center gap-2 text-sm">
+    {{ form.is_bookable }}
+    <label for="id_is_bookable">{{ form.is_bookable.label }}</label>
+  </div>
+  {% if form.services.field.queryset.exists %}
+  <fieldset class="space-y-2">
+    <legend class="text-sm font-medium text-aubergine">{{ form.services.label }}</legend>
+  <ul class="space-y-2">
+    {% for choice in form.services %}
+    <li class="flex items-center gap-2 rounded-xl border border-line px-3 py-2">{{ choice.tag }} <span class="text-sm">{{ choice.choice_label }}</span></li>
+    {% endfor %}
+  </ul>
+  </fieldset>
+  {% endif %}
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <button type="submit" class="btn-primary min-h-[48px] flex-1">ادامه</button>
+    <button type="submit" name="action" value="skip" class="btn-secondary min-h-[48px] px-4 text-sm">ادامه با پیش‌فرض</button>
+  </div>
 </form>
 {% endblock %}

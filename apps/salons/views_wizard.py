@@ -11,6 +11,7 @@ from apps.salons.forms_wizard import (
     OnboardingBusinessTypeForm,
     OnboardingIdentityForm,
     OnboardingServiceSetupForm,
+    OnboardingStaffForm,
 )
 from apps.salons.models import Salon, SalonMembership
 from apps.salons.themes import LUNA_SIGNATURE_TOKENS, resolve_global_dashboard_theme
@@ -29,7 +30,7 @@ def _wizard_salon(request) -> Salon | None:
     return membership.salon if membership else None
 
 
-WIZARD_STEPS_TOTAL = 5
+WIZARD_STEPS_TOTAL = 6
 
 
 @method_decorator(login_required, name="dispatch")
@@ -39,68 +40,106 @@ class OnboardingWizardView(View):
         2: "onboarding/wizard/step_identity.html",
         3: "onboarding/wizard/step_services.html",
         4: "onboarding/wizard/step_staff.html",
-        5: "onboarding/wizard/step_complete.html",
+        5: "onboarding/wizard/step_hours.html",
+        6: "onboarding/wizard/step_complete.html",
     }
+
+    def _guard_step(self, request, step: int, salon: Salon | None):
+        if step > 1 and salon is None and step < WIZARD_STEPS_TOTAL:
+            return redirect("salons_onboarding:wizard", step=1)
+        if salon and not ow.salon_needs_onboarding(salon) and step < WIZARD_STEPS_TOTAL:
+            return redirect("dashboard:home")
+        return None
 
     def get(self, request, step: int):
         step = max(1, min(step, WIZARD_STEPS_TOTAL))
         salon = _wizard_salon(request)
-        if step > 1 and salon is None and step < WIZARD_STEPS_TOTAL:
-            return redirect("salons_onboarding:wizard", step=1)
+        blocked = self._guard_step(request, step, salon)
+        if blocked:
+            return blocked
+
+        salon_name = request.session.get(ow.SESSION_SALON_NAME) or (salon.name if salon else "")
 
         if step == 1:
             form = OnboardingBusinessTypeForm(
-                initial={"business_type": request.session.get(ow.SESSION_BUSINESS_TYPE) or (salon.business_type if salon else "")}
+                initial={
+                    "business_type": request.session.get(ow.SESSION_BUSINESS_TYPE)
+                    or (salon.business_type if salon else ""),
+                    "name": salon_name,
+                }
             )
         elif step == 2:
-            form = OnboardingIdentityForm(instance=salon) if salon else OnboardingIdentityForm()
+            form = (
+                OnboardingIdentityForm(instance=salon, salon_name=salon_name)
+                if salon
+                else OnboardingIdentityForm(salon_name=salon_name)
+            )
         elif step == 3:
-            if not salon:
-                return redirect("salons_onboarding:wizard", step=2)
             form = OnboardingServiceSetupForm(salon=salon)
+        elif step == 4:
+            profile = ow.get_owner_staff_profile(salon, request.user) if salon else None
+            if profile is None and salon:
+                profile = ow.ensure_owner_staff_profile(salon, request.user)
+            form = OnboardingStaffForm(instance=profile, salon=salon) if profile else None
+        elif step == 5:
+            profile = ow.get_owner_staff_profile(salon, request.user) if salon else None
+            form = None
         else:
             form = None
 
         ctx = self._base_context(request, step, salon, form)
         if step == 3 and salon:
             ctx["presets"] = presets_for(salon.business_type)
+        if step == 4 and salon:
+            ctx["salon_name"] = salon.name
+        if step == 5 and salon:
+            profile = ow.get_owner_staff_profile(salon, request.user)
+            if profile is None:
+                profile = ow.ensure_owner_staff_profile(salon, request.user)
+            ctx["hours_rows"] = ow.work_hours_grid(profile)
+            ctx["owner_staff"] = profile
         if step == WIZARD_STEPS_TOTAL and salon:
-            from apps.services.models import Service
-            from apps.staff.models import StaffProfile
-
-            ctx["stats"] = {
-                "services": Service.scoped(salon).filter(is_deleted=False).count(),
-                "staff": StaffProfile.scoped(salon).filter(is_deleted=False).count(),
-            }
+            ctx["summary"] = ow.onboarding_summary(salon)
         return render(request, self.steps[step], ctx)
 
     def post(self, request, step: int):
         step = max(1, min(step, WIZARD_STEPS_TOTAL))
         salon = _wizard_salon(request)
         form = None
+        hours_errors = None
 
         if step == 1:
             form = OnboardingBusinessTypeForm(request.POST)
             if form.is_valid():
-                bt = form.cleaned_data["business_type"]
-                request.session[ow.SESSION_BUSINESS_TYPE] = bt
+                request.session[ow.SESSION_BUSINESS_TYPE] = form.cleaned_data["business_type"]
+                request.session[ow.SESSION_SALON_NAME] = form.cleaned_data["name"]
                 if salon:
-                    ow.apply_business_defaults(salon, bt)
-                    return redirect("salons_onboarding:wizard", step=2)
+                    salon.name = form.cleaned_data["name"]
+                    salon.save(update_fields=["name", "updated_at"])
+                    ow.apply_business_defaults(salon, form.cleaned_data["business_type"])
                 return redirect("salons_onboarding:wizard", step=2)
         elif step == 2:
+            salon_name = request.session.get(ow.SESSION_SALON_NAME, "").strip()
+            if not salon_name:
+                return redirect("salons_onboarding:wizard", step=1)
             business_type = request.session.get(ow.SESSION_BUSINESS_TYPE) or Salon.BusinessType.COMBINED
-            form = OnboardingIdentityForm(request.POST, request.FILES, instance=salon) if salon else OnboardingIdentityForm(request.POST, request.FILES)
+            form = (
+                OnboardingIdentityForm(request.POST, request.FILES, instance=salon, salon_name=salon_name)
+                if salon
+                else OnboardingIdentityForm(request.POST, request.FILES, salon_name=salon_name)
+            )
             if form.is_valid():
                 try:
                     with transaction.atomic():
                         if salon:
                             salon = form.save()
+                            salon.name = salon_name
+                            salon.save(update_fields=["name", "updated_at"])
                             ow.apply_business_defaults(salon, business_type)
                         else:
                             salon = ow.create_salon_for_owner(
                                 request.user,
-                                name=form.cleaned_data["name"],
+                                name=salon_name,
                                 slug=form.cleaned_data["slug"],
                                 public_phone=form.cleaned_data.get("public_phone", ""),
                                 city=form.cleaned_data.get("city", ""),
@@ -120,6 +159,8 @@ class OnboardingWizardView(View):
             salon = _wizard_salon(request)
             if not salon:
                 return redirect("salons_onboarding:wizard", step=2)
+            if request.POST.get("action") == "skip":
+                return redirect("salons_onboarding:wizard", step=4)
             form = OnboardingServiceSetupForm(request.POST, salon=salon)
             if form.is_valid():
                 ow.create_selected_services(
@@ -129,22 +170,66 @@ class OnboardingWizardView(View):
                 )
                 return redirect("salons_onboarding:wizard", step=4)
         elif step == 4:
-            return redirect("salons_onboarding:wizard", step=5)
+            salon = _wizard_salon(request)
+            if not salon:
+                return redirect("salons_onboarding:wizard", step=2)
+            if request.POST.get("action") == "skip":
+                ow.ensure_owner_staff_profile(salon, request.user)
+                return redirect("salons_onboarding:wizard", step=5)
+            profile = ow.ensure_owner_staff_profile(salon, request.user)
+            form = OnboardingStaffForm(request.POST, instance=profile, salon=salon)
+            if form.is_valid():
+                form.save()
+                return redirect("salons_onboarding:wizard", step=5)
+        elif step == 5:
+            salon = _wizard_salon(request)
+            if not salon:
+                return redirect("salons_onboarding:wizard", step=2)
+            if request.POST.get("action") == "skip":
+                profile = ow.ensure_owner_staff_profile(salon, request.user)
+                ow.apply_default_work_hours(profile)
+                return redirect("salons_onboarding:wizard", step=6)
+            profile = ow.ensure_owner_staff_profile(salon, request.user)
+            rows, hours_errors = ow.parse_work_hours_post(request.POST)
+            if not hours_errors:
+                ow.save_staff_work_hours(profile, rows)
+                return redirect("salons_onboarding:wizard", step=6)
         elif step == WIZARD_STEPS_TOTAL:
             salon = _wizard_salon(request)
-            if salon:
-                ow.complete_onboarding(salon)
+            if not salon:
+                return redirect("salons_onboarding:wizard", step=1)
+            if not ow.salon_needs_onboarding(salon):
                 request.session.pop(ow.SESSION_SALON_KEY, None)
                 request.session.pop(ow.SESSION_BUSINESS_TYPE, None)
+                request.session.pop(ow.SESSION_SALON_NAME, None)
+                return redirect("dashboard:home")
+            ow.complete_onboarding(salon)
+            request.session.pop(ow.SESSION_SALON_KEY, None)
+            request.session.pop(ow.SESSION_BUSINESS_TYPE, None)
+            request.session.pop(ow.SESSION_SALON_NAME, None)
             return redirect("dashboard:home")
 
         ctx = self._base_context(request, step, salon, form)
+        if step == 3 and salon:
+            ctx["presets"] = presets_for(salon.business_type)
+        if step == 5 and salon:
+            profile = ow.get_owner_staff_profile(salon, request.user) or ow.ensure_owner_staff_profile(
+                salon, request.user
+            )
+            ctx["hours_rows"] = ow.work_hours_grid(profile)
+            ctx["hours_errors"] = hours_errors
+            ctx["owner_staff"] = profile
+        if step == WIZARD_STEPS_TOTAL and salon:
+            ctx["summary"] = ow.onboarding_summary(salon)
         return render(request, self.steps.get(step, self.steps[1]), ctx)
 
     def _base_context(self, request, step, salon, form):
+        salon_name = request.session.get(ow.SESSION_SALON_NAME) or (salon.name if salon else "")
         return {
             "step": step,
             "steps_total": WIZARD_STEPS_TOTAL,
+            "wizard_step_labels": ow.WIZARD_STEP_LABELS,
+            "salon_name": salon_name,
             "form": form,
             "salon": salon,
             "theme_preview": LUNA_SIGNATURE_TOKENS,

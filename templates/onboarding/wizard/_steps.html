@@ -1,0 +1,10 @@
+<ol class="public-auth-steps" aria-label="مراحل راه‌اندازی سالن">
+  {% for label in wizard_step_labels %}
+  <li
+    class="{% if forloop.counter < step %}is-done{% elif forloop.counter == step %}is-current{% endif %}"
+    {% if forloop.counter == step %}aria-current="step"{% endif %}
+  >
+    {{ forloop.counter }}. {{ label }}
+  </li>
+  {% endfor %}
+</ol>
