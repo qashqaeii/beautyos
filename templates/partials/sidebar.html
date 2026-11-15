@@ -13,9 +13,6 @@
     {% include "partials/dashboard_nav_core.html" %}
   </nav>
   <div class="maison-sidebar__footer theme-sidebar-footer shrink-0 border-t p-3 text-xs">
-    {% if nav_salon_settings %}
-    <a href="{% url 'salons_settings:home' %}" class="nav-link mb-1 {% if request.resolver_match.app_name == 'salons_settings' %}nav-link-active{% endif %}" title="اطلاعات سالن"><i data-lucide="building-2" class="h-[1.125rem] w-[1.125rem] shrink-0"></i><span class="nav-label">اطلاعات سالن</span></a>
-    {% endif %}
     {% if user.is_authenticated %}
     <p class="maison-sidebar-footer__meta truncate text-ink">{{ user.full_name|default:user.display_phone }}</p>
     <form method="post" action="{% url 'accounts:logout' %}" class="mt-2">

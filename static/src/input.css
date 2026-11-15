@@ -71,6 +71,50 @@
     background-color: var(--color-background);
   }
 
+  body.beautyos-main-bg {
+    background-color: var(--color-background);
+    min-height: 100dvh;
+  }
+
+  body.beautyos-main-bg .beautyos-main-bg__shell {
+    background-color: transparent;
+    background-image: linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-background) 38%, transparent) 0%,
+        color-mix(in srgb, var(--color-background) 48%, transparent) 55%,
+        color-mix(in srgb, var(--color-background) 58%, transparent) 100%
+      ),
+      var(--beautyos-bg-image, none);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    background-attachment: scroll;
+    min-height: 100dvh;
+  }
+
+  @media (min-width: 1024px) {
+    body.beautyos-main-bg .beautyos-main-bg__shell {
+      background-attachment: fixed;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body.beautyos-main-bg .beautyos-main-bg__shell {
+      background-attachment: scroll;
+    }
+  }
+
+  body.beautyos-main-bg .maison-main,
+  body.beautyos-main-bg .public-auth-main {
+    background-color: transparent;
+  }
+
+  body.beautyos-main-bg .maison-unified-header {
+    background-color: color-mix(in srgb, var(--color-background) 55%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
@@ -2749,7 +2793,14 @@
     --color-surface-sage: var(--pub-bg-secondary);
     --color-blush: color-mix(in srgb, var(--pub-rose-gold) 38%, var(--pub-card));
     --shadow-card: var(--pub-shadow-soft);
+  }
+
+  .public-site:not(.beautyos-main-bg__shell) {
     background: linear-gradient(180deg, #faf6f3 0%, #f5efe9 42%, #f8f4f1 100%);
+  }
+
+  body.beautyos-main-bg .maison-app.beautyos-main-bg__shell {
+    background-color: transparent;
   }
 
   .public-nav {
