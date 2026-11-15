@@ -91,10 +91,13 @@ def _concurrent_posts(user, salon, fields_a, fields_b):
             client = _auth_client(user, salon)
             barrier.wait(timeout=15)
             resp = client.post("/appointments/new/", fields)
+            redirect_url = ""
+            if resp.status_code in (301, 302, 303, 307, 308):
+                redirect_url = resp.get("Location", getattr(resp, "url", "") or "")
             results[idx] = {
                 "status": resp.status_code,
                 "body": resp.content.decode(),
-                "url": resp.url,
+                "url": redirect_url,
             }
         except Exception as exc:  # pragma: no cover
             results[idx] = {"error": repr(exc)}
@@ -148,6 +151,7 @@ def test_concurrent_new_customer_deposit_single_winner(salon, owner_membership):
     before_customers = Customer.scoped(salon).count()
     before_appts = Appointment.scoped(salon).filter(staff=staff, start_at=start).count()
     before_payments = Payment.scoped(salon).count()
+    before_activity = CustomerActivity.objects.filter(salon=salon).count()
 
     results = _concurrent_posts(owner_membership.user, salon, fields_a, fields_b)
 
@@ -183,9 +187,13 @@ def test_concurrent_new_customer_deposit_single_winner(salon, owner_membership):
     loser_phone = phone_b_e164 if winner_phone == phone_a_e164 else phone_a_e164
     assert not Customer.scoped(salon).filter(phone=loser_phone).exists()
     assert not Payment.scoped(salon).filter(customer__phone=loser_phone).exists()
+    assert CustomerActivity.objects.filter(salon=salon, customer=winner).count() == 2
+    assert CustomerActivity.objects.filter(salon=salon).count() == before_activity + 2
+    assert not CustomerActivity.objects.filter(salon=salon, customer__phone=loser_phone).exists()
 
 
 @pytest.mark.django_db
+@requires_postgresql
 def test_deposit_failure_rolls_back_customer_appointment_and_payment(
     client, salon, owner_membership, monkeypatch
 ):
