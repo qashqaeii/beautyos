@@ -1,28 +1,225 @@
 {% extends "layouts/app_shell.html" %}
-{% block title %}تنظیمات سالن{% endblock %}
-{% block page_title %}تنظیمات سالن{% endblock %}
+{% block title %}اطلاعات سالن{% endblock %}
+{% block page_title %}اطلاعات سالن{% endblock %}
+{% block page_subtitle %}مدیریت هویت، تماس، صفحه عمومی و ساعات فعالیت سالن شما{% endblock %}
+
 {% block content %}
-<p class="mb-2 text-sm text-ink-secondary">اطلاعات عمومی و قواعد پیگیری مشتریان.</p>
-<div class="mb-6 rounded-[16px] border border-line px-4 py-3 text-sm text-ink-secondary" style="background-color: color-mix(in srgb, var(--color-surface-lavender) 45%, var(--color-surface-elevated));">
-  BeautyOS در حال حاضر از تم یکپارچه <strong class="text-espresso">Editorial Rose</strong> برای همه سالن‌ها استفاده می‌کند.
-  {% if stored_dashboard_theme %}
-  <span class="mt-1 block text-xs text-ink-muted">تم ذخیره‌شده قبلی: {{ stored_dashboard_theme }} (در UI اعمال نمی‌شود)</span>
+<div class="mx-auto max-w-3xl space-y-6 pb-24 sm:pb-8">
+  {# هویت سالن #}
+  <section class="premium-card overflow-hidden p-0">
+    <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div class="flex items-center gap-4">
+        <div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-line bg-surface-elevated text-xl font-semibold text-accent">
+          {% if salon.logo %}
+          <img src="{{ salon.logo.url }}" alt="" class="h-full w-full object-cover" width="64" height="64">
+          {% else %}
+          <span aria-hidden="true">{{ salon.name|slice:":1"|default:"س" }}</span>
+          {% endif %}
+        </div>
+        <div class="min-w-0">
+          <h2 class="truncate text-lg font-semibold text-espresso">{{ salon.name }}</h2>
+          <p class="mt-0.5 text-sm text-ink-secondary">{{ business_type_label }}</p>
+          <p class="mt-1 text-xs text-ink-muted" dir="ltr">{{ salon.slug }}</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2 text-xs">
+        {% if salon.is_active %}
+        <span class="rounded-full bg-sage/15 px-2.5 py-1 text-sage">فعال</span>
+        {% else %}
+        <span class="rounded-full bg-coral/10 px-2.5 py-1 text-coral">غیرفعال</span>
+        {% endif %}
+        {% if salon.is_accepting_bookings %}
+        <span class="rounded-full border border-line px-2.5 py-1 text-ink-secondary">رزرو آنلاین</span>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {# فرم اطلاعات #}
+  <form
+    method="post"
+    enctype="multipart/form-data"
+    class="space-y-6"
+    x-data="{ submitting: false }"
+    @submit="submitting = true"
+  >
+    {% csrf_token %}
+    <input type="hidden" name="form_kind" value="profile">
+
+    <section class="premium-card space-y-4 p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-espresso">اطلاعات عمومی</h3>
+      <p class="text-xs text-ink-muted">فیلدهای ستاره‌دار برای نمایش در صفحه عمومی توصیه می‌شوند.</p>
+      <div class="public-auth-field">
+        <label for="id_name">{{ profile_form.name.label }}</label>
+        {{ profile_form.name }}
+        {% if profile_form.name.errors %}<p class="mt-1 text-xs text-coral">{{ profile_form.name.errors.0 }}</p>{% endif %}
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="public-auth-field">
+          <label for="id_public_phone">{{ profile_form.public_phone.label }}</label>
+          {{ profile_form.public_phone }}
+          {% if profile_form.public_phone.errors %}<p class="mt-1 text-xs text-coral">{{ profile_form.public_phone.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="public-auth-field">
+          <label for="id_city">{{ profile_form.city.label }}</label>
+          {{ profile_form.city }}
+        </div>
+      </div>
+      <div class="public-auth-field">
+        <label for="id_address">{{ profile_form.address.label }}</label>
+        {{ profile_form.address }}
+      </div>
+      <div class="public-auth-field">
+        <label for="id_tagline">{{ profile_form.tagline.label }}</label>
+        {{ profile_form.tagline }}
+        <p class="field-hint">اختیاری — یک جمله کوتاه زیر نام سالن</p>
+      </div>
+      <div class="public-auth-field">
+        <label for="id_description">{{ profile_form.description.label }}</label>
+        {{ profile_form.description }}
+      </div>
+    </section>
+
+    <section class="premium-card space-y-4 p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-espresso">هویت بصری</h3>
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <div class="flex h-20 w-20 items-center justify-center rounded-2xl border border-dashed border-line bg-surface">
+          {% if salon.logo %}
+          <img src="{{ salon.logo.url }}" alt="" class="h-full w-full rounded-2xl object-cover">
+          {% else %}
+          <span class="text-sm text-ink-muted">بدون لوگو</span>
+          {% endif %}
+        </div>
+        <div class="min-w-0 flex-1 space-y-2">
+          <label class="text-sm font-medium text-espresso" for="id_logo">تغییر لوگو</label>
+          {{ profile_form.logo }}
+          <p class="text-xs text-ink-muted">JPG، PNG یا WebP — حداکثر ۲ مگابایت</p>
+          {% if profile_form.logo.errors %}<p class="text-xs text-coral">{{ profile_form.logo.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="premium-card space-y-4 p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-espresso">صفحه عمومی</h3>
+      <div class="public-auth-field">
+        <label for="id_slug">{{ profile_form.slug.label }}</label>
+        {{ profile_form.slug }}
+        <p class="field-hint">تغییر آدرس ممکن است لینک‌های قبلی را باطل کند.</p>
+        {% if profile_form.slug.errors %}<p class="mt-1 text-xs text-coral">{{ profile_form.slug.errors.0 }}</p>{% endif %}
+      </div>
+      <p class="text-sm">
+        <a href="{{ public_url }}" class="text-accent hover:underline" target="_blank" rel="noopener noreferrer">مشاهده صفحه عمومی</a>
+      </p>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="public-auth-field">
+          <label for="id_instagram">{{ profile_form.instagram.label }}</label>
+          {{ profile_form.instagram }}
+        </div>
+        <div class="public-auth-field">
+          <label for="id_whatsapp">{{ profile_form.whatsapp.label }}</label>
+          {{ profile_form.whatsapp }}
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-4 text-sm">
+        <label class="flex items-center gap-2">
+          {{ profile_form.is_accepting_bookings }}
+          {{ profile_form.is_accepting_bookings.label }}
+        </label>
+        <label class="flex items-center gap-2">
+          {{ profile_form.is_active }}
+          {{ profile_form.is_active.label }}
+        </label>
+      </div>
+    </section>
+
+    <button
+      type="submit"
+      class="btn-primary sticky bottom-4 z-10 min-h-[48px] w-full sm:static sm:w-auto"
+      :disabled="submitting"
+      :class="{ 'opacity-70': submitting }"
+    >
+      <span x-show="!submitting">ذخیره اطلاعات سالن</span>
+      <span x-show="submitting" x-cloak>در حال ذخیره…</span>
+    </button>
+  </form>
+
+  {% if salon.logo %}
+  <form method="post" class="premium-card p-5 sm:p-6" onsubmit="return confirm('لوگو حذف شود؟');">
+    {% csrf_token %}
+    <input type="hidden" name="form_kind" value="clear_logo">
+    <button type="submit" class="btn-secondary min-h-[44px] text-sm text-coral">حذف لوگو</button>
+  </form>
   {% endif %}
+
+  {# ساعات فعالیت — منبع: StaffWorkHours مالک #}
+  <section class="premium-card space-y-4 p-5 sm:p-6">
+    <div>
+      <h3 class="text-base font-semibold text-espresso">ساعات فعالیت</h3>
+      <p class="mt-1 text-xs text-ink-muted">
+        برنامه هفتگی بر اساس پروفایل <strong>{{ owner_staff.display_name }}</strong> (مالک) است.
+        ساعات سایر متخصصان از بخش «کارکنان» قابل تنظیم است.
+      </p>
+    </div>
+    {% if hours_errors %}
+    <div class="space-y-1">
+      {% for err in hours_errors %}
+      <p class="text-xs text-coral">{{ err }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <form method="post" class="space-y-3">
+      {% csrf_token %}
+      <input type="hidden" name="form_kind" value="hours">
+      <ul class="space-y-2">
+        {% for row in hours_rows %}
+        <li class="rounded-xl border border-line p-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-sm font-medium text-espresso">{{ row.label }}</span>
+            <label class="flex items-center gap-2 text-xs text-ink-muted">
+              <input type="checkbox" name="wh_{{ row.weekday }}_closed" {% if row.is_closed %}checked{% endif %} class="rounded" data-hours-closed>
+              تعطیل
+            </label>
+          </div>
+          <div class="mt-2 grid grid-cols-2 gap-2" data-hours-times>
+            <input type="text" name="wh_{{ row.weekday }}_start" value="{{ row.start }}" class="input-field input-field--time24" placeholder="09:00" dir="ltr" inputmode="numeric" maxlength="5" {% if row.is_closed %}disabled{% endif %}>
+            <input type="text" name="wh_{{ row.weekday }}_end" value="{{ row.end }}" class="input-field input-field--time24" placeholder="21:00" dir="ltr" inputmode="numeric" maxlength="5" {% if row.is_closed %}disabled{% endif %}>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      <button type="submit" class="btn-secondary min-h-[44px] w-full sm:w-auto">ذخیره ساعات</button>
+    </form>
+  </section>
+
+  <details class="premium-card group p-5 sm:p-6">
+    <summary class="cursor-pointer list-none text-base font-semibold text-espresso">قوانین رزرو و پیگیری</summary>
+    <form method="post" class="mt-4 space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="form_kind" value="retention">
+      {% for field in retention_form %}
+      <div class="public-auth-field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn-secondary min-h-[44px] w-full sm:w-auto">ذخیره قوانین</button>
+    </form>
+  </details>
 </div>
-<form method="post" enctype="multipart/form-data" class="mx-auto max-w-3xl space-y-8">
-  {% csrf_token %}
-  <section class="card space-y-4">
-    <h2 class="font-semibold text-espresso">هویت سالن</h2>
-    {% for field in salon_form %}
-    <div><label class="mb-1 block text-sm text-ink-secondary">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="text-xs text-danger">{{ field.errors.0 }}</p>{% endif %}</div>
-    {% endfor %}
-  </section>
-  <section class="card space-y-4">
-    <h2 class="font-semibold text-espresso">پیگیری و رزرو</h2>
-    {% for field in retention_form %}
-    <div><label class="mb-1 block text-sm text-ink-secondary">{{ field.label }}</label>{{ field }}</div>
-    {% endfor %}
-  </section>
-  <button type="submit" class="btn-primary w-full sm:w-auto">ذخیره تنظیمات</button>
-</form>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("[data-hours-closed]").forEach(function (cb) {
+    function sync() {
+      var row = cb.closest("li");
+      if (!row) return;
+      row.querySelectorAll("[data-hours-times] input").forEach(function (inp) {
+        inp.disabled = cb.checked;
+        if (cb.checked) inp.value = "";
+      });
+    }
+    cb.addEventListener("change", sync);
+    sync();
+  });
+});
+</script>
 {% endblock %}

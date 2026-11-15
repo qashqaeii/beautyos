@@ -70,11 +70,11 @@ def test_settings_preserves_stored_theme_without_picker(client: Client, user, ow
     session["active_salon_id"] = str(owner_membership.salon.id)
     session.save()
     html = client.get("/settings/").content.decode()
-    assert "Editorial Rose" in html
+    assert "اطلاعات سالن" in html
+    assert 'data-theme="luna_signature"' in html
     assert "dashboard_theme" not in html
     owner_membership.salon.settings.refresh_from_db()
     assert owner_membership.salon.settings.dashboard_theme == stored
-    assert stored in html
 
 
 @pytest.mark.django_db

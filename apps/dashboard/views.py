@@ -100,7 +100,7 @@ def management(request):
     if has_permission(membership, P_MEMBERS_MANAGE):
         links.append({"title": "اعضا و دعوت", "url": reverse("salons_members:home"), "icon": "user-plus"})
     if has_permission(membership, P_SALON_SETTINGS):
-        links.append({"title": "تنظیمات سالن", "url": reverse("salons_settings:home"), "icon": "settings"})
+        links.append({"title": "اطلاعات سالن", "url": reverse("salons_settings:home"), "icon": "building-2"})
     links.append({"title": "نمونه‌کارها", "url": reverse("portfolio:list"), "icon": "images"})
     return render(
         request,
