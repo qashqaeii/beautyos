@@ -5,19 +5,17 @@
   data-stat-index="{{ stat_index|default:1 }}"
 >
   <div class="dashboard-stat-mini__surface">
-    <div class="dashboard-stat-mini__row">
-      <div class="dashboard-stat-mini__body">
-        <p class="dashboard-stat-mini__label">{{ label }}</p>
-        <p class="dashboard-stat-mini__value tabular-nums">
-          <span
-            class="js-overview-stat-value dashboard-stat-mini__digits"
-            data-stat-key="{{ stat_key }}"
-            data-stat-target="{{ anim_value|default:0 }}"
-            data-stat-commas="{% if animate_money %}1{% else %}0{% endif %}"
-          >{% if animate_money %}{{ anim_value|default:0|fa_money }}{% else %}{{ anim_value|default:0|fa_num }}{% endif %}</span>{% if suffix %}<span class="dashboard-stat-mini__unit">{{ suffix }}</span>{% endif %}
-        </p>
-      </div>
+    <div class="dashboard-stat-mini__stack">
       <span class="dashboard-stat-mini__icon" aria-hidden="true"><i data-lucide="{{ icon }}" class="beautyos-lucide beautyos-lucide--sm"></i></span>
+      <p class="dashboard-stat-mini__label">{{ label }}</p>
+      <p class="dashboard-stat-mini__value tabular-nums">
+        <span
+          class="js-overview-stat-value dashboard-stat-mini__digits"
+          data-stat-key="{{ stat_key }}"
+          data-stat-target="{{ anim_value|default:0 }}"
+          data-stat-commas="{% if animate_money %}1{% else %}0{% endif %}"
+        >{% if animate_money %}{{ anim_value|default:0|fa_money }}{% else %}{{ anim_value|default:0|fa_num }}{% endif %}</span>{% if suffix %}<span class="dashboard-stat-mini__unit">{{ suffix }}</span>{% endif %}
+      </p>
     </div>
   </div>
 </div>

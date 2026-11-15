@@ -1,27 +1,15 @@
 {% load static format_tags %}
-<header class="overview-hero dashboard-enter">
-  <div class="overview-hero__visual" aria-hidden="true">
-    <img
-      src="{% static 'images/photos/Sunlit Salon with Twin Hairstyle Portraits.webp' %}"
-      alt=""
-      class="overview-hero__image"
-      width="640"
-      height="480"
-      decoding="async"
-      onerror="this.onerror=null;this.src='{% static 'images/dashboard/lavender_glow_beauty_portrait.png' %}';"
-    >
-    <div class="overview-hero__blend" aria-hidden="true"></div>
+<header class="dash-page-header dash-page-header--overview dashboard-enter">
+  <div class="dash-page-header__copy">
+    <h1 class="dash-page-header__title">نمای کلی سالن</h1>
+    <p class="dash-page-header__subtitle">{{ active_salon.name }}</p>
   </div>
-  <div class="overview-hero__content">
-    <h1 class="overview-hero__title">نمای کلی سالن</h1>
-    <p class="overview-hero__salon">{{ active_salon.name }}</p>
-    <div class="overview-hero__dates">
-      <a href="?day={{ prev_day }}{% if range_key %}&range={{ range_key }}{% endif %}" class="overview-hero__nav" aria-label="روز قبل">‹</a>
-      <form method="get" class="overview-hero__jalali-block">
-        {% if range_key %}<input type="hidden" name="range" value="{{ range_key }}">{% endif %}
-        {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
-      </form>
-      <a href="?day={{ next_day }}{% if range_key %}&range={{ range_key }}{% endif %}" class="overview-hero__nav" aria-label="روز بعد">›</a>
-    </div>
+  <div class="dash-page-header__dates">
+    <a href="?day={{ prev_day }}{% if range_key %}&range={{ range_key }}{% endif %}" class="dash-page-header__nav" aria-label="روز قبل">‹</a>
+    <form method="get" class="dash-page-header__jalali-form">
+      {% if range_key %}<input type="hidden" name="range" value="{{ range_key }}">{% endif %}
+      {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
+    </form>
+    <a href="?day={{ next_day }}{% if range_key %}&range={{ range_key }}{% endif %}" class="dash-page-header__nav" aria-label="روز بعد">›</a>
   </div>
 </header>
