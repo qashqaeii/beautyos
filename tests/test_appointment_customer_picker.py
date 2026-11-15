@@ -324,6 +324,48 @@ def test_internal_booking_post_renders_after_scheduling_error_without_typeerror(
 
 
 @pytest.mark.django_db
+def test_internal_booking_post_new_customer_without_mode_flag(client, salon, owner_membership):
+    """Simulates submit when new_customer_mode hidden field is empty but fields are filled."""
+    cat = ServiceCategory.objects.create(salon=salon, name="no-flag")
+    service = Service.objects.create(
+        salon=salon, category=cat, name="خدمت", duration_minutes=30, price_toman=50_000
+    )
+    staff, _ = StaffProfile.objects.get_or_create(
+        salon=salon,
+        membership=owner_membership,
+        defaults={"display_name": "متخصص", "is_bookable": True},
+    )
+    staff.services.add(service)
+    start = timezone.localtime(timezone.now() + timedelta(days=8)).replace(
+        hour=14, minute=0, second=0, microsecond=0
+    )
+    weekday = (start.date().weekday() + 2) % 7
+    StaffWorkHours.objects.get_or_create(
+        salon=salon,
+        staff=staff,
+        weekday=weekday,
+        defaults={"start_time": time(8, 0), "end_time": time(22, 0)},
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+    fields = _appt_post_fields(
+        start,
+        staff,
+        service,
+        customer_search="جدید",
+        new_customer_first_name="کاوه",
+        new_customer_last_name="جدید",
+        new_customer_phone="09121111555",
+    )
+    resp = client.post("/appointments/new/", fields, follow=False)
+    assert resp.status_code == 302
+    assert Customer.objects.filter(salon=salon, phone="+989121111555").exists()
+    assert Appointment.objects.filter(staff=staff, customer__phone="+989121111555").exists()
+
+
+@pytest.mark.django_db
 def test_internal_booking_post_success_with_deposit(client, salon, owner_membership):
     from apps.finance.models import Payment
 

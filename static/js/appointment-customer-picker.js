@@ -37,6 +37,27 @@
         }
         this.syncHiddenCustomer();
         this.$watch("customerId", () => this.syncHiddenCustomer());
+        const form = this.$root.closest("form");
+        if (form && !form.dataset.apptCustomerSubmitHook) {
+          form.dataset.apptCustomerSubmitHook = "1";
+          form.addEventListener("submit", () => this.prepareSubmit());
+        }
+      },
+
+      hasNewCustomerInput() {
+        return [this.firstName, this.lastName, this.newPhone].some((v) => (v || "").trim());
+      },
+
+      prepareSubmit() {
+        if (this.customerId || !this.canCreateCustomer) {
+          this.syncHiddenCustomer();
+          return;
+        }
+        if (this.hasNewCustomerInput()) {
+          this.mode = "new";
+          this.query = "";
+        }
+        this.syncHiddenCustomer();
       },
 
       syncHiddenCustomer() {
@@ -148,7 +169,13 @@
       },
 
       isNewCustomerSubmit() {
-        return this.canCreateCustomer && this.mode === "new" && !this.customerId;
+        if (!this.canCreateCustomer || this.customerId) {
+          return false;
+        }
+        if (this.mode === "new") {
+          return true;
+        }
+        return this.hasNewCustomerInput();
       },
 
       onKeydown(event) {

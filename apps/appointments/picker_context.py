@@ -5,6 +5,29 @@ from apps.customers.models import Customer
 from apps.salons.permissions_policy import P_CUSTOMER_CREATE, P_CUSTOMER_VIEW, has_permission
 
 
+def _post_has_new_customer_fields(data) -> bool:
+    if data is None:
+        return False
+    return any(
+        (
+            (data.get("new_customer_first_name") or "").strip(),
+            (data.get("new_customer_last_name") or "").strip(),
+            (data.get("new_customer_phone") or "").strip(),
+        )
+    )
+
+
+def _post_new_customer_mode(data) -> bool:
+    if data is None:
+        return False
+    raw = data.get("new_customer_mode")
+    if raw in (True, "on", "true", "1", "True"):
+        return True
+    if raw in (None, "", "false", "0", "off", "False"):
+        return False
+    return bool(raw)
+
+
 def resolve_customer_picker_context(*, form, membership, salon) -> dict:
     can_create = has_permission(membership, P_CUSTOMER_CREATE)
     can_search = has_permission(membership, P_CUSTOMER_VIEW)
@@ -37,19 +60,12 @@ def resolve_customer_picker_context(*, form, membership, salon) -> dict:
     elif customer_pk and selected_display:
         mode = "selected"
     elif form.is_bound:
-        if form.data.get("customer") and selected_display:
+        raw_customer = (form.data.get("customer") or "").strip()
+        if raw_customer and selected_display:
             mode = "selected"
-        elif form.data.get("new_customer_mode"):
+        elif _post_new_customer_mode(form.data) or _post_has_new_customer_fields(form.data):
             mode = "new"
-        elif any(
-            (
-                (form.data.get("new_customer_first_name") or "").strip(),
-                (form.data.get("new_customer_last_name") or "").strip(),
-                (form.data.get("new_customer_phone") or "").strip(),
-            )
-        ):
-            mode = "new"
-        elif (form.data.get("customer_search") or "").strip() and not form.data.get("customer"):
+        elif (form.data.get("customer_search") or "").strip() and not raw_customer:
             mode = "search"
         else:
             mode = "new"
