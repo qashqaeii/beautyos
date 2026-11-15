@@ -1,0 +1,141 @@
+<form
+  method="post"
+  action="{% url 'services:edit' pk=edit_service.pk %}"
+  enctype="multipart/form-data"
+  class="inventory-create-modal__form service-form"
+  id="service-edit-form"
+>
+  {% csrf_token %}
+
+  <div class="inventory-create-modal__scroll maison-scroll-themed">
+    <div class="service-form__intro service-form__intro--edit">
+      <span class="service-form__intro-label">ویرایش</span>
+      <span class="service-form__intro-name">{{ edit_service.name }}</span>
+    </div>
+
+    <div class="service-form__fields service-form__fields--modal">
+      <div class="service-form-field">
+        <label class="field-label" for="{{ edit_form.name.id_for_label }}">{{ edit_form.name.label }}</label>
+        {{ edit_form.name }}
+        {% if edit_form.name.errors %}<p class="service-form-field__error">{{ edit_form.name.errors.0 }}</p>{% endif %}
+      </div>
+
+      <div class="service-form-field service-form-field--category">
+        <div class="service-form-field__category-head">
+          <label class="field-label mb-0" for="{{ edit_form.category.id_for_label }}">{{ edit_form.category.label }}</label>
+          <button
+            type="button"
+            class="service-form__add-category-btn"
+            @click="showEditCategory = !showEditCategory"
+            :aria-expanded="showEditCategory"
+          >
+            + دسته‌بندی جدید
+          </button>
+        </div>
+        {{ edit_form.category }}
+        {% if edit_form.category.errors %}<p class="service-form-field__error">{{ edit_form.category.errors.0 }}</p>{% endif %}
+
+        <template x-if="showEditCategory">
+          <div class="service-form-category-panel">
+            <label class="field-label" for="id_edit_new_category_name">نام دسته‌بندی</label>
+            <input
+              type="text"
+              name="new_category_name"
+              id="id_edit_new_category_name"
+              class="input-field"
+              value="{{ edit_new_category_name|default:'' }}"
+              autocomplete="off"
+            />
+            {% if edit_category_error %}<p class="service-form-field__error">{{ edit_category_error }}</p>{% endif %}
+            <div class="service-form-category-panel__actions">
+              <button type="submit" name="intent" value="add_category" class="btn-secondary text-sm px-4 py-2">
+                افزودن
+              </button>
+              <button type="button" class="service-form-category-panel__cancel" @click="showEditCategory = false">
+                انصراف
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <div class="service-form-field">
+        <label class="field-label" for="{{ edit_form.price_toman.id_for_label }}">{{ edit_form.price_toman.label }}</label>
+        {{ edit_form.price_toman }}
+        {% if edit_form.price_toman.errors %}<p class="service-form-field__error">{{ edit_form.price_toman.errors.0 }}</p>{% endif %}
+      </div>
+
+      <div class="service-form-field">
+        <label class="field-label" for="{{ edit_form.description.id_for_label }}">{{ edit_form.description.label }}</label>
+        {{ edit_form.description }}
+        {% if edit_form.description.errors %}<p class="service-form-field__error">{{ edit_form.description.errors.0 }}</p>{% endif %}
+      </div>
+
+      <div class="service-form-advanced">
+        <button
+          type="button"
+          class="service-form-advanced__toggle"
+          @click="showEditAdvanced = !showEditAdvanced"
+          :aria-expanded="showEditAdvanced"
+        >
+          <span>تنظیمات بیشتر</span>
+          <i data-lucide="chevron-down" class="h-4 w-4 transition" :class="showEditAdvanced && 'rotate-180'"></i>
+        </button>
+        <div
+          class="service-form-advanced__body"
+          x-show="showEditAdvanced"
+          x-cloak
+          x-transition.opacity.duration.200ms
+        >
+          <div class="service-form-field">
+            <label class="field-label" for="{{ edit_form.duration_minutes.id_for_label }}">{{ edit_form.duration_minutes.label }}</label>
+            {{ edit_form.duration_minutes }}
+            {% if edit_form.duration_minutes.errors %}<p class="service-form-field__error">{{ edit_form.duration_minutes.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="service-form-field">
+            <label class="field-label" for="{{ edit_form.sort_order.id_for_label }}">{{ edit_form.sort_order.label }}</label>
+            {{ edit_form.sort_order }}
+            {% if edit_form.sort_order.errors %}<p class="service-form-field__error">{{ edit_form.sort_order.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="service-form-field service-form-field--checkbox">
+            <label class="service-form-checkbox">
+              {{ edit_form.is_active }}
+              <span>{{ edit_form.is_active.label }}</span>
+            </label>
+            {% if edit_form.is_active.errors %}<p class="service-form-field__error">{{ edit_form.is_active.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="service-form-field service-form-field--checkbox">
+            <label class="service-form-checkbox">
+              {{ edit_form.is_public }}
+              <span>{{ edit_form.is_public.label }}</span>
+            </label>
+            {% if edit_form.is_public.errors %}<p class="service-form-field__error">{{ edit_form.is_public.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="service-form-field">
+            <span class="field-label" id="service-edit-image-label">{{ edit_form.image.label }}</span>
+            <div class="service-form-file">
+              {{ edit_form.image }}
+              <button
+                type="button"
+                class="service-form-file__btn"
+                @click="$refs.serviceEditImage.click()"
+              >
+                انتخاب تصویر
+              </button>
+              <span class="service-form-file__name" x-text="editImageName" x-show="editImageName" x-cloak></span>
+              {% if edit_service.image %}
+              <p class="service-form-file__current text-xs text-ink-muted mt-1">تصویر فعلی ذخیره شده است.</p>
+              {% endif %}
+            </div>
+            {% if edit_form.image.errors %}<p class="service-form-field__error">{{ edit_form.image.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="inventory-create-modal__foot">
+    <button type="submit" name="intent" value="save_service" class="btn-primary service-form__submit">ذخیره تغییرات</button>
+    <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-edit-modal')">انصراف</button>
+  </footer>
+</form>

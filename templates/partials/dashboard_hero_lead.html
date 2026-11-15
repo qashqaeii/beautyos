@@ -1,0 +1,11 @@
+<span class="font-medium text-ink">{{ active_salon.name }}</span>
+<span aria-hidden="true"> · </span>
+امروز <strong class="text-heading">{{ kpis.appointments_today }}</strong> نوبت
+{% if kpis.pending_appointments %}
+<span aria-hidden="true"> · </span>
+<strong class="text-heading">{{ kpis.pending_appointments }}</strong> در انتظار تأیید
+{% endif %}
+{% if kpis.next_appointment %}
+<span aria-hidden="true"> · </span>
+نوبت بعدی <strong class="text-heading">{{ kpis.next_appointment.start_at|time:"H:i" }}</strong>
+{% endif %}

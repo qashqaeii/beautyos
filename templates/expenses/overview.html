@@ -1,0 +1,24 @@
+{% extends "layouts/app_shell.html" %}
+{% load humanize %}
+{% block page_title %}هزینه‌های سالن{% endblock %}
+{% block page_subtitle %}گزارش ماه جاری{% endblock %}
+{% block content %}
+<div class="grid gap-4 sm:grid-cols-3 mb-6">
+  {% include "partials/stat_card.html" with label="درآمد ماه" value=revenue_total|fa_money suffix="تومان" %}
+  {% include "partials/stat_card.html" with label="هزینه ماه" value=expense_total|fa_money suffix="تومان" %}
+  {% include "partials/stat_card.html" with label="سود عملیاتی تخمینی" value=operating_estimate|fa_money suffix="تومان" hint="درآمد منهای هزینه ثبت‌شده" %}
+</div>
+<div class="page-toolbar">
+  <p class="text-xs text-ink-muted">تعهد پورسانت جداگانه در بخش پورسانت محاسبه می‌شود.</p>
+  <a href="{% url 'expenses:create' %}" class="btn-primary text-sm">ثبت هزینه</a>
+</div>
+{% if expenses %}
+<ul class="divide-y divide-line premium-card p-0">
+  {% for e in expenses %}
+  <li class="flex justify-between gap-4 px-5 py-3 text-sm"><span>{{ e.get_category_display }} · {{ e.description|default:e.expense_date }}</span><span>{{ e.amount_toman|fa_money }} تومان</span></li>
+  {% endfor %}
+</ul>
+{% else %}
+{% include "partials/empty_state.html" with icon="receipt" title="هزینه‌ای ثبت نشده" cta_url="/expenses/new/" cta_label="ثبت هزینه" %}
+{% endif %}
+{% endblock %}

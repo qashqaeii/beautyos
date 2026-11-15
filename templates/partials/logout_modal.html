@@ -1,0 +1,45 @@
+<div
+  id="logout-modal"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-aubergine/40 px-4 backdrop-blur-sm"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="logout-modal-title"
+>
+  <div class="w-full max-w-sm rounded-2xl border border-line bg-surface p-6 shadow-lift">
+    <h2 id="logout-modal-title" class="text-lg font-semibold text-aubergine">خروج از حساب</h2>
+    <p class="mt-2 text-sm text-charcoal/70">مطمئنید می‌خواهید از {{ BEAUTYOS_PRODUCT_NAME }} خارج شوید؟</p>
+    <div class="mt-6 grid grid-cols-2 gap-3">
+      <form method="post" action="{% url 'accounts:logout' %}" class="contents">
+        {% csrf_token %}
+        <button type="submit" class="btn-primary min-h-[48px] w-full">خروج</button>
+      </form>
+      <button type="button" class="btn-public-ghost min-h-[48px] w-full" data-logout-cancel>انصراف</button>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var modal = document.getElementById("logout-modal");
+  if (!modal) return;
+  function openModal() {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+  function closeModal() {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+  document.querySelectorAll("[data-logout-open]").forEach(function (el) {
+    el.addEventListener("click", openModal);
+  });
+  modal.querySelectorAll("[data-logout-cancel]").forEach(function (el) {
+    el.addEventListener("click", closeModal);
+  });
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeModal();
+  });
+});
+</script>

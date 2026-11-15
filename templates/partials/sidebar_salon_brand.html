@@ -1,0 +1,13 @@
+<div class="maison-salon-brand-mark"{% if not active_salon.logo %} title="لوگوی سالن"{% endif %}>
+  {% if active_salon.logo %}
+  <img
+    src="{{ active_salon.logo.url }}"
+    alt=""
+    class="maison-salon-brand-mark__img"
+    loading="lazy"
+    decoding="async"
+  >
+  {% else %}
+  <span class="maison-salon-brand-mark__glyph" aria-hidden="true">{{ active_salon.name|slice:":1"|default:"س" }}</span>
+  {% endif %}
+</div>

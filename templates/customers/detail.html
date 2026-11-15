@@ -1,0 +1,230 @@
+{% extends "layouts/app_shell.html" %}
+{% load appointment_tags static %}
+{% block title %}{{ customer.full_name }}{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block extra_head %}
+{% if can_book_appointment %}
+<script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+<script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% if can_payment_create %}
+<script defer src="{% static 'js/appointment-deposit-preview.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div
+  class="customer-detail-page"
+  x-data="{
+    editOpen: {{ edit_modal_open|yesno:'true,false' }},
+    bookOpen: {{ book_modal_open|yesno:'true,false' }},
+    closeModals() {
+      this.editOpen = false;
+      this.bookOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      ['edit', 'book'].forEach((key) => params.delete(key));
+      const qs = params.toString();
+      window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', editOpen || bookOpen)"
+  @beautyos-close-modal.window="closeModals()"
+  @keydown.escape.window="(editOpen || bookOpen) && !window.__beautyosJalaliCalendarOpen && closeModals()"
+>
+  <header class="customer-detail-header">
+    <div class="customer-detail-header__identity">
+      {% if customer.avatar %}
+      <img
+        src="{{ customer.avatar.url }}"
+        alt=""
+        class="customer-detail-header__avatar"
+        width="64"
+        height="64"
+        loading="eager"
+      />
+      {% else %}
+      <span class="customer-detail-header__avatar customer-detail-header__avatar--initials" aria-hidden="true">
+        {{ customer.initials }}
+      </span>
+      {% endif %}
+      <div class="customer-detail-header__copy">
+        <div class="customer-detail-header__name-row">
+          <h1 class="customer-detail-header__name">{{ customer.full_name }}</h1>
+          {% if customer.is_vip %}<span class="customer-detail-header__vip">VIP</span>{% endif %}
+        </div>
+        <p class="customer-detail-header__phone" dir="ltr">{{ customer.phone }}</p>
+      </div>
+    </div>
+    <div class="customer-detail-header__actions">
+      {% if can_book_appointment %}
+      <button
+        type="button"
+        class="customer-detail-header__btn customer-detail-header__btn--primary"
+        @click="bookOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))"
+      >
+        <i data-lucide="plus" class="customer-detail-header__icon" aria-hidden="true"></i>
+        <span>ثبت نوبت</span>
+      </button>
+      {% endif %}
+      <button
+        type="button"
+        class="customer-detail-header__btn customer-detail-header__btn--ghost"
+        @click="editOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))"
+      >
+        <i data-lucide="pencil" class="customer-detail-header__icon" aria-hidden="true"></i>
+        <span>ویرایش</span>
+      </button>
+    </div>
+  </header>
+
+  <div
+    class="customer-detail-summary"
+    role="list"
+    aria-label="خلاصه مشتری"
+  >
+    <div class="customer-detail-summary__item" role="listitem">
+      <span class="customer-detail-summary__label">تعداد مراجعات</span>
+      <span class="customer-detail-summary__value">{{ customer.total_visits|fa_num }}</span>
+    </div>
+    <div class="customer-detail-summary__item" role="listitem">
+      <span class="customer-detail-summary__label">آخرین مراجعه</span>
+      <span class="customer-detail-summary__value">
+        {% if customer.last_visit_at %}{{ customer.last_visit_at|fa_jalali }}{% else %}—{% endif %}
+      </span>
+    </div>
+    {% if 'finance.reports' in membership_permissions %}
+    <div class="customer-detail-summary__item" role="listitem">
+      <span class="customer-detail-summary__label">مجموع خرید</span>
+      <span class="customer-detail-summary__value">{{ customer.total_spent_toman|fa_money }} <span class="text-xs font-normal text-ink-secondary">تومان</span></span>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="customer-detail-columns">
+    <section class="customer-detail-card customer-detail-card--main" aria-labelledby="customer-upcoming-heading">
+      <div class="customer-detail-card__head">
+        <h2 id="customer-upcoming-heading" class="customer-detail-card__title">نوبت‌های پیش‌رو</h2>
+      </div>
+      {% if upcoming %}
+      <ul class="customer-detail-appt-list">
+        {% for a in upcoming %}
+        <li>
+          <a href="{% url 'appointments:detail' pk=a.pk %}" class="customer-detail-appt-row">
+            <div class="customer-detail-appt-row__main">
+              <p class="customer-detail-appt-row__datetime">
+                {{ a.start_at|fa_jalali }} · {{ a.start_at|fa_time }}
+              </p>
+              <p class="customer-detail-appt-row__service">
+                {{ a.service.name }}{% if a.staff %} · {{ a.staff.display_name }}{% endif %}
+              </p>
+            </div>
+            <p class="customer-detail-appt-row__meta">
+              <span class="{{ a.status|status_badge }}">{{ a.get_status_display }}</span>
+            </p>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="customer-detail-empty">نوبت پیش‌رویی ثبت نشده است.</p>
+      {% endif %}
+    </section>
+
+    <section
+      class="customer-detail-card customer-detail-card--notes"
+      aria-labelledby="customer-notes-heading"
+      x-data="{ noteOpen: false }"
+    >
+      <div class="customer-detail-card__head">
+        <h2 id="customer-notes-heading" class="customer-detail-card__title">یادداشت‌های داخلی</h2>
+        <button type="button" class="customer-detail-card__action" @click="noteOpen = !noteOpen">
+          + یادداشت جدید
+        </button>
+      </div>
+      <ul class="customer-detail-notes-list">
+        {% for note in recent_notes %}
+        <li class="customer-detail-note">
+          <p class="customer-detail-note__body">{{ note.body }}</p>
+          <p class="customer-detail-note__meta">
+            {{ note.created_at|fa_jalali_datetime }}{% if note.author %} · {{ note.author }}{% endif %}
+          </p>
+        </li>
+        {% empty %}
+        <li class="customer-detail-empty">یادداشتی ثبت نشده است.</li>
+        {% endfor %}
+      </ul>
+      <form
+        method="post"
+        action="{% url 'customers:add_note' pk=customer.pk %}"
+        class="customer-detail-note-form"
+        x-show="noteOpen"
+        x-cloak
+        x-transition.opacity
+      >
+        {% csrf_token %}
+        {{ note_form.body }}
+        <button type="submit" class="btn-secondary w-full text-xs">ثبت یادداشت</button>
+      </form>
+    </section>
+  </div>
+
+  {% if 'finance.reports' in membership_permissions %}
+  <section class="customer-detail-card customer-detail-payments" aria-labelledby="customer-payments-heading">
+    <div class="customer-detail-card__head">
+      <h2 id="customer-payments-heading" class="customer-detail-card__title">پرداخت‌ها</h2>
+    </div>
+    {% if payments %}
+    <ul>
+      {% for p in payments %}
+      <li class="customer-detail-pay-row">
+        <span class="customer-detail-pay-row__date">{{ p.created_at|fa_jalali }}</span>
+        <span class="text-xs text-ink-secondary">{{ p.get_status_display }}</span>
+        <span class="customer-detail-pay-row__amount">{{ p.paid_amount_toman|fa_money }} تومان</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="customer-detail-empty">پرداختی ثبت نشده است.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <details class="customer-detail-timeline">
+    <summary class="customer-detail-timeline__summary">
+      <span>سابقهٔ فعالیت</span>
+      <i data-lucide="chevron-left" class="customer-detail-timeline__chevron" aria-hidden="true"></i>
+    </summary>
+    <div class="customer-detail-timeline__body">
+      <ol class="customer-detail-timeline__list">
+        {% for act in activities %}
+        <li class="customer-detail-timeline__item">
+          <span class="customer-detail-timeline__dot" aria-hidden="true"></span>
+          <p class="font-medium text-ink">{{ act.title }}</p>
+          <p class="text-xs text-ink-muted">{{ act.created_at|fa_jalali_datetime }}</p>
+          {% if act.description %}<p class="mt-1 text-xs text-ink-secondary">{{ act.description }}</p>{% endif %}
+        </li>
+        {% empty %}
+        <li class="customer-detail-empty">فعالیتی ثبت نشده است.</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </details>
+
+  {% include "customers/partials/customer_edit_modal.html" %}
+  {% if can_book_appointment and appointment_form %}
+  {% include "appointments/partials/appointment_booking_modal.html" with booking_form_id="customer" %}
+  {% endif %}
+</div>
+<script>
+  function initCustomerDetailModalFields() {
+    const form = document.querySelector("[data-appt-booking-form]");
+    if (form && window.initTime24Fields) window.initTime24Fields(form);
+    if (window.lucide) window.lucide.createIcons();
+  }
+  document.addEventListener("DOMContentLoaded", initCustomerDetailModalFields);
+  document.addEventListener("alpine:initialized", initCustomerDetailModalFields);
+  window.addEventListener("beautyos-modal-opened", initCustomerDetailModalFields);
+</script>
+{% endblock %}

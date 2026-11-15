@@ -1,0 +1,22 @@
+{% load appointment_tags %}
+<article class="appt-card appt-card--detailed">
+  <div class="appt-card__main">
+    <div class="appt-card__time-col">
+      <p class="appt-card__time-lg">{{ appointment.start_at|time:"H:i" }}</p>
+      <p class="text-[10px] text-ink-muted">{{ appointment.end_at|time:"H:i" }}</p>
+    </div>
+    <div class="min-w-0 flex-1">
+      <p class="font-medium text-ink">{{ appointment.customer.full_name }}</p>
+      <p class="mt-0.5 text-xs text-ink-secondary">{{ appointment.service.name }}{% if appointment.staff %} · {{ appointment.staff.display_name }}{% endif %}</p>
+    </div>
+    <span class="{{ appointment.status|status_badge }}">{{ appointment.get_status_display }}</span>
+  </div>
+  {% if show_actions %}
+  <div class="appt-card__actions">
+    {% if appointment.status == 'confirmed' or appointment.status == 'pending' %}
+    <a href="{% url 'reception:checkin' pk=appointment.pk %}" class="btn-primary text-xs">پذیرش</a>
+    {% endif %}
+    <a href="{% url 'appointments:detail' pk=appointment.pk %}" class="btn-secondary text-xs">جزئیات</a>
+  </div>
+  {% endif %}
+</article>

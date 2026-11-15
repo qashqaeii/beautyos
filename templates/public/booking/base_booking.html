@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="booking-shell mx-auto max-w-lg" data-theme="luna_signature">
+  <div class="mb-8 flex justify-center">
+    <a href="{% if salon %}{% url 'salons_public:landing' slug=salon.slug %}{% else %}#{% endif %}" title="{{ BEAUTYOS_PRODUCT_NAME }}">
+      <span class="inline-flex rounded-xl border border-line bg-surface-elevated px-3 py-2">
+        {% include "partials/site_logo.html" with logo_class="h-9 w-auto max-w-[8rem] object-contain" %}
+      </span>
+    </a>
+  </div>
+  {% block booking_content %}{% endblock %}
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) lucide.createIcons();
+  });
+</script>
+{% endblock %}

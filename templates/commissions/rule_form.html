@@ -1,0 +1,11 @@
+{% extends "layouts/app_shell.html" %}
+{% block page_title %}قانون پورسانت{% endblock %}
+{% block content %}
+<form method="post" class="card max-w-lg space-y-4">
+  {% csrf_token %}
+  {% for field in form %}
+  <div><label class="mb-1 block text-sm">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="text-xs text-danger">{{ field.errors.0 }}</p>{% endif %}</div>
+  {% endfor %}
+  <button class="btn-primary">ذخیره</button>
+</form>
+{% endblock %}

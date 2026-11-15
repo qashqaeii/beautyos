@@ -1,0 +1,128 @@
+{% extends "layouts/app_shell.html" %}
+{% load humanize appointment_tags %}
+{% block title %}میز منشی · {{ active_salon.name }}{% endblock %}
+{% block page_eyebrow %}{{ day_jalali }}{% endblock %}
+{% block page_title %}میز پذیرش{% endblock %}
+{% block page_subtitle %}برنامه {{ day_jalali }}{% endblock %}
+{% block page_actions %}
+<form method="get" class="flex items-center gap-2 text-xs">
+  {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
+</form>
+<a href="{% url 'appointments:create' %}?day={{ selected_day|date:'Y-m-d' }}" class="btn-primary text-xs"><i data-lucide="plus" class="h-4 w-4"></i> نوبت جدید</a>
+{% endblock %}
+
+{% block content %}
+<div class="maison-dashboard-grid space-y-5">
+  {% if next_appt %}
+  <section class="maison-panel order-1">
+    <p class="text-xs font-medium text-ink-muted">نوبت بعدی</p>
+    <p class="mt-1 text-3xl font-bold tabular-nums text-ink">{{ next_appt.start_at|fa_time }}</p>
+    <p class="font-semibold text-ink">{{ next_appt.customer.full_name }}</p>
+    <p class="text-sm text-ink-secondary">{{ next_appt.service.name }}{% if next_appt.staff %} · {{ next_appt.staff.display_name }}{% endif %}</p>
+    {% if next_payment %}<p class="text-xs text-ink-muted">پرداخت: {{ next_payment.label }}{% if next_payment.owed_toman %} · مانده {{ next_payment.owed_toman|fa_money }} تومان{% endif %}</p>{% endif %}
+    {% if can_checkin %}
+      {% if next_appt.status == 'confirmed' or next_appt.status == 'pending' %}
+    <a href="{% url 'reception:checkin' pk=next_appt.pk %}" class="btn-primary mt-4 w-full justify-center text-sm lg:w-auto">ثبت ورود</a>
+      {% endif %}
+    {% endif %}
+  </section>
+  {% else %}
+  <section class="maison-panel"><p class="text-sm text-ink-muted">نوبت فعالی در صف نیست.</p></section>
+  {% endif %}
+
+  <section class="maison-panel order-2">
+    <h3 class="mb-3 text-sm font-semibold text-ink">رزروهای منتظر تأیید</h3>
+    <ul class="divide-y text-sm" style="border-color: var(--color-divider);">
+      {% for a in pending_confirm %}
+      <li class="flex flex-wrap items-center justify-between gap-2 py-3">
+        <span>{{ a.customer.full_name }} · {{ a.service.name }}{% if a.staff %} · {{ a.staff.display_name }}{% endif %}</span>
+        <span class="text-xs text-ink-muted">{{ a.start_at|fa_jalali_datetime }}</span>
+        <a href="{% url 'appointments:detail' pk=a.pk %}" class="text-xs font-medium">بررسی</a>
+      </li>
+      {% empty %}
+      <li class="py-4 text-ink-muted">رزرو منتظر تأیید نیست.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="maison-panel order-3">
+    <h3 class="mb-3 text-sm font-semibold text-ink">اولین وقت آزاد</h3>
+    <form method="get" class="mb-3 flex flex-wrap gap-2">
+      <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+      <select name="service" class="input-field text-sm" onchange="this.form.submit()">
+        <option value="">انتخاب خدمت</option>
+        {% for s in services %}
+        <option value="{{ s.pk }}" {% if selected_service and selected_service.pk == s.pk %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    {% if selected_service %}
+    <ul class="space-y-2 text-sm">
+      {% for row in first_slots %}
+      <li class="flex flex-wrap justify-between gap-2 rounded-lg border px-3 py-2" style="border-color: var(--color-border);">
+        <span>{{ row.staff.display_name }} · {{ row.start|time:"H:i" }}</span>
+        <a href="{% url 'appointments:create' %}?staff={{ row.staff.pk }}&service={{ row.service.pk }}&start={{ row.start|date:'c'|urlencode }}" class="text-xs font-medium">رزرو</a>
+      </li>
+      {% empty %}
+      <li class="text-ink-muted">برای این خدمت امروز وقت آزاد نیست.</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-sm text-ink-muted">خدمت را انتخاب کنید.</p>
+    {% endif %}
+  </section>
+
+  <section class="maison-panel order-4 hidden lg:block">
+    <div class="maison-panel__head">
+      <h3 class="maison-panel__title">تقویم روزانه تیم</h3>
+    </div>
+    <div class="flex gap-4 overflow-x-auto">
+      {% for col in calendar_columns %}
+      <div class="min-w-[11rem]">
+        <p class="mb-2 text-sm font-semibold">{{ col.staff.display_name }}</p>
+        {% for a in col.appointments %}
+        <a href="{% url 'appointments:detail' pk=a.pk %}" class="mb-1 block rounded-lg border px-2 py-1 text-xs" style="border-color: var(--color-border);">{{ a.start_at|time:"H:i" }} · {{ a.customer.full_name|truncatechars:12 }}</a>
+        {% empty %}
+        <p class="text-xs text-ink-muted">بدون نوبت</p>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="maison-panel order-4 lg:hidden">
+    <form method="get" class="mb-3">
+      <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+      <select name="staff" class="input-field text-sm" onchange="this.form.submit()">
+        <option value="">متخصص</option>
+        {% for col in calendar_columns %}
+        <option value="{{ col.staff.pk }}" {% if staff_filter_id == col.staff.pk %}selected{% endif %}>{{ col.staff.display_name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    {% for col in calendar_columns %}
+      {% if not staff_filter_id or staff_filter_id == col.staff.pk %}
+      <ul class="space-y-2 text-sm">
+        {% for a in col.appointments %}
+        <li><a href="{% url 'appointments:detail' pk=a.pk %}">{{ a.start_at|time:"H:i" }} · {{ a.customer.full_name }}</a></li>
+        {% empty %}<li class="text-ink-muted">بدون نوبت</li>{% endfor %}
+      </ul>
+      {% endif %}
+    {% endfor %}
+  </section>
+
+  <section class="maison-panel order-5">
+    <h3 class="mb-3 text-sm font-semibold text-ink">متخصص‌ها</h3>
+    <div class="grid gap-3 sm:grid-cols-2">
+      {% for item in staff_roster %}
+      <div class="rounded-xl border p-3 text-sm" style="border-color: var(--color-border);">
+        <p class="font-semibold text-ink">{{ item.staff.display_name }}</p>
+        <p class="mt-1 text-xs text-ink-secondary">آزاد امروز: {{ item.capacity.free_minutes|default:0 }} دقیقه</p>
+        <p class="mt-2 text-[11px] text-ink-muted">{% for s in item.services %}{{ s.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
+        <a href="{% url 'appointments:create' %}?staff={{ item.staff.pk }}" class="btn-secondary mt-3 w-full justify-center text-xs">رزرو برای این متخصص</a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

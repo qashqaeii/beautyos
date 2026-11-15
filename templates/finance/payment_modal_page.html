@@ -1,0 +1,34 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}ثبت پرداخت{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block content %}
+<div
+  class="finance-payment-modal-page"
+  x-data="{
+    paymentOpen: {{ payment_modal_open|yesno:'true,false' }},
+    closePayment() {
+      this.paymentOpen = false;
+      window.location.href = '{{ payment_return_url|escapejs }}';
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', paymentOpen)"
+  @beautyos-close-create-modal.window="closePayment()"
+  @keydown.escape.window="paymentOpen && closePayment()"
+>
+  {% if messages %}
+  <div class="mb-3 space-y-2 px-4 pt-2">
+    {% for message in messages %}
+    <p class="inventory-page__flash text-sm{% if message.tags %} inventory-page__flash--{{ message.tags }}{% endif %}">{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% include "finance/partials/payment_create_modal.html" %}
+</div>
+<script>
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}

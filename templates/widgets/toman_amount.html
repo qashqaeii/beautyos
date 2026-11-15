@@ -1,0 +1,32 @@
+<div
+  class="toman-amount"
+  data-toman-amount
+  x-data="tomanAmountField({ name: '{{ widget.name }}', amount: {{ widget.amount_int }} })"
+>
+  <div class="toman-amount__control">
+    <input
+      type="text"
+      id="{{ widget.attrs.id }}"
+      class="toman-amount__display input-field"
+      :value="display"
+      x-ref="displayInput"
+      @input="onDisplayInput($event)"
+      @paste="onDisplayPaste($event)"
+      inputmode="numeric"
+      dir="ltr"
+      autocomplete="off"
+      {% for name, value in widget.attrs.items %}
+        {% if name != "id" and name != "type" and name != "inputmode" %}
+        {{ name }}="{{ value }}"
+        {% endif %}
+      {% endfor %}
+    />
+    <span class="toman-amount__suffix" aria-hidden="true">تومان</span>
+  </div>
+  <input
+    type="hidden"
+    name="{{ widget.name }}"
+    x-ref="hiddenInput"
+    :value="hiddenValue"
+  />
+</div>

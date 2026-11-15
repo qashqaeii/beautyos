@@ -1,0 +1,16 @@
+{% extends "layouts/auth.html" %}
+{% block title %}ساخت سالن · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block auth_subtitle %}اولین قدم: نام سالن شما{% endblock %}
+{% block auth_content %}
+<form method="post" class="space-y-4">
+  {% csrf_token %}
+  {% for field in form %}
+  <div>
+    <label class="mb-1 block text-sm font-medium">{{ field.label }}</label>
+    {{ field }}
+    {% if field.errors %}<p class="mt-1 text-xs text-coral">{{ field.errors.0 }}</p>{% endif %}
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn-primary w-full">ادامه</button>
+</form>
+{% endblock %}

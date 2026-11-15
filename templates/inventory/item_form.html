@@ -1,0 +1,8 @@
+{% extends "layouts/app_shell.html" %}
+{% block content %}
+<script>window.location.replace("{% url 'inventory:list' %}?create=1");</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url={% url 'inventory:list' %}?create=1">
+  <p class="p-4 text-sm"><a href="{% url 'inventory:list' %}?create=1">رفتن به لیست محصولات</a></p>
+</noscript>
+{% endblock %}

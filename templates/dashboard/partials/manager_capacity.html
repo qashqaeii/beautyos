@@ -1,0 +1,40 @@
+{% load appointment_tags %}
+<section class="maison-panel mb-5">
+  <div class="maison-panel__head">
+    <h3 class="maison-panel__title">برنامه و ظرفیت · {{ day_jalali }}</h3>
+    <a href="{% url 'appointments:calendar' %}?day={{ selected_day|date:'Y-m-d' }}" class="text-xs font-medium text-ink-secondary">تقویم کامل</a>
+  </div>
+  <p class="mb-3 text-xs text-ink-muted">فیلتر مالی بالای صفحه بر اساس ثبت پرداخت است؛ تقویم این بخش بر اساس تاریخ {{ selected_day|fa_jalali }}.</p>
+  <div class="hidden gap-4 overflow-x-auto lg:grid lg:grid-cols-3 xl:grid-cols-4">
+    {% for col in calendar_columns %}
+    <div class="min-w-[12rem] rounded-xl border p-3" style="border-color: var(--color-border);">
+      <p class="truncate text-sm font-semibold text-ink">{{ col.staff.display_name }}</p>
+      {% if col.capacity.on_leave %}
+      <p class="mt-1 text-xs text-ink-muted">مرخصی</p>
+      {% else %}
+      <p class="mt-1 text-xs text-ink-secondary">رزرو {{ col.capacity.booked_minutes }} د · آزاد {{ col.capacity.free_minutes }} د</p>
+      {% if col.capacity.first_slot %}
+      <p class="text-[11px] text-ink-muted">اولین وقت: {{ col.capacity.first_slot|time:"H:i" }}</p>
+      {% endif %}
+      {% endif %}
+      <ul class="mt-2 max-h-40 space-y-1 overflow-y-auto text-xs">
+        {% for a in col.appointments %}
+        <li class="truncate"><span class="tabular-nums font-medium">{{ a.start_at|time:"H:i" }}</span> · {{ a.customer.full_name|truncatechars:14 }}</li>
+        {% empty %}
+        <li class="text-ink-muted">بدون نوبت</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% empty %}
+    <p class="text-sm text-ink-muted">متخصص فعالی ثبت نشده است.</p>
+    {% endfor %}
+  </div>
+  <div class="space-y-2 text-sm lg:hidden">
+    {% for row in staff_capacity|slice:":6" %}
+    <div class="flex justify-between gap-2 border-b py-2" style="border-color: var(--color-divider);">
+      <span class="font-medium">{{ row.staff.display_name }}</span>
+      <span class="text-ink-secondary">آزاد {{ row.free_minutes }} دقیقه</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>

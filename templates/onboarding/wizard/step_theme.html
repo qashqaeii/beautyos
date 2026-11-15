@@ -1,0 +1,18 @@
+{% extends "onboarding/wizard/base.html" %}
+{% block title %}انتخاب تم{% endblock %}
+{% block wizard_content %}
+<h1 class="text-xl font-semibold text-espresso">تم فضای کار</h1>
+<p class="mt-1 text-sm text-ink-secondary">تم پنل و صفحه عمومی مستقل هستند؛ هر دو را می‌توانید تنظیم کنید.</p>
+<form method="post" class="mt-6 space-y-6">
+  {% csrf_token %}
+  <div>
+    <p class="mb-2 text-sm font-medium">تم داشبورد</p>
+    {{ form.dashboard_theme }}
+  </div>
+  <div>
+    <p class="mb-2 text-sm font-medium">تم صفحه عمومی</p>
+    {{ form.public_theme }}
+  </div>
+  <button type="submit" class="btn-primary">ادامه</button>
+</form>
+{% endblock %}

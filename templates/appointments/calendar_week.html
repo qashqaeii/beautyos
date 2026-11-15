@@ -1,0 +1,93 @@
+{% extends "layouts/app_shell.html" %}
+{% load appointment_tags %}
+{% block page_title %}برنامه نوبت‌ها{% endblock %}
+{% block page_subtitle %}نمای هفتگی · {{ week_start|fa_jalali }} تا {{ week_end|fa_jalali }}{% endblock %}
+{% block content %}
+<div class="page-toolbar">
+  <div class="flex flex-wrap items-center gap-2 text-sm text-ink-secondary">
+    <a href="?week={{ prev_week }}" class="btn-secondary text-xs">هفته قبل</a>
+    <span class="font-medium text-ink">{{ week_start|fa_jalali }} – {{ week_end|fa_jalali }}</span>
+    <a href="?week={{ next_week }}" class="btn-secondary text-xs">هفته بعد</a>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a href="{% url 'appointments:calendar' %}" class="btn-secondary text-xs">روزانه</a>
+    <a href="{% url 'appointments:create' %}" class="btn-primary text-sm">ثبت نوبت</a>
+  </div>
+</div>
+
+{% if staff_list %}
+<form method="get" class="mb-4 flex flex-wrap gap-2">
+  <input type="hidden" name="week" value="{{ request.GET.week|default:week_start|date:'Y-m-d' }}">
+  <select name="staff" class="input-field w-auto min-w-[10rem]" onchange="this.form.submit()">
+    <option value="">همه متخصصین</option>
+    {% for s in staff_list %}
+    <option value="{{ s.pk }}" {% if request.GET.staff == s.pk|stringformat:'s' %}selected{% endif %}>{{ s.display_name }}</option>
+    {% endfor %}
+  </select>
+</form>
+{% endif %}
+
+<div class="hidden overflow-x-auto lg:block">
+  <div class="min-w-[56rem]">
+    <div class="grid grid-cols-[3rem_repeat(7,minmax(0,1fr))] gap-px rounded-[20px] border border-line bg-line overflow-hidden">
+      <div class="bg-surface-muted p-2"></div>
+      {% for day in days %}
+      <div class="bg-surface p-2 text-center {% if day == today %}ring-2 ring-inset ring-accent/50{% endif %}">
+        <p class="text-[10px] font-medium text-ink-muted">{{ day|fa_weekday }}</p>
+        <p class="text-sm font-semibold text-espresso">{{ day|fa_jalali }}</p>
+        {% if day == today %}<span class="text-[10px] text-accent">امروز</span>{% endif %}
+      </div>
+      {% endfor %}
+
+      {% for hour in hours %}
+      <div class="bg-surface-muted px-1 py-3 text-center text-[10px] text-ink-muted">{{ hour|fa_num }}:۰۰</div>
+      {% for day in days %}
+      <div class="min-h-[3.25rem] bg-surface p-1">
+        {% for a in by_day|dict_item:day %}
+        {% if a.start_at.hour == hour %}
+        <a href="{% url 'appointments:detail' pk=a.pk %}" class="mb-1 block rounded-lg border border-line bg-accent-soft/50 px-2 py-1 text-[10px] hover:border-accent/40">
+          <span class="font-semibold text-espresso">{{ a.start_at|fa_time }}</span>
+          <span class="block truncate">{{ a.customer.full_name }}</span>
+          <span class="{{ a.status|status_badge }} mt-0.5 scale-90">{{ a.get_status_display }}</span>
+        </a>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="space-y-4 lg:hidden">
+  <div class="flex gap-2 overflow-x-auto pb-1">
+    {% for day in days %}
+    <a href="{% url 'appointments:calendar' %}?day={{ day|date:'Y-m-d' }}" class="shrink-0 rounded-xl border px-3 py-2 text-center text-xs {% if day == today %}border-accent bg-accent-soft text-espresso font-medium{% else %}border-line bg-surface text-ink-secondary{% endif %}">
+      <span class="block">{{ day|fa_jalali }}</span>
+      <span class="text-[10px]">{{ day|fa_weekday }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% for day in days %}
+  {% with appts=by_day|dict_item:day %}
+  {% if appts %}
+  <section class="premium-card py-4">
+    <h3 class="text-sm font-semibold text-espresso">{{ day|fa_jalali }}{% if day == today %} · امروز{% endif %}</h3>
+    <ul class="mt-3 divide-y divide-line">
+      {% for a in appts %}
+      <li class="py-3">
+        <a href="{% url 'appointments:detail' pk=a.pk %}" class="flex items-center justify-between gap-2 text-sm">
+          <span class="font-medium text-espresso">{{ a.start_at|time:"H:i" }} · {{ a.customer.full_name }}</span>
+          <span class="{{ a.status|status_badge }}">{{ a.get_status_display }}</span>
+        </a>
+        <p class="mt-1 text-xs text-ink-muted">{{ a.service.name }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  {% endwith %}
+  {% endfor %}
+  {% if not days %}<p class="text-sm text-ink-muted">بدون نوبت در این هفته</p>{% endif %}
+</div>
+{% endblock %}

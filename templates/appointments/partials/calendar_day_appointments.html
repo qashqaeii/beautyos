@@ -1,0 +1,43 @@
+{% load appointment_tags format_tags %}
+{% if selected_day %}
+<section class="appt-month-day-list dashboard-enter" aria-labelledby="appt-month-day-list-heading">
+  <header class="appt-month-day-list__head">
+    <h2 id="appt-month-day-list-heading" class="appt-month-day-list__title">
+      نوبت‌های <span class="tabular-nums">{{ day_jalali|persian_digits }}</span>
+    </h2>
+    {% if can_book_appointment %}
+    <a
+      href="?{{ month_query }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;book=1"
+      class="btn-primary appt-month-day-list__book text-xs sm:text-sm"
+    >
+      <i data-lucide="plus" class="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true"></i>
+      ثبت نوبت
+    </a>
+    {% endif %}
+  </header>
+  {% if appointments %}
+  <ul class="appt-month-day-list__items">
+    {% for a in appointments %}
+    <li>
+      <a href="{% url 'appointments:detail' pk=a.pk %}" class="appt-month-day-list__row">
+        {% if a.staff %}
+        <span class="appt-month-day-list__accent" style="--appt-staff-accent: {{ a.staff|staff_calendar_color }}" aria-hidden="true"></span>
+        {% endif %}
+        <span class="appt-month-day-list__main min-w-0">
+          <span class="appt-month-day-list__time tabular-nums">{{ a.start_at|fa_time }}{% if a.end_at %} – {{ a.end_at|fa_time }}{% endif %}</span>
+          <span class="appt-month-day-list__meta">
+            <span class="appt-month-day-list__customer">{{ a.customer.full_name }}</span>
+            <span class="appt-month-day-list__sep" aria-hidden="true">·</span>
+            <span class="appt-month-day-list__service">{{ a.service.name }}{% if a.staff %} · {{ a.staff.full_display_name }}{% endif %}</span>
+          </span>
+        </span>
+        <span class="appt-month-day-list__status {{ a.status|status_badge }}">{{ a.get_status_display }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="appt-month-day-list__empty">برای این روز نوبتی ثبت نشده است.</p>
+  {% endif %}
+</section>
+{% endif %}

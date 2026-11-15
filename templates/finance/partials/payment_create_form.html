@@ -1,0 +1,83 @@
+<form
+  method="post"
+  action="{% url 'finance:payment_create' %}"
+  class="inventory-create-modal__form finance-payment-form finance-payment-form--modal"
+  id="finance-payment-create-form"
+>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ payment_return_url }}">
+  {% if tab %}
+  <input type="hidden" name="finance_tab" value="{{ tab }}">
+  <input type="hidden" name="finance_range" value="{{ range_key }}">
+  <input type="hidden" name="finance_day" value="{{ selected_day|date:'Y-m-d' }}">
+  {% endif %}
+
+  <div class="inventory-create-modal__scroll maison-scroll-themed">
+    {% if payment_form.non_field_errors %}
+    <p class="finance-payment-form__error finance-payment-form__error--form">{{ payment_form.non_field_errors.0 }}</p>
+    {% endif %}
+
+    <section class="finance-payment-form__section" aria-labelledby="finance-payment-customer-title">
+      <h3 id="finance-payment-customer-title" class="finance-payment-form__section-title">مشتری و نوبت</h3>
+      <div class="finance-payment-form__fields">
+        <div class="finance-payment-form__field">
+          <label class="field-label" for="{{ payment_form.customer.id_for_label }}">{{ payment_form.customer.label }}</label>
+          {{ payment_form.customer }}
+          {% if payment_form.customer.errors %}<p class="finance-payment-form__error">{{ payment_form.customer.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="finance-payment-form__field">
+          <label class="field-label" for="{{ payment_form.appointment.id_for_label }}">{{ payment_form.appointment.label }}</label>
+          {{ payment_form.appointment }}
+          {% if payment_form.appointment.errors %}<p class="finance-payment-form__error">{{ payment_form.appointment.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="finance-payment-form__section" aria-labelledby="finance-payment-amounts-title">
+      <h3 id="finance-payment-amounts-title" class="finance-payment-form__section-title">مبالغ (تومان)</h3>
+      <div class="finance-payment-form__fields finance-payment-form__fields--amounts">
+        <div class="finance-payment-form__field">
+          <label class="field-label" for="{{ payment_form.total_amount_toman.id_for_label }}">{{ payment_form.total_amount_toman.label }}</label>
+          {{ payment_form.total_amount_toman }}
+          {% if payment_form.total_amount_toman.errors %}<p class="finance-payment-form__error">{{ payment_form.total_amount_toman.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="finance-payment-form__field">
+          <label class="field-label" for="{{ payment_form.discount_toman.id_for_label }}">{{ payment_form.discount_toman.label }}</label>
+          {{ payment_form.discount_toman }}
+          {% if payment_form.discount_toman.errors %}<p class="finance-payment-form__error">{{ payment_form.discount_toman.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="finance-payment-form__field">
+          <label class="field-label" for="{{ payment_form.paid_amount_toman.id_for_label }}">{{ payment_form.paid_amount_toman.label }}</label>
+          {{ payment_form.paid_amount_toman }}
+          {% if payment_form.paid_amount_toman.errors %}<p class="finance-payment-form__error">{{ payment_form.paid_amount_toman.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="finance-payment-form__section finance-payment-form__section--last" aria-labelledby="finance-payment-meta-title">
+      <h3 id="finance-payment-meta-title" class="finance-payment-form__section-title">جزئیات پرداخت</h3>
+      <div class="finance-payment-form__fields finance-payment-form__fields--meta">
+        <div class="finance-payment-form__field">
+          <label class="field-label" for="{{ payment_form.method.id_for_label }}">{{ payment_form.method.label }}</label>
+          {{ payment_form.method }}
+          {% if payment_form.method.errors %}<p class="finance-payment-form__error">{{ payment_form.method.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="finance-payment-form__field">
+          <label class="field-label" for="{{ payment_form.status.id_for_label }}">{{ payment_form.status.label }}</label>
+          {{ payment_form.status }}
+          {% if payment_form.status.errors %}<p class="finance-payment-form__error">{{ payment_form.status.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="finance-payment-form__field finance-payment-form__field--full">
+          <label class="field-label" for="{{ payment_form.notes.id_for_label }}">{{ payment_form.notes.label }}</label>
+          {{ payment_form.notes }}
+          {% if payment_form.notes.errors %}<p class="finance-payment-form__error">{{ payment_form.notes.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="inventory-create-modal__foot">
+    <button type="submit" class="btn-primary finance-payment-form__submit">ثبت پرداخت</button>
+    <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-create-modal')">انصراف</button>
+  </footer>
+</form>

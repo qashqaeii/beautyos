@@ -1,0 +1,225 @@
+{% extends "layouts/app_shell.html" %}
+{% load static format_tags %}
+{% block header_modifier %}dashboard-lite-app-header{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block mobile_header %}{% endblock %}
+{% block extra_head %}
+<script defer src="{% static 'js/loyalty-overview.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% endblock %}
+{% block content %}
+<div class="loyalty-page mx-auto w-full max-w-4xl pb-24 md:pb-8" x-data="{ adjustOpen: false }">
+  <header class="loyalty-page__hero dashboard-enter">
+    <div class="loyalty-page__hero-copy">
+      <h1 class="loyalty-page__title">باشگاه مشتریان</h1>
+      <p class="loyalty-page__subtitle">امتیاز وفاداری، سطوح عضویت و فعالیت اخیر سالن</p>
+    </div>
+    <button type="button" class="btn-secondary loyalty-page__adjust-toggle text-sm" @click="adjustOpen = !adjustOpen">
+      <i data-lucide="plus-circle" class="h-4 w-4" aria-hidden="true"></i>
+      ثبت تغییر امتیاز
+    </button>
+  </header>
+
+  <div class="loyalty-stats-grid dashboard-enter">
+    <article class="loyalty-stat">
+      <p class="loyalty-stat__label">اعضای باشگاه</p>
+      <p class="loyalty-stat__value tabular-nums">{{ stats.member_count|fa_num }}</p>
+    </article>
+    <article class="loyalty-stat">
+      <p class="loyalty-stat__label">مجموع امتیاز فعال</p>
+      <p class="loyalty-stat__value tabular-nums">{{ stats.total_points|fa_num }}</p>
+    </article>
+    <article class="loyalty-stat">
+      <p class="loyalty-stat__label">میانگین امتیاز</p>
+      <p class="loyalty-stat__value tabular-nums">{{ stats.avg_points|fa_num }}</p>
+    </article>
+    <article class="loyalty-stat">
+      <p class="loyalty-stat__label">امتیاز این ماه</p>
+      <p class="loyalty-stat__value tabular-nums">{{ stats.points_earned_month|fa_num }}</p>
+      {% if stats.points_redeemed_month %}
+      <p class="loyalty-stat__hint">مصرف {{ stats.points_redeemed_month|fa_num }}</p>
+      {% endif %}
+    </article>
+  </div>
+
+  <section class="loyalty-tier-grid dashboard-enter" aria-label="توزیع سطوح عضویت">
+    {% for row in tier_rows %}
+    <article class="loyalty-tier-chip loyalty-tier-chip--{{ row.key }}">
+      <span class="loyalty-tier-chip__label">{{ row.label }}</span>
+      <span class="loyalty-tier-chip__count tabular-nums">{{ row.count|fa_num }} نفر</span>
+      <span class="loyalty-tier-chip__min">از {{ row.min_points|fa_num }} امتیاز</span>
+    </article>
+    {% endfor %}
+  </section>
+
+  {% if messages %}
+  <div class="loyalty-panel__messages space-y-2 dashboard-enter">
+    {% for message in messages %}
+    <p class="loyalty-panel__flash text-sm{% if message.tags %} loyalty-panel__flash--{{ message.tags }}{% endif %}">{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <section
+    class="loyalty-adjust-panel dashboard-enter"
+    x-show="adjustOpen"
+    x-cloak
+    x-transition.opacity.duration.150ms
+  >
+    <h2 class="loyalty-panel__heading">ثبت دستی تغییر امتیاز</h2>
+    <form method="post" class="loyalty-adjust-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="adjust">
+      <div class="loyalty-adjust-form__grid">
+        <div class="loyalty-adjust-form__field">
+          <label class="loyalty-adjust-form__label" for="id_customer">مشتری</label>
+          {{ adjust_form.customer }}
+        </div>
+        <div class="loyalty-adjust-form__field">
+          <label class="loyalty-adjust-form__label" for="id_points_delta">تغییر امتیاز</label>
+          <input type="number" name="points_delta" id="id_points_delta" class="input-field text-sm" required>
+          <p class="loyalty-adjust-form__hint">مثبت برای افزایش، منفی برای کاهش</p>
+        </div>
+        <div class="loyalty-adjust-form__field loyalty-adjust-form__field--wide">
+          <label class="loyalty-adjust-form__label" for="id_note">توضیح</label>
+          <input type="text" name="note" id="id_note" class="input-field text-sm" maxlength="255" required placeholder="علت تغییر امتیاز">
+        </div>
+      </div>
+      <div class="loyalty-adjust-form__actions">
+        <button type="submit" class="btn-primary text-sm">ذخیره</button>
+        <button type="button" class="btn-secondary text-sm" @click="adjustOpen = false">بستن</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="loyalty-members-panel dashboard-enter">
+    <div class="loyalty-members-panel__head">
+      <h2 class="loyalty-panel__heading">
+        رتبه‌بندی اعضا
+        {% if search_q %}
+        <span class="loyalty-members-panel__filtered">· نتیجه جستجو</span>
+        {% endif %}
+      </h2>
+      <form method="get" class="loyalty-search-form" role="search">
+        <label class="sr-only" for="loyalty-search-q">جستجوی مشتری</label>
+        <input
+          type="search"
+          name="q"
+          id="loyalty-search-q"
+          value="{{ search_q }}"
+          class="input-field loyalty-search-form__input text-sm"
+          placeholder="نام یا شماره موبایل"
+          autocomplete="off"
+        >
+        {% if search_q %}
+        <a href="{% url 'loyalty:overview' %}" class="btn-secondary loyalty-search-form__clear text-xs">پاک کردن</a>
+        {% endif %}
+      </form>
+    </div>
+
+    {% if members %}
+    <div class="loyalty-members-table" role="table" aria-label="لیست اعضای باشگاه">
+      <div class="loyalty-members-table__head loyalty-members-table__row" role="row">
+        <span class="loyalty-members-table__cell loyalty-members-table__cell--rank" role="columnheader">رتبه</span>
+        <span class="loyalty-members-table__cell loyalty-members-table__cell--member" role="columnheader">عضو</span>
+        <span class="loyalty-members-table__cell loyalty-members-table__cell--tier" role="columnheader">سطح</span>
+        <span class="loyalty-members-table__cell loyalty-members-table__cell--points" role="columnheader">امتیاز</span>
+        <span class="loyalty-members-table__cell loyalty-members-table__cell--meta" role="columnheader">خلاصه</span>
+      </div>
+      <ul class="loyalty-members-list m-0 list-none p-0">
+        {% for row in members %}
+        {% with acc=row.account member=row.account.customer %}
+        <li class="loyalty-members-list__item">
+          <div
+            class="loyalty-members-table__row loyalty-members-table__row--body"
+            role="row"
+            data-rank="{{ forloop.counter|fa_num }}"
+          >
+            <span class="loyalty-members-table__cell loyalty-members-table__cell--rank tabular-nums" role="cell">{{ forloop.counter|fa_num }}</span>
+            <div class="loyalty-members-table__cell loyalty-members-table__cell--member" role="cell">
+              <div class="loyalty-member-cell">
+                <span class="loyalty-member-cell__avatar" aria-hidden="true">{{ member.initials }}</span>
+                <div class="loyalty-member-cell__copy min-w-0">
+                  <a href="{% url 'loyalty:member' pk=acc.pk %}" class="loyalty-member-cell__name">{{ member.full_name }}</a>
+                  <p class="loyalty-member-cell__phone tabular-nums">{{ member.phone|fa_num }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="loyalty-members-table__cell loyalty-members-table__cell--tier" role="cell">
+              <span class="loyalty-tier-badge loyalty-tier-badge--{{ row.tier.key }}">{{ row.tier.label_fa }}</span>
+            </div>
+            <span class="loyalty-members-table__cell loyalty-members-table__cell--points tabular-nums font-semibold" role="cell">{{ acc.points_balance|fa_num }}</span>
+            <div class="loyalty-members-table__cell loyalty-members-table__cell--meta" role="cell">
+              <span>{{ member.total_visits|fa_num }} مراجعه</span>
+              {% if member.is_vip %}<span class="loyalty-member-cell__vip">VIP</span>{% endif %}
+            </div>
+          </div>
+        </li>
+        {% endwith %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% if total_members > member_count %}
+    <p class="loyalty-members-panel__more text-xs">
+      نمایش {{ member_count|fa_num }} از {{ total_members|fa_num }} عضو. برای بقیه از جستجو استفاده کنید.
+    </p>
+    {% endif %}
+    {% else %}
+    <p class="loyalty-panel__empty">
+      {% if search_q %}عضوی با این جستجو پیدا نشد.{% else %}هنوز امتیازی برای مشتریان ثبت نشده؛ پس از اولین رزرو یا ثبت دستی امتیاز، لیست پر می‌شود.{% endif %}
+    </p>
+    {% endif %}
+  </section>
+
+  <section class="loyalty-activity-panel dashboard-enter">
+    <h2 class="loyalty-panel__heading">فعالیت اخیر</h2>
+    {% if recent_rows %}
+    <ul class="loyalty-activity-list">
+      {% for row in recent_rows %}
+      {% with tx=row.tx %}
+      <li class="loyalty-activity-list__item">
+        <div class="loyalty-activity-row">
+          <div class="loyalty-activity-row__copy">
+            <a href="{% url 'customers:detail' pk=tx.account.customer_id %}" class="loyalty-activity-row__name">{{ tx.account.customer.full_name }}</a>
+            <p class="loyalty-activity-row__meta">
+              {{ tx.get_kind_display }}
+              {% if tx.note %}· {{ tx.note }}{% endif %}
+            </p>
+          </div>
+          <div class="loyalty-activity-row__aside">
+            <span class="loyalty-activity-row__points tabular-nums{% if row.signed_points < 0 %} loyalty-activity-row__points--down{% else %} loyalty-activity-row__points--up{% endif %}">
+              {% if row.signed_points > 0 %}+{% endif %}{{ row.signed_points|fa_num }}
+            </span>
+            <time class="loyalty-activity-row__time" datetime="{{ tx.created_at|date:'c' }}">{{ tx.created_at|fa_jalali_datetime }}</time>
+          </div>
+        </div>
+      </li>
+      {% endwith %}
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="loyalty-panel__empty">تراکنش امتیازی ثبت نشده است.</p>
+    {% endif %}
+  </section>
+
+  <section class="loyalty-rules-panel dashboard-enter" aria-label="قوانین سطح‌بندی">
+    <h2 class="loyalty-panel__heading">سطوح عضویت</h2>
+    <ul class="loyalty-rules-list">
+      {% for rule in rules %}
+      <li class="loyalty-rules-list__item">
+        <span class="loyalty-rules-list__label">{{ rule.label }}</span>
+        <span class="loyalty-rules-list__min tabular-nums">از {{ rule.min_points|fa_num }} امتیاز</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+<script>
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}

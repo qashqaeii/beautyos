@@ -1,0 +1,170 @@
+{% load static %}
+{# حالت اولیه بدون وابستگی به Alpine: کلاس hidden سمت سرور #}
+{{ customer_picker_config|json_script:"appt-customer-picker-config" }}
+<div
+  class="appt-customer-picker"
+  data-appt-customer-picker
+  x-data="appointmentCustomerPicker(JSON.parse(document.getElementById('appt-customer-picker-config').textContent))"
+  @keydown="onKeydown($event)"
+>
+  <div class="appt-booking-section__head">
+    <h2 class="appt-booking-section__title !mb-0">مشتری</h2>
+    {% if perms_customer_create %}
+    <button
+      type="button"
+      class="appt-customer-picker__pick-existing{% if picker_initial_mode == 'search' %} hidden{% endif %}"
+      :class="{ hidden: !canCreateCustomer || mode === 'search' }"
+      @click="openSearch()"
+    >
+      انتخاب مشتری موجود
+    </button>
+    {% endif %}
+  </div>
+
+  <input type="hidden" name="customer" x-ref="customerHidden" :value="customerId" />
+  <input type="hidden" name="new_customer_mode" :value="isNewCustomerSubmit() ? 'on' : ''" />
+  <input type="hidden" name="customer_search" :value="query" />
+
+  {% if not perms_customer_create and not perms_customer_search %}
+  <p class="appt-customer-picker__empty text-sm text-ink-secondary">
+    برای این نوبت مجوز انتخاب یا ثبت مشتری ندارید. با مدیر سالن تماس بگیرید.
+  </p>
+  {% else %}
+
+  <div
+    class="appt-customer-picker__selected{% if picker_initial_mode != 'selected' %} hidden{% endif %}"
+    :class="{ hidden: mode !== 'selected' }"
+    data-panel="selected"
+  >
+    <p class="appt-customer-picker__selected-name">{{ selected_customer_display.full_name|default:"" }}</p>
+    <p class="appt-customer-picker__selected-phone tabular-nums" dir="ltr">{{ selected_customer_display.phone_display|default:"" }}</p>
+    <p class="appt-customer-picker__selected-name sr-only" aria-hidden="true" x-text="selectedName"></p>
+    <p class="appt-customer-picker__selected-phone tabular-nums sr-only" dir="ltr" x-text="selectedPhone"></p>
+    <button type="button" class="appt-customer-picker__change" @click="changeCustomer()">تغییر مشتری</button>
+  </div>
+  {% if form.customer_search.errors %}
+  <p class="text-xs text-coral">{{ form.customer_search.errors.0 }}</p>
+  {% endif %}
+
+  <div
+    class="appt-customer-picker__field-wrap{% if picker_initial_mode != 'search' %} hidden{% endif %}"
+    :class="{ hidden: mode !== 'search' }"
+    data-panel="search"
+  >
+    <label class="mb-1 block text-sm" for="id_customer_search">جست‌وجو با نام یا شماره</label>
+    <input
+      type="search"
+      id="id_customer_search"
+      x-ref="searchInput"
+      class="input-field appt-customer-picker__input"
+      autocomplete="off"
+      role="combobox"
+      aria-autocomplete="list"
+      :aria-expanded="open ? 'true' : 'false'"
+      x-model="query"
+      @input="onInput()"
+      @focus="onFocusSearch()"
+      placeholder="نام یا شماره موبایل"
+    />
+    <ul
+      class="appt-customer-picker__list"
+      role="listbox"
+      x-show="open && results.length"
+      x-cloak
+      @mousedown.prevent
+    >
+      <template x-for="(item, index) in results" :key="item.id">
+        <li>
+          <button
+            type="button"
+            class="appt-customer-picker__option"
+            :class="{ 'is-active': index === activeIndex }"
+            role="option"
+            @click="selectCustomer(item)"
+          >
+            <span class="appt-customer-picker__name" x-text="item.full_name"></span>
+            <span class="appt-customer-picker__phone tabular-nums" dir="ltr" x-text="item.phone_display"></span>
+          </button>
+        </li>
+      </template>
+    </ul>
+    {% if perms_customer_create %}
+    <button
+      type="button"
+      class="appt-customer-picker__back mt-2 text-xs font-medium text-ink-secondary"
+      @click="mode = 'new'"
+    >
+      بازگشت به ثبت مشتری جدید
+    </button>
+    {% endif %}
+  </div>
+
+  {% if perms_customer_create %}
+  <div
+    class="appt-customer-picker__new-fields{% if picker_initial_mode != 'new' %} hidden{% endif %}"
+    :class="{ hidden: mode !== 'new' }"
+    data-panel="new"
+  >
+    <div class="appt-customer-picker__name-grid">
+      <div>
+        <label class="mb-1 block text-sm" for="id_new_customer_first_name">نام</label>
+        <input
+          type="text"
+          name="new_customer_first_name"
+          id="id_new_customer_first_name"
+          x-ref="firstName"
+          class="input-field"
+          autocomplete="off"
+          value="{{ form.new_customer_first_name.value|default:'' }}"
+          x-model="firstName"
+        />
+        {% if form.new_customer_first_name.errors %}
+        <p class="mt-1 text-xs text-coral">{{ form.new_customer_first_name.errors.0 }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <label class="mb-1 block text-sm" for="id_new_customer_last_name">نام خانوادگی</label>
+        <input
+          type="text"
+          name="new_customer_last_name"
+          id="id_new_customer_last_name"
+          class="input-field"
+          autocomplete="off"
+          value="{{ form.new_customer_last_name.value|default:'' }}"
+          x-model="lastName"
+        />
+        {% if form.new_customer_last_name.errors %}
+        <p class="mt-1 text-xs text-coral">{{ form.new_customer_last_name.errors.0 }}</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="mt-3">
+      <label class="mb-1 block text-sm" for="id_new_customer_phone">شماره تماس</label>
+      <input
+        type="tel"
+        name="new_customer_phone"
+        id="id_new_customer_phone"
+        class="input-field input-field--tel"
+        dir="ltr"
+        inputmode="tel"
+        autocomplete="tel"
+        value="{{ form.new_customer_phone.value|default:'' }}"
+        x-model="newPhone"
+        @blur="checkPhoneDuplicate()"
+      />
+      {% if form.new_customer_phone.errors %}
+      <p class="mt-1 text-xs text-coral">{{ form.new_customer_phone.errors.0 }}</p>
+      {% endif %}
+    </div>
+    <div class="appt-customer-picker__duplicate hidden" :class="{ hidden: !duplicateMatch }" data-panel="duplicate">
+      <p class="text-xs text-ink-secondary">
+        این شماره قبلاً ثبت شده:
+        <strong x-text="duplicateMatch?.full_name"></strong>
+        <span class="tabular-nums" dir="ltr" x-text="duplicateMatch ? ' · ' + duplicateMatch.phone_display : ''"></span>
+      </p>
+      <button type="button" class="appt-customer-picker__dup-btn" @click="useDuplicateMatch()">انتخاب این مشتری</button>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+</div>

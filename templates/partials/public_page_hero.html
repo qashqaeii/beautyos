@@ -1,0 +1,8 @@
+{# optional: eyebrow, title, lead #}
+<section class="public-page-hero">
+  <div class="public-page-hero__inner">
+    {% if eyebrow %}<p class="public-page-hero__eyebrow">{{ eyebrow }}</p>{% endif %}
+    <h1 class="public-page-hero__title display-editorial">{{ title }}</h1>
+    {% if lead %}<p class="public-page-hero__lead">{{ lead }}</p>{% endif %}
+  </div>
+</section>

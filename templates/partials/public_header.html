@@ -1,0 +1,124 @@
+{% load static %}
+<header
+  class="public-nav"
+  x-data="{ navOpen: false }"
+  x-effect="document.documentElement.classList.toggle('public-nav-open', navOpen)"
+  @keydown.escape.window="navOpen = false"
+>
+  <div class="public-nav__inner">
+    <a href="{% url 'website:home' %}" class="public-nav__brand" title="{{ BEAUTYOS_PRODUCT_NAME }}">
+      <img src="{% static BEAUTYOS_SITE_LOGO %}" alt="" class="public-nav__logo" width="120" height="36">
+      <span class="public-nav__brand-text">{{ BEAUTYOS_PRODUCT_NAME }}</span>
+    </a>
+
+    {% with url_name=request.resolver_match.url_name|default:"" %}
+    <nav class="public-nav__links" aria-label="ناوبری اصلی">
+      <a
+        href="{% url 'website:home' %}"
+        class="public-nav-link {% if url_name == 'home' %}public-nav-link--active{% endif %}"
+      >خانه</a>
+      <a
+        href="{% url 'website:features' %}"
+        class="public-nav-link {% if url_name == 'features' %}public-nav-link--active{% endif %}"
+      >امکانات</a>
+      <a
+        href="{% url 'website:home' %}#showcase"
+        class="public-nav-link"
+      >محصول</a>
+      <a
+        href="{% url 'website:home' %}#start"
+        class="public-nav-link"
+      >شروع</a>
+      <a
+        href="{% url 'website:home' %}#faq"
+        class="public-nav-link {% if url_name == 'home' %}public-nav-link--anchor{% endif %}"
+      >سوالات</a>
+      <a
+        href="{% url 'website:contact' %}"
+        class="public-nav-link {% if url_name == 'contact' %}public-nav-link--active{% endif %}"
+      >تماس با ما</a>
+    </nav>
+
+    <div class="public-nav__actions">
+      {% if user.is_authenticated %}
+      <button type="button" class="btn-public-ghost public-nav__logout" data-logout-open aria-haspopup="dialog">
+        <i data-lucide="log-out" class="h-4 w-4" aria-hidden="true"></i>
+        <span>خروج</span>
+      </button>
+      <a href="{% url 'dashboard:home' %}" class="btn-public-primary public-nav__cta">
+        <i data-lucide="layout-dashboard" class="h-4 w-4" aria-hidden="true"></i>
+        <span>پنل سالن</span>
+      </a>
+      {% else %}
+      <a href="{% url 'accounts:login' %}" class="btn-public-ghost public-nav__login hidden min-[480px]:inline-flex">ورود</a>
+      <a href="{% url 'accounts:register' %}" class="btn-public-primary public-nav__cta">ثبت‌نام سالن</a>
+      {% endif %}
+
+      <button
+        type="button"
+        class="public-nav__toggle"
+        @click="navOpen = !navOpen"
+        :aria-expanded="navOpen"
+        aria-controls="public-nav-drawer"
+        aria-label="باز و بسته کردن منو"
+      >
+        <i data-lucide="menu" class="h-5 w-5" aria-hidden="true" x-show="!navOpen"></i>
+        <i data-lucide="x" class="h-5 w-5" aria-hidden="true" x-show="navOpen" x-cloak></i>
+      </button>
+    </div>
+    {% endwith %}
+  </div>
+
+  <div
+    class="public-nav-backdrop"
+    x-show="navOpen"
+    x-transition.opacity
+    @click="navOpen = false"
+    x-cloak
+    aria-hidden="true"
+  ></div>
+
+  <div
+    id="public-nav-drawer"
+    class="public-nav-drawer"
+    x-show="navOpen"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="translate-x-full"
+    @click.outside="navOpen = false"
+    x-cloak
+    role="dialog"
+    aria-modal="true"
+    aria-label="منوی سایت"
+  >
+  {% with url_name=request.resolver_match.url_name|default:"" %}
+    <div class="public-nav-drawer__head">
+      <p class="text-sm font-semibold text-aubergine">{{ BEAUTYOS_PRODUCT_NAME }}</p>
+      <button type="button" class="public-nav__toggle" @click="navOpen = false" aria-label="بستن منو">
+        <i data-lucide="x" class="h-5 w-5" aria-hidden="true"></i>
+      </button>
+    </div>
+    <nav class="public-nav-drawer__links" aria-label="ناوبری موبایل">
+      <a href="{% url 'website:home' %}" class="public-nav-drawer__link {% if url_name == 'home' %}is-active{% endif %}" @click="navOpen = false">خانه</a>
+      <a href="{% url 'website:features' %}" class="public-nav-drawer__link {% if url_name == 'features' %}is-active{% endif %}" @click="navOpen = false">امکانات</a>
+      <a href="{% url 'website:home' %}#showcase" class="public-nav-drawer__link" @click="navOpen = false">محصول</a>
+      <a href="{% url 'website:home' %}#start" class="public-nav-drawer__link" @click="navOpen = false">شروع</a>
+      <a href="{% url 'website:home' %}#faq" class="public-nav-drawer__link" @click="navOpen = false">سوالات</a>
+      <a href="{% url 'website:faq' %}" class="public-nav-drawer__link {% if url_name == 'faq' %}is-active{% endif %}" @click="navOpen = false">راهنمای کامل</a>
+      <a href="{% url 'website:contact' %}" class="public-nav-drawer__link {% if url_name == 'contact' %}is-active{% endif %}" @click="navOpen = false">تماس با ما</a>
+    </nav>
+    <div class="public-nav-drawer__footer">
+      {% if user.is_authenticated %}
+      <a href="{% url 'dashboard:home' %}" class="btn-public-primary w-full" @click="navOpen = false">ورود به پنل سالن</a>
+      <button type="button" class="btn-public-ghost mt-2 w-full" data-logout-open @click="navOpen = false">خروج از حساب</button>
+      {% else %}
+      <a href="{% url 'accounts:register' %}" class="btn-public-primary w-full" @click="navOpen = false">ثبت‌نام سالن</a>
+      <a href="{% url 'accounts:login' %}" class="btn-public-ghost mt-2 w-full" @click="navOpen = false">ورود</a>
+      {% endif %}
+    </div>
+  {% endwith %}
+  </div>
+</header>

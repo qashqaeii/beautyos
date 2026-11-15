@@ -1,0 +1,27 @@
+{% extends "layouts/app_shell.html" %}
+{% load humanize %}
+{% block page_title %}پکیج‌ها{% endblock %}
+{% block page_subtitle %}فروش و جلسات{% endblock %}
+{% block content %}
+<div class="page-toolbar">
+  <a href="{% url 'packages:create' %}" class="btn-secondary text-sm">تعریف پکیج</a>
+  <a href="{% url 'packages:sell' %}" class="btn-primary text-sm">فروش به مشتری</a>
+</div>
+{% if packages %}
+<div class="grid gap-4 md:grid-cols-2 mb-8">
+  {% for p in packages %}
+  <article class="premium-card"><h3 class="font-semibold text-espresso">{{ p.name }}</h3><p class="text-sm text-ink-secondary">{{ p.session_count }} جلسه · {{ p.price_toman|fa_money }} تومان</p></article>
+  {% endfor %}
+</div>
+{% endif %}
+{% if sales %}
+<h3 class="mb-3 font-medium text-espresso">فروش اخیر</h3>
+<ul class="card divide-y divide-line text-sm">
+  {% for s in sales %}
+  <li class="flex justify-between py-2"><span>{{ s.customer.full_name }} · {{ s.package.name }}</span><span>{{ s.sessions_remaining }} باقی‌مانده</span></li>
+  {% endfor %}
+</ul>
+{% elif not packages %}
+{% include "partials/empty_state.html" with icon="package" title="پکیجی تعریف نشده" cta_url="/packages/new/" cta_label="تعریف پکیج" %}
+{% endif %}
+{% endblock %}

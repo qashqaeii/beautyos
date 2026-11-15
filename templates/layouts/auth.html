@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="flex min-h-screen items-center justify-center bg-porcelain px-4 py-12">
+  <div class="w-full max-w-md">
+    <div class="mb-8 text-center">
+      <div class="flex justify-center">
+        <div class="rounded-2xl border border-line bg-surface-elevated px-5 py-4">
+          {% include "partials/site_logo.html" with logo_class="h-14 w-auto max-w-[14rem] object-contain" %}
+        </div>
+      </div>
+      <p class="sr-only">{{ BEAUTYOS_PRODUCT_NAME }}</p>
+      <p class="mt-4 text-sm text-ink-secondary">{% block auth_subtitle %}{% endblock %}</p>
+    </div>
+    <div class="premium-card">
+      {% block auth_content %}{% endblock %}
+    </div>
+    <p class="mt-6 text-center text-xs text-ink-muted">با ورود، شرایط استفاده و حریم خصوصی را می‌پذیرید.</p>
+  </div>
+</div>
+<script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons();});</script>
+{% endblock %}

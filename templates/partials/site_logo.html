@@ -1,0 +1,9 @@
+{% load static %}
+<img
+  src="{% static BEAUTYOS_SITE_LOGO %}"
+  alt="{{ BEAUTYOS_PRODUCT_NAME }}"
+  class="{{ logo_class|default:'h-10 w-auto max-w-[11rem] object-contain' }}"
+  decoding="async"
+  {% if logo_width %}width="{{ logo_width }}"{% endif %}
+  {% if logo_height %}height="{{ logo_height }}"{% endif %}
+>

@@ -1,0 +1,173 @@
+{% load format_tags appointment_tags %}
+{% if no_staff_for_service %}
+<p class="appt-cal-empty appt-cal-empty--inline text-sm text-ink-secondary">متخصصی برای این خدمت ثبت نشده</p>
+{% elif calendar_grid.columns %}
+<div
+  class="appt-cal-grid hidden lg:block"
+  style="--appt-cal-rows: {{ calendar_grid.total_rows }}; --appt-cal-slot: 20px"
+>
+  <div class="appt-cal-grid__viewport maison-scroll-themed">
+    <div
+      class="appt-cal-grid__table"
+      style="grid-template-columns: 3.25rem repeat({{ calendar_grid.columns|length }}, minmax(10rem, 1fr))"
+    >
+      <div class="appt-cal-grid__head-row">
+        <div class="appt-cal-grid__corner" aria-hidden="true"></div>
+        {% for col in calendar_grid.columns %}
+        <div class="appt-cal-grid__staff-head {{ col.color_class }}">
+          <span class="appt-cal-grid__staff-name">{{ col.staff.full_display_name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="appt-cal-grid__body-row">
+        <div
+          class="appt-cal-grid__times"
+          style="grid-template-rows: repeat({{ calendar_grid.total_rows }}, var(--appt-cal-slot))"
+        >
+          {% for tl in calendar_grid.time_labels %}
+          <span class="appt-cal-grid__time-label" style="grid-row: {{ tl.row }}">{{ tl.label|persian_digits }}</span>
+          {% endfor %}
+        </div>
+        {% for col in calendar_grid.columns %}
+        <div
+          class="appt-cal-grid__column {{ col.color_class }}"
+          style="grid-template-rows: repeat({{ calendar_grid.total_rows }}, var(--appt-cal-slot))"
+        >
+          {% for seg in col.segments %}
+          {% if seg.type == 'appointment' %}
+          <a
+            href="{{ seg.detail_url }}"
+            class="appt-cal-seg appt-cal-seg--appt {{ col.color_class }}{% if seg.is_service_match %} appt-cal-seg--highlight{% endif %}"
+            style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+          >
+            <span class="appt-cal-seg__time tabular-nums">{{ seg.time_range|persian_digits }}</span>
+            <span class="appt-cal-seg__customer">{{ seg.customer_name }}</span>
+            <span class="appt-cal-seg__service">{{ seg.service_name }}</span>
+            <span class="appt-cal-seg__status">{{ seg.status_label }}</span>
+          </a>
+          {% elif seg.type == 'busy' %}
+          <div
+            class="appt-cal-seg appt-cal-seg--busy"
+            style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+            role="img"
+            aria-label="{{ seg.label }}"
+            title="{{ seg.time_range|persian_digits }}"
+          ></div>
+          {% elif seg.type == 'free' %}
+          {% if seg.book_url %}
+          <a
+            href="{{ seg.book_url }}"
+            class="appt-cal-seg appt-cal-seg--free {{ col.color_class }}"
+            style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+            aria-label="رزرو وقت آزاد"
+          ></a>
+          {% else %}
+          <div
+            class="appt-cal-seg appt-cal-seg--free"
+            style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+          ></div>
+          {% endif %}
+          {% else %}
+          <div
+            class="appt-cal-seg appt-cal-seg--{{ seg.type }}"
+            style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+            role="img"
+            aria-label="{{ seg.label }}"
+          ></div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="appt-cal-mobile lg:hidden">
+  {% if not staff_filter_locked %}
+  <form method="get" class="appt-cal-mobile__staff-pick mb-3">
+    <input type="hidden" name="day" value="{{ day|date:'Y-m-d' }}">
+    {% if selected_service %}<input type="hidden" name="service" value="{{ selected_service.pk }}">{% endif %}
+    <label class="field-label" for="appt-cal-mobile-staff">متخصص</label>
+    <select name="staff" id="appt-cal-mobile-staff" class="input-field mt-1 w-full text-sm" onchange="this.form.submit()">
+      {% for s in staff_list %}
+      <option value="{{ s.pk }}" {% if mobile_staff_pk == s.pk %}selected{% endif %}>{{ s.full_display_name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+  {% if mobile_column %}
+  <div
+    class="appt-cal-grid appt-cal-grid--mobile"
+    style="--appt-cal-rows: {{ calendar_grid.total_rows }}; --appt-cal-slot: 22px"
+  >
+    <div class="appt-cal-grid__viewport maison-scroll-themed">
+      <div class="appt-cal-grid__table appt-cal-grid__table--one" style="grid-template-columns: 3.25rem minmax(0, 1fr)">
+        <div class="appt-cal-grid__head-row">
+          <div class="appt-cal-grid__corner"></div>
+          <div class="appt-cal-grid__staff-head {{ mobile_column.color_class }}">
+            <span class="appt-cal-grid__staff-name">{{ mobile_column.staff.full_display_name }}</span>
+          </div>
+        </div>
+        <div class="appt-cal-grid__body-row">
+          <div
+            class="appt-cal-grid__times"
+            style="grid-template-rows: repeat({{ calendar_grid.total_rows }}, var(--appt-cal-slot))"
+          >
+            {% for tl in calendar_grid.time_labels %}
+            <span class="appt-cal-grid__time-label" style="grid-row: {{ tl.row }}">{{ tl.label|persian_digits }}</span>
+            {% endfor %}
+          </div>
+          <div
+            class="appt-cal-grid__column {{ mobile_column.color_class }}"
+            style="grid-template-rows: repeat({{ calendar_grid.total_rows }}, var(--appt-cal-slot))"
+          >
+            {% for seg in mobile_column.segments %}
+            {% if seg.type == 'appointment' %}
+            <a
+              href="{{ seg.detail_url }}"
+              class="appt-cal-seg appt-cal-seg--appt {{ mobile_column.color_class }}{% if seg.is_service_match %} appt-cal-seg--highlight{% endif %}"
+              style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+            >
+              <span class="appt-cal-seg__time tabular-nums">{{ seg.time_range|persian_digits }}</span>
+              <span class="appt-cal-seg__customer">{{ seg.customer_name }}</span>
+              <span class="appt-cal-seg__service">{{ seg.service_name }}</span>
+              <span class="appt-cal-seg__status">{{ seg.status_label }}</span>
+            </a>
+            {% elif seg.type == 'busy' %}
+            <div
+              class="appt-cal-seg appt-cal-seg--busy"
+              style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+              role="img"
+              aria-label="{{ seg.label }}"
+            ></div>
+            {% elif seg.type == 'free' %}
+            {% if seg.book_url %}
+            <a
+              href="{{ seg.book_url }}"
+              class="appt-cal-seg appt-cal-seg--free {{ mobile_column.color_class }}"
+              style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+              aria-label="رزرو وقت آزاد"
+            ></a>
+            {% else %}
+            <div class="appt-cal-seg appt-cal-seg--free" style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"></div>
+            {% endif %}
+            {% else %}
+            <div
+              class="appt-cal-seg appt-cal-seg--{{ seg.type }}"
+              style="grid-row: {{ seg.row_start }} / span {{ seg.row_span }}"
+              role="img"
+              aria-label="{{ seg.label }}"
+            ></div>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% else %}
+<p class="appt-cal-empty mt-4 text-sm text-ink-muted">متخصص فعالی برای نمایش نیست.</p>
+{% endif %}

@@ -1,0 +1,37 @@
+{% extends "layouts/public_site.html" %}
+{% block title %}تماس و پشتیبانی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block public_content %}
+{% include "partials/public_page_hero.html" with eyebrow="پشتیبانی" title="تماس و پشتیبانی" lead="برای مشکلات فنی یا راه‌اندازی سالن، از مسیرهای زیر کمک بگیرید." %}
+<div class="mx-auto max-w-3xl px-4 pb-14 sm:px-6">
+  <div class="public-contact-grid">
+    <article class="public-contact-card">
+      <i data-lucide="building-2" class="h-6 w-6 text-lavender" aria-hidden="true"></i>
+      <h2 class="mt-3 font-semibold text-aubergine">صاحبان سالن</h2>
+      <p class="mt-2 text-sm leading-relaxed text-charcoal/70">
+        اگر سالن ثبت کرده‌اید، از داخل پنل با نقش مدیر می‌توانید هماهنگی پشتیبانی و تنظیمات را انجام دهید.
+      </p>
+      <a href="{% url 'dashboard:home' %}" class="mt-4 inline-flex text-sm font-medium text-lavender hover:underline">رفتن به پنل سالن</a>
+    </article>
+    <article class="public-contact-card">
+      <i data-lucide="sparkles" class="h-6 w-6 text-lavender" aria-hidden="true"></i>
+      <h2 class="mt-3 font-semibold text-aubergine">شروع تازه</h2>
+      <p class="mt-2 text-sm leading-relaxed text-charcoal/70">
+        هنوز حساب ندارید؟ ثبت‌نام سالن رایگان است و در چند دقیقه پنل، تقویم و صفحه رزرو آنلاین آماده می‌شود.
+      </p>
+      <a href="{% url 'accounts:register' %}" class="mt-4 inline-flex text-sm font-medium text-lavender hover:underline">ثبت‌نام سالن</a>
+    </article>
+    <article class="public-contact-card sm:col-span-2">
+      <i data-lucide="book-open" class="h-6 w-6 text-lavender" aria-hidden="true"></i>
+      <h2 class="mt-3 font-semibold text-aubergine">راهنمای سریع</h2>
+      <p class="mt-2 text-sm leading-relaxed text-charcoal/70">
+        پیش از تماس، بخش سؤالات متداول و مقالات بلاگ پاسخ بسیاری از سؤالات درباره نوبت عمومی، نقش‌های تیم و ورود پیامکی را پوشش می‌دهد.
+      </p>
+      <div class="mt-4 flex flex-wrap gap-4 text-sm">
+        <a href="{% url 'website:faq' %}" class="font-medium text-lavender hover:underline">سؤالات متداول</a>
+        <a href="{% url 'website:blog' %}" class="font-medium text-lavender hover:underline">مقالات بلاگ</a>
+        <a href="{% url 'website:features' %}" class="font-medium text-lavender hover:underline">امکانات پنل</a>
+      </div>
+    </article>
+  </div>
+</div>
+{% endblock %}

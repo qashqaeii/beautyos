@@ -1,0 +1,19 @@
+<header class="dashboard-shell-header dashboard-enter">
+  <div class="dashboard-shell-header__inner">
+    <div class="min-w-0">
+      <p class="dashboard-shell-header__eyebrow">{{ active_salon.name }}</p>
+      <h1 class="dashboard-shell-header__title">{{ header_title }}</h1>
+    </div>
+    <div class="dashboard-shell-header__date flex flex-wrap items-center gap-2">
+      <a href="?day={{ prev_day }}{% if range_key %}&range={{ range_key }}{% endif %}{% if request.GET.service %}&service={{ request.GET.service }}{% endif %}{% if request.GET.staff %}&staff={{ request.GET.staff }}{% endif %}" class="dashboard-shell-header__nav" aria-label="روز قبل">‹</a>
+      <span class="dashboard-shell-header__jalali tabular-nums">{{ day_jalali|default:today_jalali|persian_digits }}</span>
+      <a href="?day={{ next_day }}{% if range_key %}&range={{ range_key }}{% endif %}{% if request.GET.service %}&service={{ request.GET.service }}{% endif %}{% if request.GET.staff %}&staff={{ request.GET.staff }}{% endif %}" class="dashboard-shell-header__nav" aria-label="روز بعد">›</a>
+      <form method="get" class="dashboard-shell-header__picker-form">
+        {% if range_key %}<input type="hidden" name="range" value="{{ range_key }}">{% endif %}
+        {% if request.GET.service %}<input type="hidden" name="service" value="{{ request.GET.service }}">{% endif %}
+        {% if request.GET.staff %}<input type="hidden" name="staff" value="{{ request.GET.staff }}">{% endif %}
+        {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali|default:today_jalali %}
+      </form>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,43 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}ثبت مرخصی{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="staff-timeoff-page">
+  <header class="staff-timeoff-page__header">
+    <div class="staff-timeoff-page__head-copy">
+      <h1 class="staff-timeoff-page__title">ثبت مرخصی</h1>
+      <p class="staff-timeoff-page__staff-name">{{ profile.display_name|default:profile.user }}</p>
+    </div>
+    <a href="{% url 'staff:detail' pk=profile.pk %}" class="staff-timeoff-page__back">بازگشت به پروفایل</a>
+  </header>
+
+  <div class="staff-timeoff-card">
+    <form method="post" class="staff-timeoff-form">
+      {% csrf_token %}
+      <div class="staff-timeoff-form__dates">
+        <div class="staff-timeoff-field">
+          <label class="field-label" for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}</label>
+          {{ form.start_date }}
+          {% if form.start_date.errors %}<p class="staff-timeoff-field__error">{{ form.start_date.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="staff-timeoff-field">
+          <label class="field-label" for="{{ form.end_date.id_for_label }}">{{ form.end_date.label }}</label>
+          {{ form.end_date }}
+          {% if form.end_date.errors %}<p class="staff-timeoff-field__error">{{ form.end_date.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div class="staff-timeoff-field staff-timeoff-form__reason">
+        <label class="field-label" for="{{ form.reason.id_for_label }}">{{ form.reason.label }}</label>
+        {{ form.reason }}
+        {% if form.reason.errors %}<p class="staff-timeoff-field__error">{{ form.reason.errors.0 }}</p>{% endif %}
+      </div>
+      {% if form.non_field_errors %}
+      <p class="staff-timeoff-field__error">{{ form.non_field_errors.0 }}</p>
+      {% endif %}
+      <button type="submit" class="btn-primary staff-timeoff-form__submit">ثبت مرخصی</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

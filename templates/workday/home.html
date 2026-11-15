@@ -1,0 +1,38 @@
+{% extends "layouts/app_shell.html" %}
+{% load appointment_tags %}
+{% block page_title %}روز کاری من{% endblock %}
+{% block page_subtitle %}{{ today }}{% endblock %}
+{% block header_modifier %}max-lg:hidden{% endblock %}
+{% block mobile_header %}
+{% if profile %}
+{% include "partials/mobile_app_brand_header.html" with greeting_override="روز کاری" title_line=profile.display_name %}
+{% else %}
+{% include "partials/mobile_app_brand_header.html" with greeting_override="روز کاری" title_line="متخصص" %}
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="space-y-4 lg:space-y-6">
+  {% if next_appt %}
+  <section class="maison-panel lg:hidden">
+    <p class="text-xs font-medium text-ink-secondary">نوبت بعدی</p>
+    <p class="mt-1 text-2xl font-semibold tabular-nums text-ink">{{ next_appt.start_at|time:"H:i" }}</p>
+    <p class="font-medium text-ink">{{ next_appt.customer.full_name }}</p>
+    <p class="text-sm text-ink-secondary">{{ next_appt.service.name }}</p>
+    <a href="{% url 'appointments:detail' pk=next_appt.pk %}" class="btn-primary mt-4 w-full text-sm">مشاهده نوبت</a>
+  </section>
+  {% endif %}
+
+  <section class="premium-card divide-y divide-line p-0" id="schedule">
+    <div class="maison-panel__head border-b px-5 py-3 !mb-0" style="border-color: var(--color-divider);">
+      <h2 class="maison-panel__title text-sm">برنامه امروز</h2>
+    </div>
+    {% for a in appointments %}
+    <div class="px-4 py-3 lg:px-5">
+      {% include "partials/appointment_card_compact.html" with appointment=a %}
+    </div>
+    {% empty %}
+    <p class="p-6 text-center text-sm text-ink-muted">امروز نوبتی ندارید.</p>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body %}
+<style>[x-cloak]{display:none!important}</style>
+<div class="public-site public-auth-shell min-h-screen bg-porcelain text-aubergine" data-theme="luna_signature">
+  <div class="public-auth-layout">
+    <aside class="public-auth-brand" aria-hidden="false">
+      <a href="{% url 'website:home' %}" class="public-auth-brand__logo">
+        <img src="{% static BEAUTYOS_SITE_LOGO %}" alt="{{ BEAUTYOS_PRODUCT_NAME }}" width="140" height="42">
+      </a>
+      <div class="public-auth-brand__body">
+        <p class="public-auth-brand__eyebrow">مدیریت حرفه‌ای سالن</p>
+        <h2 class="public-auth-brand__title">نوبت‌ها، تیم و درآمد — در یک پنل منسجم</h2>
+        <ul class="public-auth-brand__list">
+          <li><i data-lucide="calendar-check" class="h-4 w-4" aria-hidden="true"></i>رزرو آنلاین و تقویم روزانه</li>
+          <li><i data-lucide="users" class="h-4 w-4" aria-hidden="true"></i>مدیریت مشتری و تیم با نقش‌های مجزا</li>
+          <li><i data-lucide="shield-check" class="h-4 w-4" aria-hidden="true"></i>ورود امن با کد یک‌بار مصرف</li>
+        </ul>
+      </div>
+      <a href="{% url 'website:home' %}" class="public-auth-brand__back">
+        <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
+        بازگشت به صفحه اصلی
+      </a>
+    </aside>
+
+    <div class="public-auth-main">
+      <header class="public-auth-top">
+        <a href="{% url 'website:home' %}" class="public-auth-top__home lg:hidden">
+          <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
+          خانه
+        </a>
+        <img src="{% static BEAUTYOS_SITE_LOGO %}" alt="" class="public-auth-top__logo lg:hidden" width="100" height="30">
+      </header>
+
+      <div class="public-auth-card-wrap">
+        {% block auth_steps %}{% endblock %}
+        <header class="public-auth-card__head">
+          <h1 class="public-auth-card__title">{% block auth_heading %}{% endblock %}</h1>
+          <p class="public-auth-card__subtitle">{% block auth_subtitle %}{% endblock %}</p>
+        </header>
+        <div class="public-auth-card premium-card">
+          {% block auth_content %}{% endblock %}
+        </div>
+        <p class="public-auth-legal">
+          با ادامه،
+          <a href="{% url 'website:terms' %}">شرایط استفاده</a>
+          و
+          <a href="{% url 'website:privacy' %}">حریم خصوصی</a>
+          {{ BEAUTYOS_PRODUCT_NAME }} را می‌پذیرید.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons();});</script>
+{% block extra_auth_js %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,273 @@
+from datetime import timedelta
+
+from django.conf import settings
+from django.contrib.auth import login, logout
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.views import View
+
+from apps.accounts.forms import OTPVerifyForm, PhoneForm, RegisterProfileForm
+from apps.accounts.models import OTPChallenge, User
+from apps.accounts.services.otp import OTPInvalid, OTPRateLimited, issue_otp, verify_otp
+from apps.core.utils.phone import display_iran_mobile
+
+OTP_RESEND_COOLDOWN_SECONDS = 60
+
+
+def _store_dev_otp(request, issued):
+    if issued.dev_code:
+        request.session["dev_otp_code"] = issued.dev_code
+    request.session["otp_issued_at"] = issued.challenge.created_at.isoformat()
+
+
+def _otp_issued_at(request):
+    raw = request.session.get("otp_issued_at")
+    if not raw:
+        return None
+    try:
+        parsed = timezone.datetime.fromisoformat(raw)
+        if timezone.is_naive(parsed):
+            return timezone.make_aware(parsed, timezone.get_current_timezone())
+        return parsed
+    except (TypeError, ValueError):
+        return None
+
+
+def _verify_context(request, *, phone, otp_form, purpose, next_step=""):
+    issued_at = _otp_issued_at(request)
+    now = timezone.now()
+    resend_at = None
+    if issued_at:
+        resend_at = issued_at + timedelta(seconds=OTP_RESEND_COOLDOWN_SECONDS)
+    expires_at = None
+    if issued_at:
+        expires_at = issued_at + timedelta(seconds=settings.BEAUTYOS_OTP_EXPIRY_SECONDS)
+    return {
+        "phone_display": display_iran_mobile(phone),
+        "otp_form": otp_form,
+        "purpose": purpose,
+        "next_step": next_step,
+        "dev_otp_code": request.session.get("dev_otp_code") if request.session.get("auth_phone") == phone else None,
+        "otp_resend_at_iso": resend_at.isoformat() if resend_at else "",
+        "otp_expires_at_iso": expires_at.isoformat() if expires_at else "",
+        "can_resend_now": resend_at is None or now >= resend_at,
+    }
+
+
+def _client_ip(request):
+    forwarded = request.META.get("HTTP_X_FORWARDED_FOR")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR")
+
+
+class LoginView(View):
+    template_name = "accounts/login.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect("dashboard:home")
+        return render(request, self.template_name, {"phone_form": PhoneForm()})
+
+    def post(self, request):
+        step = request.POST.get("step", "phone")
+        if step == "phone":
+            form = PhoneForm(request.POST)
+            if not form.is_valid():
+                return render(request, self.template_name, {"phone_form": form})
+            phone = form.cleaned_data["phone"]
+            try:
+                issued = issue_otp(
+                    phone=phone,
+                    purpose=OTPChallenge.Purpose.LOGIN,
+                    request_ip=_client_ip(request),
+                    user_agent=request.META.get("HTTP_USER_AGENT", ""),
+                )
+            except OTPRateLimited:
+                form.add_error(None, "تعداد درخواست‌ها بیش از حد مجاز است.")
+                return render(request, self.template_name, {"phone_form": form})
+            request.session["auth_phone"] = phone
+            request.session["auth_purpose"] = OTPChallenge.Purpose.LOGIN
+            _store_dev_otp(request, issued)
+            return redirect("accounts:verify")
+        return redirect("accounts:login")
+
+
+class RegisterView(View):
+    template_name = "accounts/register.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect("dashboard:home")
+        return render(request, self.template_name, {"phone_form": PhoneForm()})
+
+    def post(self, request):
+        form = PhoneForm(request.POST)
+        if not form.is_valid():
+            return render(request, self.template_name, {"phone_form": form})
+        phone = form.cleaned_data["phone"]
+        if User.objects.filter(phone=phone).exists():
+            form.add_error("phone", "این شماره قبلاً ثبت شده است. از ورود استفاده کنید.")
+            return render(request, self.template_name, {"phone_form": form})
+        try:
+            issued = issue_otp(
+                phone=phone,
+                purpose=OTPChallenge.Purpose.REGISTER,
+                request_ip=_client_ip(request),
+                user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            )
+        except OTPRateLimited:
+            form.add_error(None, "تعداد درخواست‌ها بیش از حد مجاز است.")
+            return render(request, self.template_name, {"phone_form": form})
+        request.session["auth_phone"] = phone
+        request.session["auth_purpose"] = OTPChallenge.Purpose.REGISTER
+        request.session["auth_next_step"] = "register_profile"
+        _store_dev_otp(request, issued)
+        return redirect("accounts:verify")
+
+
+class VerifyOTPView(View):
+    def _change_number_url(self, purpose):
+        if purpose == OTPChallenge.Purpose.REGISTER:
+            return reverse("accounts:register")
+        return reverse("accounts:login")
+
+    def get(self, request):
+        phone = request.session.get("auth_phone")
+        purpose = request.session.get("auth_purpose")
+        if not phone or not purpose:
+            return redirect("accounts:login")
+        ctx = _verify_context(
+            request,
+            phone=phone,
+            otp_form=OTPVerifyForm(),
+            purpose=purpose,
+            next_step=request.session.get("auth_next_step", ""),
+        )
+        ctx["change_number_url"] = self._change_number_url(purpose)
+        return render(request, "accounts/verify_otp.html", ctx)
+
+    def post(self, request):
+        phone = request.session.get("auth_phone")
+        purpose = request.session.get("auth_purpose")
+        if not phone or not purpose:
+            return redirect("accounts:login")
+
+        if request.POST.get("action") == "resend":
+            issued_at = _otp_issued_at(request)
+            if issued_at and timezone.now() < issued_at + timedelta(seconds=OTP_RESEND_COOLDOWN_SECONDS):
+                ctx = _verify_context(
+                    request,
+                    phone=phone,
+                    otp_form=OTPVerifyForm(),
+                    purpose=purpose,
+                    next_step=request.session.get("auth_next_step", ""),
+                )
+                ctx["change_number_url"] = self._change_number_url(purpose)
+                ctx["resend_error"] = "لطفاً چند ثانیه صبر کنید و دوباره تلاش کنید."
+                return render(request, "accounts/verify_otp.html", ctx)
+            try:
+                issued = issue_otp(
+                    phone=phone,
+                    purpose=purpose,
+                    request_ip=_client_ip(request),
+                    user_agent=request.META.get("HTTP_USER_AGENT", ""),
+                )
+            except OTPRateLimited:
+                ctx = _verify_context(
+                    request,
+                    phone=phone,
+                    otp_form=OTPVerifyForm(),
+                    purpose=purpose,
+                    next_step=request.session.get("auth_next_step", ""),
+                )
+                ctx["change_number_url"] = self._change_number_url(purpose)
+                ctx["resend_error"] = "تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید."
+                return render(request, "accounts/verify_otp.html", ctx)
+            _store_dev_otp(request, issued)
+            ctx = _verify_context(
+                request,
+                phone=phone,
+                otp_form=OTPVerifyForm(),
+                purpose=purpose,
+                next_step=request.session.get("auth_next_step", ""),
+            )
+            ctx["change_number_url"] = self._change_number_url(purpose)
+            ctx["resend_ok"] = True
+            return render(request, "accounts/verify_otp.html", ctx)
+
+        form = OTPVerifyForm(request.POST)
+        next_step = request.POST.get("next_step", "") or request.session.get("auth_next_step", "")
+        if not form.is_valid():
+            ctx = _verify_context(request, phone=phone, otp_form=form, purpose=purpose, next_step=next_step)
+            ctx["change_number_url"] = self._change_number_url(purpose)
+            return render(request, "accounts/verify_otp.html", ctx)
+
+        try:
+            verify_otp(phone=phone, purpose=purpose, code=form.cleaned_data["code"])
+        except OTPInvalid as exc:
+            form.add_error("code", str(exc))
+            ctx = _verify_context(request, phone=phone, otp_form=form, purpose=purpose, next_step=next_step)
+            ctx["change_number_url"] = self._change_number_url(purpose)
+            return render(request, "accounts/verify_otp.html", ctx)
+
+        if purpose == OTPChallenge.Purpose.REGISTER:
+            request.session["register_verified"] = True
+            return render(
+                request,
+                "accounts/register_profile.html",
+                {"profile_form": RegisterProfileForm(), "phone_display": display_iran_mobile(phone)},
+            )
+
+        user = User.objects.filter(phone=phone).first()
+        if user is None:
+            return redirect("accounts:register")
+
+        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+        for key in ("auth_phone", "auth_purpose", "auth_next_step", "dev_otp_code", "otp_issued_at"):
+            request.session.pop(key, None)
+        return redirect(self._post_login_redirect(request, user))
+
+    def _post_login_redirect(self, request, user):
+        from apps.salons.models import SalonMembership
+
+        if SalonMembership.objects.filter(user=user, is_active=True).exists():
+            return reverse("dashboard:home")
+        return reverse("salons_onboarding:create")
+
+
+class RegisterProfileView(View):
+    def post(self, request):
+        if not request.session.get("register_verified"):
+            return redirect("accounts:register")
+        phone = request.session.get("auth_phone")
+        if not phone:
+            return redirect("accounts:register")
+
+        form = RegisterProfileForm(request.POST)
+        if not form.is_valid():
+            return render(
+                request,
+                "accounts/register_profile.html",
+                {"profile_form": form, "phone_display": display_iran_mobile(phone)},
+            )
+
+        user, _created = User.objects.get_or_create(phone=phone, defaults={"full_name": form.cleaned_data["full_name"]})
+        if user.full_name != form.cleaned_data["full_name"]:
+            user.full_name = form.cleaned_data["full_name"]
+            user.save(update_fields=["full_name", "updated_at"])
+
+        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+        for key in ("auth_phone", "auth_purpose", "register_verified"):
+            request.session.pop(key, None)
+        return redirect("salons_onboarding:create")
+
+
+class LogoutView(View):
+    def post(self, request):
+        logout(request)
+        return redirect("website:home")
+
+    def get(self, request):
+        return redirect("website:home")

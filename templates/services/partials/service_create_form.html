@@ -1,0 +1,123 @@
+<form
+  method="post"
+  action="{% url 'services:create' %}"
+  enctype="multipart/form-data"
+  class="inventory-create-modal__form service-form"
+  id="service-create-form"
+>
+  {% csrf_token %}
+
+  <div class="inventory-create-modal__scroll maison-scroll-themed">
+  <div class="service-form__fields service-form__fields--modal">
+    <div class="service-form-field">
+      <label class="field-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+      {{ form.name }}
+      {% if form.name.errors %}<p class="service-form-field__error">{{ form.name.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="service-form-field service-form-field--category">
+      <div class="service-form-field__category-head">
+        <label class="field-label mb-0" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+        <button
+          type="button"
+          class="service-form__add-category-btn"
+          @click="showCategory = !showCategory"
+          :aria-expanded="showCategory"
+        >
+          + دسته‌بندی جدید
+        </button>
+      </div>
+      {{ form.category }}
+      {% if form.category.errors %}<p class="service-form-field__error">{{ form.category.errors.0 }}</p>{% endif %}
+
+      <template x-if="showCategory">
+        <div class="service-form-category-panel">
+          <label class="field-label" for="id_new_category_name">نام دسته‌بندی</label>
+          <input
+            type="text"
+            name="new_category_name"
+            id="id_new_category_name"
+            class="input-field"
+            value="{{ new_category_name|default:'' }}"
+            autocomplete="off"
+          />
+          {% if category_error %}<p class="service-form-field__error">{{ category_error }}</p>{% endif %}
+          <div class="service-form-category-panel__actions">
+            <button type="submit" name="intent" value="add_category" class="btn-secondary text-sm px-4 py-2">
+              افزودن
+            </button>
+            <button type="button" class="service-form-category-panel__cancel" @click="showCategory = false">
+              انصراف
+            </button>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="service-form-field">
+      <label class="field-label" for="{{ form.price_toman.id_for_label }}">{{ form.price_toman.label }}</label>
+      {{ form.price_toman }}
+      {% if form.price_toman.errors %}<p class="service-form-field__error">{{ form.price_toman.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="service-form-field">
+      <label class="field-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+      {{ form.description }}
+      {% if form.description.errors %}<p class="service-form-field__error">{{ form.description.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="service-form-advanced">
+      <button
+        type="button"
+        class="service-form-advanced__toggle"
+        @click="showAdvanced = !showAdvanced"
+        :aria-expanded="showAdvanced"
+      >
+        <span>تنظیمات بیشتر</span>
+        <i data-lucide="chevron-down" class="h-4 w-4 transition" :class="showAdvanced && 'rotate-180'"></i>
+      </button>
+      <div
+        class="service-form-advanced__body"
+        x-show="showAdvanced"
+        x-cloak
+        x-transition.opacity.duration.200ms
+      >
+        <div class="service-form-field service-form-field--checkbox">
+          <label class="service-form-checkbox">
+            {{ form.is_active }}
+            <span>{{ form.is_active.label }}</span>
+          </label>
+          {% if form.is_active.errors %}<p class="service-form-field__error">{{ form.is_active.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="service-form-field service-form-field--checkbox">
+          <label class="service-form-checkbox">
+            {{ form.is_public }}
+            <span>{{ form.is_public.label }}</span>
+          </label>
+          {% if form.is_public.errors %}<p class="service-form-field__error">{{ form.is_public.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="service-form-field">
+          <span class="field-label" id="service-image-label">{{ form.image.label }}</span>
+          <div class="service-form-file">
+            {{ form.image }}
+            <button
+              type="button"
+              class="service-form-file__btn"
+              @click="$refs.serviceImage.click()"
+            >
+              انتخاب تصویر
+            </button>
+            <span class="service-form-file__name" x-text="imageName" x-show="imageName" x-cloak></span>
+          </div>
+          {% if form.image.errors %}<p class="service-form-field__error">{{ form.image.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <footer class="inventory-create-modal__foot">
+    <button type="submit" name="intent" value="save_service" class="btn-primary service-form__submit">ذخیره خدمت</button>
+    <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-create-modal')">انصراف</button>
+  </footer>
+</form>

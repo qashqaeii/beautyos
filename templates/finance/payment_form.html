@@ -1,0 +1,11 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}ثبت پرداخت{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block content %}
+<script>window.location.replace("{% url 'finance:payment_create' %}?next={{ next_url|urlencode }}");</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url={% url 'finance:payment_create' %}?next={{ next_url|urlencode }}">
+  <p class="p-4 text-sm"><a href="{% url 'finance:payment_create' %}">رفتن به ثبت پرداخت</a></p>
+</noscript>
+{% endblock %}

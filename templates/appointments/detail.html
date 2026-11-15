@@ -1,0 +1,16 @@
+{% extends "layouts/app_shell.html" %}
+{% block page_title %}جزئیات نوبت{% endblock %}
+{% block content %}
+<div class="card max-w-2xl">
+  <p class="text-xs text-charcoal/50">کد پیگیری: <span dir="ltr">{{ appointment.tracking_code }}</span></p>
+  <h2 class="mt-2 text-xl font-semibold text-aubergine">{{ appointment.customer.full_name }}</h2>
+  <p class="text-sm text-charcoal/70">{{ appointment.service.name }} · {{ appointment.staff.display_name }}</p>
+  <p class="mt-2">{{ appointment.start_at|fa_jalali_datetime }} — {{ appointment.get_status_display }}</p>
+  <form method="post" class="mt-6 flex flex-wrap gap-2">{% csrf_token %}
+    {% if appointment.status != 'cancelled' and appointment.status != 'completed' %}
+    <button name="action" value="complete" class="btn-primary text-xs">تکمیل مراجعه</button>
+    <button name="action" value="cancel" class="btn-secondary text-xs">لغو</button>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}

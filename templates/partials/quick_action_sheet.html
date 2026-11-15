@@ -1,0 +1,53 @@
+<div
+  class="maison-sheet-backdrop"
+  x-show="quickSheetOpen"
+  x-transition.opacity
+  @click="quickSheetOpen = false"
+  x-cloak
+  aria-hidden="true"
+></div>
+<div
+  class="maison-sheet"
+  x-show="quickSheetOpen"
+  x-transition:enter="transition ease-out duration-200"
+  x-transition:enter-start="translate-y-full"
+  x-transition:enter-end="translate-y-0"
+  @click.outside="quickSheetOpen = false"
+  x-cloak
+  role="dialog"
+  aria-label="اقدام سریع"
+>
+  <div class="maison-sheet__handle" aria-hidden="true"></div>
+  <h2 class="mb-4 text-base font-semibold text-ink">افزودن</h2>
+  <nav class="grid gap-2">
+    {% if 'appointment.create' in membership_permissions %}
+    <a href="{% url 'appointments:create' %}" class="maison-sheet__action" @click="quickSheetOpen = false">
+      <i data-lucide="calendar-plus" class="h-5 w-5"></i>
+      <span>رزرو نوبت</span>
+    </a>
+    {% endif %}
+    {% if 'customer.create' in membership_permissions %}
+    <a href="{% url 'customers:create' %}" class="maison-sheet__action" @click="quickSheetOpen = false">
+      <i data-lucide="user-plus" class="h-5 w-5"></i>
+      <span>مشتری جدید</span>
+    </a>
+    {% endif %}
+    {% if 'payment.create' in membership_permissions %}
+    <a href="{% url 'finance:payment_create' %}" class="maison-sheet__action" @click="quickSheetOpen = false">
+      <i data-lucide="banknote" class="h-5 w-5"></i>
+      <span>ثبت دریافت</span>
+    </a>
+    {% endif %}
+    {% if not active_membership or active_membership.role != 'specialist' %}
+    <a href="{% url 'retention:queue' %}" class="maison-sheet__action" @click="quickSheetOpen = false">
+      <i data-lucide="heart-handshake" class="h-5 w-5"></i>
+      <span>صف پیگیری</span>
+    </a>
+    {% else %}
+    <a href="{% url 'workday:home' %}" class="maison-sheet__action" @click="quickSheetOpen = false">
+      <i data-lucide="sparkles" class="h-5 w-5"></i>
+      <span>برنامه امروز</span>
+    </a>
+    {% endif %}
+  </nav>
+</div>

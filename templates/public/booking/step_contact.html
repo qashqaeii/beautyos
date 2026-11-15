@@ -1,0 +1,20 @@
+{% extends "public/booking/base_booking.html" %}
+{% block booking_content %}
+{% include "partials/booking_progress.html" with step=4 %}
+<div class="premium-card border-line">
+  <h1 class="display-editorial text-lg font-semibold text-espresso">اطلاعات شما</h1>
+  <p class="mt-1 text-sm text-ink-secondary">برای تأیید نوبت، نام و موبایل را وارد کنید.</p>
+  <form method="post" class="mt-6 space-y-4">
+    {% csrf_token %}
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">نام کامل</label>
+      <input name="full_name" class="input-field" placeholder="مثلاً سارا محمدی" required autocomplete="name">
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">موبایل</label>
+      <input name="phone" class="input-field" placeholder="0912…" required inputmode="tel" autocomplete="tel">
+    </div>
+    <button type="submit" class="btn-primary w-full">دریافت کد تأیید</button>
+  </form>
+</div>
+{% endblock %}

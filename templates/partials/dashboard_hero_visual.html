@@ -1,0 +1,12 @@
+{% load static %}
+<div class="maison-hero__visual{% if compact %} maison-hero__visual--mobile{% endif %}">
+  <img
+    src="{% static 'images/dashboard/lavender_glow_beauty_portrait.png' %}"
+    alt="تصویر تزئینی BeautyOS"
+    class="dashboard-hero-image"
+    width="320"
+    height="200"
+    loading="{% if compact %}lazy{% else %}eager{% endif %}"
+    decoding="async"
+  >
+</div>

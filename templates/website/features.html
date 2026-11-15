@@ -1,0 +1,33 @@
+{% extends "layouts/public_site.html" %}
+{% block title %}امکانات · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block public_content %}
+{% include "partials/public_page_hero.html" with eyebrow="محصول" title="امکانات پنل سالن" lead="هر نقش به بخش‌های مشخصی دسترسی دارد؛ موارد زیر بر اساس مجوزهای واقعی نقش‌ها در سیستم است." %}
+<div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
+  <div class="mt-12 space-y-10">
+    {% for panel in role_panels %}
+    <section class="rounded-[24px] border border-line bg-surface p-6 sm:p-8">
+      <div class="flex items-start gap-4">
+        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent-soft/60 text-accent">
+          <i data-lucide="{{ panel.icon }}" class="h-6 w-6" aria-hidden="true"></i>
+        </span>
+        <div class="min-w-0 flex-1">
+          <h2 class="display-editorial text-2xl text-aubergine">{{ panel.role }}</h2>
+          <p class="text-sm text-charcoal/55">{{ panel.subtitle }}</p>
+          <ul class="mt-4 space-y-2 text-sm text-charcoal/75">
+            {% for cap in panel.capabilities %}
+            <li class="flex gap-2">
+              <span class="text-sage" aria-hidden="true">✓</span>
+              <span>{{ cap }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+  <p class="mt-12 text-center">
+    <a href="{% url 'accounts:register' %}" class="btn-public-primary">ثبت‌نام سالن</a>
+  </p>
+</div>
+{% endblock %}

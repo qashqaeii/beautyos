@@ -1,0 +1,83 @@
+{% extends "layouts/app_shell.html" %}
+{% load format_tags %}
+{% block header_modifier %}dashboard-lite-app-header{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block mobile_header %}{% endblock %}
+{% block content %}
+<div class="loyalty-page loyalty-page--member mx-auto w-full max-w-3xl pb-24 md:pb-8">
+  <header class="loyalty-page__hero dashboard-enter">
+    <div class="loyalty-page__hero-copy min-w-0">
+      <a href="{% url 'loyalty:overview' %}" class="loyalty-back-link text-sm">
+        <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
+        بازگشت به باشگاه
+      </a>
+      <h1 class="loyalty-page__title mt-2">{{ account.customer.full_name }}</h1>
+      <p class="loyalty-page__subtitle tabular-nums">{{ account.customer.phone|fa_num }}</p>
+    </div>
+    <span class="loyalty-tier-badge loyalty-tier-badge--{{ tier.key }} loyalty-tier-badge--lg">{{ tier.label_fa }}</span>
+  </header>
+
+  <section class="loyalty-member-summary dashboard-enter">
+    <div class="loyalty-member-summary__points">
+      <p class="loyalty-member-summary__label">موجودی امتیاز</p>
+      <p class="loyalty-member-summary__value tabular-nums">{{ account.points_balance|fa_num }}</p>
+    </div>
+    <div class="loyalty-member-summary__meta">
+      <p><span class="tabular-nums">{{ account.customer.total_visits|fa_num }}</span> مراجعه</p>
+      <p>{{ account.customer.total_spent_toman|fa_money }}</p>
+    </div>
+  </section>
+
+  {% if next_tier %}
+  <section class="loyalty-progress-panel dashboard-enter" aria-label="پیشرفت تا سطح بعد">
+    <div class="loyalty-progress-panel__head">
+      <span>تا سطح {{ next_tier.label_fa }}</span>
+      <span class="tabular-nums">{{ progress_into|fa_num }} از {{ progress_span|fa_num }}</span>
+    </div>
+    <div class="loyalty-progress-bar" role="progressbar" aria-valuenow="{{ progress_pct }}" aria-valuemin="0" aria-valuemax="100">
+      <div class="loyalty-progress-bar__fill" style="width: {{ progress_pct }}%;"></div>
+    </div>
+  </section>
+  {% else %}
+  <p class="loyalty-member-max-tier dashboard-enter">این عضو در بالاترین سطح باشگاه است.</p>
+  {% endif %}
+
+  <section class="loyalty-activity-panel dashboard-enter">
+    <h2 class="loyalty-panel__heading">تاریخچه امتیاز</h2>
+    {% if tx_rows %}
+    <ul class="loyalty-activity-list">
+      {% for row in tx_rows %}
+      {% with tx=row.tx %}
+      <li class="loyalty-activity-list__item">
+        <div class="loyalty-activity-row">
+          <div class="loyalty-activity-row__copy">
+            <p class="loyalty-activity-row__meta loyalty-activity-row__meta--strong">{{ tx.get_kind_display }}</p>
+            {% if tx.note %}<p class="loyalty-activity-row__meta">{{ tx.note }}</p>{% endif %}
+          </div>
+          <div class="loyalty-activity-row__aside">
+            <span class="loyalty-activity-row__points tabular-nums{% if row.signed_points < 0 %} loyalty-activity-row__points--down{% else %} loyalty-activity-row__points--up{% endif %}">
+              {% if row.signed_points > 0 %}+{% endif %}{{ row.signed_points|fa_num }}
+            </span>
+            <time class="loyalty-activity-row__time" datetime="{{ tx.created_at|date:'c' }}">{{ tx.created_at|fa_jalali_datetime }}</time>
+          </div>
+        </div>
+      </li>
+      {% endwith %}
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="loyalty-panel__empty">تراکنشی برای این مشتری ثبت نشده است.</p>
+    {% endif %}
+  </section>
+
+  <div class="loyalty-member-actions dashboard-enter">
+    <a href="{% url 'customers:detail' pk=account.customer_id %}" class="btn-secondary text-sm">پرونده مشتری</a>
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}

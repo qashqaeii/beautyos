@@ -1,0 +1,11 @@
+{% extends "layouts/app_shell.html" %}
+{% block content %}
+<div class="mx-auto max-w-md card text-center">
+  <p>آرشیو مشتری <strong>{{ customer.full_name }}</strong>؟</p>
+  <form method="post" class="mt-4 flex gap-2 justify-center">
+    {% csrf_token %}
+    <button type="submit" class="btn-primary">تأیید آرشیو</button>
+    <a href="{% url 'customers:detail' pk=customer.pk %}" class="btn-secondary">انصراف</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "layouts/app_shell.html" %}
+{% block page_title %}اعضای سالن{% endblock %}
+{% block page_subtitle %}دعوت و نقش‌ها{% endblock %}
+{% block content %}
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="premium-card">
+    <h2 class="mb-4 font-semibold text-espresso">دعوت عضو جدید</h2>
+    <form method="post" action="{% url 'salons_members:invite' %}" class="space-y-3">
+      {% csrf_token %}
+      {{ invite_form.phone.label_tag }}{{ invite_form.phone }}
+      {{ invite_form.role.label_tag }}{{ invite_form.role }}
+      <button class="btn-primary">ارسال دعوت</button>
+    </form>
+    <h3 class="mt-6 mb-2 text-sm font-medium">دعوت‌های باز</h3>
+    <ul class="space-y-2 text-sm">
+      {% for inv in pending_invites %}
+      <li class="flex justify-between gap-2 rounded-lg border border-line px-3 py-2">
+        <span dir="ltr">{{ inv.phone }}</span>
+        <span>{{ inv.get_role_display }}</span>
+        <a href="{% url 'salons_members:invite_cancel' pk=inv.pk %}" class="text-danger text-xs">لغو</a>
+      </li>
+      {% empty %}
+      <li class="text-ink-muted">دعوت باز نیست.</li>
+      {% endfor %}
+    </ul>
+    <p class="mt-4 text-xs text-ink-muted">لینک پذیرش: `/members/accept/&lt;token&gt;/` پس از ورود کاربر با همان موبایل</p>
+  </section>
+  <section class="premium-card">
+    <h2 class="mb-4 font-semibold text-espresso">اعضای فعال</h2>
+    <ul class="divide-y divide-line text-sm">
+      {% for m in members %}
+      <li class="py-3 flex flex-wrap items-center justify-between gap-2">
+        <span>{{ m.user.full_name|default:m.user.phone }}</span>
+        <span class="flex items-center gap-2">
+          <span>{{ m.get_role_display }}</span>
+          {% if m.role == 'receptionist' %}
+          <a href="{% url 'salons_members:toggle_staff_manage' pk=m.pk %}" class="text-xs font-medium text-ink-secondary hover:text-ink">
+            {% if m.can_manage_staff %}مدیریت متخصص ✓{% else %}+ مدیریت متخصص{% endif %}
+          </a>
+          {% endif %}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

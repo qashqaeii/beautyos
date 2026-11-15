@@ -1,0 +1,45 @@
+<nav class="maison-mobile-bar lg:hidden" aria-label="ناوبری موبایل">
+  {% if active_membership and active_membership.role == 'specialist' %}
+  <div class="maison-mobile-bar__inner maison-mobile-bar__inner--lite grid-cols-1">
+    {% if nav_calendar %}
+    <a href="{% url 'appointments:calendar' %}{% if active_membership.staff_profile %}?staff={{ active_membership.staff_profile.pk }}{% endif %}" class="maison-mobile-bar__link {% if request.resolver_match.app_name == 'appointments' %}is-active{% endif %}">
+      <i data-lucide="calendar-days" class="h-5 w-5"></i>
+      <span>تقویم</span>
+    </a>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="maison-mobile-bar__inner maison-mobile-bar__inner--lite grid grid-cols-5">
+    {% if nav_overview %}
+    <a href="{% url 'dashboard:home' %}" class="maison-mobile-bar__link {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'home' %}is-active{% endif %}">
+      <i data-lucide="layout-dashboard" class="h-5 w-5"></i>
+      <span>نمای کلی</span>
+    </a>
+    {% endif %}
+    {% if nav_management %}
+    <a href="{% url 'dashboard:management' %}" class="maison-mobile-bar__link {% if request.resolver_match.url_name == 'management' %}is-active{% endif %}">
+      <i data-lucide="briefcase" class="h-5 w-5"></i>
+      <span>مدیریت</span>
+    </a>
+    {% endif %}
+    {% if nav_reception %}
+    <a href="{% url 'reception:desk' %}" class="maison-mobile-bar__link {% if request.resolver_match.app_name == 'reception' %}is-active{% endif %}">
+      <i data-lucide="concierge-bell" class="h-5 w-5"></i>
+      <span>پذیرش</span>
+    </a>
+    {% endif %}
+    {% if nav_specialists %}
+    <a href="{% url 'dashboard:specialists' %}" class="maison-mobile-bar__link {% if request.resolver_match.url_name == 'specialists' %}is-active{% endif %}">
+      <i data-lucide="sparkles" class="h-5 w-5"></i>
+      <span>متخصص‌ها</span>
+    </a>
+    {% endif %}
+    {% if nav_calendar %}
+    <a href="{% url 'appointments:calendar' %}" class="maison-mobile-bar__link {% if request.resolver_match.app_name == 'appointments' and request.resolver_match.url_name == 'calendar' %}is-active{% endif %}">
+      <i data-lucide="calendar-days" class="h-5 w-5"></i>
+      <span>تقویم</span>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</nav>

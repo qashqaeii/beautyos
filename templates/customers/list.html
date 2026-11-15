@@ -1,0 +1,230 @@
+{% extends "layouts/app_shell.html" %}
+{% load humanize %}
+{% block title %}مشتریان{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block page_actions %}{% endblock %}
+
+{% block content %}
+<div
+  class="customers-list-page"
+  x-data="{
+    createOpen: {{ create_modal_open|yesno:'true,false' }},
+    closeCreate() {
+      this.createOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('create')) {
+        params.delete('create');
+        const qs = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+      }
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', createOpen)"
+  @beautyos-close-create-modal.window="closeCreate()"
+  @keydown.escape.window="createOpen && !window.__beautyosJalaliCalendarOpen && closeCreate()"
+>
+  {% if messages %}
+  <div class="customers-list-page__messages mb-3 space-y-2">
+    {% for message in messages %}
+    <p class="inventory-page__flash text-sm{% if message.tags %} inventory-page__flash--{{ message.tags }}{% endif %}">{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <header class="customers-list-page__header">
+    <div class="customers-list-page__headline">
+      <span class="customers-list-page__head-icon" aria-hidden="true">
+        <i data-lucide="users" class="h-5 w-5"></i>
+      </span>
+      <h1 class="customers-list-page__title">مدیریت مشتریان</h1>
+    </div>
+    <button
+      type="button"
+      class="customers-list-page__add btn-primary"
+      @click="createOpen = true; $nextTick(() => { if (window.lucide) window.lucide.createIcons(); window.dispatchEvent(new CustomEvent('beautyos-modal-opened')); })"
+    >
+      <i data-lucide="plus" class="h-4 w-4 shrink-0" aria-hidden="true"></i>
+      <span>مشتری جدید</span>
+    </button>
+  </header>
+
+  <section class="customers-list-page__workspace" aria-label="فهرست مشتریان">
+    <div class="customers-list-page__controls">
+      <div class="customers-list-page__controls-top">
+        <p class="customers-list-page__summary">
+          <span class="customers-list-page__count-num">{{ result_count|fa_num }}</span>
+          <span>مشتری</span>
+          {% if q %}
+          <span class="customers-list-page__summary-tag">جست‌وجو فعال</span>
+          {% endif %}
+        </p>
+        {% include "partials/list_view_toggle.html" %}
+      </div>
+
+      <form method="get" class="customers-list-page__search-form" role="search">
+        <input type="hidden" name="view" value="{{ view_mode }}">
+        {% if segment %}<input type="hidden" name="segment" value="{{ segment }}">{% endif %}
+        <label class="sr-only" for="customers-search-input">جست‌وجوی نام یا موبایل</label>
+        <div class="customers-list-page__search-wrap">
+          <i data-lucide="search" class="customers-list-page__search-icon" aria-hidden="true"></i>
+          <input
+            id="customers-search-input"
+            type="search"
+            name="q"
+            value="{{ q }}"
+            class="input-field customers-list-page__search"
+            placeholder="جست‌وجوی نام یا موبایل"
+            autocomplete="off"
+          />
+        </div>
+      </form>
+
+      <nav class="customers-list-page__segments" aria-label="فیلتر وضعیت مشتری">
+        <a
+          href="{% querystring segment=None page=None %}"
+          class="customers-list-page__segment {% if not segment %}is-active{% endif %}"
+        >همه</a>
+        <a
+          href="{% querystring segment='new' page=None %}"
+          class="customers-list-page__segment {% if segment == 'new' %}is-active{% endif %}"
+        >جدید</a>
+        <a
+          href="{% querystring segment='active' page=None %}"
+          class="customers-list-page__segment {% if segment == 'active' %}is-active{% endif %}"
+        >فعال</a>
+        <a
+          href="{% querystring segment='inactive_30' page=None %}"
+          class="customers-list-page__segment {% if segment == 'inactive_30' %}is-active{% endif %}"
+        >غیرفعال ۳۰ روز</a>
+        <a
+          href="{% querystring segment='vip' page=None %}"
+          class="customers-list-page__segment {% if segment == 'vip' %}is-active{% endif %}"
+        >VIP</a>
+        <a
+          href="{% querystring segment='upcoming' page=None %}"
+          class="customers-list-page__segment {% if segment == 'upcoming' %}is-active{% endif %}"
+        >نوبت آینده</a>
+      </nav>
+    </div>
+
+    <div class="customers-list-page__results">
+      {% if page.object_list %}
+        {% if view_mode == 'table' %}
+        <div class="customers-list-table-wrap dashboard-enter">
+          <table class="customers-list-table">
+            <thead>
+              <tr>
+                <th scope="col">نام مشتری</th>
+                <th scope="col" class="customers-list-table__hide-sm">شماره موبایل</th>
+                <th scope="col">مراجعات</th>
+                <th scope="col"><span class="sr-only">پروفایل</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in page %}
+              <tr>
+                <td class="customers-list-table__name" data-label="نام مشتری">
+                  <div class="customers-list-table__name-cell">
+                    <span class="customers-list-table__name-text">{{ c.full_name }}</span>
+                    {% if c.is_vip %}<span class="customers-list-card__vip">VIP</span>{% endif %}
+                  </div>
+                </td>
+                <td class="customers-list-table__phone customers-list-table__hide-sm" data-label="شماره موبایل" dir="ltr">{{ c.phone }}</td>
+                <td class="customers-list-table__visits" data-label="مراجعات">
+                  <span class="customers-list-table__visits-num">{{ c.total_visits|fa_num }}</span>
+                </td>
+                <td class="customers-list-table__action">
+                  <a href="{% url 'customers:detail' pk=c.pk %}" class="customers-list-table__profile-link">
+                    <span>پروفایل</span>
+                    <i data-lucide="chevron-left" class="customers-list-table__profile-icon" aria-hidden="true"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="customers-list-grid dashboard-enter">
+          {% for c in page %}
+          <a href="{% url 'customers:detail' pk=c.pk %}" class="customers-list-card">
+            <div class="customers-list-card__identity">
+              {% if c.avatar %}
+              <img src="{{ c.avatar.url }}" alt="" class="customers-list-card__avatar" width="48" height="48" loading="lazy" />
+              {% else %}
+              <span class="customers-list-card__avatar customers-list-card__avatar--placeholder" aria-hidden="true">{{ c.full_name|slice:":1" }}</span>
+              {% endif %}
+              <div class="customers-list-card__copy">
+                <span class="customers-list-card__name-row">
+                  <span class="customers-list-card__name">{{ c.full_name }}</span>
+                  {% if c.is_vip %}<span class="customers-list-card__vip">VIP</span>{% endif %}
+                </span>
+                <span class="customers-list-card__phone" dir="ltr">{{ c.phone }}</span>
+              </div>
+            </div>
+            <dl class="customers-list-card__stats{% if 'payment.view' not in membership_permissions %} customers-list-card__stats--solo{% endif %}">
+              <div class="customers-list-card__stat">
+                <dt>مراجعات</dt>
+                <dd>{{ c.total_visits|fa_num }}</dd>
+              </div>
+              {% if 'payment.view' in membership_permissions %}
+              <div class="customers-list-card__stat">
+                <dt>مجموع خرید</dt>
+                <dd>
+                  <span class="customers-list-card__money">{{ c.total_spent_toman|default:0|fa_money }}</span>
+                  <span class="customers-list-card__unit">تومان</span>
+                </dd>
+              </div>
+              {% endif %}
+            </dl>
+            <span class="customers-list-card__cta">
+              مشاهده پروفایل
+              <i data-lucide="chevron-left" class="customers-list-card__cta-icon" aria-hidden="true"></i>
+            </span>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if page.has_other_pages %}
+        <div class="customers-list-page__pagination">
+          {% if page.has_previous %}
+          <a href="{% querystring page=page.previous_page_number %}" class="btn-secondary">قبلی</a>
+          {% endif %}
+          <span class="customers-list-page__page-num">صفحه {{ page.number }}</span>
+          {% if page.has_next %}
+          <a href="{% querystring page=page.next_page_number %}" class="btn-secondary">بعدی</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      {% elif q or segment or tag_id %}
+      <div class="customers-list-page__empty-filter maison-empty dashboard-enter">
+        <i data-lucide="search-x" class="mb-4 h-10 w-10 text-ink-secondary" aria-hidden="true"></i>
+        <h3 class="text-base font-semibold text-ink">نتیجه‌ای یافت نشد</h3>
+        <p class="mt-2 max-w-sm text-sm text-ink-secondary">عبارت جست‌وجو یا فیلتر را تغییر دهید.</p>
+        <a href="{% url 'customers:list' %}?view={{ view_mode }}" class="btn-secondary mt-6 text-sm">پاک کردن فیلترها</a>
+      </div>
+      {% else %}
+      <div class="customers-list-page__empty dashboard-enter">
+        {% url 'customers:list' as customers_list_url %}
+        {% include "partials/empty_state.html" with icon="users" title="هنوز مشتری ثبت نکرده‌اید" description="اولین مشتری را اضافه کنید تا تاریخچه و نوبت‌ها را یکجا ببینید." cta_url=customers_list_url|add:"?create=1" cta_label="افزودن اولین مشتری" %}
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {% include "customers/partials/customer_create_modal.html" %}
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+  window.addEventListener("beautyos-modal-opened", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}

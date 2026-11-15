@@ -1,0 +1,16 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}مدیریت · {{ active_salon.name }}{% endblock %}
+{% block header_modifier %}dashboard-lite-app-header{% endblock %}
+{% block page_title %}مدیریت{% endblock %}
+{% block page_subtitle %}ابزارهای سالن{% endblock %}
+
+{% block content %}
+<div class="dashboard-mgmt-grid mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+  {% for link in links %}
+  <a href="{{ link.url }}" class="dashboard-mgmt-card dashboard-enter">
+    <i data-lucide="{{ link.icon }}" class="h-5 w-5 text-ink-secondary"></i>
+    <span class="font-medium text-ink">{{ link.title }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

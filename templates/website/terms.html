@@ -1,0 +1,33 @@
+{% extends "layouts/public_site.html" %}
+{% block title %}شرایط استفاده · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block public_content %}
+{% include "partials/public_page_hero.html" with title="شرایط استفاده" lead="قواعد استفاده مسئولانه از سامانه برای مالکان سالن و اعضای تیم." %}
+<div class="mx-auto max-w-3xl px-4 pb-14 sm:px-6">
+  <div class="space-y-6 text-sm leading-relaxed text-charcoal/75">
+    <section>
+      <h2 class="text-base font-semibold text-aubergine">پذیرش شرایط</h2>
+      <p class="mt-2">
+        استفاده از {{ BEAUTYOS_PRODUCT_NAME }} به‌منزله پذیرش استفاده مسئولانه از سامانه برای مدیریت سالن و مشتریان است.
+      </p>
+    </section>
+    <section>
+      <h2 class="text-base font-semibold text-aubergine">مسئولیت محتوای سالن</h2>
+      <p class="mt-2">
+        مالک سالن مسئول صحت اطلاعات خدمات، قیمت‌ها و نوبت‌های نمایش‌داده‌شده در صفحه عمومی است.
+      </p>
+    </section>
+    <section>
+      <h2 class="text-base font-semibold text-aubergine">پیامک و اعلان‌ها</h2>
+      <p class="mt-2">
+        ارسال پیامک ورود و اعلان‌ها مشمول محدودیت نرخ و قوانین مخابراتی است؛ سوءاستفاده از درخواست مکرر کد ورود مجاز نیست.
+      </p>
+    </section>
+    <section>
+      <h2 class="text-base font-semibold text-aubergine">نقش‌ها و دسترسی تیم</h2>
+      <p class="mt-2">
+        دسترسی اعضای تیم باید مطابق نقش واقعی آن‌ها در سالن تنظیم شود؛ اشتراک‌گذاری حساب با اشخاص غیرمجاز توصیه نمی‌شود.
+      </p>
+    </section>
+  </div>
+</div>
+{% endblock %}

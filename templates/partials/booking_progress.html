@@ -1,0 +1,9 @@
+{% with step=step|default:1 %}
+<ol class="booking-stepper">
+  <li class="{% if step >= 1 %}is-active{% endif %}">خدمت</li>
+  <li class="{% if step >= 2 %}is-active{% endif %}">متخصص</li>
+  <li class="{% if step >= 3 %}is-active{% endif %}">زمان</li>
+  <li class="{% if step >= 4 %}is-active{% endif %}">اطلاعات</li>
+  <li class="{% if step >= 5 %}is-active{% endif %}">تأیید</li>
+</ol>
+{% endwith %}

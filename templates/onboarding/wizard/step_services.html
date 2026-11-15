@@ -1,0 +1,24 @@
+{% extends "onboarding/wizard/base.html" %}
+{% block title %}خدمات{% endblock %}
+{% block wizard_content %}
+<h1 class="text-xl font-semibold text-espresso">خدمات پیشنهادی</h1>
+<p class="mt-1 text-sm text-ink-secondary">فقط خدماتی که انتخاب کنید ایجاد می‌شوند.</p>
+<form method="post" class="mt-6 space-y-6">
+  {% csrf_token %}
+  <ul class="space-y-2">
+    {% for choice in form.selected_presets %}
+    <li class="flex items-center gap-2 rounded-xl border border-line px-3 py-2">{{ choice.tag }} <span class="text-sm">{{ choice.choice_label }}</span></li>
+    {% endfor %}
+  </ul>
+  <fieldset class="rounded-2xl border border-dashed border-line p-4">
+    <legend class="px-2 text-sm font-medium">خدمت سفارشی (اختیاری)</legend>
+    <div class="mt-3 grid gap-2 sm:grid-cols-3">
+      <input type="text" name="custom_name" class="input-field" placeholder="نام خدمت">
+      <input type="number" name="custom_duration" class="input-field" placeholder="دقیقه" value="30">
+      <input type="number" name="custom_price" class="input-field" placeholder="قیمت (تومان)">
+    </div>
+  </fieldset>
+  <button type="submit" class="btn-primary">ادامه</button>
+  <a href="{% url 'salons_onboarding:wizard' step=5 %}" class="btn-secondary text-xs">رد کردن خدمات</a>
+</form>
+{% endblock %}

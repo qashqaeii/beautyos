@@ -1,0 +1,122 @@
+{% load static %}
+<form
+  method="post"
+  action="{% url 'appointments:create' %}"
+  class="inventory-create-modal__form appt-booking-form appt-booking-form--modal"
+  id="{% if form_id %}{{ form_id }}{% else %}appointment-booking-form{% endif %}"
+  data-appt-booking-form
+  autocomplete="off"
+>
+  {% csrf_token %}
+  <input type="hidden" name="booking_return_path" value="{{ booking_return_path|default:'' }}" />
+  {% if booking_staff_locked %}
+  <input type="hidden" name="booking_staff_locked" value="{{ booking_staff_locked.pk }}" />
+  {% endif %}
+  {% if from_customer_detail %}
+  <input type="hidden" name="from_customer_detail" value="{{ from_customer_detail }}" />
+  {% endif %}
+  {% if appointment_form.non_field_errors %}
+  <p class="customer-form-field__error inventory-create-modal__form-error">{{ appointment_form.non_field_errors.0 }}</p>
+  {% endif %}
+
+  <div class="inventory-create-modal__scroll maison-scroll-themed">
+    <section class="appt-booking-section appt-booking-section--modal">
+      {% if customer_locked %}
+      <div class="appt-booking-section__head">
+        <h2 class="appt-booking-section__title !mb-0">مشتری</h2>
+      </div>
+      <div class="customer-detail-booking-lock">
+        <p class="customer-detail-booking-lock__name">{{ customer_locked.full_name }}</p>
+        <p class="customer-detail-booking-lock__phone tabular-nums" dir="ltr">{{ customer_locked.phone }}</p>
+        {{ appointment_form.customer }}
+      </div>
+      {% else %}
+      {% include "appointments/partials/customer_picker.html" with form=appointment_form %}
+      {% endif %}
+    </section>
+
+    <section class="appt-booking-section appt-booking-section--modal">
+      <h2 class="appt-booking-section__title">{% if booking_staff_locked %}خدمت{% else %}خدمت و متخصص{% endif %}</h2>
+      <div class="appt-booking-fields{% if booking_staff_locked %} appt-booking-fields--staff-locked{% endif %}">
+        <div class="customer-form-field{% if booking_staff_locked %} customer-form-field--full{% endif %}">
+          <label class="field-label" for="{{ appointment_form.service.id_for_label }}">{{ appointment_form.service.label }}</label>
+          {{ appointment_form.service }}
+          {% if appointment_form.service.errors %}<p class="customer-form-field__error">{{ appointment_form.service.errors.0 }}</p>{% endif %}
+        </div>
+        {% if not booking_staff_locked %}
+        <div class="customer-form-field">
+          <label class="field-label" for="{{ appointment_form.staff.id_for_label }}">{{ appointment_form.staff.label }}</label>
+          {{ appointment_form.staff }}
+          {% if appointment_form.staff.errors %}<p class="customer-form-field__error">{{ appointment_form.staff.errors.0 }}</p>{% endif %}
+        </div>
+        {% else %}
+        {{ appointment_form.staff }}
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="appt-booking-section appt-booking-section--modal appt-booking-section--last">
+      <h2 class="appt-booking-section__title">زمان نوبت</h2>
+      <div class="appt-booking-datetime">
+        <div class="customer-form-field">
+          <label class="field-label" for="{{ appointment_form.appointment_date.id_for_label }}">{{ appointment_form.appointment_date.label }}</label>
+          {{ appointment_form.appointment_date }}
+          {% if appointment_form.appointment_date.errors %}<p class="customer-form-field__error">{{ appointment_form.appointment_date.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="customer-form-field">
+          <label class="field-label" for="{{ appointment_form.appointment_time.id_for_label }}">{{ appointment_form.appointment_time.label }}</label>
+          {{ appointment_form.appointment_time }}
+          {% if appointment_form.appointment_time.errors %}<p class="customer-form-field__error">{{ appointment_form.appointment_time.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <details
+        class="appt-booking-advanced customer-form-advanced mt-4"
+        {% if booking_advanced_open %}open{% endif %}
+      >
+        <summary class="appt-booking-advanced__toggle customer-form-advanced__toggle">جزئیات بیشتر</summary>
+        <div class="appt-booking-advanced__body customer-form-advanced__body space-y-3">
+          {% if can_payment_create %}
+          {{ service_prices|json_script:"appt-service-prices-booking" }}
+          <div
+            class="appt-booking-deposit appt-booking-deposit--modal"
+            x-data="appointmentDepositSection({ prices: JSON.parse(document.getElementById('appt-service-prices-booking').textContent), serviceSelectId: '{{ appointment_form.service.id_for_label }}' })"
+          >
+            <p class="field-label mb-2">بیعانه (اختیاری)</p>
+            <div class="customer-form-field">
+              <label class="field-label" for="{{ appointment_form.deposit_amount_toman.id_for_label }}">{{ appointment_form.deposit_amount_toman.label }}</label>
+              {{ appointment_form.deposit_amount_toman }}
+              {% if appointment_form.deposit_amount_toman.errors %}<p class="customer-form-field__error">{{ appointment_form.deposit_amount_toman.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="appt-booking-deposit__summary mt-2 text-xs text-ink-secondary" x-show="showSummary" x-cloak>
+              <span>مبلغ نوبت: <strong class="tabular-nums" x-text="formatAmount(appointmentPrice)"></strong> تومان</span>
+              <span class="ms-2" x-show="deposit > 0">مانده: <strong class="tabular-nums" x-text="formatAmount(balanceAfterDeposit)"></strong> تومان</span>
+            </div>
+            <div x-show="showMethod" x-cloak class="customer-form-field mt-2">
+              <label class="field-label" for="{{ appointment_form.deposit_method.id_for_label }}">{{ appointment_form.deposit_method.label }}</label>
+              {{ appointment_form.deposit_method }}
+              {% if appointment_form.deposit_method.errors %}<p class="customer-form-field__error">{{ appointment_form.deposit_method.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="customer-form-field">
+            <label class="field-label" for="{{ appointment_form.notes.id_for_label }}">{{ appointment_form.notes.label }}</label>
+            {{ appointment_form.notes }}
+            {% if appointment_form.notes.errors %}<p class="customer-form-field__error">{{ appointment_form.notes.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="customer-form-field">
+            <label class="field-label" for="{{ appointment_form.status.id_for_label }}">{{ appointment_form.status.label }}</label>
+            {{ appointment_form.status }}
+            {% if appointment_form.status.errors %}<p class="customer-form-field__error">{{ appointment_form.status.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </details>
+    </section>
+  </div>
+
+  <footer class="inventory-create-modal__foot">
+    <button type="submit" class="btn-primary customer-form__submit-modal">ثبت نوبت</button>
+    <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-modal')">انصراف</button>
+  </footer>
+</form>

@@ -1,0 +1,194 @@
+{% extends "layouts/public_site.html" %}
+{% load static %}
+{% block title %}CRM یکپارچه سالن زیبایی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block extra_head %}
+<meta name="description" content="بیوتی‌اواس — تقویم نوبت، مشتریان، تیم و گزارش درآمد در یک پنل؛ رزرو آنلاین برای مشتریان و مدیریت حرفه‌ای سالن.">
+{% endblock %}
+{% block public_content %}
+<div class="pub-home">
+  <section class="public-home-hero" aria-labelledby="home-hero-title">
+    <div class="public-home-hero__inner">
+      <div class="public-home-hero__copy">
+        <p class="public-home-hero__badge">
+          <strong>{{ BEAUTYOS_PRODUCT_NAME }}</strong>
+          <span class="public-home-hero__badge-sep" aria-hidden="true">·</span>
+          CRM سالن زیبایی
+        </p>
+        <h1 id="home-hero-title" class="public-home-hero__title">
+          <span class="public-home-hero__title-accent">آرامش لوکس</span>
+          برای مدیریت نوبت و تیم
+        </h1>
+        <p class="public-home-hero__lead">
+          نرم‌افزار واقعی نوبت‌دهی، مشتری و مالی — یک پنل برای مالک، منشی و متخصص، بعلاوه صفحه رزرو آنلاین برای مشتریان.
+        </p>
+        <div class="public-home-hero__actions">
+          <a href="{% url 'accounts:register' %}" class="btn-public-primary public-home-hero__cta-primary">
+            ثبت‌نام سالن
+          </a>
+          <a href="#showcase" class="btn-public-ghost public-home-hero__cta-secondary">
+            دیدن امکانات پنل
+          </a>
+        </div>
+        <ul class="public-home-hero__trust" aria-label="مزیت‌های کلیدی">
+          <li><i data-lucide="calendar-days" class="h-3.5 w-3.5 shrink-0" aria-hidden="true"></i>تقویم شمسی</li>
+          <li><i data-lucide="shield" class="h-3.5 w-3.5 shrink-0" aria-hidden="true"></i>دسترسی نقش‌محور</li>
+          <li><i data-lucide="mouse-pointer-click" class="h-3.5 w-3.5 shrink-0" aria-hidden="true"></i>بدون نصب</li>
+        </ul>
+      </div>
+      <div class="public-home-hero__visual">
+        <figure class="public-home-hero__figure">
+          <div class="public-home-hero__visual-frame">
+            <img
+              src="{% static 'images/dashboard/lavender_glow_beauty_portrait.webp' %}"
+              alt=""
+              class="public-home-hero__visual-img"
+              width="420"
+              height="525"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            >
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="pub-home-value" aria-label="چرا BeautyOS">
+    <div class="pub-home-shell">
+      <ul class="pub-home-value__grid">
+        {% for item in home_value_props %}
+        <li class="pub-home-value__item">
+          <span class="pub-home-value__icon" aria-hidden="true"><i data-lucide="{{ item.icon }}" class="h-4 w-4"></i></span>
+          <h2 class="pub-home-value__title">{{ item.title }}</h2>
+          <p class="pub-home-value__text">{{ item.description }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <section class="pub-home-modules" id="showcase" aria-labelledby="home-modules-title">
+    <div class="pub-home-shell">
+      <header class="pub-home-head">
+        <p class="pub-home-head__eyebrow">معرفی محصول</p>
+        <h2 id="home-modules-title" class="pub-home-head__title">امکانات واقعی پنل، نه تبلیغات کلی</h2>
+        <p class="pub-home-head__lead">هر بلوک زیر بر اساس ماژول‌های پیاده‌سازی‌شده در BeautyOS است.</p>
+      </header>
+
+      {% for mod in module_spotlights %}
+      <article class="pub-home-module{% if mod.layout == 'wide' %} pub-home-module--wide{% endif %}{% if mod.reverse %} pub-home-module--reverse{% endif %}">
+        <div class="pub-home-module__copy">
+          <span class="pub-home-module__icon" aria-hidden="true"><i data-lucide="{{ mod.icon }}" class="h-5 w-5"></i></span>
+          <h3 class="pub-home-module__title">{{ mod.title }}</h3>
+          <p class="pub-home-module__text">{{ mod.description }}</p>
+          <ul class="pub-home-module__bullets">
+            {% for point in mod.bullets %}
+            <li>{{ point }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="pub-home-module__preview">
+          {% include "website/partials/home_ui_preview.html" with variant=mod.ui_variant chrome_label=mod.title %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="public-home-features" id="home-services" aria-labelledby="home-features-title">
+    <div class="public-home-features__inner">
+      <header class="pub-home-head pub-home-head--start">
+        <h2 id="home-features-title" class="pub-home-head__title">چهار محور مدیریت سالن</h2>
+        <p class="pub-home-head__lead">خلاصه‌ای از قابلیت‌های اصلی که از اولین روز فعال می‌شوند.</p>
+      </header>
+      <div class="public-home-features__grid">
+        {% for item in landing_highlights %}
+        <article class="public-home-feature-card public-home-feature-card--{% cycle 'standard' 'outline' 'soft' 'accent' %}">
+          <span class="public-home-feature-card__icon" aria-hidden="true">
+            <i data-lucide="{{ item.icon }}" class="h-5 w-5"></i>
+          </span>
+          <h3 class="public-home-feature-card__title">{{ item.title }}</h3>
+          <p class="public-home-feature-card__text">{{ item.description }}</p>
+        </article>
+        {% endfor %}
+      </div>
+      <p class="pub-home-features__more">
+        <a href="{% url 'website:features' %}" class="pub-home-link">
+          جزئیات کامل امکانات
+          <i data-lucide="arrow-left" class="h-4 w-4" aria-hidden="true"></i>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="public-home-start" id="start" aria-labelledby="home-start-title">
+    <div class="public-home-start__inner">
+      <div class="public-home-start__copy">
+        <h2 id="home-start-title" class="public-home-start__title">شروع در سه قدم</h2>
+        <p class="public-home-start__lead">ثبت‌نام مالک، ساخت سالن و آماده‌سازی خدمات و تیم — کمتر از یک جلسه.</p>
+        <a href="{% url 'accounts:register' %}" class="btn-public-primary public-home-start__cta">ثبت‌نام سالن</a>
+      </div>
+      <ol class="public-home-steps">
+        {% for item in start_steps %}
+        <li class="public-home-step-card">
+          <span class="public-home-step-card__index" aria-hidden="true">{{ item.step }}</span>
+          <h3 class="public-home-step-card__title">{{ item.title }}</h3>
+          <p class="public-home-step-card__text">{{ item.description }}</p>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
+  <section class="pub-home-faq" id="faq" aria-labelledby="home-faq-title">
+    <div class="pub-home-shell pub-home-shell--narrow">
+      <header class="pub-home-head">
+        <h2 id="home-faq-title" class="pub-home-head__title">سؤالات متداول</h2>
+        <p class="pub-home-head__lead">پیش از ثبت‌نام — پاسخ‌های کوتاه بر اساس جریان واقعی محصول.</p>
+      </header>
+      <div class="pub-home-faq__list">
+        {% for item in home_faqs %}
+        <details class="public-faq-item group"{% if forloop.first %} open{% endif %}>
+          <summary>
+            <span>{{ item.q }}</span>
+            <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 opacity-50 transition group-open:rotate-180" aria-hidden="true"></i>
+          </summary>
+          <div class="public-faq-item__body">{{ item.a }}</div>
+        </details>
+        {% endfor %}
+      </div>
+      <p class="pub-home-faq__more">
+        <a href="{% url 'website:faq' %}" class="pub-home-link">همه سؤالات و پاسخ‌ها</a>
+      </p>
+    </div>
+  </section>
+
+  {% if latest_posts %}
+  <section class="public-home-section public-home-section--alt" aria-labelledby="home-blog-title">
+    <div class="public-home-section__inner public-home-section__inner--tight">
+      <div class="public-home-section__head">
+        <h2 id="home-blog-title" class="public-home-section__title">مقالات</h2>
+        <a href="{% url 'website:blog' %}" class="public-home-section__more">همه</a>
+      </div>
+      <div class="public-home-blog-grid">
+        {% for post in latest_posts %}
+        {% include "website/partials/blog_card.html" with post=post %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="public-home-cta" aria-labelledby="home-cta-title">
+    <div class="public-home-cta__inner">
+      <h2 id="home-cta-title" class="public-home-cta__title">سالن خود را همین امروز آنلاین مدیریت کنید</h2>
+      <p class="public-home-cta__lead">ثبت‌نام رایگان · ورود اعضا با کد پیامکی</p>
+      <div class="public-home-cta__actions">
+        <a href="{% url 'accounts:register' %}" class="btn-public-primary">ثبت‌نام سالن</a>
+        <a href="{% url 'accounts:login' %}" class="btn-public-ghost">ورود</a>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

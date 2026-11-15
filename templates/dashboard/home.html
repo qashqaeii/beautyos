@@ -1,0 +1,236 @@
+{% extends "layouts/app_shell.html" %}
+{% load humanize appointment_tags %}
+{% block title %}داشبورد · {{ active_salon.name }}{% endblock %}
+{% block page_eyebrow %}{{ today_jalali }}{% endblock %}
+{% block page_title %}نمای کلی سالن{% endblock %}
+{% block page_subtitle %}خلاصه عملکرد و برنامه امروز{% endblock %}
+{% block header_modifier %}dashboard-home-header{% endblock %}
+{% block page_actions %}
+{% if finance %}
+<form method="get" class="flex flex-wrap items-center gap-2 text-xs">
+  <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+  <select name="range" class="input-field !py-1.5 !text-xs" onchange="this.form.submit()">
+    <option value="day" {% if range_key == 'day' %}selected{% endif %}>امروز / روز انتخابی</option>
+    <option value="week" {% if range_key == 'week' %}selected{% endif %}>۷ روز</option>
+    <option value="month" {% if range_key == 'month' %}selected{% endif %}>ماه جاری</option>
+  </select>
+  <a href="?day={{ prev_day }}&range={{ range_key }}" class="btn-secondary !px-2">قبل</a>
+  <a href="?day={{ next_day }}&range={{ range_key }}" class="btn-secondary !px-2">بعد</a>
+</form>
+{% if can_manage_staff %}
+<a href="{% url 'staff:list' %}" class="btn-secondary text-xs"><i data-lucide="user-cog" class="h-4 w-4"></i> متخصص جدید</a>
+{% endif %}
+{% endif %}
+<a href="{% url 'appointments:create' %}" class="btn-primary text-xs"><i data-lucide="plus" class="h-4 w-4"></i> ثبت نوبت</a>
+{% endblock %}
+
+{% block mobile_header %}
+<header class="maison-mobile-head maison-reveal lg:hidden">
+  <div class="flex min-w-0 flex-1 items-center gap-2.5">
+    {% include "partials/site_logo.html" with logo_class="maison-mobile-head__logo" %}
+    <div class="min-w-0">
+      <p class="text-xs text-ink-secondary">روز زیبایی شما{% if user.first_name %}، {{ user.first_name }}{% endif %}</p>
+      <p class="truncate text-sm font-semibold text-ink">{{ active_salon.name }}</p>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+{% if finance %}
+{% include "dashboard/partials/manager_finance.html" %}
+{% include "dashboard/partials/manager_capacity.html" %}
+{% include "dashboard/partials/manager_followups.html" %}
+{% endif %}
+{# —— Mobile home (owner / manager) —— #}
+<div class="maison-dashboard-grid space-y-4 lg:hidden">
+  <section class="maison-hero maison-hero--mobile maison-hero--integrated maison-hero--motion">
+    <div class="maison-hero__content">
+      <p class="maison-hero__eyebrow">{{ today_jalali }}</p>
+      <h2 class="maison-hero__title text-xl">روز زیبایی شروع شده</h2>
+      <p class="maison-hero__lead mt-2 text-[13px]">{% include "partials/dashboard_hero_lead.html" %}</p>
+      <a href="{% url 'appointments:create' %}" class="btn-primary mt-3 w-full justify-center text-sm">ثبت نوبت</a>
+    </div>
+    {% include "partials/dashboard_hero_visual.html" with compact=True %}
+  </section>
+
+  <div class="maison-stagger grid grid-cols-2 gap-3">
+    {% if 'finance.reports' in membership_permissions %}
+    {% include "partials/stat_card.html" with variant="standard" icon="wallet" label="درآمد امروز" value=kpis.revenue_today|fa_money suffix="تومان" hint="جمع پرداخت‌های امروز" %}
+    {% else %}
+    {% include "partials/stat_card.html" with variant="standard" icon="calendar-check" label="نوبت‌های امروز" value=kpis.appointments_today hint="برنامه همین روز" %}
+    {% endif %}
+    {% include "partials/stat_card.html" with variant="primary" icon="clock" label="در انتظار تأیید" value=kpis.pending_appointments hint="نیاز به اقدام" %}
+  </div>
+
+  {% include "partials/dashboard_next_appointment.html" with appointment=kpis.next_appointment %}
+
+  <section class="maison-panel">
+    <div class="maison-panel__head">
+      <h3 class="maison-panel__title">برنامه امروز</h3>
+      <a href="{% url 'appointments:calendar' %}" class="text-xs font-medium text-ink-secondary">مشاهده همه</a>
+    </div>
+    <div class="space-y-2">
+      {% for a in kpis.timeline|slice:":5" %}
+      {% include "partials/appointment_card_compact.html" with appointment=a %}
+      {% empty %}
+      <p class="py-4 text-center text-sm text-ink-muted">برای امروز نوبتی نیست.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="maison-shortcuts">
+    <a href="{% url 'appointments:create' %}" class="maison-shortcut"><i data-lucide="calendar-plus" class="h-5 w-5"></i><span>نوبت جدید</span></a>
+    <a href="{% url 'customers:list' %}?create=1" class="maison-shortcut"><i data-lucide="user-plus" class="h-5 w-5"></i><span>مشتری جدید</span></a>
+    <a href="{% url 'waitlist:queue' %}" class="maison-shortcut"><i data-lucide="list-ordered" class="h-5 w-5"></i><span>لیست انتظار</span></a>
+    <a href="{% url 'retention:queue' %}" class="maison-shortcut"><i data-lucide="heart-handshake" class="h-5 w-5"></i><span>پیگیری‌ها</span></a>
+  </section>
+
+  {% if 'finance.reports' in membership_permissions %}
+  <section class="maison-panel">
+    <div class="maison-panel__head">
+      <h3 class="maison-panel__title">بینش هفته</h3>
+    </div>
+    <p class="text-sm text-ink-secondary">پیگیری باز: <strong class="text-ink">{{ kpis.follow_up_needed }}</strong></p>
+    {% if kpis.overdue_payments %}
+    <p class="mt-2 text-xs text-ink-muted">{{ kpis.overdue_payments }} پرداخت معلق</p>
+    {% endif %}
+  </section>
+  {% endif %}
+</div>
+
+{# —— Desktop —— #}
+<div class="maison-dashboard-grid hidden space-y-5 lg:block">
+  <h2 class="sr-only">داشبورد دسکتاپ</h2>
+  <div class="grid items-stretch gap-4 lg:grid-cols-12 lg:gap-5">
+    <section class="maison-hero maison-hero--desktop maison-hero--integrated maison-hero--motion lg:col-span-8">
+      <div class="maison-hero__grid">
+        <div class="maison-hero__content">
+          <p class="maison-hero__eyebrow">{{ today_jalali }}</p>
+          <h2 class="maison-hero__title text-xl lg:text-[1.65rem]">روز زیبایی شروع شده</h2>
+          <p class="maison-hero__lead">{% include "partials/dashboard_hero_lead.html" %}</p>
+          <a href="{% url 'appointments:calendar' %}" class="maison-text-cta mt-3 inline-flex text-sm">مشاهده تقویم امروز</a>
+        </div>
+        {% include "partials/dashboard_hero_visual.html" %}
+      </div>
+    </section>
+    <div class="lg:col-span-4">
+      {% include "partials/dashboard_next_appointment.html" with appointment=kpis.next_appointment %}
+    </div>
+  </div>
+
+  <div class="maison-stagger grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    {% url 'appointments:calendar' as calendar_url %}
+    {% include "partials/stat_card.html" with variant="primary" featured=True icon="calendar-check" label="نوبت‌های امروز" value=kpis.appointments_today href=calendar_url hint="برنامه همین روز" %}
+    {% url 'finance:overview' as finance_url %}
+    {% if 'finance.reports' in membership_permissions %}
+    {% include "partials/stat_card.html" with variant="standard" icon="wallet" label="درآمد امروز" value=kpis.revenue_today|fa_money suffix="تومان" href=finance_url hint="جمع پرداخت‌های امروز" %}
+    {% endif %}
+    {% include "partials/stat_card.html" with variant="standard" icon="clock" label="در انتظار تأیید" value=kpis.pending_appointments hint="نیاز به اقدام فوری" %}
+    {% include "partials/stat_card.html" with variant="standard" icon="user-plus" label="مشتری جدید" value=kpis.new_customers_today hint="ثبت‌شده امروز" %}
+  </div>
+
+  <section class="maison-status-strip">
+    <p class="maison-status-strip__title">وضعیت امروز</p>
+    <div class="maison-status-strip__chips">
+      <span class="maison-status-chip maison-status-chip--done">تکمیل <strong>{{ kpis.completed_today }}</strong></span>
+      <span class="maison-status-chip maison-status-chip--watch">پیگیری <strong>{{ kpis.follow_up_needed }}</strong></span>
+      <span class="maison-status-chip maison-status-chip--muted">لغو <strong>{{ kpis.cancelled_today }}</strong></span>
+      <span class="maison-status-chip maison-status-chip--muted">عدم حضور <strong>{{ kpis.no_show_today }}</strong></span>
+    </div>
+  </section>
+
+  <div class="grid gap-5 lg:grid-cols-12">
+    <section class="maison-panel lg:col-span-7">
+      <div class="maison-panel__head">
+        <h3 class="maison-panel__title">برنامه امروز</h3>
+        <a href="{% url 'appointments:calendar' %}" class="text-xs font-medium text-ink-secondary hover:text-ink">تقویم</a>
+      </div>
+      {% if kpis.timeline %}
+      <ul class="maison-timeline max-h-[22rem] overflow-y-auto">
+        {% for a in kpis.timeline %}
+        <li class="maison-timeline__item">
+          <span class="maison-timeline__time">{{ a.start_at|time:"H:i" }}</span>
+          <div class="min-w-0">
+            <p class="truncate font-medium text-ink">{{ a.customer.full_name }}</p>
+            <p class="text-xs text-ink-secondary">{{ a.service.name }}{% if a.staff %} · {{ a.staff.display_name }}{% endif %}</p>
+          </div>
+          <span class="{{ a.status|status_badge }} shrink-0 text-[10px]">{{ a.get_status_display }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      {% url 'appointments:create' as create_appt_url %}
+      {% include "partials/empty_state.html" with icon="calendar-x" title="برای امروز نوبتی ثبت نشده" cta_url=create_appt_url cta_label="ثبت نوبت" %}
+      {% endif %}
+    </section>
+
+    <section class="maison-panel lg:col-span-5">
+      {% if 'finance.reports' in membership_permissions %}
+      <div class="maison-panel__head">
+        <h3 class="maison-panel__title">درآمد ۷ روز</h3>
+      </div>
+      <div class="maison-chart maison-chart--compact" role="img" aria-label="نمودار درآمد">
+        {% for row in kpis.revenue_by_day %}
+        <div class="flex min-w-0 flex-1 flex-col items-center gap-2">
+          <div class="flex w-full flex-1 items-end justify-center" style="min-height: 6rem;">
+            <span class="maison-chart__bar" style="height: {% widthratio row.amount kpis.revenue_week_max 100 %}%; min-height: 4px;" title="{{ row.amount|fa_money }} تومان"></span>
+          </div>
+          <span class="text-[10px] text-ink-muted">{{ row.day|fa_jalali }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="maison-panel__head">
+        <h3 class="maison-panel__title">عملکرد خدمات</h3>
+      </div>
+      <ul class="text-sm">
+        {% for row in kpis.popular_services|slice:":4" %}
+        <li class="maison-list-row">
+          <span class="font-medium text-ink">{{ row.service__name }}</span>
+          <span class="text-xs text-ink-muted">{{ row.c }} نوبت</span>
+        </li>
+        {% empty %}
+        <li class="py-4 text-center text-sm text-ink-muted">پس از تکمیل نوبت‌ها آمار نمایش داده می‌شود.</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+  </div>
+
+  {% if kpis.follow_up_needed or kpis.overdue_payments %}
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {% if kpis.follow_up_needed %}
+    <a href="{% url 'retention:queue' %}" class="maison-panel block text-sm no-underline transition hover:border-border-strong">
+      <p class="font-semibold text-ink">پیگیری مشتری</p>
+      <p class="mt-1 text-2xl font-bold tabular-nums">{{ kpis.follow_up_needed }}</p>
+      <p class="text-xs text-ink-muted">مورد باز</p>
+    </a>
+    {% endif %}
+    {% if kpis.overdue_payments and 'finance.reports' in membership_permissions %}
+    <a href="{% url 'finance:overview' %}" class="maison-panel block text-sm no-underline">
+      <p class="font-semibold text-ink">پرداخت معلق</p>
+      <p class="mt-1 text-2xl font-bold tabular-nums">{{ kpis.overdue_payments }}</p>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if startup_checklist and not startup_checklist.complete %}
+  <section class="maison-panel" id="startup-checklist">
+    <div class="maison-panel__head">
+      <h3 class="maison-panel__title">راه‌اندازی سالن</h3>
+      <span class="text-xs text-ink-muted">{{ startup_checklist.done_count }}/{{ startup_checklist.total }}</span>
+    </div>
+    <ul class="space-y-2 text-sm">
+      {% for item in startup_checklist.items %}
+      <li class="maison-list-row {% if item.done %}opacity-60{% endif %}">
+        <span>{% if item.done %}✓{% else %}○{% endif %} {{ item.label }}</span>
+        {% if not item.done %}<a href="{% url item.url_name %}" class="text-xs font-medium text-ink hover:underline">انجام</a>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% if active_salon %}
+  {% if user_memberships|length > 1 %}
+  <div class="relative min-w-0 {% if compact %}flex-1{% endif %}" x-data="{ open: false }" @click.outside="open = false">
+  {% if compact %}
+    <button
+      type="button"
+      class="app-salon-chip w-full min-w-0"
+      @click="open = !open"
+      aria-haspopup="listbox"
+      aria-expanded="false"
+    >
+      <i data-lucide="store" class="h-3.5 w-3.5 shrink-0 opacity-70"></i>
+      <span class="truncate">{{ active_salon.name }}</span>
+      <i data-lucide="chevron-down" class="ms-auto h-3 w-3 shrink-0 opacity-50"></i>
+    </button>
+  {% else %}
+    <button type="button" class="app-salon-chip max-w-[14rem]" @click="open = !open" aria-haspopup="listbox">
+      <i data-lucide="store" class="h-3.5 w-3.5 shrink-0 opacity-70"></i>
+      <span class="truncate">{{ active_salon.name }}</span>
+      <i data-lucide="chevron-down" class="h-3 w-3 shrink-0 opacity-50"></i>
+    </button>
+  {% endif %}
+    <ul
+      x-cloak
+      x-show="open"
+      x-transition
+      class="absolute {% if compact %}right-0{% else %}left-0{% endif %} top-full z-40 mt-2 min-w-[14rem] rounded-xl border border-line bg-surface-elevated p-1 shadow-none"
+      style="border-color: var(--color-border); background-color: var(--color-surface-elevated, var(--color-surface));"
+      role="listbox"
+    >
+      {% for m in user_memberships %}
+      <li>
+        <a
+          href="{% url 'salons_onboarding:switch' salon_id=m.salon_id %}?next={{ request.path }}"
+          class="block rounded-lg px-3 py-2 text-xs transition {% if m.salon_id == active_salon.id %}font-medium text-espresso{% else %}text-ink-secondary hover:bg-surface-muted{% endif %}"
+          style="{% if m.salon_id == active_salon.id %}background-color: color-mix(in srgb, var(--color-accent-soft) 65%, transparent);{% endif %}"
+        >
+          {{ m.salon.name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+    {% if compact %}
+    <span class="app-salon-chip app-salon-chip--static min-w-0 max-w-[min(100%,14rem)] flex-1">
+      <i data-lucide="store" class="h-3.5 w-3.5 shrink-0 opacity-70"></i>
+      <span class="truncate">{{ active_salon.name }}</span>
+    </span>
+    {% else %}
+    <span class="app-salon-chip app-salon-chip--static max-w-[14rem]">
+      <i data-lucide="store" class="h-3.5 w-3.5 shrink-0 opacity-70"></i>
+      <span class="truncate">{{ active_salon.name }}</span>
+    </span>
+    {% endif %}
+  {% endif %}
+{% endif %}

@@ -1,0 +1,157 @@
+{% extends "layouts/app_shell.html" %}
+{% load format_tags inventory_tags %}
+{% block title %}محصولات و موجودی{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block content %}
+<div
+  class="inventory-page"
+  x-data="{
+    createOpen: {{ create_modal_open|yesno:'true,false' }},
+    closeCreate() {
+      this.createOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('create')) {
+        params.delete('create');
+        const qs = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+      }
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', createOpen)"
+  @beautyos-close-create-modal.window="closeCreate()"
+  @keydown.escape.window="createOpen && closeCreate()"
+>
+  <header class="inventory-page__header">
+    <div class="inventory-page__headline">
+      <h1 class="inventory-page__title">محصولات و موجودی</h1>
+      {% if low_count %}
+      <p class="inventory-page__hint">{{ low_count|fa_num }} قلم نیاز به توجه</p>
+      {% endif %}
+    </div>
+    <button type="button" class="btn-primary inventory-page__add" @click="createOpen = true">
+      + افزودن محصول
+    </button>
+  </header>
+
+  <form method="get" class="inventory-page__filters" role="search">
+    <div class="inventory-page__search">
+      <input
+        type="search"
+        name="q"
+        value="{{ query }}"
+        class="input-field inventory-page__search-input"
+        placeholder="جست‌وجوی نام محصول"
+        autocomplete="off"
+      />
+    </div>
+    <div class="inventory-page__filter-row">
+      <label class="sr-only" for="inventory-category-filter">دسته‌بندی</label>
+      <select id="inventory-category-filter" name="category" class="input-field inventory-page__category-select" onchange="this.form.submit()">
+        <option value="" {% if not category_key %}selected{% endif %}>همه دسته‌ها</option>
+        <option value="none" {% if category_key == 'none' %}selected{% endif %}>بدون دسته‌بندی</option>
+        {% for c in categories %}
+        <option value="{{ c.pk }}" {% if category_key == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+      <a href="{% url 'inventory:categories' %}" class="inventory-page__categories-link">مدیریت دسته‌ها</a>
+      {% if query or category_key %}
+      <a href="{% url 'inventory:list' %}" class="inventory-page__clear-filter">پاک کردن فیلتر</a>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if messages %}
+  <div class="inventory-page__messages space-y-2">
+    {% for message in messages %}
+    <p class="inventory-page__flash text-sm{% if message.tags %} inventory-page__flash--{{ message.tags }}{% endif %}">{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if items %}
+  <div class="inventory-table-wrap hidden md:block">
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th scope="col">محصول</th>
+          <th scope="col">دسته‌بندی</th>
+          <th scope="col">موجودی</th>
+          <th scope="col">حداقل موجودی</th>
+          <th scope="col" class="inventory-table__actions-head">عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr class="inventory-table__row">
+          <td class="inventory-table__name">{{ item.name }}</td>
+          <td class="inventory-table__category">
+            {% if item.category %}{{ item.category.name }}{% else %}<span class="text-ink-muted">بدون دسته‌بندی</span>{% endif %}
+          </td>
+          <td class="inventory-table__qty">
+            {% if item.stock_status == 'out' %}
+            <span class="inventory-stock-badge inventory-stock-badge--out">ناموجود</span>
+            {% elif item.stock_status == 'low' %}
+            <span class="inventory-stock-badge inventory-stock-badge--low">رو به اتمام</span>
+            <span class="inventory-table__qty-detail tabular-nums">{{ item.quantity|fa_qty }} {{ item.unit }}</span>
+            {% else %}
+            <span class="tabular-nums">{{ item.quantity|fa_qty }} {{ item.unit }}</span>
+            {% endif %}
+          </td>
+          <td class="inventory-table__min tabular-nums">{{ item.minimum_quantity|fa_qty }} {{ item.unit }}</td>
+          <td class="inventory-table__actions">
+            <a href="{% url 'inventory:stock_in' pk=item.pk %}" class="inventory-action-link">ثبت ورود</a>
+            <a href="{% url 'inventory:stock_out' pk=item.pk %}" class="inventory-action-link">ثبت مصرف</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <ul class="inventory-cards md:hidden">
+    {% for item in items %}
+    <li class="inventory-card">
+      <div class="inventory-card__main">
+        <p class="inventory-card__name">{{ item.name }}</p>
+        <p class="inventory-card__meta">
+          {% if item.category %}{{ item.category.name }}{% else %}بدون دسته‌بندی{% endif %}
+          <span class="inventory-card__dot">·</span>
+          حداقل {{ item.minimum_quantity|fa_qty }} {{ item.unit }}
+        </p>
+      </div>
+      <div class="inventory-card__qty">
+        {% if item.stock_status == 'out' %}
+        <span class="inventory-stock-badge inventory-stock-badge--out">ناموجود</span>
+        {% elif item.stock_status == 'low' %}
+        <span class="inventory-stock-badge inventory-stock-badge--low">رو به اتمام</span>
+        <span class="tabular-nums">{{ item.quantity|fa_qty }} {{ item.unit }}</span>
+        {% else %}
+        <span class="tabular-nums">{{ item.quantity|fa_qty }} {{ item.unit }}</span>
+        {% endif %}
+      </div>
+      <div class="inventory-card__actions">
+        <a href="{% url 'inventory:stock_in' pk=item.pk %}" class="btn-secondary btn-secondary--compact">ثبت ورود</a>
+        <a href="{% url 'inventory:stock_out' pk=item.pk %}" class="btn-secondary btn-secondary--compact">ثبت مصرف</a>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  {% url 'inventory:list' as list_url %}
+  {% include "partials/empty_state.html" with icon="boxes" title="محصولی ثبت نشده" description="اولین محصول را اضافه کنید یا فیلترها را تغییر دهید." cta_url=list_url|add:"?create=1" cta_label="افزودن محصول" %}
+  {% endif %}
+
+  {% include "inventory/partials/item_create_modal.html" %}
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}
+

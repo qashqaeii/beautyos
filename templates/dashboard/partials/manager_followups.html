@@ -1,0 +1,41 @@
+{% load humanize %}
+<section class="maison-panel mb-5">
+  <div class="maison-panel__head">
+    <h3 class="maison-panel__title">پیگیری‌ها</h3>
+  </div>
+  <div class="grid gap-4 lg:grid-cols-3">
+    <div>
+      <p class="mb-2 text-xs font-medium text-ink-secondary">رزرو منتظر تأیید</p>
+      <ul class="space-y-2 text-sm">
+        {% for a in followups.pending_appointments %}
+        <li><a href="{% url 'appointments:detail' pk=a.pk %}" class="font-medium text-ink hover:underline">{{ a.customer.full_name }}</a> · {{ a.start_at|fa_jalali_datetime }}</li>
+        {% empty %}
+        <li class="text-ink-muted">موردی نیست.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <p class="mb-2 text-xs font-medium text-ink-secondary">بیعانه پرداخت‌نشده</p>
+      <ul class="space-y-2 text-sm">
+        {% for p in followups.unpaid_deposits %}
+        <li>
+          {% if p.appointment %}<a href="{% url 'appointments:detail' pk=p.appointment_id %}" class="text-ink">{{ p.customer.full_name }}</a>{% else %}{{ p.customer.full_name }}{% endif %}
+          · {{ p.paid_amount_toman|default:0 }} تومان
+        </li>
+        {% empty %}
+        <li class="text-ink-muted">موردی نیست.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <p class="mb-2 text-xs font-medium text-ink-secondary">پیگیری مشتری</p>
+      <ul class="space-y-2 text-sm">
+        {% for f in followups.due_followups %}
+        <li><a href="{% url 'customers:detail' pk=f.customer_id %}" class="text-ink">{{ f.customer.full_name }}</a> · {{ f.reason }}</li>
+        {% empty %}
+        <li class="text-ink-muted">موردی نیست.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>

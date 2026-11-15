@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block body %}
+<div
+  class="maison-app flex h-[100dvh] max-h-[100dvh] overflow-hidden"
+  x-data="{
+    sidebarCollapsed: false,
+    quickSheetOpen: false,
+    moreSheetOpen: false,
+    navGroups: { business: false, finance: false, growth: true, digital: false },
+    toggleNavGroup(key) {
+      this.navGroups[key] = !this.navGroups[key];
+      localStorage.setItem('maisonNavGroups', JSON.stringify(this.navGroups));
+    }
+  }"
+  x-init="
+    sidebarCollapsed = localStorage.getItem('maisonSidebarCollapsed') === '1';
+    try {
+      const saved = JSON.parse(localStorage.getItem('maisonNavGroups') || '{}');
+      Object.keys(saved).forEach((k) => { if (k in navGroups) navGroups[k] = saved[k]; });
+    } catch (e) {}
+  "
+  :class="{ 'maison-app--sheet-open': quickSheetOpen || moreSheetOpen }"
+>
+  {% include "partials/sidebar.html" %}
+  <div class="maison-main maison-scroll-minimal min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+    <div class="maison-htmx-progress htmx-indicator" aria-hidden="true"></div>
+    <header class="maison-unified-header maison-reveal {% block header_modifier %}{% endblock %}">
+      <div class="maison-unified-header__primary">
+        <button
+          type="button"
+          class="maison-sidebar-toggle hidden shrink-0 lg:inline-flex"
+          aria-label="جمع کردن منو"
+          @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('maisonSidebarCollapsed', sidebarCollapsed ? '1' : '0')"
+        >
+          <i data-lucide="panel-right" class="h-4 w-4"></i>
+        </button>
+        <div class="maison-unified-header__copy min-w-0 flex-1">
+          <p class="maison-page-date hidden lg:block">{% block page_eyebrow %}{% endblock %}</p>
+          <h1 class="maison-page-title">{% block page_title %}نمای کلی{% endblock %}</h1>
+          <p class="maison-page-subtitle">{% block page_subtitle %}{% endblock %}</p>
+        </div>
+      </div>
+      <div class="maison-unified-header__actions">
+        <div class="maison-page-actions">
+          {% block page_actions %}{% endblock %}
+        </div>
+        {% if user.is_authenticated %}
+        <span class="app-user-chip app-user-chip--desktop hidden max-w-[8rem] truncate sm:inline-flex" title="{{ user.full_name|default:user.display_phone }}">
+          {{ user.full_name|default:user.display_phone|truncatechars:16 }}
+        </span>
+        {% endif %}
+      </div>
+    </header>
+
+    <main class="maison-content maison-content--enter">
+      {% block mobile_header %}{% endblock %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  {% include "partials/quick_action_sheet.html" %}
+  {% include "partials/mobile_more_sheet.html" %}
+  {% include "partials/mobile_nav.html" %}
+  {% block app_overlays %}{% endblock %}
+</div>
+<style>[x-cloak]{display:none!important}</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) lucide.createIcons();
+  });
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) lucide.createIcons();
+  });
+</script>
+{% endblock %}

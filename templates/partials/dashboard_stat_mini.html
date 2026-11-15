@@ -1,0 +1,19 @@
+{% load format_tags humanize %}
+<div
+  class="dashboard-stat-mini dashboard-stat-enter {% if featured %}dashboard-stat-mini--featured{% endif %} {% if settled %}dashboard-stat-mini--settled{% endif %}"
+  style="--dash-stat-i: {{ stat_index|default:1 }};"
+  data-stat-index="{{ stat_index|default:1 }}"
+>
+  <div class="dashboard-stat-mini__surface">
+    <span class="dashboard-stat-mini__icon" aria-hidden="true"><i data-lucide="{{ icon }}" class="h-4 w-4"></i></span>
+    <p class="dashboard-stat-mini__label">{{ label }}</p>
+    <p class="dashboard-stat-mini__value tabular-nums">
+      <span
+        class="js-overview-stat-value dashboard-stat-mini__digits"
+        data-stat-key="{{ stat_key }}"
+        data-stat-target="{{ anim_value|default:0 }}"
+        data-stat-commas="{% if animate_money %}1{% else %}0{% endif %}"
+      >{% if animate_money %}{{ anim_value|default:0|fa_money }}{% else %}{{ anim_value|default:0|fa_num }}{% endif %}</span>{% if suffix %}<span class="dashboard-stat-mini__unit">{{ suffix }}</span>{% endif %}
+    </p>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+{% extends "layouts/app_shell.html" %}
+{% load humanize appointment_tags %}
+{% block title %}روز کاری · {{ active_salon.name }}{% endblock %}
+{% block page_eyebrow %}{{ day_jalali }}{% endblock %}
+{% block page_title %}روز کاری من{% endblock %}
+{% block page_actions %}
+<form method="get" class="flex items-center gap-2 text-xs">
+  {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+  {% if next_appt %}
+  <section class="maison-panel">
+    <p class="text-xs text-ink-muted">نوبت بعدی من</p>
+    <p class="mt-1 text-3xl font-bold tabular-nums">{{ next_appt.start_at|fa_time }}</p>
+    <p class="font-semibold text-ink">{{ next_appt.customer.full_name }}</p>
+    <p class="text-sm text-ink-secondary">{{ next_appt.service.name }} · {{ next_appt.service.duration_minutes }} دقیقه</p>
+    {% with notes=next_appt.customer.notes.all %}
+    {% if notes %}
+    <p class="mt-2 text-xs text-ink-muted">یادداشت: {{ notes.0.body|truncatechars:120 }}</p>
+    {% endif %}
+    {% endwith %}
+    <a href="{% url 'appointments:detail' pk=next_appt.pk %}" class="btn-primary mt-4 text-sm">جزئیات نوبت</a>
+  </section>
+  {% else %}
+  <p class="text-sm text-ink-muted">نوبت بعدی ندارید.</p>
+  {% endif %}
+
+  <section class="maison-panel">
+    <h3 class="mb-3 text-sm font-semibold text-ink">برنامهٔ من · {{ day_jalali }}</h3>
+    {% for a in appointments %}
+    <div class="border-b py-3 last:border-0" style="border-color: var(--color-divider);">
+      {% include "partials/appointment_card_compact.html" with appointment=a %}
+    </div>
+    {% empty %}
+    <p class="text-sm text-ink-muted">در این روز نوبتی ندارید.</p>
+    {% endfor %}
+  </section>
+
+  {% if commission_summary %}
+  <section class="maison-panel">
+    <h3 class="mb-3 text-sm font-semibold text-ink">پورسانت من (ماه جاری)</h3>
+    <dl class="grid grid-cols-2 gap-4 text-sm">
+      <div><dt class="text-ink-muted">در انتظار تسویه</dt><dd class="font-semibold tabular-nums">{{ commission_summary.recognized|fa_money }} تومان</dd></div>
+      <div><dt class="text-ink-muted">تسویه‌شده</dt><dd class="font-semibold tabular-nums">{{ commission_summary.settled|fa_money }} تومان</dd></div>
+    </dl>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

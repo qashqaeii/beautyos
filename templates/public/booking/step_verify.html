@@ -1,0 +1,13 @@
+{% extends "public/booking/base_booking.html" %}
+{% block booking_content %}
+{% include "partials/booking_progress.html" with step=4 %}
+<div class="premium-card">
+  <h1 class="display-editorial text-lg font-semibold text-espresso">تأیید موبایل</h1>
+  <p class="mt-1 text-sm text-ink-secondary">کد ارسال‌شده را وارد کنید.</p>
+  <form method="post" class="mt-6 space-y-4">
+    {% csrf_token %}
+    {{ form.code }}
+    <button type="submit" class="btn-primary w-full">تأیید و ادامه</button>
+  </form>
+</div>
+{% endblock %}

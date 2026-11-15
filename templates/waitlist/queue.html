@@ -1,0 +1,69 @@
+{% extends "layouts/app_shell.html" %}
+{% load format_tags %}
+{% block header_modifier %}dashboard-lite-app-header{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block mobile_header %}{% endblock %}
+{% block content %}
+<div class="waitlist-page mx-auto w-full max-w-3xl pb-24 md:pb-8">
+  <header class="waitlist-page__hero dashboard-enter">
+    <h1 class="waitlist-page__title">لیست انتظار</h1>
+    <p class="waitlist-page__count tabular-nums">{{ queue_count|fa_num }} نوبت در انتظار تأیید</p>
+  </header>
+
+  <section class="waitlist-queue-panel dashboard-enter">
+    {% if messages %}
+    <div class="waitlist-queue-panel__messages mb-3 space-y-2">
+      {% for message in messages %}
+      <p class="waitlist-queue-panel__flash text-sm{% if message.tags %} waitlist-queue-panel__flash--{{ message.tags }}{% endif %}">{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if appointments %}
+    <div class="waitlist-queue-table" role="table" aria-label="صف تأیید نوبت">
+      <div class="waitlist-queue-table__head waitlist-queue-table__row" role="row">
+        <span class="waitlist-queue-table__cell waitlist-queue-table__cell--num" role="columnheader">ردیف</span>
+        <span class="waitlist-queue-table__cell waitlist-queue-table__cell--customer" role="columnheader">نام مشتری</span>
+        <span class="waitlist-queue-table__cell waitlist-queue-table__cell--service" role="columnheader">خدمت</span>
+        <span class="waitlist-queue-table__cell waitlist-queue-table__cell--staff" role="columnheader">متخصص</span>
+        <span class="waitlist-queue-table__cell waitlist-queue-table__cell--action" role="columnheader">تأیید نوبت</span>
+      </div>
+      <ul class="waitlist-queue-list m-0 list-none p-0">
+        {% for appt in appointments %}
+        <li class="waitlist-queue-list__item">
+          <div class="waitlist-queue-table__row waitlist-queue-table__row--body" role="row" data-row="{{ forloop.counter|fa_num }}">
+            <span class="waitlist-queue-table__cell waitlist-queue-table__cell--num tabular-nums" role="cell">{{ forloop.counter|fa_num }}</span>
+            <div class="waitlist-queue-table__cell waitlist-queue-table__cell--customer" role="cell">
+              <a href="{% url 'customers:detail' pk=appt.customer_id %}" class="waitlist-queue-row__name">{{ appt.customer.full_name }}</a>
+            </div>
+            <span class="waitlist-queue-table__cell waitlist-queue-table__cell--service" role="cell">{{ appt.service.name }}</span>
+            <span class="waitlist-queue-table__cell waitlist-queue-table__cell--staff" role="cell">{{ appt.staff.full_display_name }}</span>
+            <div class="waitlist-queue-table__cell waitlist-queue-table__cell--action" role="cell">
+              <form method="post" action="{% url 'waitlist:confirm' pk=appt.pk %}" class="waitlist-confirm-form">
+                {% csrf_token %}
+                <button type="submit" class="waitlist-confirm-btn">
+                  <i data-lucide="circle-check" class="waitlist-confirm-btn__icon" aria-hidden="true"></i>
+                  <span class="waitlist-confirm-btn__label">تأیید نوبت</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <p class="waitlist-queue-panel__empty">نوبتی در انتظار تأیید نیست.</p>
+    {% endif %}
+  </section>
+</div>
+<script>
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}

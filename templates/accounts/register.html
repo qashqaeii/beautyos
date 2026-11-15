@@ -1,0 +1,33 @@
+{% extends "layouts/public_auth.html" %}
+{% block title %}ثبت‌نام سالن · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block auth_steps %}
+<ol class="public-auth-steps" aria-label="مراحل ثبت‌نام">
+  <li class="is-current" aria-current="step">۱. تأیید موبایل</li>
+  <li>۲. کد پیامکی</li>
+  <li>۳. اطلاعات مالک</li>
+</ol>
+{% endblock %}
+{% block auth_heading %}ثبت‌نام سالن جدید{% endblock %}
+{% block auth_subtitle %}مالک سالن با شماره موبایل خود ثبت‌نام می‌کند و پس از تأیید، سالن و پنل مدیریت ساخته می‌شود.{% endblock %}
+{% block auth_content %}
+<form method="post" class="space-y-5">
+  {% csrf_token %}
+  {% if phone_form.non_field_errors %}
+  <p class="rounded-xl border border-coral/30 bg-coral/5 px-3 py-2 text-sm text-coral" role="alert">{{ phone_form.non_field_errors.0 }}</p>
+  {% endif %}
+  <div class="public-auth-field">
+    <label for="id_phone">{{ phone_form.phone.label }}</label>
+    {{ phone_form.phone }}
+    <p class="field-hint">این شماره به‌عنوان مالک سالن ذخیره می‌شود و برای ورود بعدی استفاده می‌شود.</p>
+    {% if phone_form.phone.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ phone_form.phone.errors.0 }}</p>{% endif %}
+  </div>
+  <button type="submit" class="btn-primary min-h-[48px] w-full gap-2">
+    <i data-lucide="shield-check" class="h-4 w-4" aria-hidden="true"></i>
+    دریافت کد تأیید
+  </button>
+</form>
+<p class="mt-6 text-center text-sm text-charcoal/60">
+  قبلاً عضو یک سالن شده‌اید؟
+  <a href="{% url 'accounts:login' %}" class="font-medium text-accent hover:underline">ورود به پنل</a>
+</p>
+{% endblock %}

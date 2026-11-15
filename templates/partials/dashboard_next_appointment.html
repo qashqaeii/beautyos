@@ -1,0 +1,36 @@
+{% load appointment_tags %}
+{% if appointment %}
+<section class="maison-next-appt maison-next-appt--ops h-full">
+  <header class="maison-next-appt__head">
+    <p class="maison-next-appt__label">نوبت بعدی</p>
+    <p class="maison-next-appt__time tabular-nums" aria-label="ساعت شروع">{{ appointment.start_at|time:"H:i" }}</p>
+  </header>
+  <div class="maison-next-appt__body">
+    <p class="maison-next-appt__name truncate">{{ appointment.customer.full_name }}</p>
+    <p class="maison-next-appt__meta truncate">
+      {{ appointment.service.name }}{% if appointment.staff %} · {{ appointment.staff.display_name }}{% endif %}
+    </p>
+    <span class="{{ appointment.status|status_badge }} maison-next-appt__status">{{ appointment.get_status_display }}</span>
+  </div>
+  <footer class="maison-next-appt__footer">
+    {% if appointment.status == 'confirmed' or appointment.status == 'pending' %}
+    <a href="{% url 'reception:checkin' pk=appointment.pk %}" class="btn-primary maison-next-appt__cta w-full justify-center text-sm">
+      <i data-lucide="user-check" class="h-4 w-4" stroke-width="1.75"></i>
+      پذیرش مشتری
+    </a>
+    {% endif %}
+    <a href="{% url 'appointments:detail' pk=appointment.pk %}" class="maison-next-appt__secondary text-xs font-medium">جزئیات نوبت</a>
+  </footer>
+</section>
+{% else %}
+<section class="maison-next-appt maison-next-appt--ops maison-next-appt--empty h-full">
+  <header class="maison-next-appt__head">
+    <p class="maison-next-appt__label">نوبت بعدی</p>
+  </header>
+  <p class="text-sm leading-relaxed text-ink-secondary">نوبت فعالی در صف نیست. برنامه امروز را در تقویم ببینید.</p>
+  <footer class="maison-next-appt__footer">
+    <a href="{% url 'appointments:create' %}" class="btn-primary maison-next-appt__cta w-full justify-center text-sm">ثبت نوبت</a>
+    <a href="{% url 'appointments:calendar' %}" class="maison-next-appt__secondary text-xs font-medium">مشاهده تقویم</a>
+  </footer>
+</section>
+{% endif %}

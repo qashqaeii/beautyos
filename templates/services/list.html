@@ -1,0 +1,89 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}خدمات{% endblock %}
+{% block page_title %}خدمات سالن{% endblock %}
+{% block page_subtitle %}مدت، قیمت و وضعیت خدمات{% endblock %}
+{% block content %}
+<div
+  class="services-page"
+  x-data="{
+    createOpen: {{ create_modal_open|yesno:'true,false' }},
+    editOpen: {{ edit_modal_open|default:False|yesno:'true,false' }},
+    showCategory: {{ category_panel_open|default:False|yesno:'true,false' }},
+    showAdvanced: {{ advanced_open|default:False|yesno:'true,false' }},
+    showEditCategory: {{ edit_category_panel_open|default:False|yesno:'true,false' }},
+    showEditAdvanced: {{ edit_advanced_open|default:False|yesno:'true,false' }},
+    imageName: '',
+    editImageName: '',
+    closeCreate() {
+      this.createOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('create')) {
+        params.delete('create');
+        const qs = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+      }
+    },
+    closeEdit() {
+      this.editOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('edit')) {
+        params.delete('edit');
+        const qs = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+      }
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', createOpen || editOpen)"
+  @beautyos-close-create-modal.window="closeCreate()"
+  @beautyos-close-edit-modal.window="closeEdit()"
+  @keydown.escape.window="editOpen ? closeEdit() : (createOpen && closeCreate())"
+>
+  <div class="page-toolbar">
+    <p class="text-sm text-ink-secondary">{{ services|length }} خدمت فعال در سیستم</p>
+    <button type="button" class="btn-primary" @click="createOpen = true">خدمت جدید</button>
+  </div>
+
+  {% if messages %}
+  <div class="services-page__messages mb-3 space-y-2">
+    {% for message in messages %}
+    <p class="inventory-page__flash text-sm{% if message.tags %} inventory-page__flash--{{ message.tags }}{% endif %}">{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if services %}
+  <div class="grid gap-4 md:grid-cols-2">
+    {% for s in services %}
+    <article class="maison-service-card !flex-row !items-start">
+      <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-soft to-surface-muted text-accent">
+        <i data-lucide="sparkles" class="h-6 w-6"></i>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h3 class="font-semibold text-espresso">{{ s.name }}</h3>
+        <p class="mt-1 text-sm text-ink-secondary">
+          {% if s.category %}{{ s.category.name }} · {% endif %}
+          {{ s.duration_minutes }} دقیقه · {{ s.price_toman|floatformat:0 }} تومان
+        </p>
+        {% if not s.is_active %}<span class="badge-pending mt-2">غیرفعال</span>{% endif %}
+      </div>
+      <a href="{% url 'services:list' %}?edit={{ s.pk }}" class="btn-secondary self-start text-xs">ویرایش</a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  {% url 'services:list' as list_url %}
+  {% include "partials/empty_state.html" with icon="scissors" title="خدمات سالن هنوز تعریف نشده‌اند" description="خدمات را اضافه کنید تا در رزرو و صفحه عمومی نمایش داده شوند." cta_url=list_url|add:"?create=1" cta_label="افزودن خدمت" %}
+  {% endif %}
+
+  {% include "services/partials/service_create_modal.html" %}
+  {% include "services/partials/service_edit_modal.html" %}
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}

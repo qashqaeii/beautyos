@@ -1,0 +1,22 @@
+{% extends "onboarding/wizard/base.html" %}
+{% block title %}نوع سالن{% endblock %}
+{% block wizard_content %}
+<h1 class="text-2xl font-semibold" style="color: var(--color-text-primary);">به BeautyOS خوش آمدید</h1>
+<p class="mt-2 text-sm" style="color: var(--color-text-secondary);">برای آماده‌سازی فضای کاری، نوع سالن خود را انتخاب کنید.</p>
+<form method="post" class="mt-8 space-y-4">
+  {% csrf_token %}
+  <div class="grid gap-4 md:grid-cols-3">
+    {% for value, label in form.business_type.field.choices %}
+    <label class="cursor-pointer rounded-2xl border border-line bg-surface p-4 transition hover:border-[var(--color-accent)] has-[:checked]:border-[var(--color-accent)] has-[:checked]:shadow-card">
+      <input type="radio" name="business_type" value="{{ value }}" class="sr-only" {% if form.business_type.value == value %}checked{% endif %}>
+      <p class="font-semibold" style="color: var(--color-text-primary);">{{ label }}</p>
+      <p class="mt-2 text-xs" style="color: var(--color-text-muted);">
+        {% if value == 'beauty_women' %}تم پیشنهادی: Rose Atelier{% elif value == 'barber_men' %}تم پیشنهادی: Modern Gentleman{% else %}تم پیشنهادی: Signature Neutral{% endif %}
+      </p>
+    </label>
+    {% endfor %}
+  </div>
+  {% if form.errors %}<p class="text-sm text-danger">{{ form.errors }}</p>{% endif %}
+  <button type="submit" class="btn-primary w-full md:w-auto">ادامه</button>
+</form>
+{% endblock %}

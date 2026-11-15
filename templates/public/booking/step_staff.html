@@ -1,0 +1,18 @@
+{% extends "public/booking/base_booking.html" %}
+{% block booking_content %}
+{% include "partials/booking_progress.html" with step=2 %}
+<h1 class="display-editorial text-xl font-semibold text-espresso">{{ service.name }}</h1>
+<p class="mt-1 text-sm text-ink-secondary">انتخاب متخصص</p>
+<ul class="mt-6 space-y-3">
+  {% for st in staff_list %}
+  <li>
+    <a class="booking-service-link service-card-pastel--sage" href="{% url 'salons_public:booking_datetime' slug=salon.slug %}?staff={{ st.pk }}">
+      <span class="font-medium text-espresso">{{ st.display_name }}</span>
+      <i data-lucide="chevron-left" class="h-4 w-4 text-ink-muted"></i>
+    </a>
+  </li>
+  {% empty %}
+  <li class="empty-state py-8">متخصصی برای این خدمت در دسترس نیست.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

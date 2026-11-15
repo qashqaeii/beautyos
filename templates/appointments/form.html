@@ -1,0 +1,43 @@
+{% extends "layouts/app_shell.html" %}
+{% load static %}
+{% block page_title %}رزرو نوبت{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block extra_head %}
+<script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+<script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% if can_payment_create %}
+<script defer src="{% static 'js/appointment-deposit-preview.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div
+  class="appt-booking-host min-h-[40vh]"
+  x-data="{
+    bookOpen: {{ book_modal_open|yesno:'true,false' }},
+    closeModals() {
+      this.bookOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('book')) {
+        params.delete('book');
+        const qs = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+      }
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', bookOpen)"
+  @beautyos-close-modal.window="closeModals()"
+  @keydown.escape.window="bookOpen && !window.__beautyosJalaliCalendarOpen && closeModals()"
+>
+  {% include "appointments/partials/appointment_booking_modal.html" %}
+</div>
+<script>
+  function initAppointmentBookingModalFields() {
+    const form = document.querySelector("[data-appt-booking-form]");
+    if (form && window.initTime24Fields) window.initTime24Fields(form);
+    if (window.lucide) window.lucide.createIcons();
+  }
+  document.addEventListener("DOMContentLoaded", initAppointmentBookingModalFields);
+  document.addEventListener("alpine:initialized", initAppointmentBookingModalFields);
+  window.addEventListener("beautyos-modal-opened", initAppointmentBookingModalFields);
+</script>
+{% endblock %}

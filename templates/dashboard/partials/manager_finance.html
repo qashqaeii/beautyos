@@ -1,0 +1,20 @@
+{% load humanize %}
+<section class="maison-panel mb-5 hidden lg:block">
+  <div class="maison-panel__head">
+    <h3 class="maison-panel__title">خلاصهٔ مالی</h3>
+    <p class="text-xs text-ink-muted">{{ finance.finance_range_label }}</p>
+  </div>
+  <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    {% include "partials/stat_card.html" with label="دریافتی کل" value=finance.total_received|fa_money suffix="تومان" %}
+    {% include "partials/stat_card.html" with label="بیعانه‌ها" value=finance.deposits_amount|fa_money suffix="تومان" %}
+    {% include "partials/stat_card.html" with label="نوبت تسویه‌شده" value=finance.settled_count %}
+    {% include "partials/stat_card.html" with label="مانده قابل وصول" value=finance.receivable_amount|fa_money suffix="تومان" hint=finance.receivable_range_label %}
+  </div>
+</section>
+<section class="maison-panel mb-4 lg:hidden">
+  <h3 class="mb-3 text-sm font-semibold text-ink">خلاصهٔ مالی · {{ day_jalali }}</h3>
+  <dl class="grid grid-cols-2 gap-3 text-sm">
+    <div><dt class="text-ink-muted">دریافتی</dt><dd class="font-semibold tabular-nums">{{ finance.total_received|fa_money }} تومان</dd></div>
+    <div><dt class="text-ink-muted">مانده وصول</dt><dd class="font-semibold tabular-nums">{{ finance.receivable_amount|fa_money }} تومان</dd></div>
+  </dl>
+</section>

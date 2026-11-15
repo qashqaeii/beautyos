@@ -1,0 +1,23 @@
+{% load static %}
+{% load format_tags %}
+<article class="flex flex-col overflow-hidden rounded-[20px] border border-line bg-surface">
+  <a href="{% url 'website:blog_post' slug=post.slug %}" class="block">
+    {% if post.cover_image %}
+    <img src="{{ post.cover_image.url }}" alt="" class="aspect-[16/10] w-full object-cover" loading="lazy">
+    {% else %}
+    <div class="flex aspect-[16/10] items-center justify-center bg-lavender/10 text-lavender">
+      <i data-lucide="newspaper" class="h-10 w-10" aria-hidden="true"></i>
+    </div>
+    {% endif %}
+  </a>
+  <div class="flex flex-1 flex-col p-5">
+    {% if post.category %}<p class="text-xs font-medium text-lavender">{{ post.category }}</p>{% endif %}
+    <h2 class="mt-1 text-lg font-semibold text-aubergine">
+      <a href="{% url 'website:blog_post' slug=post.slug %}" class="hover:underline">{{ post.title }}</a>
+    </h2>
+    {% if post.summary %}<p class="mt-2 line-clamp-3 text-sm text-charcoal/70">{{ post.summary }}</p>{% endif %}
+    {% if post.published_at %}
+    <p class="mt-auto pt-4 text-xs text-charcoal/50">{{ post.published_at|jalali_datetime }}</p>
+    {% endif %}
+  </div>
+</article>

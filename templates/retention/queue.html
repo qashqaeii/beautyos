@@ -1,0 +1,104 @@
+{% extends "layouts/app_shell.html" %}
+{% load static format_tags %}
+{% block header_modifier %}dashboard-lite-app-header{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block mobile_header %}{% endblock %}
+{% block extra_head %}
+<script defer src="{% static 'js/retention-queue.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% endblock %}
+{% block content %}
+<div
+  class="retention-page mx-auto w-full max-w-2xl pb-24 md:pb-8"
+  x-data="retentionQueue({ openId: {{ open_item_id|default:'null' }} })"
+>
+  <header class="retention-page__hero dashboard-enter">
+    <h1 class="retention-page__title">پیگیری مشتریان</h1>
+    <form method="post" class="retention-page__sync">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="sync">
+      <button type="submit" class="btn-secondary retention-page__sync-btn text-sm">
+        <i data-lucide="refresh-cw" class="h-4 w-4" aria-hidden="true"></i>
+        به‌روزرسانی صف
+      </button>
+    </form>
+  </header>
+
+  <section class="retention-queue-panel dashboard-enter">
+  {% if messages %}
+    <div class="retention-queue-panel__messages space-y-2">
+      {% for message in messages %}
+      <p class="retention-queue-panel__flash{% if message.tags %} retention-queue-panel__flash--{{ message.tags }}{% endif %} text-sm">{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+    <h2 class="retention-queue-panel__heading">
+      صف پیگیری · {{ queue_count|fa_num }} مشتری
+    </h2>
+
+    {% if items %}
+    <ul class="retention-queue-list">
+      {% for item in items %}
+      <li class="retention-queue-list__item">
+        <div class="retention-queue-row">
+          <div class="retention-queue-row__copy min-w-0">
+            <a
+              href="{% url 'customers:detail' pk=item.customer.pk %}"
+              class="retention-queue-row__name"
+            >{{ item.customer.full_name }}</a>
+            <p class="retention-queue-row__reason">{{ item.reason }}</p>
+          </div>
+          <div class="retention-queue-row__actions">
+            <span class="retention-queue-row__badge tabular-nums">{{ item.days_since_visit|fa_num }} روز بدون مراجعه</span>
+            <button
+              type="button"
+              class="retention-queue-row__toggle"
+              @click="openRow({{ item.pk }})"
+              x-show="openId !== {{ item.pk }}"
+            >ثبت پیگیری</button>
+          </div>
+        </div>
+
+        <div
+          class="retention-queue-form-wrap"
+          x-show="openId === {{ item.pk }}"
+          x-cloak
+          x-transition.opacity.duration.150ms
+        >
+          <form
+            method="post"
+            action="{% url 'retention:done' pk=item.pk %}"
+            class="retention-queue-form"
+            @submit="prepareSubmit()"
+          >
+            {% csrf_token %}
+            <label class="retention-queue-form__label" for="retention-note-{{ item.pk }}">نتیجه تماس یا اقدام بعدی</label>
+            <textarea
+              id="retention-note-{{ item.pk }}"
+              name="result_note"
+              class="input-field retention-queue-form__input"
+              rows="3"
+              required
+              data-retention-note="{{ item.pk }}"
+            >{% if open_item_id == item.pk %}{{ open_draft_note }}{% endif %}</textarea>
+            <div class="retention-queue-form__actions">
+              <button type="submit" class="btn-primary text-sm">ذخیره پیگیری</button>
+              <button type="button" class="btn-secondary text-sm" @click="cancel()">انصراف</button>
+            </div>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="retention-queue-panel__empty">مشتری‌ای در صف پیگیری نیست</p>
+    {% endif %}
+  </section>
+</div>
+<script>
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}

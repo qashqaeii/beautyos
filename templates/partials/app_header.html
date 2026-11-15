@@ -1,0 +1,17 @@
+<header class="sticky top-0 z-20 border-b border-aubergine/10 bg-ivory/90 backdrop-blur">
+  <div class="flex items-center justify-between gap-4 px-4 py-4 md:px-8">
+    <div>
+      <h1 class="text-lg font-semibold text-aubergine">{% block page_title %}داشبورد{% endblock %}</h1>
+      {% if active_salon %}
+      <p class="text-xs text-charcoal/50">{{ active_salon.name }} · امروز {{ today_jalali|default:"" }}</p>
+      {% endif %}
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="{% url 'appointments:create' %}" class="btn-secondary hidden text-xs md:inline-flex">افزودن نوبت</a>
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="text-sm text-charcoal/60 hover:text-aubergine">خروج</button>
+      </form>
+    </div>
+  </div>
+</header>

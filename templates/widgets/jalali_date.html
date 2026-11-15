@@ -1,0 +1,51 @@
+{% load format_tags %}
+<div
+  class="jalali-date{% if widget.birth_picker %} jalali-date--birth{% elif not widget.show_calendar_icon %} jalali-date--minimal{% endif %}"
+  data-jalali-date
+  x-data="jalaliDateField({
+    name: '{{ widget.name }}',
+    iso: '{{ widget.iso_value|escapejs }}',
+    display: '{{ widget.jalali_value|escapejs }}',
+    maxIso: '{{ widget.max_iso|escapejs }}',
+    birthPicker: {{ widget.birth_picker|yesno:'true,false' }}
+  })"
+  @keydown.escape.window="handleEscapeKey($event)"
+  @pointerdown.window="jalaliDismissPointer($event)"
+>
+  <div class="jalali-date__control">
+    <input
+      type="text"
+      class="jalali-date__display {{ widget.attrs.class }}"
+      {% for name, value in widget.attrs.items %}{% if name != 'class' and name != 'type' %} {{ name }}="{{ value }}"{% endif %}{% endfor %}
+      x-model="display"
+      x-ref="displayInput"
+      @input="onDisplayInput($event)"
+      @keydown.enter.prevent="commitTyped()"
+      @blur="commitTyped()"
+      @paste="onDisplayPaste($event)"
+      @click.stop="openCalendar()"
+      inputmode="numeric"
+      dir="ltr"
+      autocomplete="off"
+      aria-haspopup="dialog"
+      :aria-expanded="open"
+      placeholder="۱۴۰۵/۰۸/۲۱"
+    />
+    {% if widget.show_calendar_icon %}
+    <button
+      type="button"
+      class="jalali-date__calendar-btn"
+      data-jalali-calendar-trigger
+      x-ref="calendarBtn"
+      @pointerdown.stop
+      @click.stop.prevent="toggleCalendar()"
+      :aria-expanded="open"
+      aria-label="باز کردن تقویم شمسی"
+    >
+      <i data-lucide="calendar-days" class="jalali-date__calendar-icon" aria-hidden="true"></i>
+    </button>
+    {% endif %}
+  </div>
+  <input type="hidden" name="{{ widget.name }}" x-model="iso" id="{{ widget.attrs.id|default:widget.name }}" />
+  {% include "partials/jalali_calendar_popover.html" %}
+</div>

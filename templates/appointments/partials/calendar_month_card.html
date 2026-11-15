@@ -1,0 +1,135 @@
+{% load format_tags appointment_tags %}
+<section class="appt-month-card dashboard-enter" aria-labelledby="appt-month-heading">
+  <header class="appt-month-card__head">
+    <a href="{{ prev_month_href }}" class="appt-month-card__nav" aria-label="ماه قبل">
+      <i data-lucide="chevron-right" class="appt-month-card__nav-icon" aria-hidden="true"></i>
+    </a>
+    <div class="appt-month-card__head-center">
+      <h2 id="appt-month-heading" class="appt-month-card__title">{{ jalali_month_name }}</h2>
+      {% if show_staff_filter %}
+      <div
+        class="appt-month-staff-filter"
+        x-data="{ open: false }"
+        @keydown.escape.window="open = false"
+      >
+        <button
+          type="button"
+          class="appt-month-staff-filter__trigger"
+          @click="open = !open"
+          :aria-expanded="open"
+          aria-haspopup="listbox"
+        >
+          <span class="appt-month-staff-filter__label">متخصصان</span>
+          {% if selected_staff %}
+          <span
+            class="appt-month-staff-filter__swatch"
+            style="--appt-staff-accent: {{ selected_staff|staff_calendar_color }}"
+            aria-hidden="true"
+          ></span>
+          {% endif %}
+          <span class="appt-month-staff-filter__value">{{ staff_filter_label }}</span>
+          <i data-lucide="chevron-down" class="appt-month-staff-filter__chevron" aria-hidden="true"></i>
+        </button>
+        <div
+          class="appt-month-staff-filter__menu"
+          x-show="open"
+          x-transition
+          @click.outside="open = false"
+          x-cloak
+          role="listbox"
+          aria-label="انتخاب متخصص"
+        >
+          <a
+            href="?{{ staff_filter_all_query }}"
+            class="appt-month-staff-filter__option{% if not selected_staff_id %} is-active{% endif %}"
+            @click="open = false"
+          >
+            <span class="appt-month-staff-filter__option-text">همه متخصصان</span>
+            {% if not selected_staff_id %}
+            <i data-lucide="check" class="appt-month-staff-filter__check" aria-hidden="true"></i>
+            {% endif %}
+          </a>
+          {% for member in calendar_staff %}
+          <a
+            href="?{{ staff_filter_queries|dict_item:member.pk }}"
+            class="appt-month-staff-filter__option{% if selected_staff_id == member.pk %} is-active{% endif %}"
+            @click="open = false"
+          >
+            <span
+              class="appt-month-staff-filter__swatch"
+              style="--appt-staff-accent: {{ calendar_staff_colors|dict_item:member.pk }}"
+              aria-hidden="true"
+            ></span>
+            <span class="appt-month-staff-filter__option-text">{{ member.full_display_name }}</span>
+            {% if selected_staff_id == member.pk %}
+            <i data-lucide="check" class="appt-month-staff-filter__check" aria-hidden="true"></i>
+            {% endif %}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% elif selected_staff %}
+      <p class="appt-month-staff-filter__static">
+        <span
+          class="appt-month-staff-filter__swatch"
+          style="--appt-staff-accent: {{ selected_staff|staff_calendar_color }}"
+          aria-hidden="true"
+        ></span>
+        {{ selected_staff.full_display_name }}
+      </p>
+      {% endif %}
+    </div>
+    <a href="{{ next_month_href }}" class="appt-month-card__nav" aria-label="ماه بعد">
+      <i data-lucide="chevron-left" class="appt-month-card__nav-icon" aria-hidden="true"></i>
+    </a>
+  </header>
+  {% if show_staff_legend %}
+  <ul class="appt-month-legend" aria-label="رنگ متخصصان">
+    {% for member in calendar_staff %}
+    <li class="appt-month-legend__item">
+      <span
+        class="appt-month-legend__dot"
+        style="--appt-staff-accent: {{ calendar_staff_colors|dict_item:member.pk }}"
+        aria-hidden="true"
+      ></span>
+      <span class="appt-month-legend__name">{{ member.full_display_name }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <div class="appt-month-card__matrix">
+    <div class="appt-month-card__weekdays" aria-hidden="true">
+      {% for w in calendar_month.weekday_labels %}
+      <span class="appt-month-card__weekday">{{ w }}</span>
+      {% endfor %}
+    </div>
+    <div class="appt-month-card__grid" role="grid" aria-label="روزهای {{ jalali_month_name }}">
+    {% for cell in calendar_month.cells %}
+    {% if cell.pad %}
+    <span class="appt-month-card__pad" role="presentation" aria-hidden="true"></span>
+    {% else %}
+    <a
+      href="?{{ month_query }}&amp;day={{ cell.iso }}"
+      class="appt-month-card__day{% if cell.is_today %} appt-month-card__day--today{% endif %}{% if cell.is_selected %} appt-month-card__day--selected{% endif %}"
+      {% if cell.selected_tint %}style="--appt-day-tint: {{ cell.selected_tint }}"{% endif %}
+      role="gridcell"
+      aria-current="{% if cell.is_selected %}date{% else %}false{% endif %}"
+      aria-label="{{ cell.jd|persian_digits }}"
+    >
+      <span class="appt-month-card__day-num tabular-nums">{{ cell.jd|persian_digits }}</span>
+      {% if cell.dots or cell.dots_extra %}
+      <span class="appt-month-card__dots" aria-hidden="true">
+        {% for dot in cell.dots %}
+        <span class="appt-month-card__dot" style="--appt-staff-accent: {{ dot.color }}"></span>
+        {% endfor %}
+        {% if cell.dots_extra %}
+        <span class="appt-month-card__dot-more">+{{ cell.dots_extra|persian_digits }}</span>
+        {% endif %}
+      </span>
+      {% endif %}
+    </a>
+    {% endif %}
+    {% endfor %}
+    </div>
+  </div>
+</section>

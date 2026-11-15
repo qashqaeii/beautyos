@@ -1,0 +1,27 @@
+{% extends "layouts/public_site.html" %}
+{% load static %}
+{% block title %}بلاگ · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block public_content %}
+{% include "partials/public_page_hero.html" with eyebrow="مجله" title="بلاگ" lead="مقالات و راهنماهای عملی برای مدیریت نوبت، تیم و رشد سالن." %}
+<div class="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+  {% if categories %}
+  <nav class="mt-6 flex flex-wrap gap-2" aria-label="دسته‌بندی">
+    <a href="{% url 'website:blog' %}" class="rounded-full border px-4 py-2 text-sm {% if not active_category %}border-lavender bg-lavender/10 text-aubergine{% else %}border-line text-charcoal/70{% endif %}">همه</a>
+    {% for cat in categories %}
+    <a href="{% url 'website:blog' %}?category={{ cat|urlencode }}" class="rounded-full border px-4 py-2 text-sm {% if active_category == cat %}border-lavender bg-lavender/10 text-aubergine{% else %}border-line text-charcoal/70{% endif %}">{{ cat }}</a>
+    {% endfor %}
+  </nav>
+  {% endif %}
+  {% if posts %}
+  <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {% for post in posts %}
+    {% include "website/partials/blog_card.html" with post=post %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="mt-10 rounded-xl border border-dashed border-line bg-surface px-4 py-12 text-center text-sm text-charcoal/60">
+    هنوز مقاله‌ای منتشر نشده است.
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

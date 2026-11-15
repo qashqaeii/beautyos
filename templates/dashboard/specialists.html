@@ -1,0 +1,142 @@
+{% extends "layouts/app_shell.html" %}
+{% load format_tags static %}
+{% block title %}متخصص‌ها · {{ active_salon.name }}{% endblock %}
+{% block page_title %}متخصص‌ها{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block page_actions %}{% endblock %}
+
+{% block extra_head %}
+{% if can_book_appointment and appointment_form %}
+<script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+<script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% if can_payment_create %}
+<script defer src="{% static 'js/appointment-deposit-preview.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div
+  class="specialists-page"
+  x-data="{
+    bookOpen: {{ book_modal_open|yesno:'true,false' }},
+    closeModals() {
+      this.bookOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      params.delete('book');
+      params.delete('staff');
+      const qs = params.toString();
+      window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', bookOpen)"
+  @beautyos-close-modal.window="closeModals()"
+  @keydown.escape.window="bookOpen && !window.__beautyosJalaliCalendarOpen && closeModals()"
+>
+  {% if staff_rows %}
+  <div class="specialists-list dashboard-enter" role="list">
+    {% for row in staff_rows %}
+    <div
+      class="specialists-list__item {{ row.color_class }}"
+      role="listitem"
+      x-data="{ weekOpen: false }"
+    >
+      <div class="specialists-list__row">
+        <div class="specialists-list__identity">
+          {% if row.profile.avatar %}
+          <img
+            src="{{ row.profile.avatar.url }}"
+            alt=""
+            class="specialists-list__avatar"
+            width="36"
+            height="36"
+            loading="lazy"
+          />
+          {% else %}
+          <span class="specialists-list__avatar specialists-list__avatar--initials" aria-hidden="true">
+            {{ row.profile.initials }}
+          </span>
+          {% endif %}
+          <div class="specialists-list__copy min-w-0">
+            <p class="specialists-list__name">{{ row.profile.full_display_name }}</p>
+            {% if row.service_count %}
+            <p class="specialists-list__services" title="{% for s in row.services %}{{ s.name }}{% if not forloop.last %}، {% endif %}{% endfor %}">
+              {% for s in row.services %}{{ s.name }}{% if not forloop.last %}، {% endif %}{% endfor %}
+            </p>
+            {% else %}
+            <p class="specialists-list__services specialists-list__services--empty">خدمتی ثبت نشده</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <p class="specialists-list__today tabular-nums specialists-list__today--{{ row.today_kind }}">
+          {{ row.today_label|persian_digits }}
+        </p>
+
+        <button
+          type="button"
+          class="specialists-list__week-btn"
+          @click="weekOpen = !weekOpen"
+          :aria-expanded="weekOpen"
+        >
+          <span>برنامهٔ هفته</span>
+          <i data-lucide="chevron-down" class="specialists-list__week-icon" :class="{ 'is-open': weekOpen }" aria-hidden="true"></i>
+        </button>
+
+        <div class="specialists-list__reserve">
+          {% if can_book_appointment %}
+          {% if row.can_reserve %}
+          <a
+            href="{% url 'dashboard:specialists' %}?book=1&amp;staff={{ row.profile.pk }}"
+            class="btn-primary specialists-list__book"
+          >رزرو نوبت</a>
+          {% else %}
+          <div class="specialists-list__reserve-disabled">
+            <button
+              type="button"
+              class="btn-primary specialists-list__book specialists-list__book--disabled"
+              disabled
+            >رزرو نوبت</button>
+            {% if not row.service_count %}
+            <p class="specialists-list__reserve-hint">برای رزرو، ابتدا خدمت تعریف کنید</p>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="specialists-list__week-panel" x-show="weekOpen" x-cloak>
+        <ul class="specialists-list__week-lines">
+          {% for line in row.week_lines %}
+          <li class="specialists-list__week-line{% if line.is_today %} is-today{% endif %}">
+            <span class="specialists-list__week-day">
+              {{ line.day_name }}
+              <span class="tabular-nums text-ink-muted">{{ line.jalali|persian_digits }}</span>
+            </span>
+            <span class="specialists-list__week-hours tabular-nums">{{ line.hours_text|persian_digits }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="specialists-empty text-sm text-ink-muted">متخصصی ثبت نشده است.</p>
+  {% endif %}
+
+  {% if can_book_appointment and appointment_form %}
+  {% include "appointments/partials/appointment_booking_modal.html" %}
+  {% endif %}
+</div>
+<script>
+  function initSpecialistsBookingModal() {
+    const form = document.querySelector("[data-appt-booking-form]");
+    if (form && window.initTime24Fields) window.initTime24Fields(form);
+    if (window.lucide) window.lucide.createIcons();
+  }
+  document.addEventListener("DOMContentLoaded", initSpecialistsBookingModal);
+  window.addEventListener("beautyos-modal-opened", initSpecialistsBookingModal);
+</script>
+{% endblock %}

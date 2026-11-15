@@ -1,0 +1,12 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}ویرایش خدمت{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block content %}
+<script>window.location.replace("{% if is_edit %}{% url 'services:list' %}?edit={{ service.pk }}{% else %}{% url 'services:list' %}?create=1{% endif %}");</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url={% if is_edit %}{% url 'services:list' %}?edit={{ service.pk }}{% else %}{% url 'services:list' %}?create=1{% endif %}">
+  <p class="p-4 text-sm"><a href="{% url 'services:list' %}">رفتن به لیست خدمات</a></p>
+</noscript>
+{% endblock %}

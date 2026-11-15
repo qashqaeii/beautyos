@@ -1,0 +1,17 @@
+{% extends "onboarding/wizard/base.html" %}
+{% block title %}آماده‌سازی کامل{% endblock %}
+{% block wizard_content %}
+<h1 class="text-2xl font-semibold text-espresso">سالن شما آماده است!</h1>
+{% if salon %}
+<ul class="mt-6 space-y-2 text-sm text-ink-secondary">
+  <li>سالن: <strong class="text-espresso">{{ salon.name }}</strong></li>
+  <li>صفحه عمومی: <a href="{% url 'salons_public:landing' slug=salon.slug %}" class="text-accent" target="_blank" rel="noopener">{{ salon.slug }}</a></li>
+  <li>{{ stats.services }} خدمت · {{ stats.staff }} عضو تیم</li>
+</ul>
+<form method="post" class="mt-8 flex flex-wrap gap-2">
+  {% csrf_token %}
+  <button type="submit" class="btn-primary">ورود به میز کار</button>
+  <a href="{% url 'salons_public:landing' slug=salon.slug %}" class="btn-secondary" target="_blank" rel="noopener">مشاهده صفحه عمومی</a>
+</form>
+{% endif %}
+{% endblock %}

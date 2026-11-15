@@ -1,0 +1,83 @@
+<form
+  method="post"
+  action="{% url 'inventory:create' %}"
+  class="inventory-create-modal__form inventory-form"
+  autocomplete="off"
+  x-data="{ showCategory: {{ category_panel_open|default:False|yesno:'true,false' }} }"
+  id="inventory-create-form"
+>
+  {% csrf_token %}
+
+  <div class="inventory-create-modal__scroll maison-scroll-themed">
+  <div class="inventory-form__fields inventory-form__fields--modal">
+    <div class="inventory-form-field">
+      <label class="field-label" for="{{ form.inventory_product_name.id_for_label }}">{{ form.inventory_product_name.label }}</label>
+      {{ form.inventory_product_name }}
+      {% if form.inventory_product_name.errors %}<p class="inventory-form-field__error">{{ form.inventory_product_name.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="inventory-form-field inventory-form-field--category">
+      <div class="inventory-form-field__category-head">
+        <label class="field-label mb-0" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+        <button
+          type="button"
+          class="inventory-form__add-category-btn"
+          @click="showCategory = !showCategory"
+          :aria-expanded="showCategory"
+        >
+          + دستهٔ جدید
+        </button>
+      </div>
+      {{ form.category }}
+      {% if form.category.errors %}<p class="inventory-form-field__error">{{ form.category.errors.0 }}</p>{% endif %}
+
+      <template x-if="showCategory">
+        <div class="inventory-form-category-panel">
+          <label class="field-label" for="id_new_category_name">نام دسته‌بندی</label>
+          <input
+            type="text"
+            name="new_category_name"
+            id="id_new_category_name"
+            class="input-field"
+            value="{{ new_category_name|default:'' }}"
+            autocomplete="off"
+          />
+          {% if category_error %}<p class="inventory-form-field__error">{{ category_error }}</p>{% endif %}
+          <div class="inventory-form-category-panel__actions">
+            <button type="submit" name="intent" value="add_category" class="btn-secondary text-sm px-4 py-2">
+              افزودن دسته
+            </button>
+            <button type="button" class="inventory-form-category-panel__cancel" @click="showCategory = false">
+              انصراف
+            </button>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="inventory-form-field">
+      <label class="field-label" for="{{ form.unit.id_for_label }}">{{ form.unit.label }}</label>
+      {{ form.unit }}
+      {% if form.unit.errors %}<p class="inventory-form-field__error">{{ form.unit.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="inventory-form-grid">
+      <div class="inventory-form-field">
+        <label class="field-label" for="{{ form.initial_quantity.id_for_label }}">{{ form.initial_quantity.label }}</label>
+        {{ form.initial_quantity }}
+        {% if form.initial_quantity.errors %}<p class="inventory-form-field__error">{{ form.initial_quantity.errors.0 }}</p>{% endif %}
+      </div>
+      <div class="inventory-form-field">
+        <label class="field-label" for="{{ form.minimum_quantity.id_for_label }}">{{ form.minimum_quantity.label }}</label>
+        {{ form.minimum_quantity }}
+        {% if form.minimum_quantity.errors %}<p class="inventory-form-field__error">{{ form.minimum_quantity.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <footer class="inventory-create-modal__foot">
+    <button type="submit" name="intent" value="save_item" class="btn-primary inventory-form-card__submit">ذخیره محصول</button>
+    <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-create-modal')">انصراف</button>
+  </footer>
+</form>

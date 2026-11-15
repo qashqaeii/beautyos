@@ -1,0 +1,30 @@
+<header class="reception-desk-header dashboard-enter">
+  <div class="reception-desk-header__bar">
+    <div class="reception-desk-header__brand">
+      <h1 class="reception-desk-header__title">میز پذیرش</h1>
+    </div>
+    <div class="reception-desk-header__date" aria-label="انتخاب روز">
+      <a
+        href="?day={{ prev_day }}{% if request.GET.service %}&service={{ request.GET.service }}{% endif %}{% if request.GET.staff %}&staff={{ request.GET.staff }}{% endif %}"
+        class="reception-desk-header__nav"
+        aria-label="روز قبل"
+      >‹</a>
+      <form method="get" class="reception-desk-header__picker-form min-w-0">
+        {% if request.GET.service %}<input type="hidden" name="service" value="{{ request.GET.service }}">{% endif %}
+        {% if request.GET.staff %}<input type="hidden" name="staff" value="{{ request.GET.staff }}">{% endif %}
+        {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali|default:today_jalali %}
+      </form>
+      <a
+        href="?day={{ next_day }}{% if request.GET.service %}&service={{ request.GET.service }}{% endif %}{% if request.GET.staff %}&staff={{ request.GET.staff }}{% endif %}"
+        class="reception-desk-header__nav"
+        aria-label="روز بعد"
+      >›</a>
+    </div>
+    <div class="reception-desk-header__actions">
+      <a href="?book=1&amp;day={{ selected_day|date:'Y-m-d' }}{% if request.GET.service %}&amp;service={{ request.GET.service }}{% endif %}{% if request.GET.staff %}&amp;staff={{ request.GET.staff }}{% endif %}" class="btn-primary reception-desk-header__cta text-sm">
+        <i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>
+        ثبت نوبت
+      </a>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,36 @@
+{% extends "layouts/public_auth.html" %}
+{% block title %}ورود · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block auth_steps %}
+<ol class="public-auth-steps" aria-label="مراحل ورود">
+  <li class="is-current" aria-current="step">۱. شماره موبایل</li>
+  <li>۲. کد تأیید</li>
+</ol>
+{% endblock %}
+{% block auth_heading %}ورود به پنل{% endblock %}
+{% block auth_subtitle %}شماره موبایل ثبت‌شده در سالن را وارد کنید تا کد ورود برایتان ارسال شود.{% endblock %}
+{% block auth_content %}
+<form method="post" class="space-y-5">
+  {% csrf_token %}
+  <input type="hidden" name="step" value="phone">
+  {% if phone_form.non_field_errors %}
+  <p class="rounded-xl border border-coral/30 bg-coral/5 px-3 py-2 text-sm text-coral" role="alert">{{ phone_form.non_field_errors.0 }}</p>
+  {% endif %}
+  <div class="public-auth-field">
+    <label for="id_phone">{{ phone_form.phone.label }}</label>
+    {{ phone_form.phone }}
+    <p class="field-hint">شماره را با پیش‌شماره ۰۹ وارد کنید؛ فقط اعضای دعوت‌شده به سالن می‌توانند وارد شوند.</p>
+    {% if phone_form.phone.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ phone_form.phone.errors.0 }}</p>{% endif %}
+  </div>
+  <button type="submit" class="btn-primary min-h-[48px] w-full gap-2">
+    <i data-lucide="message-square" class="h-4 w-4" aria-hidden="true"></i>
+    دریافت کد ورود
+  </button>
+</form>
+<p class="mt-6 text-center text-sm text-charcoal/60">
+  سالن دارید و هنوز ثبت‌نام نکرده‌اید؟
+  <a href="{% url 'accounts:register' %}" class="font-medium text-accent hover:underline">ثبت‌نام سالن جدید</a>
+</p>
+{% if BEAUTYOS_DEBUG %}
+<p class="mt-4 rounded-xl bg-champagne/20 p-3 text-xs text-charcoal/70">حالت توسعه: کد OTP در مرحله بعد یا کنسول سرور نمایش داده می‌شود.</p>
+{% endif %}
+{% endblock %}

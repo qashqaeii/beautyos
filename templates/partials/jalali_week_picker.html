@@ -1,0 +1,41 @@
+{# GET week anchor #}
+<form method="get" class="staff-hours-week-picker">
+  <label class="staff-hours-week-picker__label text-xs text-ink-muted">هفتهٔ نمایش</label>
+  <div
+    class="jalali-date jalali-date--compact"
+    data-jalali-date
+    x-data="jalaliWeekPicker('{{ week_anchor|date:'Y-m-d' }}')"
+    @keydown.escape.window="closeCalendar()"
+    @pointerdown.window="jalaliDismissPointer($event)"
+  >
+    <div class="jalali-date__control">
+      <input
+        type="text"
+        class="jalali-date__display input-field input-field--compact"
+        x-model="display"
+        x-ref="displayInput"
+        @input="onDisplayInput($event)"
+        @keydown.enter.prevent="commitTyped()"
+        @paste="onDisplayPaste($event)"
+        inputmode="numeric"
+        dir="ltr"
+        autocomplete="off"
+        aria-label="تاریخ هفته"
+        placeholder="۱۴۰۵/۰۸/۲۱"
+      />
+      <button
+        type="button"
+        class="jalali-date__calendar-btn"
+        data-jalali-calendar-trigger
+        x-ref="calendarBtn"
+        @pointerdown.stop
+        @click.stop.prevent="toggleCalendar()"
+        aria-label="باز کردن تقویم شمسی"
+      >
+        <i data-lucide="calendar-days" class="jalali-date__calendar-icon" aria-hidden="true"></i>
+      </button>
+    </div>
+    <input type="hidden" name="week" :value="iso" />
+    {% include "partials/jalali_calendar_popover.html" %}
+  </div>
+</form>

@@ -1,0 +1,57 @@
+{% extends "layouts/app_shell.html" %}
+{% load appointment_tags %}
+{% block page_title %}میز پذیرش{% endblock %}
+{% block page_subtitle %}برنامه {{ today }}{% endblock %}
+{% block page_eyebrow %}پذیرش · {{ today }}{% endblock %}
+{% block content %}
+<div class="maison-page-intro">
+  <div class="maison-hero !p-5 md:!p-6">
+    <p class="maison-hero__eyebrow">میز پذیرش</p>
+    <h2 class="maison-hero__title text-xl md:text-2xl">برنامه امروز</h2>
+    <p class="maison-hero__lead mt-2">
+      <strong class="text-ink">{{ summary.today_total }}</strong> نوبت ·
+      <strong class="text-ink">{{ summary.pending }}</strong> در انتظار ·
+      {{ summary.checked_in }} پذیرش‌شده
+    </p>
+  </div>
+  <a href="{% url 'appointments:create' %}" class="btn-primary h-fit self-start text-sm lg:self-end"><i data-lucide="calendar-plus" class="h-4 w-4"></i> رزرو سریع</a>
+</div>
+<div class="order-2 mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:order-none lg:grid-cols-5">
+  {% include "partials/stat_card.html" with label="کل امروز" value=summary.today_total %}
+  {% include "partials/stat_card.html" with label="پذیرش‌شده" value=summary.checked_in %}
+  {% include "partials/stat_card.html" with label="در انتظار" value=summary.pending %}
+  {% include "partials/stat_card.html" with label="لغو" value=summary.cancelled %}
+  {% include "partials/stat_card.html" with label="عدم حضور" value=summary.no_show %}
+</div>
+<div class="page-toolbar">
+  <div class="flex flex-wrap gap-2">
+    <a href="{% url 'appointments:create' %}" class="btn-primary text-sm">رزرو سریع</a>
+    <a href="{% url 'customers:create' %}" class="btn-secondary text-sm">مشتری جدید</a>
+    <a href="{% url 'waitlist:queue' %}" class="btn-secondary text-sm">لیست انتظار</a>
+    <a href="{% url 'finance:payment_create' %}" class="btn-secondary text-sm">ثبت پرداخت</a>
+  </div>
+</div>
+<section class="premium-card divide-y divide-line p-0">
+  <div class="maison-panel__head !mb-0 border-b px-5 py-3" style="border-color: var(--color-divider);">
+    <h2 class="maison-panel__title text-sm">صف نوبت‌ها</h2>
+    <a href="{% url 'appointments:calendar' %}" class="text-xs font-medium text-ink-secondary hover:text-ink">تقویم</a>
+  </div>
+  {% for a in queue %}
+  <div class="border-b px-4 py-3 last:border-0" style="border-color: var(--color-divider);">
+    {% include "partials/appointment_card_detailed.html" with appointment=a show_actions=True %}
+  </div>
+  {% empty %}
+  {% include "partials/empty_state.html" with icon="calendar" title="برای امروز نوبتی نیست" cta_url="/appointments/new/" cta_label="ثبت نوبت" %}
+  {% endfor %}
+</section>
+{% if follow_ups %}
+<section class="premium-card mt-6">
+  <h3 class="mb-3 font-semibold text-espresso">پیگیری امروز</h3>
+  <ul class="space-y-2 text-sm">
+    {% for f in follow_ups %}
+    <li><a href="{% url 'customers:detail' pk=f.customer.pk %}" class="text-accent">{{ f.customer.full_name }}</a> · {{ f.reason }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

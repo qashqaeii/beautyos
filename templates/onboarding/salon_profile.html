@@ -1,0 +1,19 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}تکمیل پروفایل سالن{% endblock %}
+{% block page_title %}تکمیل پروفایل سالن{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-xl">
+  <p class="mb-6 text-sm text-charcoal/60">چند جزئیات برای صفحه عمومی و تجربه بهتر مشتریان.</p>
+  <form method="post" class="card space-y-4">
+    {% csrf_token %}
+    {% for field in form %}
+    <div>
+      <label class="mb-1 block text-sm font-medium">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<p class="mt-1 text-xs text-coral">{{ field.errors.0 }}</p>{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn-primary w-full">ورود به داشبورد</button>
+  </form>
+</div>
+{% endblock %}

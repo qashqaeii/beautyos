@@ -1,0 +1,22 @@
+{% extends "layouts/public_site.html" %}
+{% block title %}سؤالات متداول · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block public_content %}
+{% include "partials/public_page_hero.html" with eyebrow="راهنما" title="سؤالات متداول" lead="پاسخ سریع به پرتکرارترین سؤالات درباره راه‌اندازی، نوبت‌دهی و ورود به پنل سالن." %}
+<div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-14">
+  <div class="space-y-3">
+    {% for item in faqs %}
+    <details class="public-faq-item group" {% if forloop.first %}open{% endif %}>
+      <summary>
+        <span>{{ item.q }}</span>
+        <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-charcoal/45 transition group-open:rotate-180" aria-hidden="true"></i>
+      </summary>
+      <div class="public-faq-item__body">{{ item.a }}</div>
+    </details>
+    {% endfor %}
+  </div>
+  <div class="mt-12 rounded-2xl border border-dashed border-line bg-lavender/10 px-5 py-6 text-center">
+    <p class="text-sm text-charcoal/70">سؤال دیگری دارید؟</p>
+    <a href="{% url 'website:contact' %}" class="btn-public-primary mt-4 inline-flex">تماس با پشتیبانی</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+<div class="pub-ui" data-variant="{{ variant }}" aria-hidden="true">
+  <div class="pub-ui__chrome">
+    <span class="pub-ui__dots"><i></i><i></i><i></i></span>
+    <span class="pub-ui__title">{{ chrome_label|default:"BeautyOS" }}</span>
+  </div>
+  <div class="pub-ui__body">
+    {% if variant == "calendar" %}
+    <div class="pub-ui-cal">
+      <div class="pub-ui-cal__head">
+        <span>آذر ۱۴۰۴</span>
+        <span class="pub-ui-cal__filter">متخصصان</span>
+      </div>
+      <div class="pub-ui-cal__week" aria-hidden="true">
+        <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
+      </div>
+      <div class="pub-ui-cal__grid">
+        {% for i in "123456789012345678901234567890123" %}
+        <span class="pub-ui-cal__day{% if forloop.counter == 14 %} is-active{% elif forloop.counter == 8 or forloop.counter == 16 or forloop.counter == 22 %} has-staff{% endif %}">{{ forloop.counter }}</span>
+        {% endfor %}
+      </div>
+      <ul class="pub-ui-cal__list">
+        <li><i style="--staff:#BBA5CB"></i><b>۱۰:۰۰</b><span>کوتاهی مو</span></li>
+        <li><i style="--staff:#A8BFA5"></i><b>۱۲:۳۰</b><span>رنگ مو</span></li>
+      </ul>
+    </div>
+    {% elif variant == "customers" %}
+    <ul class="pub-ui-crm">
+      <li><span class="pub-ui-crm__av">س</span><div><strong>سارا احمدی</strong><em>۰۹۱۲···۸۸۱۰</em></div></li>
+      <li><span class="pub-ui-crm__av">م</span><div><strong>مریم رضایی</strong><em>۸ مراجعه · نوبت جمعه</em></div></li>
+      <li><span class="pub-ui-crm__av">ع</span><div><strong>عباس کیانی</strong><em>یادداشت: پوست حساس</em></div></li>
+    </ul>
+    {% elif variant == "finance" %}
+    <div class="pub-ui-fin">
+      <div class="pub-ui-fin__row"><span>دریافت امروز</span><strong class="tabular-nums">۲٬۴۵۰٬۰۰۰</strong></div>
+      <div class="pub-ui-fin__row"><span>پورسانت معوق</span><strong class="tabular-nums">۸۶۰٬۰۰۰</strong></div>
+      <div class="pub-ui-fin__bar" aria-hidden="true"><span style="width:68%"></span></div>
+      <p class="pub-ui-fin__hint">گزارش مالی و تسویه در پنل مدیر</p>
+    </div>
+    {% else %}
+    <h3 class="pub-ui-book__url">s/<span>نام-سالن</span>/</h3>
+    <ol class="pub-ui-book__steps">
+      <li class="is-done">خدمت</li>
+      <li class="is-on">متخصص</li>
+      <li>زمان</li>
+    </ol>
+    <div class="pub-ui-book__slot"><span>پنج‌شنبه</span><strong class="tabular-nums">۱۵:۳۰</strong></div>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<header class="maison-mobile-head maison-reveal lg:hidden">
+  <div class="flex min-w-0 flex-1 items-center gap-3">
+    {% include "partials/site_logo.html" with logo_class="maison-mobile-head__logo" %}
+    <div class="min-w-0 flex-1">
+      <p class="text-xs text-ink-secondary">{% if greeting_override %}{{ greeting_override }}{% else %}سلام{% if user.first_name %}، {{ user.first_name }}{% endif %}{% endif %}</p>
+      <p class="truncate text-sm font-semibold text-ink">{% if title_line %}{{ title_line }}{% else %}{{ active_salon.name }}{% endif %}</p>
+    </div>
+  </div>
+</header>

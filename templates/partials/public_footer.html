@@ -1,0 +1,39 @@
+<footer class="public-footer">
+  <div class="public-footer__inner">
+    <div class="public-footer__grid">
+      <div class="public-footer__brand">
+        <p class="public-footer__title">{{ BEAUTYOS_PRODUCT_NAME }}</p>
+        <p class="public-footer__text">
+          CRM نوبت، مشتری و تیم برای سالن‌های زیبایی — با صفحه رزرو عمومی اختصاصی.
+        </p>
+      </div>
+      <div>
+        <p class="public-footer__heading">صفحات</p>
+        <ul class="public-footer__links">
+          <li><a href="{% url 'website:home' %}">خانه</a></li>
+          <li><a href="{% url 'website:features' %}">امکانات</a></li>
+          <li><a href="{% url 'website:blog' %}">بلاگ</a></li>
+          <li><a href="{% url 'website:faq' %}">سؤالات متداول</a></li>
+          <li><a href="{% url 'website:contact' %}">تماس و پشتیبانی</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="public-footer__heading">حساب کاربری</p>
+        <ul class="public-footer__links">
+          <li><a href="{% url 'accounts:login' %}">ورود</a></li>
+          <li><a href="{% url 'accounts:register' %}">ثبت‌نام سالن</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="public-footer__heading">قوانین</p>
+        <ul class="public-footer__links">
+          <li><a href="{% url 'website:privacy' %}">حریم خصوصی</a></li>
+          <li><a href="{% url 'website:terms' %}">شرایط استفاده</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="public-footer__legal">
+      © {{ BEAUTYOS_PRODUCT_NAME }} — همه حقوق محفوظ است.
+    </p>
+  </div>
+</footer>

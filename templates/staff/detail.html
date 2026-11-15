@@ -1,0 +1,153 @@
+{% extends "layouts/app_shell.html" %}
+{% load static %}
+{% block title %}{{ profile.full_display_name }}{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+{% block extra_head %}
+{% if can_book_appointment and appointment_form %}
+<script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+<script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% if can_payment_create %}
+<script defer src="{% static 'js/appointment-deposit-preview.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div
+  class="staff-profile-page"
+  x-data="{
+    editOpen: {{ edit_modal_open|yesno:'true,false' }},
+    timeoffOpen: {{ timeoff_modal_open|yesno:'true,false' }},
+    bookOpen: {{ book_modal_open|yesno:'true,false' }},
+    closeModals() {
+      this.editOpen = false;
+      this.timeoffOpen = false;
+      this.bookOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      ['edit', 'timeoff', 'book'].forEach((key) => params.delete(key));
+      const qs = params.toString();
+      window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', editOpen || timeoffOpen || bookOpen)"
+  @beautyos-close-modal.window="closeModals()"
+  @keydown.escape.window="(editOpen || timeoffOpen || bookOpen) && !window.__beautyosJalaliCalendarOpen && closeModals()"
+>
+  <header class="staff-profile-header">
+    <div class="staff-profile-header__identity">
+      {% if profile.avatar %}
+      <img
+        src="{{ profile.avatar.url }}"
+        alt=""
+        class="staff-profile-header__avatar"
+        width="64"
+        height="64"
+        loading="eager"
+      />
+      {% else %}
+      <span class="staff-profile-header__avatar staff-profile-header__avatar--initials" aria-hidden="true">
+        {{ profile.initials }}
+      </span>
+      {% endif %}
+      <div class="staff-profile-header__copy">
+        <h1 class="staff-profile-header__name">{{ profile.full_display_name }}</h1>
+        <p class="staff-profile-header__title">
+          {{ profile.title|default:"—" }}
+        </p>
+      </div>
+    </div>
+    <div class="staff-profile-header__actions">
+      <button type="button" class="staff-profile-header__btn staff-profile-header__btn--primary" @click="editOpen = true">
+        <i data-lucide="pencil" class="staff-profile-header__icon" aria-hidden="true"></i>
+        <span>ویرایش</span>
+      </button>
+      <a href="{% url 'staff:hours' pk=profile.pk %}" class="staff-profile-header__btn staff-profile-header__btn--ghost">
+        <i data-lucide="clock" class="staff-profile-header__icon" aria-hidden="true"></i>
+        <span>ساعات کاری</span>
+      </a>
+      <button
+        type="button"
+        class="staff-profile-header__btn staff-profile-header__btn--ghost"
+        @click="timeoffOpen = true; $nextTick(() => { if (window.lucide) window.lucide.createIcons(); window.dispatchEvent(new CustomEvent('beautyos-modal-opened')); })"
+      >
+        <i data-lucide="calendar-off" class="staff-profile-header__icon" aria-hidden="true"></i>
+        <span>مرخصی</span>
+      </button>
+      {% if can_book_appointment %}
+      <button
+        type="button"
+        class="staff-profile-header__btn staff-profile-header__btn--primary"
+        @click="bookOpen = true; $nextTick(() => { if (window.lucide) window.lucide.createIcons(); window.dispatchEvent(new CustomEvent('beautyos-modal-opened')); }); const p = new URLSearchParams(window.location.search); p.set('book', '1'); p.set('staff', '{{ profile.pk }}'); window.history.replaceState({}, '', window.location.pathname + '?' + p.toString());"
+      >
+        <i data-lucide="calendar-plus" class="staff-profile-header__icon" aria-hidden="true"></i>
+        <span>ثبت نوبت</span>
+      </button>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section class="card">
+      <h3 class="font-semibold text-aubergine">ساعات کاری</h3>
+      <ul class="mt-3 space-y-1 text-sm">
+        {% for row in hours_week %}
+        <li class="flex flex-wrap justify-between gap-2 border-b border-line py-2">
+          <span>{{ row.label }} · <span class="tabular-nums text-ink-secondary">{{ row.jalali|persian_digits }}</span></span>
+          <span dir="ltr" class="tabular-nums">
+            {% if row.record and row.record.is_closed %}تعطیل{% elif row.record %}{{ row.record.start_time|time:"H:i"|persian_digits }} – {{ row.record.end_time|time:"H:i"|persian_digits }}{% else %}—{% endif %}
+          </span>
+        </li>
+        {% empty %}
+        <li class="text-muted">تعریف نشده</li>
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="card">
+      <h3 class="font-semibold text-aubergine">مرخصی‌های پیش‌رو</h3>
+      <ul class="mt-3 space-y-2 text-sm">
+        {% for t in time_off %}
+        <li class="flex flex-wrap justify-between gap-2 border-b border-line py-2">
+          <span class="tabular-nums">{{ t.start_date|fa_jalali }}{% if t.end_date != t.start_date %} – {{ t.end_date|fa_jalali }}{% endif %}</span>
+          {% if t.reason %}<span class="text-muted">{{ t.reason }}</span>{% endif %}
+        </li>
+        {% empty %}
+        <li class="text-muted">مرخصی ثبت‌شده‌ای نیست</li>
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="card">
+      <h3 class="font-semibold text-aubergine">نوبت‌های پیش‌رو</h3>
+      <ul class="mt-3 space-y-2 text-sm">
+        {% for a in upcoming %}
+        <li>
+          <a href="{% url 'appointments:detail' pk=a.pk %}" class="text-lavender">
+            {{ a.start_at|fa_jalali_datetime }} — {{ a.customer.full_name }}
+          </a>
+        </li>
+        {% empty %}
+        <li class="text-muted">نوبتی نیست</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+  {% if profile.bio %}
+  <p class="card mt-6 text-sm text-charcoal/80">{{ profile.bio }}</p>
+  {% endif %}
+
+  {% include "staff/partials/staff_edit_modal.html" %}
+  {% include "staff/partials/staff_time_off_modal.html" %}
+  {% if can_book_appointment and appointment_form %}
+  {% include "appointments/partials/appointment_booking_modal.html" %}
+  {% endif %}
+</div>
+<script>
+  function initStaffProfileModals() {
+    const form = document.querySelector("[data-appt-booking-form]");
+    if (form && window.initTime24Fields) window.initTime24Fields(form);
+    if (window.lucide) window.lucide.createIcons();
+  }
+  document.addEventListener("alpine:initialized", initStaffProfileModals);
+  window.addEventListener("beautyos-modal-opened", initStaffProfileModals);
+</script>
+{% endblock %}

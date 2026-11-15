@@ -1,0 +1,39 @@
+<li class="finance-comm-row finance-comm-row--pending">
+  <div class="finance-comm-row__head">
+    <div class="finance-comm-row__identity">
+      <p class="finance-comm-row__name">{{ row.staff.display_name|default:row.staff.user }}</p>
+      <p class="finance-comm-row__percent">درصد سهم: {{ row.percent_label }}</p>
+    </div>
+    <dl class="finance-comm-row__figures finance-comm-row__figures--two">
+      <div><dt>مبلغ سهم</dt><dd class="tabular-nums">{{ row.commission_total|fa_money }}</dd></div>
+      <div><dt>مانده</dt><dd class="tabular-nums finance-comm-row__due">{{ row.remainder_total|fa_money }}</dd></div>
+    </dl>
+    {% if can_settle_commission %}
+    <form method="post" class="finance-comm-settle-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="settle_staff">
+      <input type="hidden" name="staff_id" value="{{ row.staff.pk }}">
+      <label class="finance-comm-settle-form__label" for="settle-amount-{{ row.staff.pk }}">مبلغ تسویه (تومان)</label>
+      <input
+        type="number"
+        name="amount_toman"
+        id="settle-amount-{{ row.staff.pk }}"
+        class="input-field finance-comm-settle-form__amount"
+        min="1"
+        max="{{ row.remainder_total }}"
+        value="{{ row.remainder_total }}"
+        required
+      />
+      <label class="finance-comm-settle-form__label" for="settle-note-{{ row.staff.pk }}">یادداشت</label>
+      <textarea
+        name="note"
+        id="settle-note-{{ row.staff.pk }}"
+        class="input-field finance-comm-settle-form__note"
+        rows="2"
+        placeholder="توضیح پرداخت به متخصص (اختیاری)"
+      ></textarea>
+      <button type="submit" class="btn-primary finance-comm-settle-form__btn">ثبت تسویه</button>
+    </form>
+    {% endif %}
+  </div>
+</li>

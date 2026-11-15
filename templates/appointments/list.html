@@ -1,0 +1,35 @@
+{% extends "layouts/app_shell.html" %}
+{% load appointment_tags %}
+{% block page_title %}لیست نوبت‌ها{% endblock %}
+{% block page_subtitle %}تمام رزروها به‌ترتیب زمان{% endblock %}
+{% block content %}
+<div class="page-toolbar">
+  <div class="flex gap-2">
+    <a href="{% url 'appointments:calendar' %}" class="btn-secondary text-xs">تقویم روزانه</a>
+    <a href="{% url 'appointments:calendar_week' %}" class="btn-secondary text-xs">هفتگی</a>
+  </div>
+  <a href="{% url 'appointments:create' %}" class="btn-primary text-sm">ثبت نوبت</a>
+</div>
+{% if appointments %}
+<div class="premium-card overflow-x-auto p-0">
+  <table class="w-full text-sm">
+    <thead class="border-b border-line bg-surface-muted text-ink-secondary">
+      <tr><th class="p-3 text-right font-medium">مشتری</th><th class="p-3 text-right font-medium">خدمت</th><th class="p-3 text-right font-medium">زمان</th><th class="p-3 text-right font-medium">وضعیت</th></tr>
+    </thead>
+    <tbody>
+      {% for a in appointments %}
+      <tr class="border-b border-line/80 hover:bg-surface-muted/50">
+        <td class="p-3"><a href="{% url 'appointments:detail' pk=a.pk %}" class="font-medium text-espresso hover:text-accent">{{ a.customer.full_name }}</a></td>
+        <td class="p-3">{{ a.service.name }}</td>
+        <td class="p-3 text-ink-muted">{{ a.start_at|fa_jalali_datetime }}</td>
+        <td class="p-3"><span class="{{ a.status|status_badge }}">{{ a.get_status_display }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  {% url 'appointments:create' as create_appt_url %}
+  {% include "partials/empty_state.html" with icon="calendar" title="نوبتی ثبت نشده" cta_url=create_appt_url cta_label="ثبت نوبت" %}
+{% endif %}
+{% endblock %}

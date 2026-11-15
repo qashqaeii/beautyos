@@ -1,0 +1,11 @@
+{
+  "name": "beautyos",
+  "private": true,
+  "scripts": {
+    "build:css": "python scripts/write_theme_tokens_css.py && tailwindcss -i ./static/src/input.css -o ./static/css/beautyos.css --minify",
+    "watch:css": "python scripts/write_theme_tokens_css.py && tailwindcss -i ./static/src/input.css -o ./static/css/beautyos.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

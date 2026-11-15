@@ -1,0 +1,54 @@
+{% extends "layouts/app_shell.html" %}
+{% load static format_tags %}
+{% block title %}تسویه متخصص{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="commission-settle-page">
+  <article class="commission-settle-card">
+    <header class="commission-settle-card__head">
+      <h1 class="commission-settle-card__title">تسویه متخصص</h1>
+      <p class="commission-settle-card__staff">{{ staff.display_name }}</p>
+    </header>
+
+    <section class="commission-settle-hero" aria-label="ماندهٔ قابل تسویه">
+      <p class="commission-settle-hero__label">ماندهٔ قابل تسویه</p>
+      <p class="commission-settle-hero__value tabular-nums">
+        {{ outstanding|fa_money }}
+        <span class="commission-settle-hero__unit">تومان</span>
+      </p>
+    </section>
+
+    <div class="commission-settle-card__divider" role="presentation"></div>
+
+    <section class="commission-settle-form-section" aria-labelledby="commission-settle-form-heading">
+      <h2 id="commission-settle-form-heading" class="commission-settle-form-section__title">ثبت تسویه</h2>
+      <form method="post" class="commission-settle-form" novalidate>
+        {% csrf_token %}
+        <div class="commission-settle-field">
+          <label class="field-label" for="{{ form.amount_toman.id_for_label }}">{{ form.amount_toman.label }}</label>
+          {{ form.amount_toman }}
+          {% if form.amount_toman.errors %}
+          <p class="commission-settle-field__error" role="alert">{{ form.amount_toman.errors.0 }}</p>
+          {% endif %}
+        </div>
+        <div class="commission-settle-field">
+          <label class="field-label" for="{{ form.note.id_for_label }}">{{ form.note.label }}</label>
+          {{ form.note }}
+          {% if form.note.errors %}
+          <p class="commission-settle-field__error" role="alert">{{ form.note.errors.0 }}</p>
+          {% endif %}
+        </div>
+        {% if form.non_field_errors %}
+        <p class="commission-settle-field__error" role="alert">{{ form.non_field_errors.0 }}</p>
+        {% endif %}
+        <footer class="commission-settle-card__foot">
+          <button type="submit" class="btn-primary commission-settle-card__submit">ثبت تسویه</button>
+          <a href="{% url 'finance:overview' %}?tab=commissions" class="commission-settle-card__back">بازگشت</a>
+        </footer>
+      </form>
+    </section>
+  </article>
+</div>
+{% endblock %}

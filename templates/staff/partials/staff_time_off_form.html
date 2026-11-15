@@ -1,0 +1,44 @@
+<form
+  method="post"
+  action="{% url 'staff:time_off' pk=profile.pk %}"
+  class="inventory-create-modal__form staff-timeoff-form staff-timeoff-form--modal"
+  id="staff-time-off-form"
+>
+  {% csrf_token %}
+
+  <div class="inventory-create-modal__scroll maison-scroll-themed staff-timeoff-form__scroll">
+    <div class="staff-timeoff-form__range" role="group" aria-label="بازهٔ مرخصی">
+      <div class="staff-timeoff-form__range-fields">
+        <div class="staff-timeoff-field staff-timeoff-field--date">
+          <label class="staff-timeoff-field__label field-label" for="{{ time_off_form.start_date.id_for_label }}">تاریخ شروع</label>
+          <div class="staff-timeoff-field__control">
+            {{ time_off_form.start_date }}
+          </div>
+          {% if time_off_form.start_date.errors %}<p class="staff-timeoff-field__error">{{ time_off_form.start_date.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="staff-timeoff-field staff-timeoff-field--date">
+          <label class="staff-timeoff-field__label field-label" for="{{ time_off_form.end_date.id_for_label }}">تاریخ پایان</label>
+          <div class="staff-timeoff-field__control">
+            {{ time_off_form.end_date }}
+          </div>
+          {% if time_off_form.end_date.errors %}<p class="staff-timeoff-field__error">{{ time_off_form.end_date.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="staff-timeoff-field staff-timeoff-field--reason">
+      <label class="staff-timeoff-field__label field-label" for="{{ time_off_form.reason.id_for_label }}">علت مرخصی</label>
+      {{ time_off_form.reason }}
+      {% if time_off_form.reason.errors %}<p class="staff-timeoff-field__error">{{ time_off_form.reason.errors.0 }}</p>{% endif %}
+    </div>
+
+    {% if time_off_form.non_field_errors %}
+    <p class="staff-timeoff-field__error staff-timeoff-field__error--block">{{ time_off_form.non_field_errors.0 }}</p>
+    {% endif %}
+  </div>
+
+  <footer class="inventory-create-modal__foot staff-timeoff-form__foot">
+    <button type="submit" class="btn-primary staff-timeoff-form__submit">ثبت مرخصی</button>
+    <button type="button" class="btn-secondary inventory-create-modal__cancel staff-timeoff-form__cancel" @click="$dispatch('beautyos-close-modal')">انصراف</button>
+  </footer>
+</form>

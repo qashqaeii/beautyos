@@ -1,0 +1,24 @@
+{# Inline day picker for finance/dashboard GET forms #}
+<div
+  class="jalali-date jalali-date--inline"
+  data-jalali-date
+  x-data="jalaliDaySubmit('{{ iso_day|default:'' }}')"
+  @keydown.escape.window="closeCalendar()"
+  @pointerdown.window="jalaliDismissPointer($event)"
+>
+  <button
+    type="button"
+    class="jalali-date__inline-trigger"
+    data-jalali-calendar-trigger
+    x-ref="calendarBtn"
+    @pointerdown.stop
+    @click.stop.prevent="toggleCalendar()"
+    :aria-expanded="open"
+    aria-label="باز کردن تقویم شمسی"
+  >
+    <i data-lucide="calendar-days" class="jalali-date__inline-trigger-icon" aria-hidden="true"></i>
+    <span class="jalali-date__inline-trigger-label tabular-nums" x-text="display">{{ fallback_jalali|default:''|persian_digits }}</span>
+  </button>
+  <input type="hidden" name="day" :value="iso" />
+  {% include "partials/jalali_calendar_popover.html" %}
+</div>

@@ -1,0 +1,36 @@
+<form
+  method="post"
+  action="{% url 'staff:edit' pk=profile.pk %}"
+  enctype="multipart/form-data"
+  class="inventory-create-modal__form customer-form"
+  id="staff-edit-form"
+>
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <p class="customer-form-field__error inventory-create-modal__form-error">{{ form.non_field_errors.0 }}</p>
+  {% endif %}
+
+  <div class="inventory-create-modal__scroll maison-scroll-themed">
+    <div class="customer-form__fields customer-form__fields--modal space-y-3">
+      {% for field in form.visible_fields %}
+      <div class="customer-form-field{% if field.field.widget.input_type == 'checkbox' %} customer-form-field--checkbox{% endif %}">
+        {% if field.field.widget.input_type == 'checkbox' %}
+        <label class="customer-form-checkbox">
+          {{ field }}
+          <span>{{ field.label }}</span>
+        </label>
+        {% else %}
+        <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% endif %}
+        {% if field.errors %}<p class="customer-form-field__error">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <footer class="inventory-create-modal__foot">
+    <button type="submit" class="btn-primary customer-form__submit-modal">ذخیره</button>
+    <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-modal')">انصراف</button>
+  </footer>
+</form>

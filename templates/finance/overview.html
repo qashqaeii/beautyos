@@ -1,0 +1,271 @@
+{% extends "layouts/app_shell.html" %}
+{% load humanize format_tags %}
+{% block title %}مدیریت مالی{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block content %}
+<div
+  class="finance-page"
+  x-data="{
+    showDebtForm: false,
+    paymentOpen: {{ payment_modal_open|default:False|yesno:'true,false' }},
+    closePayment() {
+      this.paymentOpen = false;
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('payment')) {
+        params.delete('payment');
+        const qs = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+      }
+    }
+  }"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', showDebtForm || paymentOpen)"
+  @beautyos-close-create-modal.window="paymentOpen ? closePayment() : null"
+  @keydown.escape.window="paymentOpen ? closePayment() : null"
+>
+  <header class="finance-page__header">
+    <div class="finance-page__headline">
+      <span class="finance-page__head-icon" aria-hidden="true">
+        <i data-lucide="wallet" class="h-5 w-5"></i>
+      </span>
+      <h1 class="finance-page__title">مدیریت مالی</h1>
+    </div>
+  </header>
+
+  <nav class="finance-page__tabs" role="tablist" aria-label="بخش‌های مالی">
+    <a href="{% querystring tab='income' %}" class="finance-page__tab {% if tab == 'income' %}is-active{% endif %}" {% if tab == 'income' %}aria-current="page"{% endif %}>درآمد و دریافتی‌ها</a>
+    <a href="{% querystring tab='debts' %}" class="finance-page__tab {% if tab == 'debts' %}is-active{% endif %}" {% if tab == 'debts' %}aria-current="page"{% endif %}>بدهی‌ها</a>
+    <a href="{% querystring tab='commissions' %}" class="finance-page__tab {% if tab == 'commissions' %}is-active{% endif %}" {% if tab == 'commissions' %}aria-current="page"{% endif %}>تسویه متخصص‌ها</a>
+  </nav>
+
+  <div class="finance-page__range-bar">
+    <div class="finance-page__range-pills" role="group" aria-label="بازه زمانی">
+      <a href="{% querystring range='today' %}" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}">امروز</a>
+      <a href="{% querystring range='month' %}" class="finance-page__range-pill {% if range_key == 'month' %}is-active{% endif %}">ماه جاری</a>
+      <a href="{% querystring range='quarter' %}" class="finance-page__range-pill {% if range_key == 'quarter' %}is-active{% endif %}">سه ماه گذشته</a>
+      <a href="{% querystring range='day' %}" class="finance-page__range-pill {% if range_key == 'day' %}is-active{% endif %}">انتخاب روز</a>
+    </div>
+    <form method="get" class="finance-page__day-picker">
+      <input type="hidden" name="tab" value="{{ tab }}">
+      <input type="hidden" name="range" value="{% if range_key == 'day' %}day{% else %}{{ range_key }}{% endif %}">
+      {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
+    </form>
+    <p class="finance-page__range-caption">
+      <span>{{ range_label }}</span>
+      <span class="finance-page__range-sep">·</span>
+      <span class="tabular-nums">{{ range_display_jalali|persian_digits }}</span>
+    </p>
+  </div>
+
+  {% if tab == 'income' %}
+  <section class="finance-page__panel dashboard-enter">
+    <div class="finance-stat-grid">
+      <article class="finance-stat-card">
+        <p class="finance-stat-card__label">دریافتی کل</p>
+        <p class="finance-stat-card__value tabular-nums">{{ income.total_received|fa_money }} <span class="finance-stat-card__unit">تومان</span></p>
+      </article>
+      <article class="finance-stat-card">
+        <p class="finance-stat-card__label">بیعانه پرداخت کرده‌اند</p>
+        <p class="finance-stat-card__value tabular-nums">{{ income.deposit_customer_count|fa_num }} <span class="finance-stat-card__unit">مشتری</span></p>
+      </article>
+      <article class="finance-stat-card finance-stat-card--success">
+        <p class="finance-stat-card__label">تسویه کامل کرده‌اند</p>
+        <p class="finance-stat-card__value tabular-nums">{{ income.settled_customer_count|fa_num }} <span class="finance-stat-card__unit">مشتری</span></p>
+      </article>
+    </div>
+
+    <div class="finance-section-head">
+      <h3 class="finance-section-head__title">پرداخت‌های مشتریان</h3>
+      {% if can_payment_create %}
+      <a href="{% querystring payment='1' %}" class="btn-primary finance-section-head__cta">ثبت پرداخت مشتری</a>
+      {% endif %}
+    </div>
+
+    {% if payments %}
+    <div class="finance-table-wrap">
+      <table class="finance-table">
+        <thead>
+          <tr>
+            <th>نام مشتری</th>
+            <th>مبلغ</th>
+            <th>نوع پرداخت</th>
+            <th>تاریخ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+          <tr>
+            <td class="finance-table__name" data-label="نام">{{ p.customer.full_name }}</td>
+            <td class="finance-table__money" data-label="مبلغ">{{ p.paid_amount_toman|fa_money }} تومان</td>
+            <td class="finance-table__meta" data-label="نوع">{{ p.get_method_display }}{% if p.status == 'partial' %} · بیعانه{% elif p.status == 'paid' %} · تسویه{% endif %}</td>
+            <td class="finance-table__date tabular-nums" data-label="تاریخ">{{ p.created_at|jalali_date|persian_digits }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="finance-empty-inline">در این بازه پرداختی ثبت نشده است.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {% if tab == 'debts' %}
+  <section class="finance-page__panel dashboard-enter">
+    <article class="finance-stat-card finance-stat-card--wide finance-stat-card--warning">
+      <p class="finance-stat-card__label">مانده بدهی سالن</p>
+      <p class="finance-stat-card__value tabular-nums">{{ total_balance|fa_money }} <span class="finance-stat-card__unit">تومان</span></p>
+    </article>
+
+    <div class="finance-section-head">
+      <h3 class="finance-section-head__title">بدهی‌های باز</h3>
+      {% if can_manage_debt %}
+      <button type="button" class="btn-primary finance-section-head__cta" @click="showDebtForm = !showDebtForm">+ ثبت بدهی</button>
+      {% endif %}
+    </div>
+
+    {% if can_manage_debt %}
+    <div class="finance-debt-form-panel" x-show="showDebtForm" x-cloak x-transition>
+      <form method="post" class="finance-debt-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_debt">
+        <div class="finance-debt-form__grid">
+          <div class="finance-debt-form__field">
+            <label class="field-label" for="{{ debt_form.creditor_name.id_for_label }}">{{ debt_form.creditor_name.label }}</label>
+            {{ debt_form.creditor_name }}
+          </div>
+          <div class="finance-debt-form__field">
+            <label class="field-label" for="{{ debt_form.creditor_type.id_for_label }}">{{ debt_form.creditor_type.label }}</label>
+            {{ debt_form.creditor_type }}
+          </div>
+          <div class="finance-debt-form__field">
+            <label class="field-label" for="{{ debt_form.principal_toman.id_for_label }}">{{ debt_form.principal_toman.label }}</label>
+            {{ debt_form.principal_toman }}
+          </div>
+          <div class="finance-debt-form__field">
+            <label class="field-label" for="{{ debt_form.due_date.id_for_label }}">{{ debt_form.due_date.label }}</label>
+            {{ debt_form.due_date }}
+          </div>
+        </div>
+        <button type="submit" class="btn-primary finance-debt-form__submit">ذخیره بدهی</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if open_debts %}
+    <ul class="finance-debt-list">
+      {% for debt in open_debts %}
+      <li class="finance-debt-row">
+        <div class="finance-debt-row__main">
+          <p class="finance-debt-row__name">{{ debt.creditor_name }}</p>
+          <p class="finance-debt-row__type">{{ debt.get_creditor_type_display }}</p>
+        </div>
+        <div class="finance-debt-row__amounts">
+          <p class="finance-debt-row__balance tabular-nums">{{ debt.balance_toman|fa_money }} تومان</p>
+          {% if debt.due_date %}
+          <p class="finance-debt-row__due">سررسید: <span class="tabular-nums">{{ debt.due_date|jalali_date|persian_digits }}</span></p>
+          {% endif %}
+        </div>
+        {% if can_manage_debt %}
+        <form method="post" class="finance-debt-pay-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="pay_debt">
+          <input type="hidden" name="debt_id" value="{{ debt.pk }}">
+          <input type="number" name="amount_toman" class="input-field finance-debt-pay-form__amount" min="1" max="{{ debt.balance_toman }}" placeholder="مبلغ" required>
+          <button type="submit" class="btn-secondary finance-debt-pay-form__btn">ثبت پرداخت بدهی</button>
+        </form>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="finance-empty-inline">بدهی بازی ثبت نشده است.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {% if tab == 'commissions' %}
+  <section
+    class="finance-page__panel dashboard-enter"
+    x-data="{ commPanel: '{% if commissions.pending_rows %}pending{% elif commissions.settled_rows %}settled{% else %}pending{% endif %}' }"
+  >
+    <p class="finance-comm-day-label">روز انتخاب‌شده: <span class="tabular-nums">{{ commissions.day_jalali|persian_digits }}</span></p>
+
+    <div class="finance-stat-grid finance-stat-grid--two finance-comm-stat-grid">
+      <button
+        type="button"
+        class="finance-stat-card finance-stat-card--success finance-stat-card--interactive text-start"
+        :class="commPanel === 'settled' && 'is-active'"
+        @click="commPanel = 'settled'"
+        aria-pressed="false"
+        :aria-pressed="commPanel === 'settled'"
+      >
+        <p class="finance-stat-card__label">{% if range_key == 'today' %}تسویه‌شده امروز{% else %}تسویه‌شده در این روز{% endif %}</p>
+        <p class="finance-stat-card__value tabular-nums">{{ commissions.settled_staff_count|fa_num }} <span class="finance-stat-card__unit">متخصص</span></p>
+        <p class="finance-stat-card__hint">مشاهده یادداشت تسویه</p>
+      </button>
+      <button
+        type="button"
+        class="finance-stat-card finance-stat-card--warning finance-stat-card--interactive text-start"
+        :class="commPanel === 'pending' && 'is-active'"
+        @click="commPanel = 'pending'"
+        aria-pressed="false"
+        :aria-pressed="commPanel === 'pending'"
+      >
+        <p class="finance-stat-card__label">نیازمند پرداخت</p>
+        <p class="finance-stat-card__value tabular-nums">{{ commissions.need_payment_staff_count|fa_num }} <span class="finance-stat-card__unit">متخصص</span></p>
+        <p class="finance-stat-card__hint">ثبت مبلغ و یادداشت تسویه</p>
+      </button>
+    </div>
+
+    <div class="finance-comm-panels">
+      <section
+        x-show="commPanel === 'settled'"
+        x-cloak
+        class="finance-comm-panel finance-comm-panel--settled"
+        aria-labelledby="finance-comm-settled-title"
+      >
+        <h3 id="finance-comm-settled-title" class="finance-comm-panel__title">متخصص‌های تسویه‌شده</h3>
+        {% if commissions.settled_rows %}
+        <ul class="finance-comm-list">
+          {% for row in commissions.settled_rows %}
+          {% include "finance/partials/commission_settled_row.html" %}
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="finance-empty-inline">در این روز هنوز تسویه‌ای برای متخصص ثبت نشده است.</p>
+        {% endif %}
+      </section>
+
+      <section
+        x-show="commPanel === 'pending'"
+        x-cloak
+        class="finance-comm-panel finance-comm-panel--pending"
+        aria-labelledby="finance-comm-pending-title"
+      >
+        <h3 id="finance-comm-pending-title" class="finance-comm-panel__title">نیازمند پرداخت سهم</h3>
+        {% if commissions.pending_rows %}
+        <ul class="finance-comm-list">
+          {% for row in commissions.pending_rows %}
+          {% include "finance/partials/commission_settle_row.html" %}
+          {% endfor %}
+        </ul>
+        {% elif commissions.staff_rows %}
+        <p class="finance-empty-inline">همهٔ متخصص‌های دارای سهم در این روز تسویه شده‌اند.</p>
+        {% else %}
+        <p class="finance-empty-inline">در این روز سهم پورسانتی شناسایی نشده است؛ پس از تکمیل نوبت‌ها اینجا نمایش داده می‌شود.</p>
+        {% endif %}
+      </section>
+    </div>
+  </section>
+  {% endif %}
+
+  {% include "finance/partials/payment_create_modal.html" %}
+</div>
+<script>
+  document.addEventListener("alpine:initialized", function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layouts/public_auth.html" %}
+{% block title %}اطلاعات شما · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block auth_steps %}
+<ol class="public-auth-steps" aria-label="مراحل ثبت‌نام">
+  <li class="is-done">۱. تأیید موبایل</li>
+  <li class="is-done">۲. کد پیامکی</li>
+  <li class="is-current" aria-current="step">۳. اطلاعات مالک</li>
+</ol>
+{% endblock %}
+{% block auth_heading %}اطلاعات مالک سالن{% endblock %}
+{% block auth_subtitle %}شماره <span dir="ltr" lang="en" class="font-medium text-aubergine">{{ phone_display }}</span> تأیید شد. نام نمایشی را وارد کنید تا سالن شما ساخته شود.{% endblock %}
+{% block auth_content %}
+<form method="post" action="{% url 'accounts:register_profile' %}" class="space-y-5">
+  {% csrf_token %}
+  <div class="public-auth-field">
+    <label for="id_full_name">{{ profile_form.full_name.label }}</label>
+    {{ profile_form.full_name }}
+    <p class="field-hint">این نام در پنل و برای اعضای تیم نمایش داده می‌شود.</p>
+    {% if profile_form.full_name.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ profile_form.full_name.errors.0 }}</p>{% endif %}
+  </div>
+  <button type="submit" class="btn-primary min-h-[48px] w-full">ادامه و ساخت سالن</button>
+</form>
+{% endblock %}

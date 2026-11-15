@@ -1,0 +1,9 @@
+{% load appointment_tags %}
+<a href="{% url 'appointments:detail' pk=appointment.pk %}" class="appt-card appt-card--compact">
+  <span class="appt-card__time tabular-nums">{{ appointment.start_at|fa_jalali }} · {{ appointment.start_at|fa_time }}</span>
+  <div class="appt-card__body min-w-0 flex-1">
+    <p class="truncate font-medium text-ink">{{ appointment.customer.full_name }}</p>
+    <p class="truncate text-xs text-ink-secondary">{{ appointment.service.name }}</p>
+  </div>
+  <span class="{{ appointment.status|status_badge }} appt-card__status">{{ appointment.get_status_display }}</span>
+</a>

@@ -1,0 +1,74 @@
+{# Shared Jalali popover — Alpine: open, popoverStyle, viewJy, viewJm, birthPicker, monthsFaList, cells, pick, closeCalendar #}
+<template x-teleport="body">
+  <div
+    x-ref="popover"
+    class="jalali-date__popover jalali-date__popover--portal"
+    :class="birthPicker && 'jalali-date__popover--birth'"
+    :style="popoverStyle"
+    x-effect="open && $nextTick(() => positionPopover())"
+    x-show="open"
+    x-cloak
+    role="dialog"
+    aria-modal="true"
+    aria-label="تقویم شمسی"
+    @click.stop
+    @keydown.escape.stop="closeCalendar()"
+    dir="rtl"
+  >
+    <template x-if="birthPicker">
+      <header class="jalali-date__popover-head jalali-date__popover-head--birth">
+        <select class="jalali-date__month-select" x-model.number="viewJm" aria-label="ماه">
+          <template x-for="(m, idx) in monthsFaList" :key="idx">
+            <option :value="idx + 1" x-text="m"></option>
+          </template>
+        </select>
+        <input
+          type="number"
+          class="jalali-date__year-input input-field"
+          x-model.number="viewJy"
+          :max="maxJalaliYear"
+          min="1300"
+          inputmode="numeric"
+          aria-label="سال"
+        />
+      </header>
+    </template>
+    <template x-if="!birthPicker">
+      <header class="jalali-date__popover-head">
+        <button type="button" class="jalali-date__nav" @click.stop="prevMonth()" aria-label="ماه قبل">
+          <span class="jalali-date__nav-icon" aria-hidden="true">›</span>
+        </button>
+        <p class="jalali-date__month-label" x-text="monthLabelFa"></p>
+        <button type="button" class="jalali-date__nav" @click.stop="nextMonth()" aria-label="ماه بعد">
+          <span class="jalali-date__nav-icon" aria-hidden="true">‹</span>
+        </button>
+      </header>
+    </template>
+    <div class="jalali-date__weekdays" aria-hidden="true">
+      <template x-for="w in weekdays" :key="w"><span x-text="w"></span></template>
+    </div>
+    <div class="jalali-date__grid" role="grid">
+      <template x-for="(cell, idx) in cells" :key="idx">
+        <button
+          type="button"
+          role="gridcell"
+          class="jalali-date__day"
+          :class="{
+            'jalali-date__day--muted': !cell.inMonth,
+            'jalali-date__day--selected': cell.selected,
+            'jalali-date__day--today': cell.today,
+            'jalali-date__day--disabled': cell.disabled
+          }"
+          :disabled="!cell.inMonth || cell.disabled"
+          :aria-label="cell.inMonth ? cell.label : null"
+          :aria-current="cell.selected ? 'date' : false"
+          @click.stop="pick(cell)"
+          x-text="cell.label"
+        ></button>
+      </template>
+    </div>
+    <footer class="jalali-date__popover-foot" x-show="!birthPicker">
+      <button type="button" class="jalali-date__today-link" @click.stop="pickToday()">امروز</button>
+    </footer>
+  </div>
+</template>

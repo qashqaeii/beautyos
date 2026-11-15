@@ -1,0 +1,69 @@
+{% extends "layouts/app_shell.html" %}
+{% load format_tags %}
+{% block title %}مدیریت دسته‌های موجودی{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="inventory-form-page inventory-form-page--wide">
+  <article class="inventory-form-card">
+    <header class="inventory-form-card__head inventory-form-card__head--split">
+      <div>
+        <h1 class="inventory-form-card__title">مدیریت دسته‌ها</h1>
+        <p class="inventory-form-card__subtitle">
+          {% if uncategorized_count %}
+          {{ uncategorized_count|fa_num }} محصول بدون دسته‌بندی
+          {% else %}
+          همهٔ محصولات در دسته‌بندی ثبت شده‌اند
+          {% endif %}
+        </p>
+      </div>
+      <a href="{% url 'inventory:list' %}" class="inventory-form-card__back">بازگشت به فهرست</a>
+    </header>
+
+    <form method="post" class="inventory-cat-create" x-data="{ name: '' }">
+      {% csrf_token %}
+      <input type="hidden" name="intent" value="create" />
+      <label class="field-label" for="id_new_inventory_category">دستهٔ جدید</label>
+      <div class="inventory-cat-create__row">
+        <input
+          type="text"
+          name="name"
+          id="id_new_inventory_category"
+          class="input-field"
+          x-model="name"
+          placeholder="نام دسته"
+          autocomplete="off"
+        />
+        <button type="submit" class="btn-primary shrink-0">افزودن</button>
+      </div>
+      <p class="inventory-cat-presets__label">پیشنهادها</p>
+      <div class="inventory-cat-presets">
+        {% for preset in category_presets %}
+        <button type="button" class="inventory-cat-preset" @click="name = '{{ preset|escapejs }}'">{{ preset }}</button>
+        {% endfor %}
+      </div>
+    </form>
+
+    <div class="inventory-form-card__divider" role="presentation"></div>
+
+    {% if categories %}
+    <ul class="inventory-cat-list">
+      {% for cat in categories %}
+      <li class="inventory-cat-list__item">
+        <form method="post" class="inventory-cat-edit">
+          {% csrf_token %}
+          <input type="hidden" name="intent" value="edit" />
+          <input type="hidden" name="category_id" value="{{ cat.pk }}" />
+          <input type="text" name="name" value="{{ cat.name }}" class="input-field inventory-cat-edit__input" aria-label="نام دسته" />
+          <button type="submit" class="btn-secondary btn-secondary--compact">ذخیره</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-sm text-ink-muted">هنوز دسته‌ای ثبت نشده. از فرم بالا یا پیشنهادها استفاده کنید.</p>
+    {% endif %}
+  </article>
+</div>
+{% endblock %}

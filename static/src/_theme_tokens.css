@@ -1,0 +1,127 @@
+/* Auto-generated — do not edit. Run: python scripts/write_theme_tokens_css.py */
+
+html[data-theme="luna_signature"],
+body[data-theme="luna_signature"] {
+  --color-primary: #9D726E;
+  --color-primary-hover: #8A635F;
+  --color-primary-foreground: #FFFFFF;
+  --color-text-primary: #51443F;
+  --color-text-heading: #51443F;
+  --color-text-secondary: #857771;
+  --color-text-on-primary: #FFFFFF;
+  --color-text-muted: #9A8B85;
+  --color-background: #F5F0EC;
+  --color-surface: #FAF7F4;
+  --color-surface-elevated: #FFFDFC;
+  --color-surface-muted: #FAF7F4;
+  --color-surface-lavender: #E9D8D2;
+  --color-surface-sage: #D8C9C1;
+  --color-success-background: #E8F0EA;
+  --color-success-text: #4D6B56;
+  --color-border: #E5DCD6;
+  --color-border-strong: #D5CAC3;
+  --color-divider: #E5DCD6;
+  --color-focus: #9D726E;
+  --color-sidebar: #F5F0EC;
+  --color-sidebar-text: #51443F;
+  --color-sidebar-muted: #857771;
+  --color-sidebar-hover: #E9D8D2;
+  --color-sidebar-active: #E9D8D2;
+  --color-accent: #B58D89;
+  --color-accent-soft: #E9D8D2;
+  --color-sage: #769B82;
+  --color-sage-soft: #E5EDE7;
+  --color-blush: #E9D8D2;
+  --color-success: #769B82;
+  --color-success-background: #E8F0EA;
+  --color-success-text: #4D6B56;
+  --color-warning: #C79A57;
+  --color-danger: #B96E6C;
+}
+
+html[data-theme="rose_atelier"],
+body[data-theme="rose_atelier"] {
+  --color-primary: #9D726E;
+  --color-primary-hover: #8A635F;
+  --color-primary-foreground: #FFFFFF;
+  --color-text-primary: #51443F;
+  --color-text-heading: #51443F;
+  --color-text-secondary: #857771;
+  --color-text-on-primary: #FFFFFF;
+  --color-text-muted: #9A8B85;
+  --color-background: #F5F0EC;
+  --color-surface: #FAF7F4;
+  --color-surface-elevated: #FFFDFC;
+  --color-surface-muted: #FAF7F4;
+  --color-surface-lavender: #E9D8D2;
+  --color-surface-sage: #D8C9C1;
+  --color-success-background: #E8F0EA;
+  --color-success-text: #4D6B56;
+  --color-border: #E5DCD6;
+  --color-border-strong: #D5CAC3;
+  --color-divider: #E5DCD6;
+  --color-focus: #9D726E;
+  --color-sidebar: #F5F0EC;
+  --color-sidebar-text: #51443F;
+  --color-sidebar-muted: #857771;
+  --color-sidebar-hover: #E9D8D2;
+  --color-sidebar-active: #E9D8D2;
+  --color-accent: #B58D89;
+  --color-accent-soft: #E9D8D2;
+  --color-sage: #769B82;
+  --color-sage-soft: #E5EDE7;
+  --color-blush: #E9D8D2;
+  --color-success: #769B82;
+  --color-success-background: #E8F0EA;
+  --color-success-text: #4D6B56;
+  --color-warning: #C79A57;
+  --color-danger: #B96E6C;
+}
+
+html[data-theme="modern_gentleman"],
+body[data-theme="modern_gentleman"] {
+  --color-primary: #51443F;
+  --color-primary-hover: #3D322E;
+  --color-accent: #857771;
+  --color-accent-soft: #D8C9C1;
+  --color-background: #F5F0EC;
+  --color-surface: #FFFDFC;
+  --color-surface-muted: #FAF7F4;
+  --color-text-primary: #51443F;
+  --color-text-secondary: #857771;
+  --color-text-muted: #9A8B85;
+  --color-border: #E5DCD6;
+  --color-border-strong: #D5CAC3;
+  --color-sidebar: #51443F;
+  --color-sidebar-hover: #6B5A54;
+  --color-sidebar-active: #857771;
+  --color-success: #769B82;
+  --color-success-background: #E8F0EA;
+  --color-success-text: #4D6B56;
+  --color-warning: #C79A57;
+  --color-danger: #B96E6C;
+}
+
+html[data-theme="signature_neutral"],
+body[data-theme="signature_neutral"] {
+  --color-primary: #9D726E;
+  --color-primary-hover: #8A635F;
+  --color-accent: #B58D89;
+  --color-accent-soft: #E9D8D2;
+  --color-background: #F5F0EC;
+  --color-surface: #FFFDFC;
+  --color-surface-muted: #FAF7F4;
+  --color-text-primary: #51443F;
+  --color-text-secondary: #857771;
+  --color-text-muted: #9A8B85;
+  --color-border: #E5DCD6;
+  --color-border-strong: #D5CAC3;
+  --color-sidebar: #51443F;
+  --color-sidebar-hover: #6B5A54;
+  --color-sidebar-active: #857771;
+  --color-success: #769B82;
+  --color-success-background: #E8F0EA;
+  --color-success-text: #4D6B56;
+  --color-warning: #C79A57;
+  --color-danger: #B96E6C;
+}

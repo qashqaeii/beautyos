@@ -1,0 +1,28 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}تنظیمات سالن{% endblock %}
+{% block page_title %}تنظیمات سالن{% endblock %}
+{% block content %}
+<p class="mb-2 text-sm text-ink-secondary">اطلاعات عمومی و قواعد پیگیری مشتریان.</p>
+<div class="mb-6 rounded-[16px] border border-line px-4 py-3 text-sm text-ink-secondary" style="background-color: color-mix(in srgb, var(--color-surface-lavender) 45%, var(--color-surface-elevated));">
+  BeautyOS در حال حاضر از تم یکپارچه <strong class="text-espresso">Editorial Rose</strong> برای همه سالن‌ها استفاده می‌کند.
+  {% if stored_dashboard_theme %}
+  <span class="mt-1 block text-xs text-ink-muted">تم ذخیره‌شده قبلی: {{ stored_dashboard_theme }} (در UI اعمال نمی‌شود)</span>
+  {% endif %}
+</div>
+<form method="post" enctype="multipart/form-data" class="mx-auto max-w-3xl space-y-8">
+  {% csrf_token %}
+  <section class="card space-y-4">
+    <h2 class="font-semibold text-espresso">هویت سالن</h2>
+    {% for field in salon_form %}
+    <div><label class="mb-1 block text-sm text-ink-secondary">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="text-xs text-danger">{{ field.errors.0 }}</p>{% endif %}</div>
+    {% endfor %}
+  </section>
+  <section class="card space-y-4">
+    <h2 class="font-semibold text-espresso">پیگیری و رزرو</h2>
+    {% for field in retention_form %}
+    <div><label class="mb-1 block text-sm text-ink-secondary">{{ field.label }}</label>{{ field }}</div>
+    {% endfor %}
+  </section>
+  <button type="submit" class="btn-primary w-full sm:w-auto">ذخیره تنظیمات</button>
+</form>
+{% endblock %}

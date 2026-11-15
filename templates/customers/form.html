@@ -1,0 +1,127 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}{% if is_edit %}ویرایش مشتری{% else %}مشتری جدید{% endif %}{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block content %}
+{% if is_edit %}
+<form method="post" enctype="multipart/form-data" class="mx-auto max-w-lg card space-y-4">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<p class="text-sm text-coral">{{ form.non_field_errors }}</p>{% endif %}
+  <div>
+    <label class="mb-1 block text-sm font-medium">{{ form.phone_input.label }}</label>
+    {{ form.phone_input }}
+    {% if form.phone_input.errors %}<p class="text-xs text-coral">{{ form.phone_input.errors.0 }}</p>{% endif %}
+  </div>
+  {% for field in form.visible_fields %}
+    {% if field.name != 'phone_input' %}
+    <div>
+      <label class="mb-1 block text-sm font-medium">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<p class="text-xs text-coral">{{ field.errors.0 }}</p>{% endif %}
+    </div>
+    {% endif %}
+  {% endfor %}
+  <button type="submit" class="btn-primary w-full">ذخیره</button>
+</form>
+{% else %}
+<div class="customer-form-page customer-form-page--create">
+  <div class="customer-form-card">
+    <header class="customer-form-card__head">
+      <div class="customer-form-card__head-inner">
+        <h1 class="customer-form-card__title">مشتری جدید</h1>
+        <span class="customer-form-card__icon" aria-hidden="true">
+          <i data-lucide="user-plus" class="h-5 w-5"></i>
+        </span>
+      </div>
+    </header>
+
+    <form
+      method="post"
+      enctype="multipart/form-data"
+      class="customer-form"
+      x-data="{ showAdvanced: {{ advanced_open|default:False|yesno:'true,false' }}, imageName: '', imagePreview: '' }"
+    >
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <p class="customer-form-field__error">{{ form.non_field_errors.0 }}</p>
+      {% endif %}
+
+      <div class="customer-form__primary-grid">
+        <div class="customer-form-field">
+          <label class="field-label" for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}</label>
+          {{ form.full_name }}
+          {% if form.full_name.errors %}<p class="customer-form-field__error">{{ form.full_name.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="customer-form-field">
+          <label class="field-label" for="{{ form.phone_input.id_for_label }}">{{ form.phone_input.label }}</label>
+          {{ form.phone_input }}
+          {% if form.phone_input.errors %}<p class="customer-form-field__error">{{ form.phone_input.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="customer-form-advanced">
+        <button
+          type="button"
+          class="customer-form-advanced__toggle"
+          @click="showAdvanced = !showAdvanced"
+          :aria-expanded="showAdvanced"
+        >
+          <span>اطلاعات تکمیلی</span>
+          <i data-lucide="chevron-down" class="h-4 w-4 transition" :class="showAdvanced && 'rotate-180'"></i>
+        </button>
+        <div
+          class="customer-form-advanced__body"
+          x-show="showAdvanced"
+          x-cloak
+          x-transition.opacity.duration.200ms
+        >
+          <div class="customer-form-field">
+            <label class="field-label" for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}</label>
+            {{ form.birth_date }}
+            {% if form.birth_date.errors %}<p class="customer-form-field__error">{{ form.birth_date.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="customer-form-field">
+            <span class="field-label" id="customer-avatar-label">{{ form.avatar.label }}</span>
+            <div class="customer-form-file">
+              {{ form.avatar }}
+              <button type="button" class="customer-form-file__btn" @click="$refs.customerAvatar.click()">
+                انتخاب تصویر
+              </button>
+              <span class="customer-form-file__name" x-text="imageName" x-show="imageName" x-cloak></span>
+            </div>
+            <img
+              x-show="imagePreview"
+              x-cloak
+              :src="imagePreview"
+              alt=""
+              class="customer-form-file__preview"
+            />
+            {% if form.avatar.errors %}<p class="customer-form-field__error">{{ form.avatar.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="customer-form-field customer-form-field--checkbox">
+            <label class="customer-form-checkbox">
+              {{ form.is_vip }}
+              <span>{{ form.is_vip.label }}</span>
+            </label>
+            {% if form.is_vip.errors %}<p class="customer-form-field__error">{{ form.is_vip.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="customer-form-field customer-form-field--checkbox">
+            <label class="customer-form-checkbox">
+              {{ form.marketing_consent }}
+              <span>{{ form.marketing_consent.label }}</span>
+            </label>
+            {% if form.marketing_consent.errors %}<p class="customer-form-field__error">{{ form.marketing_consent.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="customer-form__actions">
+        <button type="submit" class="customer-form__submit btn-primary">ثبت مشتری</button>
+        <a href="{% url 'customers:list' %}" class="customer-form__back">بازگشت به مشتریان</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "layouts/public_site.html" %}
+{% block title %}حریم خصوصی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block public_content %}
+{% include "partials/public_page_hero.html" with title="حریم خصوصی" lead="نحوه پردازش داده‌های ورود، سالن و مشتریان در {{ BEAUTYOS_PRODUCT_NAME }}." %}
+<div class="mx-auto max-w-3xl px-4 pb-14 sm:px-6">
+  <div class="prose-public space-y-6 text-sm leading-relaxed text-charcoal/75">
+    <section>
+      <h2 class="text-base font-semibold text-aubergine">داده‌هایی که جمع‌آوری می‌شود</h2>
+      <p class="mt-2">
+        {{ BEAUTYOS_PRODUCT_NAME }} اطلاعات لازم برای ورود (شماره موبایل)، مدیریت سالن، نوبت‌ها و ارائه خدمات را پردازش می‌کند.
+        هر سالن مالک داده‌های مشتریان و نوبت‌های ثبت‌شده در همان سالن است.
+      </p>
+    </section>
+    <section>
+      <h2 class="text-base font-semibold text-aubergine">احراز هویت</h2>
+      <p class="mt-2">
+        کد ورود یک‌بار مصرف برای احراز هویت ارسال می‌شود و در پایگاه داده به‌صورت هش‌شده نگه‌داری می‌شود، نه به‌صورت متن آشکار.
+      </p>
+    </section>
+    <section>
+      <h2 class="text-base font-semibold text-aubergine">دسترسی درون سالن</h2>
+      <p class="mt-2">
+        داده‌های تماس مشتریان فقط در محدوده سالنی که در آن ثبت شده‌اند، برای اعضای مجاز همان سالن و مطابق نقش قابل دسترسی است.
+      </p>
+    </section>
+    <section>
+      <h2 class="text-base font-semibold text-aubergine">درخواست حذف یا دسترسی</h2>
+      <p class="mt-2">
+        برای حذف حساب یا درخواست دسترسی به داده‌های شخصی، از مدیر سالن خود یا مسیر
+        <a href="{% url 'website:contact' %}" class="text-lavender hover:underline">تماس و پشتیبانی</a>
+        استفاده کنید.
+      </p>
+    </section>
+  </div>
+</div>
+{% endblock %}
