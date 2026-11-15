@@ -80,9 +80,9 @@
     background-color: transparent;
     background-image: linear-gradient(
         165deg,
-        color-mix(in srgb, var(--color-background) 48%, transparent) 0%,
-        color-mix(in srgb, var(--color-background) 56%, transparent) 55%,
-        color-mix(in srgb, var(--color-background) 62%, transparent) 100%
+        color-mix(in srgb, var(--color-background) 54%, transparent) 0%,
+        color-mix(in srgb, var(--color-background) 62%, transparent) 55%,
+        color-mix(in srgb, var(--color-background) 68%, transparent) 100%
       ),
       var(--beautyos-bg-image, none);
     background-repeat: no-repeat;
@@ -3985,7 +3985,7 @@
   @media (min-width: 1024px) {
     .maison-sidebar--premium {
       @apply self-center;
-      width: 16.5rem;
+      width: 17rem;
       max-height: calc(100dvh - 1.5rem);
       height: calc(100dvh - 1.5rem);
       margin-block: 0.75rem;
@@ -4001,8 +4001,13 @@
       border-color: transparent !important;
     }
     .maison-sidebar--premium .maison-sidebar__product-logo {
+      min-height: 3rem;
+      max-height: 3.35rem;
       border-color: color-mix(in srgb, var(--color-border) 75%, transparent);
       background: color-mix(in srgb, #fff 82%, var(--color-surface-elevated));
+    }
+    .maison-sidebar--premium .maison-sidebar__nav {
+      @apply space-y-0.5 px-2;
     }
     .maison-sidebar--premium .maison-sidebar__extras {
       border-block-start: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent);
@@ -4118,7 +4123,7 @@
   }
 
   .maison-content {
-    @apply mx-auto w-full max-w-[90rem] flex-1 px-4 pb-6 pt-2 lg:px-8 lg:pb-8 lg:pt-4;
+    @apply mx-auto w-full max-w-[90rem] flex-1 px-4 pb-6 pt-2 lg:px-10 lg:pb-8 lg:pt-4;
   }
 
   .maison-unified-header {
@@ -4593,7 +4598,27 @@
   }
 
   .dashboard-overview {
-    @apply flex min-w-0 flex-col gap-5 lg:gap-6;
+    @apply flex min-w-0 flex-col gap-4 lg:gap-5;
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-overview {
+      gap: 1.25rem;
+    }
+    .dashboard-overview .dashboard-stat-grid {
+      position: relative;
+      z-index: 0;
+      padding-block: 0.15rem;
+    }
+    .dashboard-overview .dashboard-stat-grid::before {
+      content: "";
+      position: absolute;
+      inset: -0.5rem -0.25rem;
+      z-index: -1;
+      border-radius: 1.75rem;
+      background: color-mix(in srgb, var(--color-background) 72%, transparent);
+      pointer-events: none;
+    }
   }
 
   .dashboard-shell-header {
@@ -4630,36 +4655,110 @@
   }
 
   .overview-hero {
-    @apply relative flex min-h-[8.5rem] flex-col overflow-hidden rounded-[1.65rem] border md:min-h-[10.25rem] md:flex-row md:items-stretch;
-    border-color: color-mix(in srgb, var(--color-border) 82%, transparent);
-    background: color-mix(in srgb, #fff 76%, var(--color-surface-lavender));
-    box-shadow: 0 10px 36px color-mix(in srgb, var(--color-text-primary) 5%, transparent);
+    @apply relative isolate flex min-h-[10.5rem] flex-col overflow-hidden rounded-[1.65rem] border;
+    border-color: color-mix(in srgb, var(--color-border) 78%, transparent);
+    background: linear-gradient(
+      118deg,
+      color-mix(in srgb, var(--color-surface-lavender) 42%, #fff) 0%,
+      color-mix(in srgb, #fff 92%, var(--color-surface)) 54%,
+      #fffdfc 100%
+    );
+    box-shadow: 0 12px 40px color-mix(in srgb, var(--color-text-primary) 5%, transparent);
   }
-  .overview-hero__content {
-    @apply relative z-[1] flex flex-1 flex-col justify-center px-4 py-4 md:px-6 md:py-5;
-    order: 1;
+  @media (min-width: 1024px) {
+    .overview-hero {
+      min-height: 16.5rem;
+    }
   }
   .overview-hero__visual {
-    @apply relative order-2 min-h-[7rem] w-full shrink-0 md:order-2 md:min-h-0 md:w-[42%] md:max-w-[26rem];
+    @apply relative min-h-[8.5rem] w-full shrink-0 overflow-hidden;
+  }
+  @media (min-width: 1024px) {
+    .overview-hero__visual {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: min(50%, 30rem);
+      min-height: 0;
+    }
   }
   .overview-hero__image {
-    @apply h-full min-h-[7rem] w-full object-cover object-[42%_22%] md:min-h-[10.25rem];
-    -webkit-mask-image: linear-gradient(to left, transparent 0%, #000 24%, #000 92%, transparent 100%);
-    mask-image: linear-gradient(to left, transparent 0%, #000 24%, #000 92%, transparent 100%);
+    @apply h-full min-h-[8.5rem] w-full object-cover;
+    object-position: 42% 24%;
   }
-  [dir="rtl"] .overview-hero__image {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 18%, #000 92%, transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0%, #000 18%, #000 92%, transparent 100%);
+  @media (min-width: 1024px) {
+    .overview-hero__image {
+      min-height: 100%;
+      -webkit-mask-image: linear-gradient(
+        90deg,
+        #000 0%,
+        #000 52%,
+        color-mix(in srgb, #000 88%, transparent) 72%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        90deg,
+        #000 0%,
+        #000 52%,
+        color-mix(in srgb, #000 88%, transparent) 72%,
+        transparent 100%
+      );
+    }
+  }
+  .overview-hero__blend {
+    @apply pointer-events-none absolute inset-0;
+    background: linear-gradient(
+      95deg,
+      transparent 0%,
+      color-mix(in srgb, var(--color-surface-lavender) 18%, transparent) 42%,
+      color-mix(in srgb, #fff 88%, var(--color-surface)) 70%,
+      color-mix(in srgb, #fff 96%, var(--color-surface)) 100%
+    );
+  }
+  @media (min-width: 1024px) {
+    .overview-hero__blend {
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--color-surface-lavender) 22%, transparent) 38%,
+        color-mix(in srgb, #fff 90%, var(--color-surface-lavender)) 58%,
+        color-mix(in srgb, #fff 98%, var(--color-surface)) 78%,
+        #fffdfc 100%
+      );
+    }
+  }
+  .overview-hero__content {
+    @apply relative z-[2] flex flex-1 flex-col justify-center px-4 py-4;
+  }
+  @media (min-width: 1024px) {
+    .overview-hero__content {
+      margin-inline-end: auto;
+      margin-inline-start: 0;
+      width: min(56%, 38rem);
+      min-height: 16.5rem;
+      padding-inline: 2rem 2.5rem;
+      padding-block: 2rem;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
   }
   .overview-hero__title {
-    @apply text-xl font-bold leading-snug md:text-[1.65rem];
+    @apply text-[1.35rem] font-bold leading-tight md:text-[1.75rem];
     color: var(--color-text-primary);
   }
   .overview-hero__salon {
-    @apply mt-1 text-sm font-medium text-ink-secondary;
+    @apply mt-1.5 text-sm font-medium text-ink-secondary;
   }
   .overview-hero__dates {
-    @apply mt-4 flex flex-wrap items-center gap-2;
+    @apply mt-3.5 flex flex-wrap items-center justify-start gap-2 lg:mt-4;
+  }
+  @media (min-width: 1024px) {
+    .overview-hero__dates {
+      justify-content: flex-start;
+    }
   }
   .overview-hero .jalali-date__inline-trigger {
     @apply rounded-xl border px-3 py-1.5 shadow-sm;
@@ -4692,16 +4791,21 @@
   }
 
   .dashboard-stat-grid {
-    @apply grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4;
+    @apply grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-[1.125rem];
+  }
+  @media (min-width: 1024px) {
+    .dashboard-stat-grid {
+      gap: 1.25rem;
+    }
   }
   .dashboard-stat-mini {
     @apply min-h-0;
   }
   .dashboard-stat-mini__surface {
-    @apply flex h-full min-h-[6.5rem] flex-col justify-between rounded-[1.35rem] border p-3.5 md:min-h-[7.25rem] md:p-4;
-    border-color: color-mix(in srgb, var(--color-border) 90%, transparent);
-    background: color-mix(in srgb, #fff 94%, var(--color-surface-elevated));
-    box-shadow: 0 6px 22px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+    @apply h-full min-h-[6.75rem] rounded-[1.4rem] border p-3.5 md:min-h-[7.5rem] md:p-4;
+    border-color: color-mix(in srgb, var(--color-border) 88%, transparent);
+    background: color-mix(in srgb, #fff 97%, var(--color-surface-elevated));
+    box-shadow: 0 4px 18px color-mix(in srgb, var(--color-text-primary) 5%, transparent);
     transition:
       transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
       box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
@@ -4719,9 +4823,12 @@
   .dashboard-stat-mini--settled .dashboard-stat-mini__value {
     color: color-mix(in srgb, var(--color-success-text) 88%, var(--color-text-primary));
   }
+  .dashboard-stat-mini--featured .dashboard-stat-mini__digits {
+    color: color-mix(in srgb, var(--color-primary) 86%, var(--color-text-primary));
+  }
   @media (hover: hover) and (pointer: fine) {
     .dashboard-stat-mini:hover .dashboard-stat-mini__surface {
-      transform: translate3d(0, -4px, 0);
+      transform: translate3d(0, -2px, 0);
       border-color: color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
       box-shadow: 0 10px 28px color-mix(in srgb, var(--color-primary) 14%, transparent);
     }
@@ -4742,11 +4849,14 @@
       box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary) 10%, transparent);
     }
   }
-  .dashboard-stat-mini__head {
-    @apply flex items-start justify-between gap-2;
+  .dashboard-stat-mini__row {
+    @apply flex h-full items-center gap-3;
+  }
+  .dashboard-stat-mini__body {
+    @apply flex min-w-0 flex-1 flex-col items-end gap-0.5 text-end;
   }
   .dashboard-stat-mini__icon {
-    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border;
+    @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] border;
     border-color: color-mix(in srgb, var(--color-border) 75%, transparent);
     background: color-mix(in srgb, var(--color-accent-soft) 42%, #fff);
     color: color-mix(in srgb, var(--color-primary) 72%, var(--color-text-secondary));
@@ -4761,23 +4871,23 @@
     color: var(--color-success-text);
   }
   .dashboard-stat-mini__label {
-    @apply pt-0.5 text-xs font-medium text-ink-muted;
+    @apply text-xs font-medium leading-snug text-ink-muted;
   }
   .dashboard-stat-mini__value {
-    @apply mt-2 text-[1.35rem] font-bold leading-tight text-ink md:text-[1.75rem];
+    @apply flex flex-wrap items-baseline justify-end gap-x-1 gap-y-0 text-[1.375rem] font-bold leading-none text-ink md:text-[1.625rem];
     font-variant-numeric: tabular-nums;
   }
   .dashboard-stat-mini__digits {
-    @apply inline-block min-w-[2.5ch] text-start;
+    @apply inline-block text-end;
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
   .dashboard-stat-mini__unit {
-    @apply ms-1 text-xs font-normal text-ink-muted;
+    @apply text-[11px] font-medium text-ink-muted;
   }
-
   .dashboard-stat-grid.anim-armed:not(.is-in-view):not(.anim-disabled) .dashboard-stat-enter {
-    opacity: 0;
-    transform: translate3d(0, 14px, 0);
+    opacity: 1;
+    transform: translate3d(0, 6px, 0);
   }
   .dashboard-stat-grid.is-in-view .dashboard-stat-enter {
     animation: dashboard-stat-rise 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
