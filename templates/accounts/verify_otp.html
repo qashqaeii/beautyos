@@ -2,24 +2,37 @@
 {% block title %}تأیید کد · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
 {% block auth_steps %}
 <ol class="public-auth-steps" aria-label="مراحل">
+  {% if purpose == "register" %}
+  <li class="is-done">۱. تأیید موبایل</li>
+  <li class="is-current" aria-current="step">۲. کد پیامکی</li>
+  <li>۳. اطلاعات مالک</li>
+  {% else %}
   <li class="is-done">۱. شماره موبایل</li>
   <li class="is-current" aria-current="step">۲. کد تأیید</li>
-  {% if next_step == "register_profile" %}<li>۳. اطلاعات مالک</li>{% endif %}
+  {% endif %}
 </ol>
 {% endblock %}
 {% block auth_heading %}کد پیامکی را وارد کنید{% endblock %}
-{% block auth_subtitle %}کد ۶ رقمی به شماره <span dir="ltr" lang="en" class="font-medium text-aubergine">{{ phone_display }}</span> ارسال شد.{% endblock %}
+{% block auth_subtitle %}
+{% if purpose == "register" %}
+کد ۶ رقمی برای تکمیل ثبت‌نام سالن به شماره
+{% else %}
+کد ورود ۶ رقمی به شماره
+{% endif %}
+<span dir="ltr" lang="en" class="font-medium text-aubergine">{{ phone_display }}</span> ارسال شد.
+{% endblock %}
 {% block auth_content %}
 {% if BEAUTYOS_DEBUG and dev_otp_code %}
 <p class="mb-4 rounded-xl border border-champagne/40 bg-champagne/20 px-3 py-2 text-center text-xs text-charcoal">
-  حالت توسعه — کد: <strong class="text-lg tracking-[0.3em]" dir="ltr" lang="en">{{ dev_otp_code }}</strong>
+  حالت توسعه — کد:
+  <strong class="text-lg tracking-[0.35em]" dir="ltr" lang="en">{{ dev_otp_code }}</strong>
 </p>
 {% endif %}
 {% if resend_ok %}
-<p class="mb-3 rounded-xl bg-sage/10 px-3 py-2 text-sm text-sage" role="status">کد جدید ارسال شد.</p>
+<div class="mb-3">{% include "accounts/partials/auth_flash.html" with message="کد جدید ارسال شد." variant="success" %}</div>
 {% endif %}
 {% if resend_error %}
-<p class="mb-3 rounded-xl border border-coral/30 bg-coral/5 px-3 py-2 text-sm text-coral" role="alert">{{ resend_error }}</p>
+<div class="mb-3">{% include "accounts/partials/auth_flash.html" with message=resend_error variant="error" %}</div>
 {% endif %}
 <form method="post" action="{% url 'accounts:verify' %}" class="space-y-5" id="otp-verify-form" novalidate>
   {% csrf_token %}

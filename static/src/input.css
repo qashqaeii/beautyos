@@ -3785,6 +3785,24 @@
     @apply font-medium text-lavender hover:underline;
   }
 
+  .public-auth-form-actions {
+    @apply mt-6 text-center text-sm;
+    color: color-mix(in srgb, var(--color-text-primary) 60%, transparent);
+  }
+
+  .public-auth-form-actions a {
+    @apply font-medium text-accent hover:underline;
+  }
+
+  .public-auth-crosslink {
+    @apply mt-6 text-center text-sm;
+    color: color-mix(in srgb, var(--color-text-primary) 60%, transparent);
+  }
+
+  .public-auth-crosslink a {
+    @apply font-medium text-accent hover:underline;
+  }
+
   .public-faq-item {
     @apply rounded-2xl border border-line bg-surface;
   }

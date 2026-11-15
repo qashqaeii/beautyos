@@ -1,0 +1,9 @@
+{# Status messages for public auth — uses existing coral / sage / champagne tokens #}
+{% if message %}
+<p
+  class="{% if variant == 'success' %}rounded-xl bg-sage/10 px-3 py-2 text-sm text-sage{% elif variant == 'dev' %}rounded-xl border border-champagne/40 bg-champagne/20 px-3 py-2 text-sm text-charcoal{% else %}rounded-xl border border-coral/30 bg-coral/5 px-3 py-2 text-sm text-coral{% endif %}"
+  role="{% if variant == 'success' %}status{% else %}alert{% endif %}"
+>
+  {{ message }}
+</p>
+{% endif %}

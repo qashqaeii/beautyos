@@ -12,6 +12,9 @@
 {% block auth_content %}
 <form method="post" action="{% url 'accounts:register_profile' %}" class="space-y-5">
   {% csrf_token %}
+  {% if profile_form.non_field_errors %}
+  <div class="mb-1">{% include "accounts/partials/auth_flash.html" with message=profile_form.non_field_errors.0 variant="error" %}</div>
+  {% endif %}
   <div class="public-auth-field">
     <label for="id_full_name">{{ profile_form.full_name.label }}</label>
     {{ profile_form.full_name }}

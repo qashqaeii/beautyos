@@ -13,7 +13,7 @@
 <form method="post" class="space-y-5">
   {% csrf_token %}
   {% if phone_form.non_field_errors %}
-  <p class="rounded-xl border border-coral/30 bg-coral/5 px-3 py-2 text-sm text-coral" role="alert">{{ phone_form.non_field_errors.0 }}</p>
+  <div class="mb-1">{% include "accounts/partials/auth_flash.html" with message=phone_form.non_field_errors.0 variant="error" %}</div>
   {% endif %}
   <div class="public-auth-field">
     <label for="id_phone">{{ phone_form.phone.label }}</label>
@@ -26,8 +26,8 @@
     دریافت کد تأیید
   </button>
 </form>
-<p class="mt-6 text-center text-sm text-charcoal/60">
+<p class="public-auth-crosslink">
   قبلاً عضو یک سالن شده‌اید؟
-  <a href="{% url 'accounts:login' %}" class="font-medium text-accent hover:underline">ورود به پنل</a>
+  <a href="{% url 'accounts:login' %}">ورود به پنل</a>
 </p>
 {% endblock %}

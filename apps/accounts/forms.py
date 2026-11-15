@@ -9,7 +9,9 @@ class PhoneForm(forms.Form):
         max_length=20,
         widget=forms.TextInput(
             attrs={
-                "class": "input-field",
+                "class": "input-field input-field--tel",
+                "type": "tel",
+                "dir": "ltr",
                 "placeholder": "۰۹۱۲۳۴۵۶۷۸۹",
                 "inputmode": "tel",
                 "autocomplete": "tel",
