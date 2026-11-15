@@ -10,6 +10,15 @@ from django.views import View
 from apps.accounts.forms import OTPVerifyForm, PhoneForm, RegisterProfileForm
 from apps.accounts.models import OTPChallenge, User
 from apps.accounts.services.otp import OTPInvalid, OTPRateLimited, issue_otp, verify_otp
+from apps.accounts.services.register_verification import (
+    RegisterAccountExistsError,
+    RegisterVerificationError,
+    clear_register_session_flags,
+    complete_register_profile,
+    get_valid_register_verification,
+    grant_register_verification_after_otp,
+    invalidate_register_verifications,
+)
 from apps.core.utils.phone import display_iran_mobile
 
 OTP_RESEND_COOLDOWN_SECONDS = 60
@@ -62,6 +71,25 @@ def _client_ip(request):
     return request.META.get("REMOTE_ADDR")
 
 
+def _clear_pending_auth_session(request):
+    clear_register_session_flags(request)
+    for key in ("auth_phone", "auth_purpose", "auth_next_step", "dev_otp_code", "otp_issued_at"):
+        request.session.pop(key, None)
+    request.session.modified = True
+
+
+def _begin_auth_session(request, *, phone: str, purpose: str, issued, next_step: str = ""):
+    invalidate_register_verifications(request=request)
+    clear_register_session_flags(request)
+    request.session["auth_phone"] = phone
+    request.session["auth_purpose"] = purpose
+    if next_step:
+        request.session["auth_next_step"] = next_step
+    else:
+        request.session.pop("auth_next_step", None)
+    _store_dev_otp(request, issued)
+
+
 class LoginView(View):
     template_name = "accounts/login.html"
 
@@ -87,9 +115,12 @@ class LoginView(View):
             except OTPRateLimited:
                 form.add_error(None, "تعداد درخواست‌ها بیش از حد مجاز است.")
                 return render(request, self.template_name, {"phone_form": form})
-            request.session["auth_phone"] = phone
-            request.session["auth_purpose"] = OTPChallenge.Purpose.LOGIN
-            _store_dev_otp(request, issued)
+            _begin_auth_session(
+                request,
+                phone=phone,
+                purpose=OTPChallenge.Purpose.LOGIN,
+                issued=issued,
+            )
             return redirect("accounts:verify")
         return redirect("accounts:login")
 
@@ -120,10 +151,13 @@ class RegisterView(View):
         except OTPRateLimited:
             form.add_error(None, "تعداد درخواست‌ها بیش از حد مجاز است.")
             return render(request, self.template_name, {"phone_form": form})
-        request.session["auth_phone"] = phone
-        request.session["auth_purpose"] = OTPChallenge.Purpose.REGISTER
-        request.session["auth_next_step"] = "register_profile"
-        _store_dev_otp(request, issued)
+        _begin_auth_session(
+            request,
+            phone=phone,
+            purpose=OTPChallenge.Purpose.REGISTER,
+            issued=issued,
+            next_step="register_profile",
+        )
         return redirect("accounts:verify")
 
 
@@ -205,7 +239,7 @@ class VerifyOTPView(View):
             return render(request, "accounts/verify_otp.html", ctx)
 
         try:
-            verify_otp(phone=phone, purpose=purpose, code=form.cleaned_data["code"])
+            challenge = verify_otp(phone=phone, purpose=purpose, code=form.cleaned_data["code"])
         except OTPInvalid as exc:
             form.add_error("code", str(exc))
             ctx = _verify_context(request, phone=phone, otp_form=form, purpose=purpose, next_step=next_step)
@@ -213,20 +247,20 @@ class VerifyOTPView(View):
             return render(request, "accounts/verify_otp.html", ctx)
 
         if purpose == OTPChallenge.Purpose.REGISTER:
-            request.session["register_verified"] = True
+            grant_register_verification_after_otp(request=request, phone=phone, challenge=challenge)
             return render(
                 request,
                 "accounts/register_profile.html",
                 {"profile_form": RegisterProfileForm(), "phone_display": display_iran_mobile(phone)},
             )
 
+        invalidate_register_verifications(request=request)
         user = User.objects.filter(phone=phone).first()
         if user is None:
             return redirect("accounts:register")
 
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-        for key in ("auth_phone", "auth_purpose", "auth_next_step", "dev_otp_code", "otp_issued_at"):
-            request.session.pop(key, None)
+        _clear_pending_auth_session(request)
         return redirect(self._post_login_redirect(request, user))
 
     def _post_login_redirect(self, request, user):
@@ -239,12 +273,11 @@ class VerifyOTPView(View):
 
 class RegisterProfileView(View):
     def post(self, request):
-        if not request.session.get("register_verified"):
-            return redirect("accounts:register")
-        phone = request.session.get("auth_phone")
-        if not phone:
+        verification = get_valid_register_verification(request=request)
+        if verification is None:
             return redirect("accounts:register")
 
+        phone = verification.phone
         form = RegisterProfileForm(request.POST)
         if not form.is_valid():
             return render(
@@ -253,14 +286,19 @@ class RegisterProfileView(View):
                 {"profile_form": form, "phone_display": display_iran_mobile(phone)},
             )
 
-        user, _created = User.objects.get_or_create(phone=phone, defaults={"full_name": form.cleaned_data["full_name"]})
-        if user.full_name != form.cleaned_data["full_name"]:
-            user.full_name = form.cleaned_data["full_name"]
-            user.save(update_fields=["full_name", "updated_at"])
+        try:
+            user = complete_register_profile(
+                request=request,
+                verification=verification,
+                full_name=form.cleaned_data["full_name"],
+            )
+        except RegisterAccountExistsError:
+            return redirect("accounts:login")
+        except RegisterVerificationError:
+            return redirect("accounts:register")
 
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-        for key in ("auth_phone", "auth_purpose", "register_verified"):
-            request.session.pop(key, None)
+        _clear_pending_auth_session(request)
         return redirect("salons_onboarding:create")
 
 

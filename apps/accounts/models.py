@@ -58,3 +58,29 @@ class OTPChallenge(TimeStampedModel):
     @property
     def is_consumed(self):
         return self.consumed_at is not None
+
+
+class RegisterPhoneVerification(TimeStampedModel):
+    session_key = models.CharField(max_length=40, db_index=True)
+    phone = models.CharField(max_length=16, db_index=True)
+    otp_challenge = models.ForeignKey(
+        OTPChallenge,
+        on_delete=models.PROTECT,
+        related_name="register_verifications",
+    )
+    expires_at = models.DateTimeField(db_index=True)
+    consumed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["session_key", "-created_at"]),
+            models.Index(fields=["phone", "-created_at"]),
+        ]
+
+    @property
+    def is_expired(self):
+        return timezone.now() >= self.expires_at
+
+    @property
+    def is_consumed(self):
+        return self.consumed_at is not None

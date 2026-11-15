@@ -25,7 +25,7 @@ def test_register_new_user_otp_to_profile(client, settings, monkeypatch):
     dev = client.session.get("dev_otp_code")
     assert dev
     client.post(reverse("accounts:verify"), {"code": dev})
-    assert client.session.get("register_verified")
+    assert client.session.get("register_verification_id")
     client.post(reverse("accounts:register_profile"), {"full_name": "مالک تست"})
     assert User.objects.filter(phone__contains="9122223333").exists()
     response = client.get(reverse("salons_onboarding:create"))
