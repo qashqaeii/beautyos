@@ -1,7 +1,10 @@
 from datetime import timedelta
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods
 
 from apps.appointments.models import Appointment
 from apps.appointments.booking import appointment_booking_context
@@ -23,8 +26,6 @@ from apps.salons.permissions_policy import (
 @salon_required
 def desk(request):
     if not can_see_reception(request.membership):
-        from django.core.exceptions import PermissionDenied
-
         raise PermissionDenied
     membership = request.membership
     day = parse_dashboard_day(request)
@@ -70,12 +71,18 @@ def desk(request):
 
 @salon_required
 @require_role(SalonMembership.Role.RECEPTIONIST)
+@require_http_methods(["POST"])
 def quick_checkin(request, pk):
-    from django.urls import reverse
+    if not has_permission(request.membership, P_APPOINTMENT_CHECKIN):
+        raise PermissionDenied
 
-    appt = get_object_or_404(_appointment_qs(request), pk=pk)
-    if appt.status in (Appointment.Status.CONFIRMED, Appointment.Status.PENDING):
-        appt.status = Appointment.Status.CHECKED_IN
-        appt.save(update_fields=["status", "updated_at"])
-        messages.success(request, "پذیرش انجام شد.")
+    with transaction.atomic():
+        appt = get_object_or_404(
+            Appointment.objects.select_for_update().filter(salon=request.salon),
+            pk=pk,
+        )
+        if appt.status in (Appointment.Status.CONFIRMED, Appointment.Status.PENDING):
+            appt.status = Appointment.Status.CHECKED_IN
+            appt.save(update_fields=["status", "updated_at"])
+            messages.success(request, "پذیرش انجام شد.")
     return redirect("reception:desk")

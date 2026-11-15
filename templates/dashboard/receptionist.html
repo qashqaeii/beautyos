@@ -22,7 +22,10 @@
     {% if next_payment %}<p class="text-xs text-ink-muted">پرداخت: {{ next_payment.label }}{% if next_payment.owed_toman %} · مانده {{ next_payment.owed_toman|fa_money }} تومان{% endif %}</p>{% endif %}
     {% if can_checkin %}
       {% if next_appt.status == 'confirmed' or next_appt.status == 'pending' %}
-    <a href="{% url 'reception:checkin' pk=next_appt.pk %}" class="btn-primary mt-4 w-full justify-center text-sm lg:w-auto">ثبت ورود</a>
+    <form method="post" action="{% url 'reception:checkin' pk=next_appt.pk %}" class="mt-4">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary w-full justify-center text-sm lg:w-auto">ثبت ورود</button>
+    </form>
       {% endif %}
     {% endif %}
   </section>

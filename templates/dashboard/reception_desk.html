@@ -61,7 +61,10 @@
             {% endif %}
             {% if can_checkin %}
               {% if next_appt.status == 'confirmed' or next_appt.status == 'pending' %}
-            <a href="{% url 'reception:checkin' pk=next_appt.pk %}" class="reception-desk-next__checkin btn-primary text-sm">ثبت ورود</a>
+            <form method="post" action="{% url 'reception:checkin' pk=next_appt.pk %}" class="reception-desk-next__checkin m-0">
+              {% csrf_token %}
+              <button type="submit" class="btn-primary text-sm">ثبت ورود</button>
+            </form>
               {% endif %}
             {% endif %}
           </div>

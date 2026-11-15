@@ -14,7 +14,10 @@
   {% if show_actions %}
   <div class="appt-card__actions">
     {% if appointment.status == 'confirmed' or appointment.status == 'pending' %}
-    <a href="{% url 'reception:checkin' pk=appointment.pk %}" class="btn-primary text-xs">پذیرش</a>
+    <form method="post" action="{% url 'reception:checkin' pk=appointment.pk %}" class="inline">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary text-xs">پذیرش</button>
+    </form>
     {% endif %}
     <a href="{% url 'appointments:detail' pk=appointment.pk %}" class="btn-secondary text-xs">جزئیات</a>
   </div>

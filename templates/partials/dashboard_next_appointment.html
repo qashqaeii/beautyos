@@ -14,10 +14,13 @@
   </div>
   <footer class="maison-next-appt__footer">
     {% if appointment.status == 'confirmed' or appointment.status == 'pending' %}
-    <a href="{% url 'reception:checkin' pk=appointment.pk %}" class="btn-primary maison-next-appt__cta w-full justify-center text-sm">
+    <form method="post" action="{% url 'reception:checkin' pk=appointment.pk %}" class="maison-next-appt__cta m-0 w-full">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary w-full justify-center text-sm">
       <i data-lucide="user-check" class="h-4 w-4" stroke-width="1.75"></i>
       پذیرش مشتری
-    </a>
+      </button>
+    </form>
     {% endif %}
     <a href="{% url 'appointments:detail' pk=appointment.pk %}" class="maison-next-appt__secondary text-xs font-medium">جزئیات نوبت</a>
   </footer>
