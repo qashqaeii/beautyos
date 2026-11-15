@@ -66,10 +66,7 @@
 <style>[x-cloak]{display:none!important}</style>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    if (window.lucide) lucide.createIcons();
-  });
-  document.addEventListener("alpine:initialized", function () {
-    if (window.lucide) lucide.createIcons();
+    if (window.beautyosInitIcons) window.beautyosInitIcons();
   });
 </script>
 {% endblock %}

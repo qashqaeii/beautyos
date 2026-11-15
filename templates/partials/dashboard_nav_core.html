@@ -1,30 +1,30 @@
 {% if nav_overview %}
 <a href="{% url 'dashboard:home' %}" class="nav-link {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'home' %}nav-link-active{% endif %}" title="نمای کلی">
-  <i data-lucide="layout-dashboard" class="h-[1.125rem] w-[1.125rem] shrink-0"></i>
+  <i data-lucide="layout-dashboard" class="beautyos-lucide beautyos-lucide--nav"></i>
   <span class="nav-label">نمای کلی</span>
 </a>
 {% endif %}
 {% if nav_management %}
 <a href="{% url 'dashboard:management' %}" class="nav-link {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'management' %}nav-link-active{% endif %}" title="مدیریت">
-  <i data-lucide="briefcase" class="h-[1.125rem] w-[1.125rem] shrink-0"></i>
+  <i data-lucide="briefcase" class="beautyos-lucide beautyos-lucide--nav"></i>
   <span class="nav-label">مدیریت</span>
 </a>
 {% endif %}
 {% if nav_reception %}
 <a href="{% url 'reception:desk' %}" class="nav-link {% if request.resolver_match.app_name == 'reception' %}nav-link-active{% endif %}" title="میز پذیرش">
-  <i data-lucide="concierge-bell" class="h-[1.125rem] w-[1.125rem] shrink-0"></i>
+  <i data-lucide="concierge-bell" class="beautyos-lucide beautyos-lucide--nav"></i>
   <span class="nav-label">میز پذیرش</span>
 </a>
 {% endif %}
 {% if nav_specialists %}
 <a href="{% url 'dashboard:specialists' %}" class="nav-link {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'specialists' %}nav-link-active{% endif %}" title="متخصص‌ها">
-  <i data-lucide="sparkles" class="h-[1.125rem] w-[1.125rem] shrink-0"></i>
+  <i data-lucide="sparkles" class="beautyos-lucide beautyos-lucide--nav"></i>
   <span class="nav-label">متخصص‌ها</span>
 </a>
 {% endif %}
 {% if nav_calendar %}
 <a href="{% url 'appointments:calendar' %}{% if active_membership.role == 'specialist' and active_membership.staff_profile %}?staff={{ active_membership.staff_profile.pk }}{% endif %}" class="nav-link {% if request.resolver_match.app_name == 'appointments' and request.resolver_match.url_name == 'calendar' %}nav-link-active{% endif %}" title="تقویم">
-  <i data-lucide="calendar-days" class="h-[1.125rem] w-[1.125rem] shrink-0"></i>
+  <i data-lucide="calendar-days" class="beautyos-lucide beautyos-lucide--nav"></i>
   <span class="nav-label">تقویم</span>
 </a>
 {% endif %}

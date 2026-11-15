@@ -14,7 +14,7 @@
   {% if nav_salon_settings %}
   <div class="maison-sidebar__extras shrink-0 px-2.5 pb-1">
     <a href="{% url 'salons_settings:home' %}" class="nav-link {% if request.resolver_match.app_name == 'salons_settings' %}nav-link-active{% endif %}" title="اطلاعات سالن">
-      <i data-lucide="building-2" class="h-[1.125rem] w-[1.125rem] shrink-0"></i>
+      <i data-lucide="building-2" class="beautyos-lucide beautyos-lucide--nav"></i>
       <span class="nav-label">اطلاعات سالن</span>
     </a>
   </div>
@@ -22,12 +22,12 @@
   <div class="maison-sidebar__footer theme-sidebar-footer shrink-0 border-t p-3 text-xs">
     {% if user.is_authenticated %}
     <div class="maison-sidebar-footer__user">
-      <span class="maison-sidebar-footer__avatar" aria-hidden="true"><i data-lucide="user-round" class="h-4 w-4"></i></span>
+      <span class="maison-sidebar-footer__avatar" aria-hidden="true"><i data-lucide="user-round" class="beautyos-lucide beautyos-lucide--md"></i></span>
       <p class="maison-sidebar-footer__meta truncate text-ink">{{ user.full_name|default:user.display_phone }}</p>
     </div>
     <form method="post" action="{% url 'accounts:logout' %}" class="mt-2">
       {% csrf_token %}
-      <button type="submit" class="nav-link w-full !px-2 text-ink-secondary hover:text-ink" title="خروج"><i data-lucide="log-out" class="h-[1.125rem] w-[1.125rem] shrink-0"></i><span class="nav-label">خروج</span></button>
+      <button type="submit" class="nav-link w-full !px-2 text-ink-secondary hover:text-ink" title="خروج"><i data-lucide="log-out" class="beautyos-lucide beautyos-lucide--nav"></i><span class="nav-label">خروج</span></button>
     </form>
     {% endif %}
   </div>

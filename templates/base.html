@@ -13,7 +13,8 @@
   <script defer src="{% static 'js/jalali-datepicker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
   <script defer src="{% static 'js/fa-money.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
   <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
-  <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <script defer src="{% static 'js/vendor/lucide.min.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+  <script defer src="{% static 'js/beautyos-icons.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
   {% block extra_head %}{% endblock %}
 </head>
 <body
