@@ -8,11 +8,11 @@
     {% csrf_token %}
     <div>
       <label class="mb-1 block text-xs font-medium text-ink-secondary">نام کامل</label>
-      <input name="full_name" class="input-field" placeholder="مثلاً سارا محمدی" required autocomplete="name">
+      <input name="full_name" class="input-field" placeholder="مثلاً سارا محمدی" required autocomplete="name" value="{{ full_name|default:'' }}">
     </div>
     <div>
       <label class="mb-1 block text-xs font-medium text-ink-secondary">موبایل</label>
-      <input name="phone" class="input-field" placeholder="0912…" required inputmode="tel" autocomplete="tel">
+      <input name="phone" class="input-field" placeholder="0912…" required inputmode="tel" autocomplete="tel" value="{{ phone|default:'' }}">
     </div>
     <button type="submit" class="btn-primary w-full">دریافت کد تأیید</button>
   </form>

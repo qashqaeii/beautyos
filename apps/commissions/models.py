@@ -57,6 +57,15 @@ class CommissionEntry(TenantModelMixin, TimeStampedModel):
         "appointments.Appointment",
         on_delete=models.PROTECT,
         related_name="commission_entry",
+        null=True,
+        blank=True,
+    )
+    reverses_entry = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="reversal_entries",
     )
     staff = models.ForeignKey(
         "staff.StaffProfile",

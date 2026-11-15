@@ -1,6 +1,7 @@
 from datetime import date, datetime, time, timedelta
 
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -15,6 +16,7 @@ from apps.appointments.booking import (
 )
 from apps.appointments.forms import AppointmentForm
 from apps.appointments.models import Appointment
+from apps.appointments.services.lifecycle import AppointmentLifecycleError, cancel_appointment, complete_appointment
 from apps.appointments.services.scheduling import SchedulingError, create_appointment
 from apps.core.utils.dates import (
     JALALI_MONTH_NAMES_FA,
@@ -341,7 +343,7 @@ def appointment_create(request):
                 if return_path:
                     return redirect(return_path)
                 return redirect("appointments:detail", pk=appt.pk)
-            except SchedulingError as exc:
+            except ValidationError as exc:
                 msg = exc.messages[0] if getattr(exc, "messages", None) else str(exc)
                 form.add_error(None, msg)
         return_path = safe_booking_return_path(request.POST.get("booking_return_path"))
@@ -367,16 +369,14 @@ def appointment_detail(request, pk):
     appt = get_object_or_404(_appointment_qs(request), pk=pk)
     if request.method == "POST":
         action = request.POST.get("action")
-        if action == "cancel":
-            appt.cancel()
-            messages.success(request, "نوبت لغو شد.")
-        elif action == "complete":
-            appt.status = Appointment.Status.COMPLETED
-            appt.completed_at = timezone.now()
-            appt.save(update_fields=["status", "completed_at", "updated_at"])
-            from apps.customers.services import refresh_customer_stats
-
-            refresh_customer_stats(appt.customer)
-            messages.success(request, "مراجعه تکمیل شد.")
+        try:
+            if action == "cancel":
+                cancel_appointment(salon=request.salon, appointment_id=appt.pk)
+                messages.success(request, "نوبت لغو شد.")
+            elif action == "complete":
+                complete_appointment(salon=request.salon, appointment_id=appt.pk)
+                messages.success(request, "مراجعه تکمیل شد.")
+        except AppointmentLifecycleError as exc:
+            messages.error(request, str(exc))
         return redirect("appointments:detail", pk=pk)
     return render(request, "appointments/detail.html", {"appointment": appt})

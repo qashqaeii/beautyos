@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -213,8 +214,9 @@ def stock_out(request, pk):
             )
             messages.success(request, "مصرف موجودی ثبت شد.")
             return redirect("inventory:list")
-        except Exception as exc:
-            messages.error(request, str(exc))
+        except ValidationError as exc:
+            msg = exc.messages[0] if getattr(exc, "messages", None) else str(exc)
+            messages.error(request, msg)
     return render(
         request,
         "inventory/stock_form.html",

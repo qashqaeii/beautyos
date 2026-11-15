@@ -29,3 +29,5 @@ def test_otp_invalid_code():
     issue_otp(phone=phone, purpose=OTPChallenge.Purpose.LOGIN)
     with pytest.raises(OTPInvalid):
         verify_otp(phone=phone, purpose=OTPChallenge.Purpose.LOGIN, code="000000")
+    challenge = OTPChallenge.objects.filter(phone=phone).latest("created_at")
+    assert challenge.attempts == 1

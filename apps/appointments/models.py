@@ -72,3 +72,34 @@ class Appointment(TenantModelMixin, TimeStampedModel):
         self.status = self.Status.CANCELLED
         self.cancelled_at = timezone.now()
         self.save(update_fields=["status", "cancelled_at", "updated_at"])
+
+
+class PublicBookingPhoneVerification(TimeStampedModel):
+    session_key = models.CharField(max_length=40, db_index=True)
+    salon = models.ForeignKey(
+        "salons.Salon",
+        on_delete=models.CASCADE,
+        related_name="public_booking_phone_verifications",
+    )
+    phone = models.CharField(max_length=16, db_index=True)
+    otp_challenge = models.ForeignKey(
+        "accounts.OTPChallenge",
+        on_delete=models.PROTECT,
+        related_name="public_booking_verifications",
+    )
+    expires_at = models.DateTimeField(db_index=True)
+    consumed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["session_key", "salon", "-created_at"]),
+            models.Index(fields=["salon", "phone", "-created_at"]),
+        ]
+
+    @property
+    def is_expired(self):
+        return timezone.now() >= self.expires_at
+
+    @property
+    def is_consumed(self):
+        return self.consumed_at is not None

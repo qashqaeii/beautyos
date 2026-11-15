@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
@@ -182,6 +184,69 @@ def _commission_entry_details(entries) -> list[dict]:
         grouped[key]["percent"] = pct
         grouped[key]["amount"] += e.commission_amount_toman
     return list(grouped.values())
+
+
+@transaction.atomic
+def record_salon_debt_payment(
+    *,
+    salon,
+    debt_id,
+    amount_toman: int,
+    note: str = "",
+) -> "SalonDebtPayment":
+    """Record a debt payment with row lock — rejects amounts above current balance."""
+    from apps.finance.models import SalonDebt, SalonDebtPayment
+
+    if amount_toman <= 0:
+        raise ValidationError("مبلغ پرداخت باید بزرگ‌تر از صفر باشد.")
+
+    debt = (
+        SalonDebt.objects.select_for_update()
+        .filter(pk=debt_id, salon=salon, is_closed=False)
+        .first()
+    )
+    if debt is None:
+        raise ValidationError("بدهی یافت نشد یا تسویه شده است.")
+
+    balance = debt.balance_toman
+    if amount_toman > balance:
+        raise ValidationError(f"مبلغ پرداخت بیش از مانده بدهی است. مانده فعلی: {balance} تومان.")
+
+    payment = SalonDebtPayment.objects.create(
+        salon=salon,
+        debt=debt,
+        amount_toman=amount_toman,
+        note=note or "",
+    )
+    debt.paid_toman = int(debt.paid_toman) + amount_toman
+    if debt.balance_toman <= 0:
+        debt.is_closed = True
+        debt.paid_toman = debt.principal_toman
+    debt.save(update_fields=["paid_toman", "is_closed", "updated_at"])
+    return payment
+
+
+def audit_debt_payment_consistency(*, salon=None) -> list[dict]:
+    """Read-only check: paid_toman vs sum of payment rows."""
+    from django.db.models import Sum
+
+    from apps.finance.models import SalonDebt
+
+    qs = SalonDebt.objects.all() if salon is None else SalonDebt.scoped(salon)
+    qs = qs.annotate(payments_sum=Sum("payments__amount_toman"))
+    issues = []
+    for debt in qs:
+        paid_rows = int(debt.payments_sum or 0)
+        if int(debt.paid_toman) != paid_rows:
+            issues.append(
+                {
+                    "debt_id": debt.pk,
+                    "paid_toman": int(debt.paid_toman),
+                    "payments_sum": paid_rows,
+                    "principal_toman": int(debt.principal_toman),
+                }
+            )
+    return issues
 
 
 def create_appointment_deposit(

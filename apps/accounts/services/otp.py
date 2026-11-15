@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 
 from apps.accounts.models import OTPChallenge
@@ -50,6 +51,22 @@ def issue_otp(*, phone: str, purpose: str, request_ip=None, user_agent: str = ""
     if recent >= 5:
         raise OTPRateLimited("تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید.")
 
+    active = (
+        OTPChallenge.objects.select_for_update()
+        .filter(
+            phone=phone,
+            purpose=purpose,
+            consumed_at__isnull=True,
+            expires_at__gt=timezone.now(),
+        )
+        .order_by("-created_at")
+    )
+    carried_attempts = active.values_list("attempts", flat=True).first() or 0
+    if carried_attempts >= settings.BEAUTYOS_OTP_MAX_ATTEMPTS:
+        raise OTPInvalid("تعداد تلاش‌ها بیش از حد مجاز است.")
+
+    active.update(expires_at=timezone.now())
+
     code = _generate_code()
     challenge = OTPChallenge.objects.create(
         phone=phone,
@@ -58,6 +75,7 @@ def issue_otp(*, phone: str, purpose: str, request_ip=None, user_agent: str = ""
         expires_at=timezone.now() + timedelta(seconds=settings.BEAUTYOS_OTP_EXPIRY_SECONDS),
         request_ip=request_ip,
         user_agent=(user_agent or "")[:255],
+        attempts=carried_attempts,
     )
     provider = get_sms_provider()
     provider.send_otp(phone, code, purpose)
@@ -65,32 +83,51 @@ def issue_otp(*, phone: str, purpose: str, request_ip=None, user_agent: str = ""
     return IssuedOTP(challenge=challenge, dev_code=dev_code)
 
 
-@transaction.atomic
 def verify_otp(*, phone: str, purpose: str, code: str) -> OTPChallenge:
+    """Verify OTP. Failed attempts are persisted even when OTPInvalid is raised."""
     phone = normalize_iran_mobile(phone)
-    challenge = (
-        OTPChallenge.objects.filter(
-            phone=phone,
-            purpose=purpose,
-            consumed_at__isnull=True,
+    invalid_message = None
+    success_challenge_id = None
+
+    with transaction.atomic():
+        challenge = (
+            OTPChallenge.objects.select_for_update()
+            .filter(
+                phone=phone,
+                purpose=purpose,
+                consumed_at__isnull=True,
+            )
+            .order_by("-created_at")
+            .first()
         )
-        .order_by("-created_at")
-        .first()
-    )
-    if challenge is None:
-        raise OTPInvalid("کد تأیید یافت نشد.")
-    if challenge.is_expired:
-        raise OTPInvalid("کد تأیید منقضی شده است.")
-    if challenge.attempts >= settings.BEAUTYOS_OTP_MAX_ATTEMPTS:
-        raise OTPInvalid("تعداد تلاش‌ها بیش از حد مجاز است.")
+        if challenge is None:
+            invalid_message = "کد تأیید یافت نشد."
+        elif challenge.is_expired:
+            invalid_message = "کد تأیید منقضی شده است."
+        elif challenge.attempts >= settings.BEAUTYOS_OTP_MAX_ATTEMPTS:
+            invalid_message = "تعداد تلاش‌ها بیش از حد مجاز است."
+        else:
+            expected = challenge.code_hash
+            supplied = _hash_code(code.strip(), phone)
+            if not hmac.compare_digest(expected, supplied):
+                OTPChallenge.objects.filter(pk=challenge.pk).update(
+                    attempts=F("attempts") + 1,
+                    updated_at=timezone.now(),
+                )
+                challenge.refresh_from_db(fields=["attempts", "updated_at"])
+                if challenge.attempts >= settings.BEAUTYOS_OTP_MAX_ATTEMPTS:
+                    invalid_message = "تعداد تلاش‌ها بیش از حد مجاز است."
+                else:
+                    invalid_message = "کد تأیید نادرست است."
+            else:
+                if challenge.attempts >= settings.BEAUTYOS_OTP_MAX_ATTEMPTS:
+                    invalid_message = "تعداد تلاش‌ها بیش از حد مجاز است."
+                else:
+                    challenge.consumed_at = timezone.now()
+                    challenge.save(update_fields=["consumed_at", "updated_at"])
+                    success_challenge_id = challenge.pk
 
-    expected = challenge.code_hash
-    supplied = _hash_code(code.strip(), phone)
-    if not hmac.compare_digest(expected, supplied):
-        challenge.attempts += 1
-        challenge.save(update_fields=["attempts", "updated_at"])
-        raise OTPInvalid("کد تأیید نادرست است.")
+    if invalid_message:
+        raise OTPInvalid(invalid_message)
 
-    challenge.consumed_at = timezone.now()
-    challenge.save(update_fields=["consumed_at", "updated_at"])
-    return challenge
+    return OTPChallenge.objects.get(pk=success_challenge_id)

@@ -2,7 +2,6 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import F
 
 from apps.inventory.models import InventoryCategory, InventoryItem, StockMovement
 
@@ -39,25 +38,69 @@ def create_inventory_item(
 
 
 @transaction.atomic
-def apply_movement(*, salon, item: InventoryItem, kind: str, quantity: Decimal, note: str = "", appointment=None) -> StockMovement:
+def apply_movement(
+    *,
+    salon,
+    item: InventoryItem,
+    kind: str,
+    quantity: Decimal,
+    note: str = "",
+    appointment=None,
+) -> StockMovement:
     if quantity <= 0:
         raise ValidationError("مقدار باید مثبت باشد.")
+
+    locked = InventoryItem.objects.select_for_update().get(pk=item.pk, salon=salon)
+
     if kind == StockMovement.Kind.OUT:
-        if item.quantity - quantity < 0:
-            raise ValidationError("موجودی کافی نیست.")
-        if appointment and StockMovement.objects.filter(appointment=appointment, item=item, kind=StockMovement.Kind.OUT).exists():
+        if appointment and StockMovement.objects.filter(
+            appointment=appointment, item=locked, kind=StockMovement.Kind.OUT
+        ).exists():
             raise ValidationError("مصرف این کالا برای نوبت قبلاً ثبت شده.")
-        InventoryItem.objects.filter(pk=item.pk).update(quantity=F("quantity") - quantity)
+        if quantity > locked.quantity:
+            raise ValidationError(f"موجودی کافی نیست. موجودی فعلی: {locked.quantity}")
+        locked.quantity = locked.quantity - quantity
+        locked.save(update_fields=["quantity", "updated_at"])
     elif kind == StockMovement.Kind.IN:
-        InventoryItem.objects.filter(pk=item.pk).update(quantity=F("quantity") + quantity)
+        locked.quantity = locked.quantity + quantity
+        locked.save(update_fields=["quantity", "updated_at"])
     else:
-        InventoryItem.objects.filter(pk=item.pk).update(quantity=quantity)
-    item.refresh_from_db(fields=["quantity"])
+        locked.quantity = quantity
+        locked.save(update_fields=["quantity", "updated_at"])
+
     return StockMovement.objects.create(
         salon=salon,
-        item=item,
+        item=locked,
         kind=kind,
         quantity=quantity,
         note=note,
         appointment=appointment,
     )
+
+
+def audit_inventory_consistency(*, salon=None) -> dict:
+    """Read-only audit for negative stock and movement drift (informational)."""
+    from django.db.models import Sum
+
+    qs = InventoryItem.objects.all() if salon is None else InventoryItem.scoped(salon)
+    negative = list(qs.filter(quantity__lt=0).values_list("pk", "name", "quantity"))
+    drift = []
+    for item in qs.iterator():
+        ins = (
+            StockMovement.objects.filter(item=item, kind=StockMovement.Kind.IN).aggregate(t=Sum("quantity"))["t"]
+            or Decimal(0)
+        )
+        outs = (
+            StockMovement.objects.filter(item=item, kind=StockMovement.Kind.OUT).aggregate(t=Sum("quantity"))["t"]
+            or Decimal(0)
+        )
+        expected = ins - outs
+        if item.quantity != expected:
+            drift.append(
+                {
+                    "item_id": item.pk,
+                    "stored": item.quantity,
+                    "from_movements": expected,
+                }
+            )
+    return {"negative_stock": negative, "quantity_drift": drift}

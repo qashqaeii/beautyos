@@ -55,4 +55,5 @@ def test_commission_not_duplicated(salon, owner_membership):
     from apps.commissions.models import CommissionEntry
 
     assert CommissionEntry.objects.filter(appointment=appt).count() == 1
-    assert recognize_commission_for_appointment(appt) is None
+    entry = CommissionEntry.objects.get(appointment=appt)
+    assert recognize_commission_for_appointment(appt) == entry

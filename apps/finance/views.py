@@ -1,6 +1,5 @@
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -8,13 +7,14 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from apps.commissions.services import create_settlement
 from apps.finance.forms import PaymentForm, SalonDebtForm, SalonDebtPaymentForm
-from apps.finance.models import Payment, SalonDebt, SalonDebtPayment
+from apps.finance.models import Payment, SalonDebt
 from apps.finance.services import (
     commission_day_overview,
     customer_payments_in_range,
     income_metrics,
     open_debts_summary,
     parse_finance_range,
+    record_salon_debt_payment,
 )
 from apps.salons.decorators import salon_required
 from apps.salons.models import SalonMembership
@@ -152,22 +152,20 @@ def finance_overview(request):
             debt = get_object_or_404(SalonDebt, pk=request.POST.get("debt_id"), salon=request.salon, is_closed=False)
             pay_form = SalonDebtPaymentForm(request.POST)
             if pay_form.is_valid():
-                amount = min(pay_form.cleaned_data["amount_toman"], debt.balance_toman)
-                with transaction.atomic():
-                    SalonDebtPayment.objects.create(
+                try:
+                    record_salon_debt_payment(
                         salon=request.salon,
-                        debt=debt,
-                        amount_toman=amount,
+                        debt_id=debt.pk,
+                        amount_toman=pay_form.cleaned_data["amount_toman"],
                         note=pay_form.cleaned_data.get("note", ""),
                     )
-                    debt.paid_toman += amount
-                    if debt.balance_toman <= 0:
-                        debt.is_closed = True
-                        debt.paid_toman = debt.principal_toman
-                    debt.save(update_fields=["paid_toman", "is_closed", "updated_at"])
-                messages.success(request, "پرداخت بدهی ثبت شد.")
-                redirect_params["tab"] = "debts"
-                return redirect(_finance_redirect(**redirect_params))
+                except ValidationError as exc:
+                    msg = exc.messages[0] if getattr(exc, "messages", None) else str(exc)
+                    messages.error(request, msg)
+                else:
+                    messages.success(request, "پرداخت بدهی ثبت شد.")
+                    redirect_params["tab"] = "debts"
+                    return redirect(_finance_redirect(**redirect_params))
         elif action == "settle_staff":
             if not can_settle_commission:
                 raise PermissionDenied
