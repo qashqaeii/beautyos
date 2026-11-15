@@ -1,3 +1,5 @@
+from django.db.models import Case, When
+
 from apps.salons.models import Salon, SalonMembership
 
 
@@ -22,7 +24,13 @@ def resolve_active_salon(request):
     first = (
         SalonMembership.objects.filter(user=request.user, is_active=True)
         .select_related("salon", "salon__settings")
-        .order_by("-created_at")
+        .order_by(
+            Case(
+                When(role=SalonMembership.Role.OWNER, then=0),
+                default=1,
+            ),
+            "-created_at",
+        )
         .first()
     )
     if first:

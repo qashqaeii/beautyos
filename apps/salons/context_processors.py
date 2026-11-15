@@ -6,7 +6,11 @@ from apps.dashboard.nav import (
     can_see_reception,
     can_see_specialists,
 )
-from apps.salons.permissions_policy import has_permission, membership_permission_codes
+from apps.salons.permissions_policy import (
+    P_SALON_SETTINGS,
+    has_permission,
+    membership_permission_codes,
+)
 from apps.salons.themes import (
     css_variables_for_dashboard,
     css_variables_inline,
@@ -39,6 +43,7 @@ def salon_context(request):
         "dashboard_theme_vars": theme_vars,
         "dashboard_theme_style": theme_style,
         "membership_permissions": sorted(membership_permission_codes(active_membership)),
+        "nav_salon_settings": has_permission(active_membership, P_SALON_SETTINGS),
         "nav_overview": can_see_overview(active_membership),
         "nav_management": can_see_management(active_membership),
         "nav_reception": can_see_reception(active_membership),

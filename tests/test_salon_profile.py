@@ -42,6 +42,19 @@ def test_salon_profile_page_renders(client, owner_membership):
 
 
 @pytest.mark.django_db
+def test_owner_sidebar_footer_shows_salon_settings_link(client, owner_membership):
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    html = client.get("/app/").content.decode()
+    idx = html.index("maison-sidebar__footer")
+    footer = html[idx : idx + 600]
+    assert 'href="/settings/"' in footer
+    assert "اطلاعات سالن" in footer
+
+
+@pytest.mark.django_db
 def test_salon_profile_update_name_and_phone(client, owner_membership):
     client.force_login(owner_membership.user)
     session = client.session

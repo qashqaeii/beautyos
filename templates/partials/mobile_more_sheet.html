@@ -35,7 +35,7 @@
     <a href="{% url 'retention:queue' %}" class="maison-sheet__link" @click="moreSheetOpen = false">پیگیری</a>
     <a href="{% url 'waitlist:queue' %}" class="maison-sheet__link" @click="moreSheetOpen = false">لیست انتظار</a>
     <a href="{% url 'portfolio:list' %}" class="maison-sheet__link" @click="moreSheetOpen = false">نمونه‌کار</a>
-    {% if 'salon.settings' in membership_permissions %}<a href="{% url 'salons_settings:home' %}" class="maison-sheet__link" @click="moreSheetOpen = false">اطلاعات سالن</a>{% endif %}
+    {% if nav_salon_settings %}<a href="{% url 'salons_settings:home' %}" class="maison-sheet__link" @click="moreSheetOpen = false">اطلاعات سالن</a>{% endif %}
     {% endif %}
   </nav>
 </div>
