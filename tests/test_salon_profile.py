@@ -52,11 +52,11 @@ def test_sole_owner_sees_settings_when_session_targets_manager_role(client, user
     session["active_salon_id"] = str(salon_b.id)
     session.save()
     html = client.get("/app/").content.decode()
-    idx = html.index("maison-sidebar__footer")
-    footer = html[idx : idx + 600]
-    assert 'href="/settings/"' not in footer
-    assert "اطلاعات سالن" not in footer
     assert client.session["active_salon_id"] == str(salon.id)
+    idx = html.index("maison-sidebar__extras")
+    extras = html[idx : idx + 400]
+    assert 'href="/settings/"' in extras
+    assert "اطلاعات سالن" in extras
 
 
 @pytest.mark.django_db
@@ -72,22 +72,20 @@ def test_manager_only_user_has_no_salon_settings_nav(client, salon):
     session["active_salon_id"] = str(salon.id)
     session.save()
     html = client.get("/app/").content.decode()
-    idx = html.index("maison-sidebar__footer")
-    footer = html[idx : idx + 600]
-    assert "اطلاعات سالن" not in footer
+    assert "maison-sidebar__extras" not in html
 
 
 @pytest.mark.django_db
-def test_owner_sidebar_footer_omits_salon_settings_link(client, owner_membership):
+def test_owner_sidebar_extras_shows_salon_settings_link(client, owner_membership):
     client.force_login(owner_membership.user)
     session = client.session
     session["active_salon_id"] = str(owner_membership.salon_id)
     session.save()
     html = client.get("/app/").content.decode()
-    idx = html.index("maison-sidebar__footer")
-    footer = html[idx : idx + 600]
-    assert 'href="/settings/"' not in footer
-    assert "اطلاعات سالن" not in footer
+    idx = html.index("maison-sidebar__extras")
+    extras = html[idx : idx + 400]
+    assert 'href="/settings/"' in extras
+    assert "اطلاعات سالن" in extras
 
 
 @pytest.mark.django_db

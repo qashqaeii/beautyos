@@ -5,8 +5,10 @@
   data-stat-index="{{ stat_index|default:1 }}"
 >
   <div class="dashboard-stat-mini__surface">
-    <span class="dashboard-stat-mini__icon" aria-hidden="true"><i data-lucide="{{ icon }}" class="h-4 w-4"></i></span>
-    <p class="dashboard-stat-mini__label">{{ label }}</p>
+    <div class="dashboard-stat-mini__head">
+      <p class="dashboard-stat-mini__label">{{ label }}</p>
+      <span class="dashboard-stat-mini__icon" aria-hidden="true"><i data-lucide="{{ icon }}" class="h-[1.05rem] w-[1.05rem]"></i></span>
+    </div>
     <p class="dashboard-stat-mini__value tabular-nums">
       <span
         class="js-overview-stat-value dashboard-stat-mini__digits"
