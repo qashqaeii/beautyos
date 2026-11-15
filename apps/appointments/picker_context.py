@@ -42,9 +42,11 @@ def resolve_customer_picker_context(*, form, membership, salon) -> dict:
         elif form.data.get("new_customer_mode"):
             mode = "new"
         elif any(
-            (form.data.get("new_customer_first_name") or "").strip(),
-            (form.data.get("new_customer_last_name") or "").strip(),
-            (form.data.get("new_customer_phone") or "").strip(),
+            (
+                (form.data.get("new_customer_first_name") or "").strip(),
+                (form.data.get("new_customer_last_name") or "").strip(),
+                (form.data.get("new_customer_phone") or "").strip(),
+            )
         ):
             mode = "new"
         elif (form.data.get("customer_search") or "").strip() and not form.data.get("customer"):

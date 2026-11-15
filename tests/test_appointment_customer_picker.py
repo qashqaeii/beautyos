@@ -268,3 +268,101 @@ def test_appointment_new_customer_three_fields_create(client, salon, owner_membe
     assert resp.status_code == 200
     assert Customer.objects.filter(salon=salon, phone="+989121111088").exists()
     assert Appointment.objects.filter(customer__full_name="مینا احمدی").exists()
+
+
+@pytest.mark.django_db
+def test_internal_booking_post_renders_after_scheduling_error_without_typeerror(
+    client, salon, owner_membership
+):
+    """Regression: picker_context used any(a,b,c) causing 500 on invalid POST re-render."""
+    cat = ServiceCategory.objects.create(salon=salon, name="reg-cat")
+    service = Service.objects.create(
+        salon=salon, category=cat, name="خدمت", duration_minutes=60, price_toman=200_000
+    )
+    staff, _ = StaffProfile.objects.get_or_create(
+        salon=salon,
+        membership=owner_membership,
+        defaults={"display_name": "متخصص", "is_bookable": True},
+    )
+    staff.services.add(service)
+    existing = Customer.objects.create(salon=salon, full_name="اشغال", phone="+989121111199")
+    start = timezone.localtime(timezone.now() + timedelta(days=6)).replace(
+        hour=10, minute=0, second=0, microsecond=0
+    )
+    weekday = (start.date().weekday() + 2) % 7
+    StaffWorkHours.objects.get_or_create(
+        salon=salon,
+        staff=staff,
+        weekday=weekday,
+        defaults={"start_time": time(8, 0), "end_time": time(22, 0)},
+    )
+    from apps.appointments.services.scheduling import create_appointment
+
+    create_appointment(
+        salon=salon,
+        customer=existing,
+        staff=staff,
+        service=service,
+        start=start,
+        actor=owner_membership.user,
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+    fields = _appt_post_fields(
+        start,
+        staff,
+        service,
+        new_customer_first_name="مشتری",
+        new_customer_last_name="جدید",
+        new_customer_phone="09121111888",
+    )
+    resp = client.post("/appointments/new/", fields)
+    assert resp.status_code == 200
+    assert "تداخل" in resp.content.decode() or "non_field_errors" in resp.content.decode()
+
+
+@pytest.mark.django_db
+def test_internal_booking_post_success_with_deposit(client, salon, owner_membership):
+    from apps.finance.models import Payment
+
+    cat = ServiceCategory.objects.create(salon=salon, name="dep-cat")
+    service = Service.objects.create(
+        salon=salon, category=cat, name="خدمت بیعانه", duration_minutes=30, price_toman=1_000_000
+    )
+    staff, _ = StaffProfile.objects.get_or_create(
+        salon=salon,
+        membership=owner_membership,
+        defaults={"display_name": "متخصص", "is_bookable": True},
+    )
+    staff.services.add(service)
+    customer = Customer.objects.create(salon=salon, full_name="بیعانه", phone="+989121117777")
+    start = timezone.localtime(timezone.now() + timedelta(days=7)).replace(
+        hour=12, minute=0, second=0, microsecond=0
+    )
+    weekday = (start.date().weekday() + 2) % 7
+    StaffWorkHours.objects.get_or_create(
+        salon=salon,
+        staff=staff,
+        weekday=weekday,
+        defaults={"start_time": time(8, 0), "end_time": time(22, 0)},
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+    fields = _appt_post_fields(
+        start,
+        staff,
+        service,
+        customer=customer.pk,
+        customer_search="بیعانه",
+        deposit_amount_toman="150000",
+        deposit_method=Payment.Method.CASH,
+    )
+    resp = client.post("/appointments/new/", fields, follow=False)
+    assert resp.status_code == 302
+    appt = Appointment.objects.get(staff=staff, start_at=start)
+    assert appt.customer_id == customer.pk
+    assert Payment.scoped(salon).filter(appointment=appt, paid_amount_toman=150_000).exists()
