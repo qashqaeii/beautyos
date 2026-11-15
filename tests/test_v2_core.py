@@ -21,7 +21,7 @@ def test_dashboard_theme_global_despite_stored_per_salon(owner_membership, salon
     assert resolve_salon_dashboard_theme(salon_b) == GLOBAL_DASHBOARD_THEME
     a = css_variables_for_dashboard(owner_membership.salon.settings.dashboard_theme)
     b = css_variables_for_dashboard(salon_b.settings.dashboard_theme)
-    assert a["--color-accent"] == b["--color-accent"] == "#8064A3"
+    assert a["--color-accent"] == b["--color-accent"] == "#B58D89"
 
 
 @pytest.mark.django_db

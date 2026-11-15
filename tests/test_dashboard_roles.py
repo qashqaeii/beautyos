@@ -37,8 +37,8 @@ def test_manager_sees_management_and_specialists(client, salon, owner_membership
     session = client.session
     session["active_salon_id"] = str(salon.id)
     session.save()
-    assert client.get("/management/").status_code == 200
-    assert client.get("/specialists/").status_code == 200
+    assert client.get("/app/management/").status_code == 200
+    assert client.get("/app/specialists/").status_code == 200
 
 
 @pytest.mark.django_db
@@ -47,7 +47,7 @@ def test_management_no_waitlist_packages_retention_cards(client, salon, owner_me
     session = client.session
     session["active_salon_id"] = str(salon.id)
     session.save()
-    html = client.get("/management/").content.decode()
+    html = client.get("/app/management/").content.decode()
     assert 'font-medium text-ink">لیست انتظار</span>' not in html
     assert 'font-medium text-ink">پکیج‌ها</span>' not in html
     assert 'font-medium text-ink">پیگیری مشتری</span>' not in html
@@ -110,7 +110,7 @@ def test_receptionist_no_management(client, salon, owner_membership):
     session = client.session
     session["active_salon_id"] = str(salon.id)
     session.save()
-    assert client.get("/management/").status_code == 403
+    assert client.get("/app/management/").status_code == 403
 
 
 @pytest.mark.django_db
