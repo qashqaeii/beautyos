@@ -1,10 +1,11 @@
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.commissions.forms import CommissionRuleForm, SettlementForm
 from apps.commissions.models import CommissionEntry, CommissionRule
-from apps.commissions.services import create_settlement
+from apps.commissions.services import create_settlement, staff_outstanding_commission
 from apps.salons.decorators import salon_required
 from apps.salons.models import SalonMembership
 from apps.salons.permissions import require_role
@@ -57,17 +58,22 @@ def rule_create(request):
 @require_role(SalonMembership.Role.MANAGER)
 def settle_staff(request, staff_id):
     staff = get_object_or_404(StaffProfile, pk=staff_id, salon=request.salon)
-    outstanding = (
-        CommissionEntry.scoped(request.salon)
-        .filter(staff=staff, status=CommissionEntry.Status.RECOGNIZED)
-        .aggregate(t=Sum("commission_amount_toman"))["t"]
-        or 0
-    )
+    outstanding = staff_outstanding_commission(salon=request.salon, staff=staff)
     form = SettlementForm(request.POST or None, initial={"amount_toman": outstanding})
     if request.method == "POST" and form.is_valid():
-        create_settlement(request.salon, staff, form.cleaned_data["amount_toman"], form.cleaned_data.get("note", ""))
-        messages.success(request, "تسویه پورسانت ثبت شد.")
-        return redirect("commissions:overview")
+        try:
+            create_settlement(
+                request.salon,
+                staff,
+                form.cleaned_data["amount_toman"],
+                form.cleaned_data.get("note", ""),
+            )
+        except ValidationError as exc:
+            msg = exc.messages[0] if getattr(exc, "messages", None) else str(exc)
+            form.add_error("amount_toman", msg)
+        else:
+            messages.success(request, "تسویه پورسانت ثبت شد.")
+            return redirect("commissions:overview")
     return render(
         request,
         "commissions/settle.html",

@@ -127,9 +127,33 @@ def audit_appointment_commission_consistency(*, salon=None) -> list[dict]:
     return issues
 
 
+def staff_outstanding_commission(*, salon, staff) -> int:
+    entries = CommissionEntry.scoped(salon).filter(
+        staff=staff,
+        status=CommissionEntry.Status.RECOGNIZED,
+    )
+    total = 0
+    for entry in entries:
+        total += max(0, int(entry.commission_amount_toman) - int(entry.settled_amount_toman))
+    return total
+
+
 @transaction.atomic
 def create_settlement(salon, staff, amount_toman: int, note: str = ""):
     from apps.commissions.models import CommissionSettlement
+
+    if amount_toman <= 0:
+        raise ValidationError("مبلغ تسویه باید بزرگ‌تر از صفر باشد.")
+
+    outstanding = list(
+        CommissionEntry.scoped(salon)
+        .select_for_update()
+        .filter(staff=staff, status=CommissionEntry.Status.RECOGNIZED)
+        .order_by("created_at")
+    )
+    due_total = staff_outstanding_commission(salon=salon, staff=staff)
+    if amount_toman > due_total:
+        raise ValidationError(f"مبلغ تسویه بیش از مانده قابل پرداخت است. مانده: {due_total} تومان.")
 
     settlement = CommissionSettlement.objects.create(
         salon=salon,
@@ -138,20 +162,20 @@ def create_settlement(salon, staff, amount_toman: int, note: str = ""):
         note=note,
         settled_at=timezone.now(),
     )
-    outstanding = CommissionEntry.scoped(salon).filter(
-        staff=staff, status=CommissionEntry.Status.RECOGNIZED
-    ).order_by("created_at")
     remaining = amount_toman
     for entry in outstanding:
         if remaining <= 0:
             break
-        pay = int(entry.commission_amount_toman)
-        if pay <= 0:
-            remaining -= pay
+        due = int(entry.commission_amount_toman) - int(entry.settled_amount_toman)
+        if due <= 0:
             continue
-        if pay <= remaining:
+        apply = min(due, remaining)
+        entry.settled_amount_toman = int(entry.settled_amount_toman) + apply
+        update_fields = ["settled_amount_toman", "updated_at"]
+        if entry.settled_amount_toman >= entry.commission_amount_toman:
             entry.status = CommissionEntry.Status.SETTLED
             entry.settlement = settlement
-            entry.save(update_fields=["status", "settlement", "updated_at"])
-            remaining -= pay
+            update_fields.extend(["status", "settlement"])
+        entry.save(update_fields=update_fields)
+        remaining -= apply
     return settlement

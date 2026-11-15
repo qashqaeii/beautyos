@@ -132,10 +132,12 @@ def commission_day_overview(salon, day: date) -> dict:
         )
         bucket["entries"].append(entry)
         bucket["commission_total"] += entry.commission_amount_toman
+        settled_part = int(entry.settled_amount_toman or 0)
         if entry.status == CommissionEntry.Status.SETTLED:
             bucket["paid_total"] += entry.commission_amount_toman
         elif entry.status == CommissionEntry.Status.RECOGNIZED:
-            bucket["remainder_total"] += entry.commission_amount_toman
+            bucket["paid_total"] += settled_part
+            bucket["remainder_total"] += max(0, int(entry.commission_amount_toman) - settled_part)
 
     staff_rows = []
     for row in by_staff.values():

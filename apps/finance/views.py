@@ -172,8 +172,13 @@ def finance_overview(request):
             staff = get_object_or_404(StaffProfile, pk=request.POST.get("staff_id"), salon=request.salon)
             amount = int(request.POST.get("amount_toman") or 0)
             if amount > 0:
-                create_settlement(request.salon, staff, amount, request.POST.get("note", ""))
-                messages.success(request, "تسویه متخصص ثبت شد.")
+                try:
+                    create_settlement(request.salon, staff, amount, request.POST.get("note", ""))
+                except ValidationError as exc:
+                    msg = exc.messages[0] if getattr(exc, "messages", None) else str(exc)
+                    messages.error(request, msg)
+                else:
+                    messages.success(request, "تسویه متخصص ثبت شد.")
             redirect_params["tab"] = "commissions"
             return redirect(_finance_redirect(**redirect_params))
 

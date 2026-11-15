@@ -74,6 +74,7 @@ class CommissionEntry(TenantModelMixin, TimeStampedModel):
     )
     base_amount_toman = models.BigIntegerField()
     commission_amount_toman = models.BigIntegerField()
+    settled_amount_toman = models.BigIntegerField(default=0)
     rule_snapshot = models.JSONField(default=dict)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.RECOGNIZED)
     settlement = models.ForeignKey(
