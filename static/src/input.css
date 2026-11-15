@@ -4760,6 +4760,32 @@
       justify-content: flex-start;
     }
   }
+  .overview-hero__title-row {
+    @apply flex items-center justify-start gap-3;
+  }
+  @media (min-width: 1024px) {
+    .overview-hero__title-row {
+      justify-content: flex-end;
+    }
+  }
+  .overview-hero__badge {
+    @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border;
+    border-color: color-mix(in srgb, var(--color-border) 78%, transparent);
+    background: color-mix(in srgb, var(--color-accent-soft) 48%, #fff);
+    color: color-mix(in srgb, var(--color-primary) 82%, var(--color-text-secondary));
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  }
+  .overview-hero__lead {
+    @apply mt-2 max-w-md text-sm font-medium leading-relaxed text-ink-secondary;
+  }
+  @media (min-width: 1024px) {
+    .overview-hero__lead {
+      text-align: right;
+    }
+  }
+  .overview-hero__image--mgmt {
+    object-position: 55% 38%;
+  }
   .overview-hero .jalali-date__inline-trigger {
     @apply rounded-xl border px-3 py-1.5 shadow-sm;
     border-color: color-mix(in srgb, var(--color-border) 80%, transparent);
@@ -6516,15 +6542,64 @@
     @apply max-w-full truncate text-[10px] leading-tight;
   }
 
-  .dashboard-mgmt-card {
-    @apply flex items-center gap-3 rounded-[1.25rem] border p-4 no-underline transition;
-    border-color: color-mix(in srgb, var(--color-border) 88%, transparent);
-    background: color-mix(in srgb, #fff 92%, var(--color-surface-elevated));
-    box-shadow: 0 6px 20px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  .dashboard-mgmt-page {
+    @apply flex min-w-0 flex-col gap-4 lg:gap-5;
   }
-  .dashboard-mgmt-card:hover {
-    border-color: color-mix(in srgb, var(--color-primary) 22%, var(--color-border));
-    box-shadow: 0 10px 28px color-mix(in srgb, var(--color-primary) 8%, transparent);
+  @media (min-width: 1024px) {
+    .dashboard-mgmt-page .dashboard-mgmt-grid {
+      position: relative;
+      z-index: 0;
+    }
+    .dashboard-mgmt-page .dashboard-mgmt-grid::before {
+      content: "";
+      position: absolute;
+      inset: -0.5rem -0.25rem;
+      z-index: -1;
+      border-radius: 1.75rem;
+      background: color-mix(in srgb, var(--color-background) 72%, transparent);
+      pointer-events: none;
+    }
+  }
+
+  .dashboard-mgmt-grid {
+    @apply grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3;
+    gap: 0.875rem;
+  }
+  @media (min-width: 1024px) {
+    .dashboard-mgmt-grid {
+      gap: 1.25rem;
+    }
+  }
+
+  .dashboard-mgmt-card {
+    @apply flex min-h-[5.25rem] items-center justify-between gap-3 rounded-[1.4rem] border px-4 py-3.5 no-underline transition md:min-h-[5.75rem] md:px-5 md:py-4;
+    border-color: color-mix(in srgb, var(--color-border) 86%, transparent);
+    background: color-mix(in srgb, #fff 97%, var(--color-surface-elevated));
+    box-shadow: 0 4px 18px color-mix(in srgb, var(--color-text-primary) 5%, transparent);
+  }
+  .dashboard-mgmt-card__title {
+    @apply min-w-0 flex-1 text-end text-[0.95rem] font-semibold leading-snug text-ink md:text-base;
+  }
+  .dashboard-mgmt-card__icon {
+    @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.85rem] border;
+    border-color: color-mix(in srgb, var(--color-border) 75%, transparent);
+    background: color-mix(in srgb, var(--color-accent-soft) 46%, #fff);
+    color: color-mix(in srgb, var(--color-primary) 78%, var(--color-text-secondary));
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dashboard-mgmt-card:hover {
+      transform: translate3d(0, -2px, 0);
+      border-color: color-mix(in srgb, var(--color-primary) 20%, var(--color-border));
+      box-shadow: 0 10px 26px color-mix(in srgb, var(--color-primary) 9%, transparent);
+    }
+    .dashboard-mgmt-card:hover .dashboard-mgmt-card__icon {
+      background: color-mix(in srgb, var(--color-surface-lavender) 62%, #fff);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dashboard-mgmt-card:hover {
+      transform: none;
+    }
   }
   .dashboard-specialist-card {
     @apply rounded-2xl border p-4;
