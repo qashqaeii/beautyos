@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils.text import slugify
 
+from apps.accounts.models import User
 from apps.salons.models import SalonMembership
 from apps.staff.models import StaffWorkHours
 
@@ -39,6 +40,41 @@ def test_salon_profile_page_renders(client, owner_membership):
     html = response.content.decode()
     assert "اطلاعات سالن" in html
     assert owner_membership.salon.name in html
+
+
+@pytest.mark.django_db
+def test_sole_owner_sees_settings_when_session_targets_manager_role(client, user, salon, salon_b):
+    """Owner with one salon + manager on another: tenant resolves to owner salon."""
+    SalonMembership.objects.create(user=user, salon=salon, role=SalonMembership.Role.OWNER)
+    SalonMembership.objects.create(user=user, salon=salon_b, role=SalonMembership.Role.MANAGER)
+    client.force_login(user)
+    session = client.session
+    session["active_salon_id"] = str(salon_b.id)
+    session.save()
+    html = client.get("/app/").content.decode()
+    idx = html.index("maison-sidebar__footer")
+    footer = html[idx : idx + 600]
+    assert 'href="/settings/"' in footer
+    assert "اطلاعات سالن" in footer
+    assert client.session["active_salon_id"] == str(salon.id)
+
+
+@pytest.mark.django_db
+def test_manager_only_user_has_no_salon_settings_nav(client, salon):
+    mgr_user = User.objects.create_user(phone="+989121234590", full_name="مدیر تنها")
+    manager = SalonMembership.objects.create(
+        user=mgr_user,
+        salon=salon,
+        role=SalonMembership.Role.MANAGER,
+    )
+    client.force_login(manager.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+    html = client.get("/app/").content.decode()
+    idx = html.index("maison-sidebar__footer")
+    footer = html[idx : idx + 600]
+    assert "اطلاعات سالن" not in footer
 
 
 @pytest.mark.django_db

@@ -261,6 +261,9 @@ class VerifyOTPView(View):
 
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
         _clear_pending_auth_session(request)
+        from apps.salons.middleware import sync_login_active_salon
+
+        sync_login_active_salon(request, user)
         return redirect(self._post_login_redirect(request, user))
 
     def _post_login_redirect(self, request, user):
