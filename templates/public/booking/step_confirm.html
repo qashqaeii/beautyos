@@ -7,7 +7,7 @@
     <li><span class="text-ink-muted">خدمت:</span> {{ service.name }}</li>
     <li><span class="text-ink-muted">متخصص:</span> {{ staff.display_name }}</li>
     <li><span class="text-ink-muted">زمان:</span> {{ start|fa_jalali_datetime }}</li>
-    <li><span class="text-ink-muted">مشتری:</span> {{ customer.full_name }}</li>
+    <li><span class="text-ink-muted">مشتری:</span> {{ customer_name }}</li>
   </ul>
   <form method="post" class="mt-8">
     {% csrf_token %}

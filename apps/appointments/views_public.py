@@ -11,16 +11,17 @@ from apps.accounts.services.otp import OTPInvalid, OTPRateLimited, issue_otp, ve
 from apps.appointments.models import Appointment
 from apps.appointments.public_booking import (
     BookingVerificationError,
+    ensure_booking_customer,
     finalize_public_booking,
     get_valid_phone_verification,
     grant_phone_verification_after_otp,
     invalidate_phone_verifications,
     merge_booking_session,
+    validate_public_booking_prerequisites,
 )
 from apps.appointments.services.scheduling import SchedulingError, iter_day_slots
 from apps.core.utils.dates import to_jalali
 from apps.core.utils.phone import normalize_iran_mobile
-from apps.customers.models import Customer
 from apps.salons.models import Salon
 from apps.salons.themes import css_variables_inline_public
 from apps.services.models import Service
@@ -218,21 +219,10 @@ def booking_confirm(request, slug):
     if timezone.is_naive(start):
         start = timezone.make_aware(start, timezone.get_current_timezone())
 
-    customer, _ = Customer.objects.get_or_create(
-        salon=salon,
-        phone=booking["phone"],
-        defaults={"full_name": booking["name"], "is_deleted": False},
-    )
-    if customer.is_deleted:
-        customer.is_deleted = False
-        customer.full_name = booking["name"]
-        customer.save()
-    elif customer.full_name != booking["name"]:
-        customer.full_name = booking["name"]
-        customer.save(update_fields=["full_name", "updated_at"])
-
     if request.method == "POST":
         try:
+            validate_public_booking_prerequisites(salon=salon, staff=staff, service=service, start=start)
+            customer = ensure_booking_customer(salon=salon, phone=booking["phone"], name=booking["name"])
             appt = finalize_public_booking(
                 verification=verification,
                 request=request,
@@ -250,8 +240,19 @@ def booking_confirm(request, slug):
             return redirect(reverse("salons_public:booking_verify", kwargs={"slug": slug}))
         except SchedulingError as exc:
             messages.error(request, exc.messages[0] if exc.messages else str(exc))
+            return render(
+                request,
+                "public/booking/step_confirm.html",
+                _booking_context(
+                    salon,
+                    service=service,
+                    staff=staff,
+                    start=start,
+                    customer_name=booking.get("name", ""),
+                ),
+            )
     return render(
         request,
         "public/booking/step_confirm.html",
-        _booking_context(salon, service=service, staff=staff, start=start, customer=customer),
+        _booking_context(salon, service=service, staff=staff, start=start, customer_name=booking.get("name", "")),
     )

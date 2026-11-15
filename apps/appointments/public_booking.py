@@ -6,12 +6,52 @@ from django.utils import timezone
 
 from apps.accounts.models import OTPChallenge
 from apps.appointments.models import PublicBookingPhoneVerification
-from apps.appointments.services.scheduling import create_appointment
+from apps.appointments.services.scheduling import SchedulingError, create_appointment, staff_is_available
 from apps.core.utils.phone import normalize_iran_mobile
+from apps.customers.models import Customer
 
 
 class BookingVerificationError(Exception):
     pass
+
+
+def validate_public_booking_prerequisites(*, salon, staff, service, start) -> None:
+    from apps.services.models import Service
+    from apps.staff.models import StaffProfile
+
+    if staff.salon_id != salon.pk or service.salon_id != salon.pk:
+        raise SchedulingError("داده‌ها متعلق به این سالن نیستند.")
+    if not Service.scoped(salon).filter(
+        pk=service.pk, is_active=True, is_public=True, is_deleted=False
+    ).exists():
+        raise SchedulingError("خدمت انتخاب‌شده دیگر قابل رزرو نیست.")
+    if not StaffProfile.scoped(salon).filter(
+        pk=staff.pk, is_active=True, is_bookable=True, is_deleted=False
+    ).exists():
+        raise SchedulingError("متخصص انتخاب‌شده دیگر قابل رزرو نیست.")
+    staff = StaffProfile.scoped(salon).filter(pk=staff.pk).first()
+    if staff is None or not staff.services.filter(pk=service.pk).exists():
+        raise SchedulingError("این متخصص دیگر این خدمت را ارائه نمی‌دهد.")
+    end = start + timedelta(minutes=service.duration_minutes)
+    staff_is_available(staff, start, end)
+
+
+@transaction.atomic
+def ensure_booking_customer(*, salon, phone: str, name: str) -> Customer:
+    phone = normalize_iran_mobile(phone)
+    customer, _ = Customer.objects.get_or_create(
+        salon=salon,
+        phone=phone,
+        defaults={"full_name": name, "is_deleted": False},
+    )
+    if customer.is_deleted:
+        customer.is_deleted = False
+        customer.full_name = name
+        customer.save(update_fields=["is_deleted", "full_name", "updated_at"])
+    elif customer.full_name != name:
+        customer.full_name = name
+        customer.save(update_fields=["full_name", "updated_at"])
+    return customer
 
 
 def merge_booking_session(request, **updates) -> dict:
