@@ -32,10 +32,22 @@
           همه‌چیز برای رشد و نظم سالن شما.
         </p>
         <ul class="luna-hero__features" aria-label="قابلیت‌های اصلی">
-          <li><i data-lucide="calendar-days" aria-hidden="true"></i><span>نوبت‌دهی آنلاین</span></li>
-          <li><i data-lucide="users-round" aria-hidden="true"></i><span>مدیریت مشتریان</span></li>
-          <li><i data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i><span>گزارش‌های مالی</span></li>
-          <li><i data-lucide="layers" aria-hidden="true"></i><span>باشگاه مشتریان</span></li>
+          <li class="luna-hero-feature">
+            <span class="luna-hero-feature__icon" aria-hidden="true"><i data-lucide="calendar-check"></i></span>
+            <span class="luna-hero-feature__label">نوبت‌دهی آنلاین</span>
+          </li>
+          <li class="luna-hero-feature">
+            <span class="luna-hero-feature__icon" aria-hidden="true"><i data-lucide="users-round"></i></span>
+            <span class="luna-hero-feature__label">مدیریت مشتریان</span>
+          </li>
+          <li class="luna-hero-feature">
+            <span class="luna-hero-feature__icon" aria-hidden="true"><i data-lucide="chart-no-axes-column-increasing"></i></span>
+            <span class="luna-hero-feature__label">گزارش‌های مالی</span>
+          </li>
+          <li class="luna-hero-feature">
+            <span class="luna-hero-feature__icon" aria-hidden="true"><i data-lucide="gem"></i></span>
+            <span class="luna-hero-feature__label">باشگاه مشتریان</span>
+          </li>
         </ul>
         <div class="luna-hero__actions">
           {% if user.is_authenticated %}

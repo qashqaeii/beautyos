@@ -12,6 +12,9 @@ def test_public_home_anonymous(client):
     assert "در یک پلتفرم کامل" in html
     assert "luna-home-hero.css" in html
     assert "luna-hero__features" in html
+    assert html.count('class="luna-hero-feature"') == 4
+    assert html.count('class="luna-hero-feature__icon"') == 4
+    assert html.count('class="luna-hero-feature__label"') == 4
     assert "باشگاه مشتریان" in html
     assert "public-announcement" not in html
     assert "رزرو و نوبت‌دهی آنلاین" in html

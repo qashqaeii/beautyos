@@ -101,24 +101,54 @@ body.beautyos-main-bg .public-site.luna-landing {
 .luna-hero__title > span { display:block; }
 .luna-hero__accent { color:var(--luna-hero-rose); }
 .luna-hero__lead { max-width:640px; margin:12px 0 0; color:#72564c; font-size:clamp(.94rem,1.17vw,1.12rem); line-height:1.9; font-weight:400; }
-.luna-hero__features { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(7px,.9vw,13px); width:100%; margin:20px 0 0; padding:0; list-style:none; }
-.luna-hero__features li { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; min-height:84px; min-width:0; padding:10px 5px; border:1px solid rgba(234,217,210,.8); background:rgba(255,252,250,.68); border-radius:15px; text-align:center; box-shadow:0 3px 6px rgba(81,68,63,.055); transition:background .18s ease,box-shadow .18s ease,transform .18s ease; }
-.luna-hero__features svg { width:28px; height:28px; color:var(--luna-hero-rose); stroke-width:1.75; flex:none; }
-.luna-hero__features span { font-size:clamp(.72rem,.96vw,.88rem); font-weight:600; line-height:1.55; color:var(--luna-hero-ink); overflow-wrap:anywhere; }
+/* Editorial feature tiles: an understated icon medallion, quiet surface and
+   consistent visual rhythm. These are informational, not clickable buttons. */
+.luna-hero__features {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:stretch; gap:clamp(7px,.8vw,12px);
+  width:100%; margin:20px 0 0; padding:0; list-style:none;
+}
+.luna-hero__features .luna-hero-feature {
+  position:relative; isolation:isolate; display:flex;
+  flex-direction:column; align-items:center; justify-content:center;
+  gap:7px; min-height:92px; min-width:0; padding:10px 5px;
+  border:1px solid #e6d6cf; border-radius:14px;
+  background:linear-gradient(160deg,rgba(255,253,251,.97),rgba(250,239,234,.89));
+  box-shadow:0 2px 4px rgba(79,52,43,.035),inset 0 1px 0 rgba(255,255,255,.85);
+  text-align:center;
+  transition:border-color .24s ease,box-shadow .24s ease,background-color .24s ease;
+}
+.luna-hero-feature__icon {
+  display:grid; place-items:center; flex:none; width:36px; height:36px;
+  border-radius:11px; border:1px solid rgba(163,107,98,.13);
+  background:linear-gradient(145deg,#f6e8e3,#edd9d2);
+  color:#93645b;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65);
+  transition:transform .24s cubic-bezier(.22,1,.36,1),background-color .24s ease;
+}
+.luna-hero-feature__icon svg,
+.luna-hero-feature__icon i {
+  display:block; width:21px; height:21px; stroke-width:1.65; flex:none;
+}
+.luna-hero-feature__label {
+  min-width:0; max-width:100%; color:var(--luna-hero-ink);
+  font-size:clamp(.72rem,.93vw,.87rem); font-weight:600; line-height:1.65;
+  overflow-wrap:normal; text-wrap:balance;
+}
 .luna-hero__actions { display:flex; flex-wrap:wrap; align-items:center; gap:11px; width:100%; margin-top:23px; }
 .luna-landing .luna-hero__actions a { display:inline-flex; justify-content:center; align-items:center; gap:10px; min-height:49px; padding:10px 20px; border-radius:13px; font-size:.95rem; font-weight:650; }
 .luna-hero__actions svg { width:21px; height:21px; stroke-width:1.75; flex:none; }
 .luna-landing .luna-hero__primary { flex:0 1 205px; background:linear-gradient(120deg,#b17d73,#9c6057); border-color:transparent; color:white; }
 .luna-landing .luna-hero__secondary { flex:0 1 180px; background:rgba(255,252,250,.66); border:1px solid #d9bfb7; color:var(--luna-hero-ink); }
 @media (hover:hover) and (pointer:fine) {
-  .luna-hero__features li:hover { transform:translateY(-3px); background:#fffaf7; box-shadow:0 7px 16px rgba(81,68,63,.08); }
+  .luna-hero__features .luna-hero-feature:hover { border-color:#d3b9b0; box-shadow:0 4px 12px rgba(79,52,43,.075); }
   .luna-landing :is(.luna-hero__primary,.public-nav__cta):hover { background:#8a635f; }
   .luna-landing .luna-hero__secondary:hover { background:#fffaf7; border-color:#b68b80; }
 }
 @media (min-width:1024px) and (max-width:1279px) {
   .luna-hero__inner { grid-template-columns:minmax(0,56%) minmax(0,44%); padding-inline:26px; }
   .luna-hero__media { width:61%; }
-  .luna-hero__features li { min-height:77px; border-radius:13px; }
+  .luna-hero__features .luna-hero-feature { min-height:86px; border-radius:12px; }
 }
 @media (min-width:1024px) and (max-height:700px) {
   .luna-landing .luna-hero { min-height:clamp(400px,calc(100svh - 74px),570px); }
@@ -126,8 +156,9 @@ body.beautyos-main-bg .public-site.luna-landing {
   .luna-hero__title { font-size:clamp(1.65rem,2.75vw,2.6rem); margin-top:10px; }
   .luna-hero__lead { margin-top:8px; }
   .luna-hero__features { margin-top:14px; }
-  .luna-hero__features li { min-height:70px; gap:5px; padding-block:8px; }
-  .luna-hero__features svg { width:24px; height:24px; }
+  .luna-hero__features .luna-hero-feature { min-height:78px; gap:5px; padding-block:7px; }
+  .luna-hero-feature__icon { width:32px; height:32px; }
+  .luna-hero-feature__icon svg, .luna-hero-feature__icon i { width:19px; height:19px; }
   .luna-hero__actions { margin-top:16px; }
 }
 @media (max-width:1023px) {
@@ -143,7 +174,7 @@ body.beautyos-main-bg .public-site.luna-landing {
   .luna-hero__title { font-size:clamp(1.9rem,4.5vw,3rem); margin-top:18px; }
   .luna-hero__lead { margin-top:15px; font-size:1rem; }
   .luna-hero__features { max-width:580px; margin-top:24px; }
-  .luna-hero__features span { font-size:.84rem; }
+  .luna-hero-feature__label { font-size:.82rem; }
   .luna-hero__actions { justify-content:center; margin-top:25px; }
 }
 @media (max-width:639px) {
@@ -160,8 +191,13 @@ body.beautyos-main-bg .public-site.luna-landing {
   .luna-hero__badge svg { width:17px; height:17px; }
   .luna-hero__lead { font-size:.92rem; line-height:1.95; }
   .luna-hero__features { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
-  .luna-hero__features li { min-height:72px; gap:5px; padding:8px 6px; border-radius:14px; }
-  .luna-hero__features svg { width:25px; height:25px; }
+  .luna-hero__features .luna-hero-feature {
+    flex-direction:row; justify-content:flex-start; text-align:start;
+    min-height:59px; gap:7px; padding:8px; border-radius:12px;
+  }
+  .luna-hero-feature__icon { width:32px; height:32px; border-radius:9px; }
+  .luna-hero-feature__icon svg, .luna-hero-feature__icon i { width:19px; height:19px; }
+  .luna-hero-feature__label { font-size:clamp(.70rem,2.8vw,.82rem); text-wrap:wrap; }
   .luna-landing .luna-hero__actions { display:grid; grid-template-columns:1fr; gap:9px; }
   .luna-landing .luna-hero__actions a { min-height:49px; font-size:.92rem; border-radius:12px; padding:11px; }
 }
@@ -196,9 +232,10 @@ body.beautyos-main-bg .public-site.luna-landing {
   .luna-landing .luna-hero__actions a { transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
 }
 @media (prefers-reduced-motion:no-preference) and (hover:hover) and (pointer:fine) {
+  .luna-hero-feature:hover .luna-hero-feature__icon { transform:translateY(-2px); }
   .luna-landing .luna-hero__actions a:hover { transform:translateY(-2px); box-shadow:0 5px 16px rgba(81,68,63,.1); }
 }
 @media (prefers-reduced-motion:reduce) {
   .luna-hero__photo, .luna-hero__copy *, .luna-hero__actions a { animation:none!important; transition:none!important; }
-  .luna-hero__features li:hover { transform:none; }
+  .luna-hero-feature:hover .luna-hero-feature__icon { transform:none; }
 }
