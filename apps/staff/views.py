@@ -109,6 +109,8 @@ def _staff_detail_context(
     edit_modal_open: bool = False,
     time_off_form=None,
     timeoff_modal_open: bool = False,
+    booking_form=None,
+    book_modal_open: bool = False,
 ):
     hours = profile.work_hours.order_by("weekday")
     week_start = week_start_saturday(timezone.localdate())
@@ -116,7 +118,10 @@ def _staff_detail_context(
     time_off = profile.time_off.filter(end_date__gte=timezone.localdate()).order_by("start_date")
     upcoming = (
         Appointment.scoped(request.salon)
-        .filter(staff=profile, start_at__gte=timezone.now())
+        .filter(
+            staff=profile, start_at__gte=timezone.now(),
+            status__in=[Appointment.Status.PENDING, Appointment.Status.CONFIRMED, Appointment.Status.CHECKED_IN],
+        )
         .select_related("customer", "service")
         .order_by("start_at")[:10]
     )
@@ -125,7 +130,8 @@ def _staff_detail_context(
     if time_off_form is None:
         time_off_form = StaffTimeOffForm()
     membership = getattr(request, "membership", None)
-    return {
+    can_book = has_permission(membership, P_APPOINTMENT_CREATE)
+    ctx = {
         "profile": profile,
         "hours": hours,
         "hours_week": hours_week,
@@ -135,8 +141,24 @@ def _staff_detail_context(
         "edit_modal_open": edit_modal_open,
         "time_off_form": time_off_form,
         "timeoff_modal_open": timeoff_modal_open,
-        "can_book_appointment": has_permission(membership, P_APPOINTMENT_CREATE),
+        "can_book_appointment": can_book and profile.is_active and profile.is_bookable,
+        "booking_unavailable": can_book and not (profile.is_active and profile.is_bookable),
+        "book_modal_open": False,
+        "staff_detail_url": reverse("staff:detail", kwargs={"pk": profile.pk}),
     }
+    # Always render the dialog for eligible specialists, including ordinary GET
+    # and failed profile/time-off edits. The profile, never ?staff=, owns the lock.
+    if ctx["can_book_appointment"] or (can_book and booking_form is not None):
+        if booking_form is None:
+            initial = parse_appointment_initial_from_request(request)
+            initial["staff"] = profile.pk
+            booking_form = appointment_booking_form(request, initial=initial, locked_staff=profile)
+        extra = appointment_booking_context(request, form=booking_form, book_modal_open=book_modal_open)
+        extra.pop("form", None)  # Keep the separate StaffProfileForm for editing.
+        extra["booking_return_path"] = ctx["staff_detail_url"]
+        extra["can_book_appointment"] = True
+        ctx.update(extra)
+    return ctx
 
 
 @salon_required
@@ -147,28 +169,15 @@ def staff_detail(request, pk):
         pk=pk,
         is_deleted=False,
     )
-    edit_modal_open = request.GET.get("edit") == "1"
-    timeoff_modal_open = request.GET.get("timeoff") == "1"
     book_modal_open = request.GET.get("book") == "1"
+    edit_modal_open = not book_modal_open and request.GET.get("edit") == "1"
+    timeoff_modal_open = not book_modal_open and not edit_modal_open and request.GET.get("timeoff") == "1"
     ctx = _staff_detail_context(
-        request,
-        profile,
+        request, profile,
         edit_modal_open=edit_modal_open,
         timeoff_modal_open=timeoff_modal_open,
+        book_modal_open=book_modal_open,
     )
-    booking_form = getattr(request, "booking_form_override", None)
-    if book_modal_open or booking_form is not None:
-        if booking_form is None:
-            initial = parse_appointment_initial_from_request(request)
-            initial.setdefault("staff", profile.pk)
-            booking_form = appointment_booking_form(request, initial=initial)
-        ctx.update(
-            appointment_booking_context(
-                request,
-                form=booking_form,
-                book_modal_open=True,
-            )
-        )
     return render(request, "staff/detail.html", ctx)
 
 

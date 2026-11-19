@@ -44,7 +44,11 @@ def resolve_customer_picker_context(*, form, membership, salon) -> dict:
 
     selected_display = None
     if customer_pk:
-        inst = Customer.scoped(salon).filter(pk=customer_pk, is_deleted=False).first()
+        try:
+            pk = int(customer_pk)
+        except (TypeError, ValueError):
+            pk = 0
+        inst = Customer.scoped(salon).filter(pk=pk, is_deleted=False).first() if 0 < pk <= 2**63 - 1 else None
         if inst:
             selected_display = {
                 "full_name": inst.full_name,

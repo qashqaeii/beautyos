@@ -3,10 +3,12 @@ from __future__ import annotations
 from datetime import datetime, time, timedelta
 from urllib.parse import parse_qs, urlparse
 
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import resolve, reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from apps.appointments.forms import AppointmentForm
 from apps.appointments.models import Appointment
@@ -49,7 +51,9 @@ def safe_booking_return_path(path: str | None) -> str | None:
     if not path or not isinstance(path, str):
         return None
     path = path.strip()
-    if not path.startswith("/") or "://" in path or "\n" in path:
+    if not path.startswith("/") or path.startswith("//") or "\\" in path or "://" in path or any(ord(c) < 32 or ord(c) == 127 for c in path):
+        return None
+    if not url_has_allowed_host_and_scheme(path, allowed_hosts=set()):
         return None
     if len(path) > 512:
         return None
@@ -117,19 +121,23 @@ def appointment_booking_form(
     *,
     data=None,
     initial: dict | None = None,
+    locked_staff: StaffProfile | None = None,
 ) -> AppointmentForm:
     membership = request.membership
-    locked_staff = resolve_booking_locked_staff(request, request.salon)
+    locked_staff = locked_staff or resolve_booking_locked_staff(request, request.salon)
     if data is not None:
-        return AppointmentForm(
+        form = AppointmentForm(
             data,
             salon=request.salon,
             membership=membership,
             locked_staff=locked_staff,
         )
+        if data.get("booking_staff_locked") and locked_staff is None:
+            form.add_error(None, "متخصص انتخاب‌شده دیگر قابل رزرو نیست. متخصص دیگری را انتخاب کنید.")
+        return form
     if initial is None:
         initial = parse_appointment_initial_from_request(request)
-    if locked_staff and "staff" not in initial:
+    if locked_staff:
         initial["staff"] = locked_staff.pk
     return AppointmentForm(
         salon=request.salon,
@@ -162,6 +170,8 @@ def appointment_booking_context(
     params.pop("book", None)
     qs = params.urlencode()
     booking_return_path = request.path + (f"?{qs}" if qs else "")
+    if form.is_bound:
+        booking_return_path = safe_booking_return_path(form.data.get("booking_return_path")) or booking_return_path
 
     locked_staff = getattr(form, "locked_staff", None) or resolve_booking_locked_staff(request, request.salon)
 
@@ -170,6 +180,7 @@ def appointment_booking_context(
         "form": form,
         "book_modal_open": book_modal_open,
         "booking_staff_locked": locked_staff,
+        "booking_staff_has_no_services": bool(locked_staff and not form.fields["service"].queryset.exists()),
         "booking_advanced_open": booking_advanced_open(form),
         "booking_return_path": booking_return_path,
         "customer_search_url": reverse("customers:search"),
@@ -276,9 +287,14 @@ def render_booking_host(request, return_path: str, form: AppointmentForm):
         profile = StaffProfile.scoped(request.salon).filter(pk=pk, is_deleted=False).first()
         if not profile:
             raise Http404
-        request.booking_form_override = form
-        ctx = staff_views._staff_detail_context(request, profile)
-        ctx.update(appointment_booking_context(request, form=form, book_modal_open=True))
+        if not has_permission(request.membership, P_STAFF_MANAGE):
+            raise PermissionDenied
+        if getattr(form, "locked_staff", None) is None or form.locked_staff.pk != profile.pk:
+            ctx = appointment_booking_context(request, form=form, book_modal_open=True)
+            return render(request, "appointments/form.html", ctx)
+        ctx = staff_views._staff_detail_context(
+            request, profile, booking_form=form, book_modal_open=True,
+        )
         return render(request, "staff/detail.html", ctx)
 
     if namespace == "customers" and url_name == "detail":

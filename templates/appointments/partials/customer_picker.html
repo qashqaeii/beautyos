@@ -42,6 +42,7 @@
     <p class="appt-customer-picker__selected-phone tabular-nums sr-only" dir="ltr" x-text="selectedPhone"></p>
     <button type="button" class="appt-customer-picker__change" @click="changeCustomer()">تغییر مشتری</button>
   </div>
+  {% if form.customer.errors %}<p class="customer-form-field__error" role="alert">{{ form.customer.errors.0 }}</p>{% endif %}
   {% if form.customer_search.errors %}
   <p class="text-xs text-coral">{{ form.customer_search.errors.0 }}</p>
   {% endif %}

@@ -193,6 +193,7 @@ def _beautyos_asset_version() -> str:
         "static/js/jalali-datepicker.js",
         "static/js/fa-money.js",
         "static/js/appointment-customer-picker.js",
+        "static/js/appointment-deposit-preview.js",
         "static/js/time24-input.js",
     ):
         path = BASE_DIR / rel

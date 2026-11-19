@@ -16,7 +16,7 @@
   <input type="hidden" name="from_customer_detail" value="{{ from_customer_detail }}" />
   {% endif %}
   {% if appointment_form.non_field_errors %}
-  <p class="customer-form-field__error inventory-create-modal__form-error">{{ appointment_form.non_field_errors.0 }}</p>
+  <p class="customer-form-field__error inventory-create-modal__form-error" role="alert">{{ appointment_form.non_field_errors.0 }}</p>
   {% endif %}
 
   <div class="inventory-create-modal__scroll maison-scroll-themed">
@@ -37,6 +37,8 @@
 
     <section class="appt-booking-section appt-booking-section--modal">
       <h2 class="appt-booking-section__title">{% if booking_staff_locked %}خدمت{% else %}خدمت و متخصص{% endif %}</h2>
+      {% if booking_staff_locked %}<p class="text-xs text-ink-secondary mb-2">متخصص: {{ booking_staff_locked.full_display_name }}</p>{% endif %}
+      {% if booking_staff_has_no_services %}<p class="luna-modal-errors" role="alert">برای این متخصص هیچ خدمت فعالی تعریف نشده است. ابتدا خدمات را در پروفایل متخصص تنظیم کنید.</p>{% endif %}
       <div class="appt-booking-fields{% if booking_staff_locked %} appt-booking-fields--staff-locked{% endif %}">
         <div class="customer-form-field{% if booking_staff_locked %} customer-form-field--full{% endif %}">
           <label class="field-label" for="{{ appointment_form.service.id_for_label }}">{{ appointment_form.service.label }}</label>
@@ -51,6 +53,7 @@
         </div>
         {% else %}
         {{ appointment_form.staff }}
+        {% if appointment_form.staff.errors %}<p class="customer-form-field__error" role="alert">{{ appointment_form.staff.errors.0 }}</p>{% endif %}
         {% endif %}
       </div>
     </section>
@@ -116,7 +119,7 @@
   </div>
 
   <footer class="inventory-create-modal__foot">
-    <button type="submit" class="btn-primary customer-form__submit-modal">ثبت نوبت</button>
+    <button type="submit" class="btn-primary customer-form__submit-modal"{% if booking_staff_has_no_services %} disabled{% endif %}>ثبت نوبت</button>
     <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-modal')">انصراف</button>
   </footer>
 </form>

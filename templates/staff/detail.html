@@ -25,7 +25,11 @@
       this.timeoffOpen = false;
       this.bookOpen = false;
       const params = new URLSearchParams(window.location.search);
-      ['edit', 'timeoff', 'book'].forEach((key) => params.delete(key));
+      ['edit', 'timeoff', 'book', 'staff', 'service', 'start', 'customer'].forEach((key) => params.delete(key));
+      if (window.location.pathname !== '{{ staff_detail_url|escapejs }}') {
+        window.location.replace('{{ staff_detail_url|escapejs }}');
+        return;
+      }
       const qs = params.toString();
       window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
     }
@@ -58,7 +62,7 @@
       </div>
     </div>
     <div class="staff-profile-header__actions">
-      <button type="button" class="staff-profile-header__btn staff-profile-header__btn--primary" @click="editOpen = true">
+      <button type="button" class="staff-profile-header__btn staff-profile-header__btn--primary" @click="bookOpen = false; timeoffOpen = false; editOpen = true">
         <i data-lucide="pencil" class="staff-profile-header__icon" aria-hidden="true"></i>
         <span>ویرایش</span>
       </button>
@@ -69,20 +73,22 @@
       <button
         type="button"
         class="staff-profile-header__btn staff-profile-header__btn--ghost"
-        @click="timeoffOpen = true; $nextTick(() => { if (window.lucide) window.lucide.createIcons(); window.dispatchEvent(new CustomEvent('beautyos-modal-opened')); })"
+        @click="bookOpen = false; editOpen = false; timeoffOpen = true; $nextTick(() => { if (window.lucide) window.lucide.createIcons(); window.dispatchEvent(new CustomEvent('beautyos-modal-opened')); })"
       >
         <i data-lucide="calendar-off" class="staff-profile-header__icon" aria-hidden="true"></i>
         <span>مرخصی</span>
       </button>
       {% if can_book_appointment %}
-      <button
-        type="button"
+      <a
+        href="{{ staff_detail_url }}?book=1&amp;staff={{ profile.pk }}"
         class="staff-profile-header__btn staff-profile-header__btn--primary"
-        @click="bookOpen = true; $nextTick(() => { if (window.lucide) window.lucide.createIcons(); window.dispatchEvent(new CustomEvent('beautyos-modal-opened')); }); const p = new URLSearchParams(window.location.search); p.set('book', '1'); p.set('staff', '{{ profile.pk }}'); window.history.replaceState({}, '', window.location.pathname + '?' + p.toString());"
+        @click.prevent="editOpen = false; timeoffOpen = false; bookOpen = true; $nextTick(() => { window.dispatchEvent(new CustomEvent('beautyos-modal-opened')); }); window.history.replaceState({}, '', $el.href);"
       >
         <i data-lucide="calendar-plus" class="staff-profile-header__icon" aria-hidden="true"></i>
         <span>ثبت نوبت</span>
-      </button>
+      </a>
+      {% elif booking_unavailable %}
+      <span class="text-xs text-ink-secondary">این متخصص در حال حاضر قابل رزرو نیست.</span>
       {% endif %}
     </div>
   </header>
@@ -147,6 +153,7 @@
     if (form && window.initTime24Fields) window.initTime24Fields(form);
     if (window.lucide) window.lucide.createIcons();
   }
+  document.addEventListener("DOMContentLoaded", initStaffProfileModals);
   document.addEventListener("alpine:initialized", initStaffProfileModals);
   window.addEventListener("beautyos-modal-opened", initStaffProfileModals);
 </script>
