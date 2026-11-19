@@ -1,4 +1,5 @@
 from datetime import timedelta
+from ipaddress import ip_address
 
 from django.conf import settings
 from django.contrib.auth import login, logout
@@ -9,7 +10,7 @@ from django.views import View
 
 from apps.accounts.forms import OTPVerifyForm, PhoneForm, RegisterProfileForm
 from apps.accounts.models import OTPChallenge, User
-from apps.accounts.services.otp import OTPInvalid, OTPRateLimited, issue_otp, verify_otp
+from apps.accounts.services.otp import OTPDeliveryError, OTPInvalid, OTPRateLimited, issue_otp, verify_otp
 from apps.accounts.services.register_verification import (
     RegisterAccountExistsError,
     RegisterVerificationError,
@@ -25,7 +26,8 @@ OTP_RESEND_COOLDOWN_SECONDS = 60
 
 
 def _store_dev_otp(request, issued):
-    if issued.dev_code:
+    request.session.pop("dev_otp_code", None)
+    if settings.DEBUG and issued.dev_code:
         request.session["dev_otp_code"] = issued.dev_code
     request.session["otp_issued_at"] = issued.challenge.created_at.isoformat()
 
@@ -57,7 +59,7 @@ def _verify_context(request, *, phone, otp_form, purpose, next_step=""):
         "otp_form": otp_form,
         "purpose": purpose,
         "next_step": next_step,
-        "dev_otp_code": request.session.get("dev_otp_code") if request.session.get("auth_phone") == phone else None,
+        "dev_otp_code": request.session.get("dev_otp_code") if settings.DEBUG and request.session.get("auth_phone") == phone else None,
         "otp_resend_at_iso": resend_at.isoformat() if resend_at else "",
         "otp_expires_at_iso": expires_at.isoformat() if expires_at else "",
         "can_resend_now": resend_at is None or now >= resend_at,
@@ -65,10 +67,11 @@ def _verify_context(request, *, phone, otp_form, purpose, next_step=""):
 
 
 def _client_ip(request):
-    forwarded = request.META.get("HTTP_X_FORWARDED_FOR")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
+    # Do not trust an arbitrary client-supplied X-Forwarded-For header.
+    try:
+        return str(ip_address(request.META.get("REMOTE_ADDR", "")))
+    except ValueError:
+        return None
 
 
 def _clear_pending_auth_session(request):
@@ -112,8 +115,8 @@ class LoginView(View):
                     request_ip=_client_ip(request),
                     user_agent=request.META.get("HTTP_USER_AGENT", ""),
                 )
-            except OTPRateLimited:
-                form.add_error(None, "تعداد درخواست‌ها بیش از حد مجاز است.")
+            except (OTPRateLimited, OTPInvalid, OTPDeliveryError) as exc:
+                form.add_error(None, str(exc))
                 return render(request, self.template_name, {"phone_form": form})
             _begin_auth_session(
                 request,
@@ -148,8 +151,8 @@ class RegisterView(View):
                 request_ip=_client_ip(request),
                 user_agent=request.META.get("HTTP_USER_AGENT", ""),
             )
-        except OTPRateLimited:
-            form.add_error(None, "تعداد درخواست‌ها بیش از حد مجاز است.")
+        except (OTPRateLimited, OTPInvalid, OTPDeliveryError) as exc:
+            form.add_error(None, str(exc))
             return render(request, self.template_name, {"phone_form": form})
         _begin_auth_session(
             request,
@@ -208,7 +211,7 @@ class VerifyOTPView(View):
                     request_ip=_client_ip(request),
                     user_agent=request.META.get("HTTP_USER_AGENT", ""),
                 )
-            except OTPRateLimited:
+            except (OTPRateLimited, OTPInvalid, OTPDeliveryError) as exc:
                 ctx = _verify_context(
                     request,
                     phone=phone,
@@ -217,7 +220,7 @@ class VerifyOTPView(View):
                     next_step=request.session.get("auth_next_step", ""),
                 )
                 ctx["change_number_url"] = self._change_number_url(purpose)
-                ctx["resend_error"] = "تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید."
+                ctx["resend_error"] = str(exc)
                 return render(request, "accounts/verify_otp.html", ctx)
             _store_dev_otp(request, issued)
             ctx = _verify_context(
@@ -258,6 +261,9 @@ class VerifyOTPView(View):
         user = User.objects.filter(phone=phone).first()
         if user is None:
             return redirect("accounts:register")
+        if not user.is_active:
+            _clear_pending_auth_session(request)
+            return redirect("accounts:login")
 
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
         _clear_pending_auth_session(request)

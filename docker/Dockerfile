@@ -11,6 +11,6 @@ COPY requirements/ /app/requirements/
 RUN pip install --no-cache-dir -r requirements/base.txt gunicorn
 
 COPY . /app/
-RUN python manage.py collectstatic --noinput || true
+RUN DJANGO_SETTINGS_MODULE=config.settings.local python manage.py collectstatic --noinput
 
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]

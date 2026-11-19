@@ -15,6 +15,8 @@ class DevSMSProvider(SMSProvider):
     """Development provider — logs OTP instead of sending SMS."""
 
     def send_otp(self, phone: str, code: str, purpose: str) -> None:
+        if not settings.DEBUG:
+            raise RuntimeError("DevSMSProvider is disabled outside development.")
         logger.info(
             "[BeautyOS DevSMS] purpose=%s phone=%s code=%s",
             purpose,

@@ -1,11 +1,13 @@
 import hashlib
 import hmac
+import logging
+from ipaddress import ip_address
 import secrets
 from dataclasses import dataclass
 from datetime import timedelta
 
 from django.conf import settings
-from django.db import transaction
+from django.db import connection, transaction
 from django.db.models import F
 from django.utils import timezone
 
@@ -32,6 +34,17 @@ class OTPInvalid(Exception):
     pass
 
 
+class OTPDeliveryError(Exception):
+    pass
+
+
+def _lock_rate_key(key):
+    if connection.vendor == "postgresql":
+        digest = hashlib.sha256(key.encode()).digest()[:8]
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT pg_advisory_xact_lock(%s)", [int.from_bytes(digest, "big", signed=True)])
+
+
 @dataclass
 class IssuedOTP:
     challenge: "OTPChallenge"
@@ -41,12 +54,26 @@ class IssuedOTP:
 @transaction.atomic
 def issue_otp(*, phone: str, purpose: str, request_ip=None, user_agent: str = "") -> IssuedOTP:
     phone = normalize_iran_mobile(phone)
+    try:
+        request_ip = str(ip_address(request_ip)) if request_ip else None
+    except ValueError:
+        request_ip = None
+    # Serialize even the first request, when there is no OTP row to lock.
+    keys = ["otp:phone:" + phone]
+    if request_ip:
+        keys.append("otp:ip:" + request_ip)
+    for key in sorted(keys):
+        _lock_rate_key(key)
     window_start = timezone.now() - timedelta(minutes=10)
+    all_recent = OTPChallenge.objects.filter(created_at__gte=window_start)
+    if all_recent.filter(phone=phone).count() >= 12 or (
+        request_ip and all_recent.filter(request_ip=request_ip).count() >= 30
+    ):
+        raise OTPRateLimited("تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید.")
     recent = OTPChallenge.objects.filter(
         phone=phone,
         purpose=purpose,
         created_at__gte=window_start,
-        consumed_at__isnull=True,
     ).count()
     if recent >= 5:
         raise OTPRateLimited("تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید.")
@@ -77,8 +104,12 @@ def issue_otp(*, phone: str, purpose: str, request_ip=None, user_agent: str = ""
         user_agent=(user_agent or "")[:255],
         attempts=carried_attempts,
     )
-    provider = get_sms_provider()
-    provider.send_otp(phone, code, purpose)
+    try:
+        provider = get_sms_provider()
+        provider.send_otp(phone, code, purpose)
+    except Exception:
+        logging.getLogger(__name__).warning("OTP delivery failed")
+        raise OTPDeliveryError("ارسال پیامک انجام نشد. لطفاً دوباره تلاش کنید.") from None
     dev_code = code if settings.DEBUG else None
     return IssuedOTP(challenge=challenge, dev_code=dev_code)
 
