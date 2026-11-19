@@ -45,7 +45,7 @@ def refresh_customer_stats(customer: Customer):
     customer.last_visit_at = last
     paid = (
         Payment.scoped(customer.salon)
-        .filter(customer=customer, status=Payment.Status.PAID)
+        .filter(customer=customer, status__in=[Payment.Status.PAID, Payment.Status.PARTIAL], paid_amount_toman__gt=0)
         .aggregate(total=Sum("paid_amount_toman"))
     )
     customer.total_spent_toman = paid["total"] or 0

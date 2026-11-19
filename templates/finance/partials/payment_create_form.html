@@ -41,6 +41,7 @@
         <div class="finance-payment-form__field">
           <label class="field-label" for="{{ payment_form.total_amount_toman.id_for_label }}">{{ payment_form.total_amount_toman.label }}</label>
           {{ payment_form.total_amount_toman }}
+          <p class="text-xs text-ink-secondary">برای نوبت دارای بیعانه، مانده فعلی را وارد کنید؛ نه قیمت اولیه خدمت.</p>
           {% if payment_form.total_amount_toman.errors %}<p class="finance-payment-form__error">{{ payment_form.total_amount_toman.errors.0 }}</p>{% endif %}
         </div>
         <div class="finance-payment-form__field">

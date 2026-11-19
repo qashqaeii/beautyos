@@ -18,6 +18,7 @@ from apps.finance.services import (
     open_debts_summary,
     parse_finance_range,
     record_salon_debt_payment,
+    record_customer_payment,
 )
 from apps.salons.decorators import salon_required
 from apps.salons.models import SalonMembership
@@ -274,14 +275,13 @@ def payment_create(request):
 
     form = PaymentForm(request.POST, salon=request.salon)
     if form.is_valid():
-        payment = form.save(commit=False)
-        payment.salon = request.salon
-        payment.save()
-        from apps.customers.services import refresh_customer_stats
-
-        refresh_customer_stats(payment.customer)
-        messages.success(request, "پرداخت ثبت شد.")
-        return redirect(next_url)
+        try:
+            record_customer_payment(salon=request.salon, form=form, actor=request.user)
+        except ValidationError as exc:
+            form.add_error(None, exc)
+        else:
+            messages.success(request, "پرداخت ثبت شد.")
+            return redirect(next_url)
 
     parts = urlparse(next_url)
     if can_view_finance and _is_finance_overview_path(parts.path):

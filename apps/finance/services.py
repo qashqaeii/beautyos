@@ -308,6 +308,37 @@ def audit_debt_payment_consistency(*, salon=None) -> list[dict]:
     return issues
 
 
+@transaction.atomic
+def record_customer_payment(*, salon, form, actor):
+    """Serialize linked receipts and validate against the current appointment balance."""
+    from apps.appointments.models import Appointment
+    from apps.audit.models import AuditLog
+    from apps.customers.services import refresh_customer_stats
+    from apps.dashboard.role_services import appointment_payment_summary
+
+    payment = form.save(commit=False)
+    payment.salon = salon
+    if payment.customer.salon_id != salon.pk:
+        raise ValidationError("مشتری متعلق به این سالن نیست.")
+    if payment.appointment_id:
+        appointment = Appointment.scoped(salon).select_for_update().filter(pk=payment.appointment_id).first()
+        if appointment is None or appointment.customer_id != payment.customer_id:
+            raise ValidationError("نوبت معتبر نیست.")
+        if appointment.status in (Appointment.Status.CANCELLED, Appointment.Status.NO_SHOW):
+            raise ValidationError("ثبت پرداخت برای نوبت لغوشده یا عدم حضور مجاز نیست.")
+        balance = appointment_payment_summary(appointment)["owed_toman"]
+        if balance == 0:
+            raise ValidationError("این نوبت قبلاً تسویه شده است.")
+        if payment.total_amount_toman != balance:
+            raise ValidationError(f"مبلغ قابل پرداخت پیش از تخفیف باید برابر مانده نوبت باشد: {balance:,} تومان.")
+    payment.save()
+    refresh_customer_stats(payment.customer)
+    AuditLog.objects.create(salon=salon, actor=actor, action=AuditLog.Action.CREATE,
+        entity_type="payment", entity_id=str(payment.pk),
+        message="ثبت پرداخت مشتری", metadata={"paid_amount_toman": payment.paid_amount_toman, "status": payment.status})
+    return payment
+
+
 def create_appointment_deposit(
     *,
     salon,
@@ -322,6 +353,8 @@ def create_appointment_deposit(
     from apps.customers.services import refresh_customer_stats
 
     total = appointment.price_toman
+    if amount_toman > total or appointment.salon_id != salon.pk or appointment.customer_id != customer.pk:
+        raise ValidationError("مبلغ یا اطلاعات بیعانه معتبر نیست.")
     status = Payment.Status.PAID if amount_toman >= total else Payment.Status.PARTIAL
     payment = Payment.objects.create(
         salon=salon,

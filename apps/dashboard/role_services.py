@@ -44,23 +44,24 @@ def day_bounds(day: date) -> tuple[datetime, datetime]:
 
 
 def appointment_payment_summary(appt: Appointment) -> dict:
-    payments = list(appt.payments.all())
+    payments = [
+        p for p in appt.payments.all()
+        if p.status != Payment.Status.REFUNDED and p.salon_id == appt.salon_id
+        and p.customer_id == appt.customer_id
+    ]
+    price = max(int(appt.price_toman), 0)
     if not payments:
-        owed = appt.price_toman
-        return {
-            "label": "بدون پرداخت",
-            "owed_toman": owed,
-            "paid_toman": 0,
-            "status_code": "none",
-        }
-    latest = max(payments, key=lambda p: p.created_at)
-    owed = sum(max(p.balance_toman, 0) for p in payments)
-    paid = sum(p.paid_amount_toman for p in payments)
+        return {"label": "بدون پرداخت", "owed_toman": price, "paid_toman": 0, "status_code": "none"}
+    # The appointment price is a single obligation, not the sum of installment invoices.
+    paid = sum(max(0, p.paid_amount_toman) for p in payments)
+    discount = sum(max(0, p.discount_toman) for p in payments)
+    owed = max(price - discount - paid, 0)
+    status = Payment.Status.PAID if owed == 0 else Payment.Status.PARTIAL if paid else Payment.Status.PENDING
     return {
-        "label": latest.get_status_display(),
+        "label": Payment.Status(status).label,
         "owed_toman": owed,
         "paid_toman": paid,
-        "status_code": latest.status,
+        "status_code": status,
     }
 
 

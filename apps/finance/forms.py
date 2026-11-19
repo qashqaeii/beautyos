@@ -31,6 +31,8 @@ class PaymentForm(PersianModelForm):
 
     def __init__(self, *args, salon=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["status"].choices = [(v, label) for v, label in Payment.Status.choices if v != Payment.Status.REFUNDED]
+        self.fields["total_amount_toman"].label = "مبلغ قابل پرداخت پیش از تخفیف"
         if salon:
             self.fields["customer"].queryset = Customer.scoped(salon).filter(is_deleted=False)
             from apps.appointments.models import Appointment
@@ -50,6 +52,17 @@ class PaymentForm(PersianModelForm):
             value = data.get(field)
             if value is not None and value < 0:
                 self.add_error(field, "مبلغ نمی‌تواند منفی باشد.")
+        total, discount, paid = (data.get(k) for k in ("total_amount_toman", "discount_toman", "paid_amount_toman"))
+        if None not in (total, discount, paid) and min(total, discount, paid) >= 0:
+            if discount > total:
+                self.add_error("discount_toman", "تخفیف نمی‌تواند از مبلغ کل بیشتر باشد.")
+            elif paid > total - discount:
+                self.add_error("paid_amount_toman", "پرداخت نمی‌تواند بیشتر از مبلغ پس از تخفیف باشد.")
+            else:
+                net = total - discount
+                expected = Payment.Status.PAID if paid == net else Payment.Status.PARTIAL if paid > 0 else Payment.Status.PENDING
+                if data.get("status") and data["status"] != expected:
+                    self.add_error("status", "وضعیت پرداخت با مبلغ دریافتی و مانده مطابقت ندارد.")
         return data
 
 

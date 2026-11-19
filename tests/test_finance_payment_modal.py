@@ -104,3 +104,13 @@ def test_payment_form_validates_appointment_picker_without_sliced_queryset(salon
     form = PaymentForm({**data, "customer": other.pk}, salon=salon)
     assert not form.is_valid()
     assert "appointment" in form.errors
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("discount,paid,status", [(110,0,"pending"),(0,110,"paid"),(0,50,"paid"),(0,0,"partial"),(0,100,"refunded")])
+def test_payment_rejects_inconsistent_amount_or_status(salon, discount, paid, status):
+    from apps.finance.forms import PaymentForm
+    customer = Customer.objects.create(salon=salon, full_name="مشتری", phone="+989121277733")
+    form = PaymentForm({"customer":customer.pk, "total_amount_toman":100,
+        "discount_toman":discount, "paid_amount_toman":paid,"method":"cash","status":status}, salon=salon)
+    assert not form.is_valid()
