@@ -3,12 +3,12 @@
 {% block auth_steps %}
 <ol class="public-auth-steps" aria-label="مراحل">
   {% if purpose == "register" %}
-  <li class="is-done">۱. تأیید موبایل</li>
-  <li class="is-current" aria-current="step">۲. کد پیامکی</li>
-  <li>۳. اطلاعات مالک</li>
+  <li class="is-done"><i data-lucide="check" aria-hidden="true"></i><span>۱. تأیید موبایل</span></li>
+  <li class="is-current" aria-current="step"><i data-lucide="message-square" aria-hidden="true"></i><span>۲. کد پیامکی</span></li>
+  <li><i data-lucide="user-round" aria-hidden="true"></i><span>۳. اطلاعات مالک</span></li>
   {% else %}
-  <li class="is-done">۱. شماره موبایل</li>
-  <li class="is-current" aria-current="step">۲. کد تأیید</li>
+  <li class="is-done"><i data-lucide="check" aria-hidden="true"></i><span>۱. شماره موبایل</span></li>
+  <li class="is-current" aria-current="step"><i data-lucide="message-square" aria-hidden="true"></i><span>۲. کد تأیید</span></li>
   {% endif %}
 </ol>
 {% endblock %}

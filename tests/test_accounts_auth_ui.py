@@ -21,6 +21,12 @@ def test_register_page_uses_public_auth_shell(client):
     assert "public-auth-shell" in html
     assert "ثبت‌نام سالن جدید" in html
     assert "input-field--tel" in html
+    assert "css/luna-auth.css" in html
+    assert "images/photos/beautyos-register-hero.webp" in html
+    assert "luna-auth-showcase" in html
+    assert html.count('aria-current="step"') == 1
+    assert 'name="csrfmiddlewaretoken"' in html
+    assert 'name="phone"' in html
 
 
 @pytest.mark.django_db
@@ -64,3 +70,9 @@ def test_register_profile_page_shell(client, settings, monkeypatch):
     assert response.status_code == 200
     assert "public-auth-shell" in html
     assert "اطلاعات مالک سالن" in html
+
+def test_auth_editorial_assets_exist():
+    from django.contrib.staticfiles import finders
+
+    assert finders.find("css/luna-auth.css")
+    assert finders.find("images/photos/beautyos-register-hero.webp")
