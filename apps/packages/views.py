@@ -36,5 +36,7 @@ def sell(request):
     if request.method == "POST" and form.is_valid():
         form.save(request.salon)
         messages.success(request, "پکیج برای مشتری ثبت شد.")
+        if request.membership.role == SalonMembership.Role.RECEPTIONIST:
+            return redirect("packages:sell")
         return redirect("packages:list")
     return render(request, "packages/sell.html", {"form": form})

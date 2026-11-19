@@ -21,9 +21,13 @@ class ServicePackageForm(PersianModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["session_count"].min_value = 1
+        self.fields["validity_days"].min_value = 1
+        self.fields["validity_days"].max_value = 36500
         self.fields["price_toman"] = TomanAmountField(
             label="قیمت",
             min_value=1,
+            max_value=2**63 - 1,
             error_messages={
                 "required": "قیمت پکیج را وارد کنید.",
                 "min_value": "قیمت باید حداقل ۱ تومان باشد.",
