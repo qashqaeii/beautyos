@@ -29,7 +29,7 @@ def can_see_overview(membership: SalonMembership | None) -> bool:
 
 
 def can_see_management(membership: SalonMembership | None) -> bool:
-    if not membership:
+    if not membership or not membership.is_active:
         return False
     if membership.role_rank >= SalonMembership.role_rank_for(SalonMembership.Role.MANAGER):
         return True

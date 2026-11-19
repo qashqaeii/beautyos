@@ -14,7 +14,7 @@
   {% include "partials/management_hero_header.html" %}
   <nav class="dashboard-mgmt-grid" aria-label="بخش‌های مدیریتی">
     {% for link in links %}
-    <a href="{{ link.url }}" class="dashboard-mgmt-card dashboard-enter" style="--management-card-index:{{ forloop.counter0 }}">
+    <a href="{{ link.url }}" class="dashboard-mgmt-card" style="--management-card-index:{{ forloop.counter0 }}">
       <span class="dashboard-mgmt-card__icon" aria-hidden="true"><i data-lucide="{{ link.icon }}" class="beautyos-lucide beautyos-lucide--sm"></i></span>
       <span class="editorial-management-copy">
         <span class="dashboard-mgmt-card__title">{{ link.title }}</span>
@@ -22,6 +22,8 @@
       </span>
       <i data-lucide="chevron-left" class="editorial-management-arrow" aria-hidden="true"></i>
     </a>
+    {% empty %}
+    <p class="management-empty">در حال حاضر بخش مدیریتی قابل دسترسی برای شما وجود ندارد.</p>
     {% endfor %}
   </nav>
 </div>

@@ -182,8 +182,40 @@ def test_management_editorial_design_preserves_links(client, salon, owner_member
     assert "luna-management-shell" in html
     assert "luna-management.css" in html
     assert "beautyos-management-floral.webp" in html
-    assert html.count('class="dashboard-mgmt-card dashboard-enter"') == len(response.context["links"]) == 11
+    assert html.count('class="dashboard-mgmt-card"') == len(response.context["links"]) == 11
     for link in response.context["links"]:
         assert f'href="{link["url"]}"' in html
     assert finders.find("css/luna-management.css")
     assert finders.find("images/photos/beautyos-management-floral.webp")
+
+
+@pytest.mark.django_db
+def test_management_receptionist_cards_match_destination_permissions(client, salon):
+    from django.urls import reverse
+
+    receptionist = User.objects.create_user(phone="+989121234591", full_name="منشی")
+    membership = SalonMembership.objects.create(
+        user=receptionist, salon=salon, role=SalonMembership.Role.RECEPTIONIST,
+        is_active=True, can_manage_staff=True,
+    )
+    client.force_login(receptionist)
+    response = client.get(reverse("dashboard:management"))
+    assert response.status_code == 200
+    urls = {link["url"] for link in response.context["links"]}
+    assert urls == {reverse("staff:list"), reverse("customers:list")}
+    for url in urls:
+        assert client.get(url).status_code == 200
+    for name in ("services:list", "portfolio:list", "finance:overview"):
+        assert reverse(name) not in urls
+        assert client.get(reverse(name)).status_code == 403
+    membership.can_manage_staff = False
+    membership.save(update_fields=["can_manage_staff"])
+    assert client.get(reverse("dashboard:management")).status_code == 403
+
+
+@pytest.mark.django_db
+def test_management_inactive_membership_cannot_see_navigation(owner_membership):
+    from apps.dashboard.nav import can_see_management
+
+    owner_membership.is_active = False
+    assert not can_see_management(owner_membership)

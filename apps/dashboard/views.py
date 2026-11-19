@@ -17,6 +17,7 @@ from apps.dashboard.nav import (
 from apps.dashboard.role_services import day_bounds, get_overview_context, parse_dashboard_day
 from apps.salons.decorators import salon_required
 from apps.salons.models import SalonMembership
+from apps.salons.permissions import role_at_least
 from apps.salons.permissions_policy import P_STAFF_MANAGE, has_permission
 from apps.staff.models import StaffProfile, StaffWorkHours
 
@@ -99,7 +100,9 @@ def management(request):
         links.append({"title": "کارکنان و متخصص‌ها", "url": reverse("staff:list"), "icon": "user-round"})
     if has_permission(membership, P_CUSTOMER_VIEW):
         links.append({"title": "مشتریان", "url": reverse("customers:list"), "icon": "users"})
-    links.append({"title": "خدمات", "url": reverse("services:list"), "icon": "scissors"})
+    can_manage_catalog = role_at_least(membership, SalonMembership.Role.MANAGER)
+    if can_manage_catalog:
+        links.append({"title": "خدمات", "url": reverse("services:list"), "icon": "scissors"})
     if has_permission(membership, P_FINANCE_REPORTS):
         links.append({"title": "درآمد و پرداخت‌ها", "url": reverse("finance:overview"), "icon": "wallet"})
     if has_permission(membership, P_EXPENSE_MANAGE):
@@ -114,7 +117,8 @@ def management(request):
         links.append({"title": "اعضا و دعوت", "url": reverse("salons_members:home"), "icon": "user-plus"})
     if has_permission(membership, P_SALON_SETTINGS):
         links.append({"title": "اطلاعات سالن", "url": reverse("salons_settings:home"), "icon": "building-2"})
-    links.append({"title": "نمونه‌کارها", "url": reverse("portfolio:list"), "icon": "images"})
+    if can_manage_catalog:
+        links.append({"title": "نمونه‌کارها", "url": reverse("portfolio:list"), "icon": "images"})
     descriptions = {
         "user-round": "پروفایل، ساعات کاری و دسترسی تیم",
         "users": "پرونده، سوابق و ارتباط با مشتریان",
