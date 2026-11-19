@@ -86,6 +86,7 @@ class SalonSwitchView(View):
         if membership is None:
             raise PermissionDenied
         request.session["active_salon_id"] = str(salon_id)
+        request.session["explicit_salon_id"] = str(salon_id)
         request.session.pop("onboarding_salon_id", None)
         request.session.pop("booking", None)
         next_url = request.POST.get("next", "")

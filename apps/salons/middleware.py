@@ -39,6 +39,7 @@ def prefer_sole_owner_membership(request, membership: SalonMembership | None):
 
 def sync_login_active_salon(request, user) -> None:
     """After OTP login, pin session to the user's salon when unambiguous."""
+    request.session.pop("explicit_salon_id", None)
     owner = _owner_memberships_qs(user).order_by("-created_at").first()
     if owner:
         request.session["active_salon_id"] = str(owner.salon_id)
@@ -81,8 +82,12 @@ def resolve_active_salon(request):
             .first()
         )
         if membership:
+            # Keep the legacy owner-first default only for implicit selection.
+            if request.session.get("explicit_salon_id") != str(membership.salon_id):
+                membership = prefer_sole_owner_membership(request, membership)
             return membership.salon, membership
 
+    request.session.pop("explicit_salon_id", None)
     first = (
         SalonMembership.objects.filter(user=request.user, is_active=True, salon__is_active=True)
         .select_related("salon", "salon__settings")

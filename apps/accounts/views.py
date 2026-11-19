@@ -275,7 +275,7 @@ class VerifyOTPView(View):
     def _post_login_redirect(self, request, user):
         from apps.salons.models import SalonMembership
 
-        if SalonMembership.objects.filter(user=user, is_active=True).exists():
+        if SalonMembership.objects.filter(user=user, is_active=True, salon__is_active=True).exists():
             return reverse("dashboard:home")
         return reverse("salons_onboarding:create")
 

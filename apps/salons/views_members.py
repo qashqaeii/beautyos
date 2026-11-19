@@ -70,6 +70,7 @@ def accept_invite(request, token):
     try:
         membership = accept_invitation(token, request.user)
         request.session["active_salon_id"] = str(membership.salon_id)
+        request.session["explicit_salon_id"] = str(membership.salon_id)
         messages.success(request, f"به سالن {membership.salon.name} پیوستید.")
         return redirect("dashboard:home")
     except (SalonInvitation.DoesNotExist, ValueError) as exc:
