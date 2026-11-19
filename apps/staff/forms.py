@@ -16,17 +16,17 @@ class StaffInviteForm(PersianForm):
     first_name = forms.CharField(
         label="نام",
         max_length=60,
-        widget=forms.TextInput(attrs={"class": "input-field", "autocomplete": "given-name"}),
+        widget=forms.TextInput(attrs={"class": "input-field", "autocomplete": "given-name", "placeholder": "نام را وارد کنید"}),
     )
     last_name = forms.CharField(
         label="نام خانوادگی",
         max_length=60,
-        widget=forms.TextInput(attrs={"class": "input-field", "autocomplete": "family-name"}),
+        widget=forms.TextInput(attrs={"class": "input-field", "autocomplete": "family-name", "placeholder": "نام خانوادگی را وارد کنید"}),
     )
     specialty = forms.CharField(
         label="تخصص",
         max_length=80,
-        widget=forms.TextInput(attrs={"class": "input-field"}),
+        widget=forms.TextInput(attrs={"class": "input-field", "placeholder": "مثلاً رنگ و مش"}),
     )
     phone = forms.CharField(
         label="شماره موبایل",
@@ -37,6 +37,7 @@ class StaffInviteForm(PersianForm):
                 "inputmode": "tel",
                 "dir": "ltr",
                 "autocomplete": "tel",
+                "placeholder": "09123456789",
             }
         ),
     )

@@ -40,3 +40,24 @@ def test_staff_create_post_invalid_reopens_modal(client, owner_membership, salon
     html = response.content.decode()
     assert "staff-team-page" in html
     assert "staff-create-modal-title" in html
+
+
+@pytest.mark.django_db
+def test_staff_invite_editorial_modal_keeps_existing_fields(client, owner_membership, salon):
+    from django.contrib.staticfiles import finders
+    from django.urls import reverse
+
+    client.force_login(owner_membership.user)
+    response = client.get(reverse("staff:list"), {"create": "1"})
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert "luna-modal--staff-invite" in html
+    assert 'aria-describedby="staff-create-modal-description"' in html
+    assert "luna-modals.css" in html
+    assert "luna-modals.js" in html
+    assert "staff-create-form" in html
+    for field_name in ("first_name", "last_name", "specialty", "phone"):
+        assert f'name="{field_name}"' in html
+    assert finders.find("css/luna-modals.css")
+    assert finders.find("js/luna-modals.js")
+    assert finders.find("images/photos/beautyos-modal-salon.webp")
