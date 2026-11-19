@@ -92,3 +92,14 @@
   .maison-app .luna-mobile-nav .maison-mobile-bar__link svg { width:18px; height:18px; }
   .maison-app .reception-desk-quick__row { grid-template-columns:minmax(0,1fr); }
 }
+
+/* One page-level header; sidebar control remains available even with custom headers. */
+.maison-app .luna-sidebar-control { flex:none; display:flex; justify-content:center; padding:5px 10px; }
+.maison-app .luna-sidebar-toggle { display:flex; align-items:center; justify-content:center; gap:7px; min-height:40px; min-width:40px; max-width:100%; width:100%; border-radius:10px; color:var(--color-text-primary,#51443f); background:transparent; font-size:.75rem; }
+.maison-app .luna-sidebar-toggle:hover { background:rgba(157,114,110,.10); }
+.maison-app .luna-sidebar-toggle:focus-visible { outline:2px solid #9d726e; outline-offset:2px; }
+.maison-app .luna-sidebar-toggle svg { width:19px; height:19px; flex:none; stroke-width:1.7; }
+.maison-app .maison-sidebar.is-collapsed .luna-sidebar-control { padding-inline:4px; }
+.maison-app .maison-sidebar.is-collapsed .luna-sidebar-toggle { width:40px; }
+/* Also suppress legacy empty chrome in templates that have not opted out yet. */
+body.beautyos-main-bg .maison-app .maison-unified-header:has(.maison-page-title:empty):has(.maison-page-subtitle:empty):has(.maison-page-actions:empty) { display:none; }

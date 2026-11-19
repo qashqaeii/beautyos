@@ -12,14 +12,18 @@
       this.$nextTick(() => this.$refs.mobileAccountTrigger?.focus());
     },
     navGroups: { business: false, finance: false, growth: true, digital: false },
+    toggleSidebar() {
+      this.sidebarCollapsed = !this.sidebarCollapsed;
+      try { localStorage.setItem('maisonSidebarCollapsed', this.sidebarCollapsed ? '1' : '0'); } catch (e) {}
+    },
     toggleNavGroup(key) {
       this.navGroups[key] = !this.navGroups[key];
       localStorage.setItem('maisonNavGroups', JSON.stringify(this.navGroups));
     }
   }"
   x-init="
-    sidebarCollapsed = localStorage.getItem('maisonSidebarCollapsed') === '1';
     try {
+      sidebarCollapsed = localStorage.getItem('maisonSidebarCollapsed') === '1';
       const saved = JSON.parse(localStorage.getItem('maisonNavGroups') || '{}');
       Object.keys(saved).forEach((k) => { if (k in navGroups) navGroups[k] = saved[k]; });
     } catch (e) {}
@@ -30,16 +34,9 @@
   {% include "partials/sidebar.html" %}
   <div class="maison-main maison-scroll-minimal min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
     <div class="maison-htmx-progress htmx-indicator" aria-hidden="true"></div>
+    {% block workspace_header %}
     <header class="maison-unified-header maison-reveal {% block header_modifier %}{% endblock %}">
       <div class="maison-unified-header__primary">
-        <button
-          type="button"
-          class="maison-sidebar-toggle hidden shrink-0 lg:inline-flex"
-           :aria-label="sidebarCollapsed ? 'باز کردن منو' : 'جمع کردن منو'" :aria-expanded="!sidebarCollapsed"
-          @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('maisonSidebarCollapsed', sidebarCollapsed ? '1' : '0')"
-        >
-          <i data-lucide="panel-right" class="h-4 w-4"></i>
-        </button>
         <div class="maison-unified-header__copy min-w-0 flex-1">
           <p class="maison-page-date hidden lg:block">{% block page_eyebrow %}{% endblock %}</p>
           <h1 class="maison-page-title">{% block page_title %}نمای کلی{% endblock %}</h1>
@@ -57,6 +54,7 @@
         {% endif %}
       </div>
     </header>
+    {% endblock workspace_header %}
 
     <main id="workspace-content" tabindex="-1" class="maison-content maison-content--enter">
       {% block mobile_header %}{% endblock %}

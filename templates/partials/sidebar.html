@@ -12,7 +12,12 @@
     {% endif %}
     {% if request.resolver_match.app_name == 'appointments' and request.resolver_match.url_name == 'calendar' %}<p class="editorial-calendar-brand-subtitle">سامانه مدیریت سالن زیبایی</p>{% endif %}
   </div>
-  <nav class="maison-sidebar__nav theme-sidebar-nav maison-scroll-minimal min-h-0 flex-1 space-y-1 overflow-x-hidden overflow-y-auto overscroll-contain p-2.5" aria-label="منوی اصلی">
+  <div class="luna-sidebar-control">
+    <button type="button" class="luna-sidebar-toggle" :aria-label="sidebarCollapsed ? 'باز کردن منو' : 'جمع کردن منو'" :aria-expanded="!sidebarCollapsed" aria-controls="workspace-sidebar-nav" @click="toggleSidebar()">
+      <i data-lucide="panel-right" aria-hidden="true"></i><span x-show="!sidebarCollapsed" x-cloak>جمع کردن منو</span>
+    </button>
+  </div>
+  <nav id="workspace-sidebar-nav" class="maison-sidebar__nav theme-sidebar-nav maison-scroll-minimal min-h-0 flex-1 space-y-1 overflow-x-hidden overflow-y-auto overscroll-contain p-2.5" aria-label="منوی اصلی">
     {% include "partials/dashboard_nav_core.html" %}
   </nav>
   {% if nav_salon_settings %}
