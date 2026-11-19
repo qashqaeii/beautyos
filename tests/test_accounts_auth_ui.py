@@ -12,6 +12,11 @@ def test_login_page_uses_public_auth_shell(client):
     assert "public-auth-card" in html
     assert "btn-primary" in html
     assert "input-field" in html
+    assert "luna-auth-phone-input" in html
+    assert html.count('class="luna-auth-benefit-label"') == 4
+    assert "مدیریت هوشمند" in html
+    assert "سالن زیبایی شما" in html
+    assert html.index('class="public-auth-card premium-card"') < html.index('class="public-auth-card__head"')
     assert 'data-theme="luna_signature"' in html
 
 
@@ -21,6 +26,7 @@ def test_register_page_uses_public_auth_shell(client):
     assert "public-auth-shell" in html
     assert "ثبت‌نام سالن جدید" in html
     assert "input-field--tel" in html
+    assert "luna-auth-phone-input" in html
     assert "css/luna-auth.css" in html
     assert "images/photos/beautyos-register-hero.webp" in html
     assert "luna-auth-showcase" in html

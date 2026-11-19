@@ -10,14 +10,17 @@
 {% block auth_heading %}ثبت‌نام سالن جدید{% endblock %}
 {% block auth_subtitle %}مالک سالن با شماره موبایل خود ثبت‌نام می‌کند و پس از تأیید، سالن و پنل مدیریت ساخته می‌شود.{% endblock %}
 {% block auth_content %}
-<form method="post" class="space-y-5 luna-auth-register-form">
+<form method="post" class="space-y-5 luna-auth-register-form luna-auth-phone-form">
   {% csrf_token %}
   {% if phone_form.non_field_errors %}
   <div class="mb-1">{% include "accounts/partials/auth_flash.html" with message=phone_form.non_field_errors.0 variant="error" %}</div>
   {% endif %}
   <div class="public-auth-field">
-    <label for="id_phone"><span class="luna-auth-field-icon"><i data-lucide="smartphone" aria-hidden="true"></i></span>{{ phone_form.phone.label }}</label>
-    {{ phone_form.phone }}
+    <label for="id_phone">{{ phone_form.phone.label }}</label>
+    <div class="luna-auth-phone-input">
+      {{ phone_form.phone }}
+      <i data-lucide="smartphone" aria-hidden="true"></i>
+    </div>
     <p class="field-hint">این شماره به‌عنوان مالک سالن ذخیره می‌شود و برای ورود بعدی استفاده می‌شود.</p>
     {% if phone_form.phone.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ phone_form.phone.errors.0 }}</p>{% endif %}
   </div>

@@ -17,13 +17,12 @@
         <span class="luna-auth-brandmark__type"><strong dir="ltr">{{ BEAUTYOS_PRODUCT_NAME }}</strong><small>CRM تخصصی سالن‌های زیبایی</small></span>
       </a>
       <div class="public-auth-brand__body">
-        <p class="public-auth-brand__eyebrow"><i data-lucide="sparkles" aria-hidden="true"></i> مدیریت حرفه‌ای سالن</p>
-        <h2 class="public-auth-brand__title">مدیریت سالن، به زیبایی <span>نوبت‌ها، تیم و درآمد در یک پنل</span></h2>
+        <h2 class="public-auth-brand__title">مدیریت هوشمند <span>سالن زیبایی شما</span></h2>
         <ul class="public-auth-brand__list">
-          <li><span class="luna-auth-benefit-icon"><i data-lucide="calendar-check" aria-hidden="true"></i></span>رزرو آنلاین و تقویم حرفه‌ای</li>
-          <li><span class="luna-auth-benefit-icon"><i data-lucide="users-round" aria-hidden="true"></i></span>مدیریت تیم و متخصصان</li>
-          <li><span class="luna-auth-benefit-icon"><i data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i></span>گزارش‌های مالی و درآمد</li>
-          <li><span class="luna-auth-benefit-icon"><i data-lucide="heart-handshake" aria-hidden="true"></i></span>باشگاه مشتریان و وفاداری</li>
+          <li><span class="luna-auth-benefit-icon"><i data-lucide="calendar-check" aria-hidden="true"></i></span><span class="luna-auth-benefit-label">نوبت‌دهی آنلاین</span></li>
+          <li><span class="luna-auth-benefit-icon"><i data-lucide="users-round" aria-hidden="true"></i></span><span class="luna-auth-benefit-label">مدیریت تیم</span></li>
+          <li><span class="luna-auth-benefit-icon"><i data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i></span><span class="luna-auth-benefit-label">گزارش‌های مالی</span></li>
+          <li><span class="luna-auth-benefit-icon"><i data-lucide="heart-handshake" aria-hidden="true"></i></span><span class="luna-auth-benefit-label">باشگاه مشتریان</span></li>
         </ul>
       </div>
     </aside>
@@ -39,11 +38,11 @@
 
       <div class="public-auth-card-wrap">
         {% block auth_steps %}{% endblock %}
-        <header class="public-auth-card__head">
-          <h1 class="public-auth-card__title"><i data-lucide="sparkles" class="luna-auth-heading-icon" aria-hidden="true"></i><span>{% block auth_heading %}{% endblock %}</span></h1>
-          <p class="public-auth-card__subtitle">{% block auth_subtitle %}{% endblock %}</p>
-        </header>
         <div class="public-auth-card premium-card">
+          <header class="public-auth-card__head">
+            <h1 class="public-auth-card__title"><i data-lucide="sparkles" class="luna-auth-heading-icon" aria-hidden="true"></i><span>{% block auth_heading %}{% endblock %}</span></h1>
+            <p class="public-auth-card__subtitle">{% block auth_subtitle %}{% endblock %}</p>
+          </header>
           {% block auth_content %}{% endblock %}
         </div>
         <p class="public-auth-legal">
