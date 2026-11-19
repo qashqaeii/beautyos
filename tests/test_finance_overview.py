@@ -83,3 +83,40 @@ def test_jalali_month_bounds():
 def test_jalali_three_months_bounds():
     start, end = jalali_three_previous_months_bounds()
     assert start <= end
+
+
+@pytest.mark.django_db
+def test_finance_tabs_have_one_header_and_clear_date_scope(client, owner_membership):
+    client.force_login(owner_membership.user)
+    url = reverse("finance:overview")
+    for tab in ("income", "debts", "commissions"):
+        response = client.get(url, {"tab": tab, "range": "month"})
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert html.count("<h1") == 1
+        assert 'class="maison-unified-header ' not in html
+        assert "css/luna-finance.css" in html
+        assert ("finance-page__range-bar" in html) == (tab != "debts")
+        if tab == "commissions":
+            assert response.context["range_key"] == "day"
+
+
+@pytest.mark.django_db
+def test_invalid_debt_keeps_form_open_and_values(client, owner_membership, salon):
+    client.force_login(owner_membership.user)
+    response = client.post(reverse("finance:overview") + "?tab=debts", {
+        "action": "add_debt", "creditor_name": "تست", "creditor_type": SalonDebt.CreditorType.PERSON,
+        "principal_toman": "-1",
+    })
+    assert response.status_code == 200
+    assert response.context["debt_form_open"]
+    assert response.context["debt_form"].errors["principal_toman"]
+    assert not SalonDebt.scoped(salon).exists()
+
+
+@pytest.mark.django_db
+def test_today_range_ignores_stale_day(client, owner_membership):
+    client.force_login(owner_membership.user)
+    response = client.get(reverse("finance:overview"), {"range": "today", "day": "2001-01-01"})
+    assert response.status_code == 200
+    assert response.context["selected_day"] == timezone.localdate()

@@ -35,8 +35,22 @@ class PaymentForm(PersianModelForm):
             self.fields["customer"].queryset = Customer.scoped(salon).filter(is_deleted=False)
             from apps.appointments.models import Appointment
 
-            self.fields["appointment"].queryset = Appointment.scoped(salon).order_by("-start_at")[:200]
+            recent = Appointment.scoped(salon).order_by("-start_at", "-pk").values("pk")[:200]
+            # ModelChoiceField validation calls queryset.get(); the outer query must not be sliced.
+            self.fields["appointment"].queryset = Appointment.scoped(salon).filter(pk__in=recent).order_by("-start_at", "-pk")
             self.fields["appointment"].required = False
+
+    def clean(self):
+        data = super().clean()
+        appointment = data.get("appointment")
+        customer = data.get("customer")
+        if appointment and customer and appointment.customer_id != customer.pk:
+            self.add_error("appointment", "نوبت انتخاب‌شده متعلق به این مشتری نیست.")
+        for field in ("total_amount_toman", "discount_toman", "paid_amount_toman"):
+            value = data.get(field)
+            if value is not None and value < 0:
+                self.add_error(field, "مبلغ نمی‌تواند منفی باشد.")
+        return data
 
 
 class SalonDebtForm(PersianModelForm):
@@ -56,7 +70,13 @@ class SalonDebtForm(PersianModelForm):
         self.fields["due_date"].required = False
         self.fields["note"].required = False
 
+    def clean_principal_toman(self):
+        value = self.cleaned_data["principal_toman"]
+        if value <= 0:
+            raise forms.ValidationError("مبلغ بدهی باید بزرگ‌تر از صفر باشد.")
+        return value
+
 
 class SalonDebtPaymentForm(PersianForm):
-    amount_toman = forms.IntegerField(min_value=1, widget=forms.NumberInput(attrs={"class": "input-field"}))
+    amount_toman = forms.IntegerField(min_value=1, max_value=2**63 - 1, widget=forms.NumberInput(attrs={"class": "input-field"}))
     note = forms.CharField(required=False, widget=forms.TextInput(attrs={"class": "input-field"}))

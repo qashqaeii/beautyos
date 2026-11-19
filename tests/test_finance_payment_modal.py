@@ -65,3 +65,42 @@ def test_payment_create_post_success(client, owner_membership, salon):
     )
     assert response.status_code == 302
     assert Payment.objects.filter(salon=salon, customer=customer).exists()
+
+
+@pytest.mark.django_db
+def test_invalid_payment_never_renders_reports_for_receptionist(client, salon):
+    from apps.accounts.models import User
+    from apps.salons.models import SalonMembership
+
+    user = User.objects.create_user(phone="+989121277799")
+    SalonMembership.objects.create(user=user, salon=salon, role=SalonMembership.Role.RECEPTIONIST)
+    client.force_login(user)
+    response = client.post(reverse("finance:payment_create"), {"next": reverse("finance:overview")})
+    assert response.status_code == 200
+    assert "finance/payment_modal_page.html" in [t.name for t in response.templates]
+    assert "finance/overview.html" not in [t.name for t in response.templates]
+
+
+@pytest.mark.django_db
+def test_payment_form_validates_appointment_picker_without_sliced_queryset(salon, owner_membership):
+    from datetime import timedelta
+    from django.utils import timezone
+    from apps.appointments.models import Appointment
+    from apps.finance.forms import PaymentForm
+    from apps.services.models import Service, ServiceCategory
+    from apps.staff.models import StaffProfile
+
+    customer = Customer.objects.create(salon=salon, full_name="مشتری", phone="+989121277701")
+    other = Customer.objects.create(salon=salon, full_name="مشتری دوم", phone="+989121277702")
+    category = ServiceCategory.objects.create(salon=salon, name="تست پرداخت")
+    service = Service.objects.create(salon=salon, category=category, name="خدمت", duration_minutes=30, price_toman=100000)
+    staff, _ = StaffProfile.objects.get_or_create(salon=salon, membership=owner_membership)
+    start = timezone.now()
+    appointment = Appointment.objects.create(salon=salon, customer=customer, staff=staff, service=service,
+        start_at=start, end_at=start + timedelta(minutes=30), price_toman=100000)
+    data = {"customer": customer.pk, "appointment": appointment.pk, "total_amount_toman": 100000,
+        "discount_toman": 0, "paid_amount_toman": 100000, "method": Payment.Method.CASH, "status": Payment.Status.PAID}
+    assert PaymentForm(data, salon=salon).is_valid()
+    form = PaymentForm({**data, "customer": other.pk}, salon=salon)
+    assert not form.is_valid()
+    assert "appointment" in form.errors

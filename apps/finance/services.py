@@ -17,7 +17,8 @@ from apps.finance.models import Payment, SalonDebt
 def parse_finance_range(request) -> dict:
     range_key = request.GET.get("range", "today")
     selected_day = parse_dashboard_day(request)
-    tz = timezone.get_current_timezone()
+    if not date(1900, 1, 1) <= selected_day <= date(2200, 12, 31):
+        selected_day = timezone.localdate()
 
     if range_key == "month":
         start_d, end_d = jalali_month_bounds(selected_day)
@@ -31,7 +32,8 @@ def parse_finance_range(request) -> dict:
         label = "انتخاب روز"
     else:
         range_key = "today"
-        start_d = end_d = timezone.localdate()
+        selected_day = timezone.localdate()
+        start_d = end_d = selected_day
         label = "امروز"
 
     start_dt, _ = day_bounds(start_d)

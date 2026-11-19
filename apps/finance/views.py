@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from apps.commissions.services import create_settlement
@@ -26,6 +27,18 @@ from apps.salons.permissions_policy import (
     has_permission,
 )
 from apps.staff.models import StaffProfile
+
+
+def _positive_pk(raw):
+    from django.http import Http404
+
+    try:
+        pk = int(raw)
+    except (TypeError, ValueError):
+        raise Http404 from None
+    if not 0 < pk <= 2**63 - 1:
+        raise Http404
+    return pk
 
 
 def _finance_redirect(**params):
@@ -78,27 +91,34 @@ def _finance_overview_context(
     get_query=None,
     payment_form=None,
     payment_modal_open: bool = False,
+    debt_form=None,
+    debt_form_open: bool = False,
 ):
-    get_query = get_query or request.GET
-    range_req = _FinanceGetRequest(request, get_query)
-    range_ctx = parse_finance_range(range_req)
+    get_query = (request.GET if get_query is None else get_query).copy()
     tab = get_query.get("tab", "income")
     if tab not in ("income", "debts", "commissions"):
         tab = "income"
+    if tab == "commissions" and get_query.get("range", "today") not in ("today", "day"):
+        get_query["range"] = "day"
+    range_ctx = parse_finance_range(_FinanceGetRequest(request, get_query))
 
     membership = getattr(request, "membership", None)
     can_manage_debt = has_permission(membership, P_FINANCE_REPORTS)
+    if not can_manage_debt:
+        raise PermissionDenied
     can_settle_commission = has_permission(membership, P_COMMISSION_MANAGE)
     can_payment_create = has_permission(membership, P_PAYMENT_CREATE)
 
     if payment_modal_open and can_payment_create and payment_form is None:
         payment_form = PaymentForm(salon=request.salon)
 
-    debt_form = SalonDebtForm()
-    income = income_metrics(request.salon, range_ctx["start_dt"], range_ctx["end_dt"])
-    payments = customer_payments_in_range(request.salon, range_ctx["start_dt"], range_ctx["end_dt"])
-    debts = open_debts_summary(request.salon)
-    commissions = commission_day_overview(request.salon, range_ctx["selected_day"])
+    if debt_form is None:
+        debt_form = SalonDebtForm()
+    # Only query the active tab. The other panels are not rendered.
+    income = income_metrics(request.salon, range_ctx["start_dt"], range_ctx["end_dt"]) if tab == "income" else None
+    payments = customer_payments_in_range(request.salon, range_ctx["start_dt"], range_ctx["end_dt"]) if tab == "income" else ()
+    debts = open_debts_summary(request.salon) if tab == "debts" else {}
+    commissions = commission_day_overview(request.salon, range_ctx["selected_day"]) if tab == "commissions" else None
 
     return {
         **range_ctx,
@@ -106,6 +126,7 @@ def _finance_overview_context(
         "income": income,
         "payments": payments,
         "debt_form": debt_form,
+        "debt_form_open": debt_form_open,
         **debts,
         "commissions": commissions,
         "can_manage_debt": can_manage_debt,
@@ -146,10 +167,15 @@ def finance_overview(request):
                 messages.success(request, "بدهی ثبت شد.")
                 redirect_params["tab"] = "debts"
                 return redirect(_finance_redirect(**redirect_params))
+            query = request.GET.copy()
+            query["tab"] = "debts"
+            ctx = _finance_overview_context(request, get_query=query, debt_form=debt_form, debt_form_open=True)
+            return render(request, "finance/overview.html", ctx)
         elif action == "pay_debt":
             if not can_manage_debt:
                 raise PermissionDenied
-            debt = get_object_or_404(SalonDebt, pk=request.POST.get("debt_id"), salon=request.salon, is_closed=False)
+            debt_id = _positive_pk(request.POST.get("debt_id"))
+            debt = get_object_or_404(SalonDebt, pk=debt_id, salon=request.salon, is_closed=False)
             pay_form = SalonDebtPaymentForm(request.POST)
             if pay_form.is_valid():
                 try:
@@ -166,19 +192,25 @@ def finance_overview(request):
                     messages.success(request, "پرداخت بدهی ثبت شد.")
                     redirect_params["tab"] = "debts"
                     return redirect(_finance_redirect(**redirect_params))
+            else:
+                messages.error(request, "مبلغ پرداخت بدهی معتبر نیست.")
+            redirect_params["tab"] = "debts"
+            return redirect(_finance_redirect(**redirect_params))
         elif action == "settle_staff":
             if not can_settle_commission:
                 raise PermissionDenied
-            staff = get_object_or_404(StaffProfile, pk=request.POST.get("staff_id"), salon=request.salon)
-            amount = int(request.POST.get("amount_toman") or 0)
-            if amount > 0:
+            staff = get_object_or_404(StaffProfile, pk=_positive_pk(request.POST.get("staff_id")), salon=request.salon)
+            amount_form = SalonDebtPaymentForm(request.POST)
+            if amount_form.is_valid():
                 try:
-                    create_settlement(request.salon, staff, amount, request.POST.get("note", ""))
+                    create_settlement(request.salon, staff, amount_form.cleaned_data["amount_toman"], amount_form.cleaned_data.get("note", ""))
                 except ValidationError as exc:
                     msg = exc.messages[0] if getattr(exc, "messages", None) else str(exc)
                     messages.error(request, msg)
                 else:
                     messages.success(request, "تسویه متخصص ثبت شد.")
+            else:
+                messages.error(request, "مبلغ تسویه معتبر نیست.")
             redirect_params["tab"] = "commissions"
             return redirect(_finance_redirect(**redirect_params))
 
@@ -190,12 +222,22 @@ def finance_overview(request):
 @salon_required
 @require_role(SalonMembership.Role.RECEPTIONIST)
 def payment_create(request):
+    membership = getattr(request, "membership", None)
+    if not has_permission(membership, P_PAYMENT_CREATE):
+        raise PermissionDenied
+    can_view_finance = has_permission(membership, P_FINANCE_REPORTS)
+    fallback = reverse("finance:overview") if can_view_finance else reverse("dashboard:home")
     next_url = request.POST.get("next") if request.method == "POST" else request.GET.get("next")
-    next_url = next_url or reverse("finance:overview")
+    if (not next_url or not next_url.startswith("/") or next_url.startswith("//")
+            or "\\" in next_url or any(ord(c) < 32 for c in next_url)
+            or not url_has_allowed_host_and_scheme(next_url, allowed_hosts=set())):
+        next_url = fallback
+    if _is_finance_overview_path(urlparse(next_url).path) and not can_view_finance:
+        next_url = fallback
 
     if request.method == "GET":
         parts = urlparse(next_url)
-        if _is_finance_overview_path(parts.path):
+        if can_view_finance and _is_finance_overview_path(parts.path):
             return redirect(_append_payment_query(next_url))
         return render(
             request,
@@ -219,7 +261,7 @@ def payment_create(request):
         return redirect(next_url)
 
     parts = urlparse(next_url)
-    if _is_finance_overview_path(parts.path):
+    if can_view_finance and _is_finance_overview_path(parts.path):
         get_q = _finance_get_from_post(request.POST)
         if not request.POST.get("finance_tab"):
             q = dict(parse_qsl(parts.query, keep_blank_values=True))
