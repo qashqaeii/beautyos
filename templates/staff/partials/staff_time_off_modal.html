@@ -1,14 +1,21 @@
 <template x-teleport="body">
-  <div class="inventory-create-modal-root" x-cloak x-show="timeoffOpen" x-transition.opacity role="presentation">
-    <button type="button" class="inventory-create-modal__backdrop" aria-label="بستن" @click="$dispatch('beautyos-close-modal')"></button>
+  <div class="inventory-create-modal-root luna-modal-root" x-cloak x-show="timeoffOpen" x-transition.opacity role="presentation">
+    <button type="button" class="inventory-create-modal__backdrop" tabindex="-1" aria-label="بستن" @click="$dispatch('beautyos-close-modal')"></button>
     <div
-      class="inventory-create-modal staff-timeoff-modal"
+      class="inventory-create-modal staff-timeoff-modal luna-modal luna-modal--compact"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="staff-timeoff-modal-title"
+      aria-labelledby="staff-timeoff-modal-title" aria-describedby="staff-timeoff-modal-title-description"
       @click.stop
     >
       <header class="inventory-create-modal__head staff-timeoff-modal__head">
+        <div class="luna-modal-heading">
+          <span class="luna-modal-emblem" aria-hidden="true"><i data-lucide="calendar-off"></i></span>
+          <div class="luna-modal-heading__copy staff-timeoff-modal__titles">
+            <h2 id="staff-timeoff-modal-title" class="inventory-create-modal__title" tabindex="-1">ثبت مرخصی</h2>
+            <p id="staff-timeoff-modal-title-description" class="luna-modal-subtitle">ثبت بازه مرخصی برای {{ profile.display_name|default:profile.user }}</p>
+          </div>
+        </div>
         <button
           type="button"
           class="inventory-create-modal__close staff-timeoff-modal__close"
@@ -17,10 +24,6 @@
         >
           <i data-lucide="x" class="h-4 w-4" aria-hidden="true"></i>
         </button>
-        <div class="staff-timeoff-modal__titles">
-          <h2 id="staff-timeoff-modal-title" class="inventory-create-modal__title">ثبت مرخصی</h2>
-          <p class="staff-timeoff-modal__staff">{{ profile.display_name|default:profile.user }}</p>
-        </div>
       </header>
       {% include "staff/partials/staff_time_off_form.html" %}
     </div>

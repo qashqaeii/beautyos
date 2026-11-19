@@ -1,21 +1,27 @@
 <template x-teleport="body">
   <div
-    class="inventory-create-modal-root"
+    class="inventory-create-modal-root luna-modal-root"
     x-cloak
     x-show="bookOpen"
     x-transition.opacity
     role="presentation"
   >
-    <button type="button" class="inventory-create-modal__backdrop" aria-label="بستن" @click="$dispatch('beautyos-close-modal')"></button>
+    <button type="button" class="inventory-create-modal__backdrop" tabindex="-1" aria-label="بستن" @click="$dispatch('beautyos-close-modal')"></button>
     <div
-      class="inventory-create-modal inventory-create-modal--wide appointment-booking-modal"
+      class="inventory-create-modal inventory-create-modal--wide appointment-booking-modal luna-modal luna-modal--extended"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="appointment-booking-modal-title"
+      aria-labelledby="appointment-booking-modal-title" aria-describedby="appointment-booking-modal-title-description"
       @click.stop
     >
       <header class="inventory-create-modal__head inventory-create-modal__head--lavender">
-        <h2 id="appointment-booking-modal-title" class="inventory-create-modal__title">رزرو نوبت</h2>
+        <div class="luna-modal-heading">
+          <span class="luna-modal-emblem" aria-hidden="true"><i data-lucide="calendar-plus"></i></span>
+          <div class="luna-modal-heading__copy">
+            <h2 id="appointment-booking-modal-title" class="inventory-create-modal__title" tabindex="-1">رزرو نوبت</h2>
+            <p id="appointment-booking-modal-title-description" class="luna-modal-subtitle">اطلاعات مشتری، خدمت و زمان نوبت را مشخص کنید.</p>
+          </div>
+        </div>
         <button type="button" class="inventory-create-modal__close" aria-label="بستن" @click="$dispatch('beautyos-close-modal')">
           <i data-lucide="x" class="h-4 w-4" aria-hidden="true"></i>
         </button>

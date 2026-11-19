@@ -1,9 +1,15 @@
 <template x-teleport="body">
-  <div class="inventory-create-modal-root" x-cloak x-show="editOpen" x-transition.opacity role="presentation">
-    <button type="button" class="inventory-create-modal__backdrop" aria-label="بستن" @click="$dispatch('beautyos-close-modal')"></button>
-    <div class="inventory-create-modal inventory-create-modal--wide" role="dialog" aria-modal="true" aria-labelledby="staff-edit-modal-title" @click.stop>
+  <div class="inventory-create-modal-root luna-modal-root" x-cloak x-show="editOpen" x-transition.opacity role="presentation">
+    <button type="button" class="inventory-create-modal__backdrop" tabindex="-1" aria-label="بستن" @click="$dispatch('beautyos-close-modal')"></button>
+    <div class="inventory-create-modal inventory-create-modal--wide luna-modal luna-modal--extended" role="dialog" aria-modal="true" aria-labelledby="staff-edit-modal-title" aria-describedby="staff-edit-modal-title-description" @click.stop>
       <header class="inventory-create-modal__head">
-        <h2 id="staff-edit-modal-title" class="inventory-create-modal__title">ویرایش پروفایل</h2>
+        <div class="luna-modal-heading">
+          <span class="luna-modal-emblem" aria-hidden="true"><i data-lucide="user-round-pen"></i></span>
+          <div class="luna-modal-heading__copy">
+            <h2 id="staff-edit-modal-title" class="inventory-create-modal__title" tabindex="-1">ویرایش پروفایل</h2>
+            <p id="staff-edit-modal-title-description" class="luna-modal-subtitle">ویرایش اطلاعات و تنظیمات متخصص.</p>
+          </div>
+        </div>
         <button type="button" class="inventory-create-modal__close" aria-label="بستن" @click="$dispatch('beautyos-close-modal')">
           <i data-lucide="x" class="h-4 w-4" aria-hidden="true"></i>
         </button>

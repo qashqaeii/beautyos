@@ -1,12 +1,12 @@
 <div
   id="logout-modal"
-  class="fixed inset-0 z-50 hidden items-center justify-center bg-aubergine/40 px-4 backdrop-blur-sm"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-aubergine/40 px-4 backdrop-blur-sm luna-confirm-root"
   role="dialog"
   aria-modal="true"
   aria-labelledby="logout-modal-title"
 >
-  <div class="w-full max-w-sm rounded-2xl border border-line bg-surface p-6 shadow-lift">
-    <h2 id="logout-modal-title" class="text-lg font-semibold text-aubergine">خروج از حساب</h2>
+  <div class="w-full max-w-sm rounded-2xl border border-line bg-surface p-6 shadow-lift luna-confirm-panel">
+    <div class="luna-modal-heading"><span class="luna-modal-emblem" aria-hidden="true"><i data-lucide="log-out"></i></span><h2 id="logout-modal-title" class="text-lg font-semibold text-aubergine" tabindex="-1">خروج از حساب</h2></div>
     <p class="mt-2 text-sm text-charcoal/70">مطمئنید می‌خواهید از {{ BEAUTYOS_PRODUCT_NAME }} خارج شوید؟</p>
     <div class="mt-6 grid grid-cols-2 gap-3">
       <form method="post" action="{% url 'accounts:logout' %}" class="contents">
@@ -21,13 +21,19 @@
 document.addEventListener("DOMContentLoaded", function () {
   var modal = document.getElementById("logout-modal");
   if (!modal) return;
-  function openModal() {
+  var opener = null;
+  function openModal(event) {
+    opener = event && event.currentTarget;
     modal.classList.remove("hidden");
     modal.classList.add("flex");
+    modal.querySelector("#logout-modal-title").focus();
   }
   function closeModal() {
+    if (modal.classList.contains("hidden")) return;
     modal.classList.add("hidden");
     modal.classList.remove("flex");
+    if (opener && opener.isConnected) opener.focus();
+    opener = null;
   }
   document.querySelectorAll("[data-logout-open]").forEach(function (el) {
     el.addEventListener("click", openModal);
@@ -39,7 +45,15 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.target === modal) closeModal();
   });
   document.addEventListener("keydown", function (e) {
+    if (modal.classList.contains("hidden")) return;
     if (e.key === "Escape") closeModal();
+    if (e.key === "Tab") {
+      var buttons = Array.from(modal.querySelectorAll("button:not(:disabled)"));
+      if (!buttons.length) return;
+      if (!buttons.includes(document.activeElement) || (e.shiftKey && document.activeElement === buttons[0]) || (!e.shiftKey && document.activeElement === buttons[buttons.length - 1])) {
+        e.preventDefault(); (e.shiftKey ? buttons[buttons.length - 1] : buttons[0]).focus();
+      }
+    }
   });
 });
 </script>

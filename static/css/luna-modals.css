@@ -122,7 +122,7 @@ html.app-modal-open .maison-toast-stack { z-index:240; pointer-events:none; }
   .luna-modal .staff-invite-form__grid--modal .staff-invite-field--phone { grid-column:auto; }
 }
 @media(min-width:900px) and (min-height:480px) {
-  body.theme-app .luna-modal-root .luna-modal { --modal-art-width:clamp(140px,19.6%,176px); }
+  body.theme-app .luna-modal-root .luna-modal { --modal-art-width:clamp(145px,12vw,176px); }
   body.theme-app .luna-modal-root .luna-modal--compact { --modal-art-width:135px; }
   .luna-modal::before { display:block; }
   .luna-modal .inventory-create-modal__close { position:absolute; inset-block-start:17px; inset-inline-end:17px; z-index:2; background:#fffaf7; }
@@ -141,3 +141,20 @@ html.app-modal-open .maison-toast-stack { z-index:240; pointer-events:none; }
 @media(prefers-reduced-motion:reduce) {
   .luna-modal-root,.luna-modal-root * { animation:none!important; transition:none!important; }
 }
+
+/* Keep short confirmations and mobile action sheets lightweight. */
+.luna-confirm-root { background:rgba(65,43,40,.43); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+.luna-confirm-panel { border:1px solid #e6d3ca; border-radius:22px; background:linear-gradient(145deg,#fffdfb,#fcf5f1); box-shadow:0 16px 44px rgba(68,43,39,.2); color:#51443f; }
+.luna-confirm-panel h2 { color:#50372f; }
+.luna-confirm-panel .btn-primary { background:#94645b; color:#fff; border-radius:11px; }
+.luna-confirm-panel .btn-public-ghost { color:#784d42; border:1px solid #dbc7bc; background:#fffaf7; border-radius:11px; }
+.theme-app .maison-sheet:not(.luna-modal) { background:#fffaf7; border-color:#e6d3ca; border-start-start-radius:22px; border-start-end-radius:22px; }
+.theme-app .maison-sheet-backdrop { background:rgba(65,43,40,.43); }
+.theme-app .maison-sheet :is(.maison-sheet__link,.maison-sheet__action) { min-height:44px; border-color:#e6d3ca; }
+@media (max-width:639px) {
+  .luna-modal .finance-payment-form__fields,
+  .luna-modal .finance-payment-form__fields--amounts,
+  .luna-modal .finance-payment-form__fields--meta { grid-template-columns:minmax(0,1fr); }
+  .luna-modal .staff-timeoff-form__range-fields { grid-template-columns:minmax(0,1fr); }
+}
+@media (prefers-reduced-motion:reduce) { .luna-confirm-root,.luna-confirm-root * { animation:none!important;transition:none!important; } }
