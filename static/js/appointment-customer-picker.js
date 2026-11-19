@@ -18,15 +18,17 @@
       activeIndex: -1,
       loading: false,
       debounceTimer: null,
+      searchGeneration: 0,
+      duplicateGeneration: 0,
       canCreateCustomer: Boolean(config.canCreateCustomer),
       searchOnly: Boolean(config.searchOnly),
 
       init() {
         const initial = config.initialMode || "new";
-        if (this.searchOnly) {
-          this.mode = "search";
-        } else if (this.customerId) {
+        if (this.customerId) {
           this.mode = "selected";
+        } else if (this.searchOnly) {
+          this.mode = "search";
         } else {
           this.mode = initial;
         }
@@ -49,15 +51,13 @@
       },
 
       prepareSubmit() {
-        if (this.customerId || !this.canCreateCustomer) {
-          this.syncHiddenCustomer();
-          return;
-        }
-        if (this.hasNewCustomerInput()) {
-          this.mode = "new";
-          this.query = "";
-        }
         this.syncHiddenCustomer();
+        // Flush hidden values synchronously, before the browser serializes the form.
+        const root = this.$root;
+        const mode = root.querySelector('input[name="new_customer_mode"]');
+        const query = root.querySelector('input[name="customer_search"]');
+        if (mode) mode.value = this.isNewCustomerSubmit() ? "on" : "";
+        if (query) query.value = this.mode === "new" ? "" : this.query;
       },
 
       syncHiddenCustomer() {
@@ -66,6 +66,8 @@
       },
 
       openSearch() {
+        this.searchGeneration += 1;
+        this.duplicateGeneration += 1;
         this.mode = "search";
         this.open = false;
         this.results = [];
@@ -77,7 +79,10 @@
       },
 
       changeCustomer() {
+        this.searchGeneration += 1;
+        this.duplicateGeneration += 1;
         this.customerId = "";
+        this.syncHiddenCustomer();
         this.selectedName = "";
         this.selectedPhone = "";
         this.query = "";
@@ -92,6 +97,7 @@
       onInput() {
         this.customerId = "";
         if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        this.searchGeneration += 1;
         const q = this.query.trim();
         if (q.length < 1) {
           this.results = [];
@@ -122,13 +128,20 @@
       },
 
       async runSearch(q) {
-        this.results = await this.fetchResults(q);
-        this.open = this.results.length > 0;
-        this.activeIndex = this.results.length ? 0 : -1;
+        const generation = ++this.searchGeneration;
+        const rows = await this.fetchResults(q);
+        if (generation !== this.searchGeneration || this.mode !== "search" || this.query.trim() !== q) return;
+        this.results = rows;
+        this.open = rows.length > 0;
+        this.activeIndex = rows.length ? 0 : -1;
       },
 
       selectCustomer(item) {
+        this.searchGeneration += 1;
+        this.duplicateGeneration += 1;
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
         this.customerId = String(item.id);
+        this.syncHiddenCustomer();
         this.selectedName = item.full_name;
         this.selectedPhone = item.phone_display;
         this.query = `${item.full_name} · ${item.phone_display}`;
@@ -150,9 +163,11 @@
 
       async checkPhoneDuplicate() {
         this.duplicateMatch = null;
+        const generation = ++this.duplicateGeneration;
         const phone = (this.newPhone || "").trim();
         if (phone.length < 8) return;
         const rows = await this.fetchResults(phone);
+        if (generation !== this.duplicateGeneration || this.mode !== "new" || (this.newPhone || "").trim() !== phone) return;
         const norm = (v) => String(v || "").replace(/\D/g, "");
         const target = norm(phone);
         const exact = rows.find(
@@ -172,10 +187,7 @@
         if (!this.canCreateCustomer || this.customerId) {
           return false;
         }
-        if (this.mode === "new") {
-          return true;
-        }
-        return this.hasNewCustomerInput();
+        return this.mode === "new";
       },
 
       onKeydown(event) {
@@ -190,6 +202,7 @@
           event.preventDefault();
           this.selectCustomer(this.results[this.activeIndex]);
         } else if (event.key === "Escape") {
+          event.stopPropagation();
           this.open = false;
         }
       },

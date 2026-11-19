@@ -118,6 +118,7 @@
           autocomplete="off"
           value="{{ form.new_customer_first_name.value|default:'' }}"
           x-model="firstName"
+          :disabled="mode !== 'new'"
         />
         {% if form.new_customer_first_name.errors %}
         <p class="mt-1 text-xs text-coral">{{ form.new_customer_first_name.errors.0 }}</p>
@@ -133,6 +134,7 @@
           autocomplete="off"
           value="{{ form.new_customer_last_name.value|default:'' }}"
           x-model="lastName"
+          :disabled="mode !== 'new'"
         />
         {% if form.new_customer_last_name.errors %}
         <p class="mt-1 text-xs text-coral">{{ form.new_customer_last_name.errors.0 }}</p>
@@ -151,6 +153,7 @@
         autocomplete="tel"
         value="{{ form.new_customer_phone.value|default:'' }}"
         x-model="newPhone"
+          :disabled="mode !== 'new'"
         @blur="checkPhoneDuplicate()"
       />
       {% if form.new_customer_phone.errors %}

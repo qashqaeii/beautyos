@@ -59,10 +59,10 @@ def resolve_customer_picker_context(*, form, membership, salon) -> dict:
 
     if not can_create and not can_search:
         mode = "none"
-    elif not can_create:
-        mode = "search"
     elif customer_pk and selected_display:
         mode = "selected"
+    elif not can_create:
+        mode = "search"
     elif form.is_bound:
         raw_customer = (form.data.get("customer") or "").strip()
         if raw_customer and selected_display:

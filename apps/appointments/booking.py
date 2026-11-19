@@ -40,6 +40,8 @@ def resolve_booking_locked_staff(request, salon) -> StaffProfile | None:
         pk = int(raw)
     except (TypeError, ValueError):
         return None
+    if not 0 < pk <= 2**63 - 1:
+        return None
     return (
         StaffProfile.scoped(salon)
         .filter(pk=pk, is_active=True, is_deleted=False, is_bookable=True)
