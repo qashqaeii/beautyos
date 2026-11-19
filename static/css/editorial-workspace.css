@@ -1,0 +1,47 @@
+/* Editorial Rose | workspace surfaces and workflows. Scoped to the authenticated shell. */
+.maison-app {
+  --editorial-section-gap: clamp(12px, 1.45vw, 22px);
+  --editorial-card-padding: clamp(14px, 1.45vw, 22px);
+}
+.maison-app :is(.dashboard-overview,.dashboard-mgmt-page,.reception-desk-page,.customers-list-page,.customer-detail-page,.staff-team-page,.services-page,.finance-page,.inventory-page,.loyalty-page,.retention-page,.waitlist-page,.calendar-day-page,.specialists-page) { min-width: 0; }
+.maison-app .dashboard-mgmt-grid { gap: var(--editorial-section-gap); grid-template-columns: repeat(auto-fit,minmax(min(100%, 255px),1fr)); }
+.maison-app .dashboard-mgmt-card { min-height: 96px; max-height: none; padding: 16px; gap: 12px; border-radius: var(--editorial-radius); align-items: center; box-shadow: var(--editorial-shadow); }
+.maison-app .dashboard-mgmt-card__icon { width: 43px; height: 43px; border-radius: 12px; color: var(--color-primary-hover); }
+.maison-app .editorial-management-copy { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.maison-app .dashboard-mgmt-card__title { text-align: start; font-size: .93rem; }
+.maison-app .editorial-management-description { font-size: .73rem; line-height: 1.7; color: var(--editorial-readable-muted); overflow-wrap: anywhere; }
+.maison-app .editorial-management-arrow { width: 16px; height: 16px; flex: 0 0 auto; color: var(--color-primary-hover); opacity: .7; }
+.maison-app .dashboard-stat-grid { gap: var(--editorial-section-gap); }
+.maison-app .dashboard-stat-mini { min-width: 0; }
+.maison-app .dashboard-stat-mini__surface { min-width: 0; height: 100%; border-radius: var(--editorial-radius); }
+.maison-app .dashboard-stat-mini__value { font-size: clamp(1.15rem,2.2vw,1.85rem); font-variant-numeric: tabular-nums; line-height: 1.5; overflow-wrap: anywhere; }
+.maison-app .dashboard-stat-mini__unit { font-size: .68rem; white-space: nowrap; }
+.maison-app .dash-page-header__dates { flex-wrap: wrap; min-width: 0; }
+.maison-app .dash-page-header__nav { min-width: 40px; min-height: 40px; }
+.maison-app :is(.customers-list-page__header,.staff-team-page__header,.inventory-page__header,.finance-page__header,.loyalty-page__hero,.retention-page__hero,.waitlist-page__hero,.customer-detail-header) { gap: 12px; flex-wrap: wrap; }
+.maison-app :is(.customers-list-page__title,.staff-team-page__title,.inventory-page__title,.finance-page__title,.loyalty-page__title,.retention-page__title,.waitlist-page__title,.customer-detail-header__name) { line-height: 1.5; overflow-wrap: anywhere; }
+.maison-app :is(.customers-list-page__controls-top,.inventory-page__filters,.inventory-page__filter-row,.staff-team-page__toolbar,.finance-page__range-bar,.finance-section-head,.loyalty-members-panel__head,.reception-desk-slot-filters) { min-width: 0; flex-wrap: wrap; gap: 10px; }
+.maison-app :is(.customers-list-page__search-form,.customers-list-page__search-wrap,.inventory-page__search,.loyalty-search-form,.reception-desk-slot-filters__field) { min-width: 0; max-width: 100%; }
+.maison-app :is(.customers-list-card,.staff-team-card,.inventory-card,.maison-service-card,.customer-detail-card,.finance-stat-card,.finance-comm-panel,.loyalty-stat,.loyalty-members-panel,.loyalty-activity-panel,.loyalty-rules-panel,.retention-queue-panel,.waitlist-queue-panel,.reception-desk-priority,.reception-desk-workspace) { min-width: 0; border-radius: var(--editorial-radius); box-shadow: var(--editorial-shadow); }
+.maison-app :is(.customers-list-card__name,.staff-team-card__name,.inventory-card__name,.reception-desk-next__name,.retention-queue-row__name,.customer-detail-note__body) { overflow-wrap: anywhere; }
+.maison-app :is(.customers-list-card__money,.finance-stat-card__value,.finance-table__money,.loyalty-stat__value,.customer-detail-summary__value,.reception-desk-next__time) { font-variant-numeric: tabular-nums; }
+.maison-app :is(.customers-list-table-wrap,.maison-table-wrap,.inventory-table-wrap,.finance-table-wrap) { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border-radius: var(--editorial-radius); }
+.maison-app :is(.customers-list-table,.staff-team-table,.inventory-table,.finance-table) :is(th,td) { vertical-align: middle; }
+.maison-app :is(.finance-page__tabs,.finance-page__range-pills,.customers-list-page__segments) { max-width: 100%; flex-wrap: wrap; gap: 6px; }
+.maison-app :is(.list-view-switch__btn,.finance-page__tab,.finance-page__range-pill,.customers-list-page__segment,.reception-desk-slot-btn,.waitlist-confirm-btn) { min-height: 40px; }
+.maison-app :is(.reception-desk-next__copy,.reception-desk-team__copy,.customer-detail-header__copy,.retention-queue-row__copy) { min-width: 0; }
+.maison-app :is(.maison-empty,.customer-detail-empty,.finance-empty-inline,.loyalty-panel__empty,.retention-queue-panel__empty,.waitlist-queue-panel__empty,.reception-desk-empty) { line-height: 1.8; }
+.theme-app .inventory-create-modal { max-height: calc(100dvh - 32px); overscroll-behavior: contain; }
+.theme-app .inventory-create-modal__close { min-width: 40px; min-height: 40px; }
+@media (hover:hover) and (pointer:fine) {
+  .maison-app :is(.dashboard-mgmt-card,.customers-list-card,.staff-team-card,.inventory-card,.maison-service-card):hover { box-shadow: var(--editorial-shadow-hover); border-color: var(--color-border-strong); }
+}
+@media (max-width:639px) {
+  .maison-app .dashboard-mgmt-card { min-height: 84px; padding: 13px; }
+  .maison-app .dashboard-stat-mini__value { font-size: clamp(1rem,4.8vw,1.45rem); }
+  .maison-app :is(.customers-list-page__search-form,.inventory-page__search,.loyalty-search-form) { flex: 1 1 100%; }
+  .maison-app :is(.customer-detail-header__actions,.retention-queue-row__actions,.finance-debt-pay-form) { flex-wrap: wrap; max-width: 100%; }
+  .maison-app .reception-desk-next__row { flex-wrap: wrap; }
+  .maison-app :is(.list-view-switch__btn,.finance-page__tab,.reception-desk-slot-btn,.waitlist-confirm-btn) { min-height: 44px; }
+  .theme-app .inventory-create-modal { max-height: calc(100dvh - 16px - env(safe-area-inset-bottom,0px)); }
+}

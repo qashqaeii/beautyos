@@ -102,6 +102,21 @@ def management(request):
     if has_permission(membership, P_SALON_SETTINGS):
         links.append({"title": "اطلاعات سالن", "url": reverse("salons_settings:home"), "icon": "building-2"})
     links.append({"title": "نمونه‌کارها", "url": reverse("portfolio:list"), "icon": "images"})
+    descriptions = {
+        "user-round": "پروفایل، ساعات کاری و دسترسی تیم",
+        "users": "پرونده، سوابق و ارتباط با مشتریان",
+        "scissors": "تعرفه، مدت و دسته‌بندی خدمات",
+        "wallet": "دریافتی، بدهی و تسویه متخصصان",
+        "receipt": "ثبت و مرور هزینه‌های سالن",
+        "percent": "قوانین و محاسبه سهم متخصصان",
+        "boxes": "موجودی، دسته‌بندی و گردش کالا",
+        "gem": "امتیازها و سطح وفاداری مشتریان",
+        "user-plus": "عضویت و دعوت همکاران",
+        "building-2": "هویت سالن و تنظیمات صفحه عمومی",
+        "images": "مدیریت گالری و تصاویر خدمات",
+    }
+    for link in links:
+        link["description"] = descriptions.get(link["icon"], "")
     return render(
         request,
         "dashboard/management.html",

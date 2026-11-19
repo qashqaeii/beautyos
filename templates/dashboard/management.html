@@ -12,8 +12,12 @@
   <nav class="dashboard-mgmt-grid" aria-label="بخش‌های مدیریتی">
     {% for link in links %}
     <a href="{{ link.url }}" class="dashboard-mgmt-card dashboard-enter">
-      <span class="dashboard-mgmt-card__title">{{ link.title }}</span>
       <span class="dashboard-mgmt-card__icon" aria-hidden="true"><i data-lucide="{{ link.icon }}" class="beautyos-lucide beautyos-lucide--sm"></i></span>
+      <span class="editorial-management-copy">
+        <span class="dashboard-mgmt-card__title">{{ link.title }}</span>
+        {% if link.description %}<span class="editorial-management-description">{{ link.description }}</span>{% endif %}
+      </span>
+      <i data-lucide="chevron-left" class="editorial-management-arrow" aria-hidden="true"></i>
     </a>
     {% endfor %}
   </nav>
