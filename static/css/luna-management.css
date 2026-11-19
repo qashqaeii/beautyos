@@ -1,7 +1,7 @@
 /* BeautyOS management | Editorial Rose
    The floral artwork is extracted from the approved design, not a screenshot UI.
    Existing brand, application links and role policy remain authoritative. */
-.luna-management-shell {
+body.beautyos-main-bg .maison-app.beautyos-main-bg__shell.luna-management-shell {
   --management-ink:#51443f;
   --management-title:#49332c;
   --management-muted:#74635c;
@@ -15,8 +15,8 @@
 .luna-management-shell .dashboard-mgmt-page {
   display:flex; flex-direction:column; gap:16px; min-width:0;
 }
-.luna-management-shell .maison-unified-header.dashboard-lite-app-header {
-  min-height:0; margin:0 12px; padding:9px 0 0; background:transparent; border:0;
+body.beautyos-main-bg .luna-management-shell .maison-unified-header.dashboard-lite-app-header {
+  min-height:0; margin:0 12px; padding:9px 0 0; background:transparent; border:0; backdrop-filter:none; -webkit-backdrop-filter:none;
 }
 .luna-management-shell .maison-unified-header.dashboard-lite-app-header .maison-unified-header__actions { justify-content:flex-end; width:auto; }
 .luna-management-shell .app-user-chip { background:#fff9f5; border:1px solid rgba(227,207,198,.7); border-radius:999px; box-shadow:0 3px 10px rgba(81,68,63,.055); }
@@ -45,7 +45,7 @@
   box-shadow:inset 0 1px 4px rgba(157,114,110,.12),0 2px 7px rgba(81,68,63,.055);
 }
 .management-hero-emblem svg { width:26px;height:26px;stroke-width:1.65; }
-.management-hero-copy { min-width:0; }
+.management-hero-copy { min-width:0; overflow-wrap:anywhere; }
 .luna-management-shell .dash-page-header__title { color:var(--management-title); font-size:clamp(1.25rem,2.1vw,1.9rem); line-height:1.45; font-weight:700; text-align:start; }
 .management-hero-copy p { color:var(--management-muted); font-size:.76rem; line-height:1.8; margin-top:5px; text-wrap:pretty; }
 .luna-management-shell .dashboard-mgmt-grid {
@@ -111,16 +111,16 @@
   .luna-management-shell .maison-unified-header.dashboard-lite-app-header .maison-unified-header__primary { display:flex; flex:0 0 auto; }
   .luna-management-shell .maison-unified-header.dashboard-lite-app-header .maison-unified-header__copy { display:none; }
   .luna-management-shell .maison-sidebar--premium { --color-sidebar:#f9eee8; }
-  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) { width:clamp(210px,18vw,284px); border-color:#fffaf7; box-shadow:0 8px 30px rgba(105,72,57,.055); }
-  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__brand { padding:16px 12px 19px; border-bottom:1px solid #e8d6cd!important; }
-  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__product-logo { min-height:65px;max-height:78px; margin-bottom:4px; padding:0; }
-  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__product-logo-img { max-height:70px; border-radius:12px; }
-  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .management-sidebar-brand { display:grid; justify-items:center; gap:2px; }
+  .maison-app.luna-management-shell .maison-sidebar--premium:not(.is-collapsed) { width:clamp(210px,18vw,284px); border-color:#fffaf7; box-shadow:0 8px 30px rgba(105,72,57,.055); }
+  .maison-app.luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__brand { padding:16px 12px 19px; border-bottom:1px solid #e8d6cd!important; }
+  .maison-app.luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__product-logo { min-height:65px;max-height:78px; margin-bottom:4px; padding:0; }
+  .maison-app.luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__product-logo-img { max-height:70px; border-radius:12px; }
+  .maison-app.luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .management-sidebar-brand { display:grid; justify-items:center; gap:2px; }
   .management-sidebar-brand strong { font:600 1.6rem/1.25 Georgia,serif; color:#754b40; }
   .management-sidebar-brand span { color:#74635c; font-size:.71rem; }
   .luna-management-shell .maison-sidebar .nav-link { min-height:46px; }
-  .luna-management-shell .maison-sidebar .nav-link-active { background:linear-gradient(110deg,#e6c8bc,#ecd9d1); color:#5e3c33; }
-  .luna-management-shell .maison-sidebar .nav-link-active::before { display:none; }
+  .maison-app.luna-management-shell .maison-sidebar .nav-link-active { background:linear-gradient(110deg,#e6c8bc,#ecd9d1); color:#5e3c33; }
+  .maison-app.luna-management-shell .maison-sidebar .nav-link-active::before { display:none; }
 }
 @media (min-width:1280px) {
   .luna-management-shell .dashboard-mgmt-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(12px,1.25vw,20px); }
