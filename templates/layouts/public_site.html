@@ -5,7 +5,8 @@
 <div class="public-site beautyos-main-bg__shell min-h-screen min-h-[100dvh]" data-theme="luna_signature">
   <p class="public-announcement" role="status">مدیریت حرفه‌ای نوبت و تیم سالن · رزرو آنلاین برای مشتریان</p>
   {% include "partials/public_header.html" %}
-  <main>
+  <a href="#public-content" class="editorial-skip-link">رفتن به محتوای اصلی</a>
+  <main id="public-content" tabindex="-1">
     {% block public_content %}{% endblock %}
   </main>
   {% include "partials/public_footer.html" %}

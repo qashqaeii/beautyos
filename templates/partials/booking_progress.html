@@ -1,10 +1,13 @@
 {% with step=step|default:1 %}
-<ol class="booking-stepper">
-  <li class="{% if step >= 1 %}is-active{% endif %}">خدمت</li>
-  <li class="{% if step >= 2 %}is-active{% endif %}">متخصص</li>
-  <li class="{% if step >= 3 %}is-active{% endif %}">زمان</li>
-  <li class="{% if step >= 4 %}is-active{% endif %}">اطلاعات</li>
-  <li class="{% if step >= 5 %}is-active{% endif %}">موبایل</li>
-  <li class="{% if step >= 6 %}is-active{% endif %}">تأیید</li>
-</ol>
+<div class="editorial-booking-progress">
+  <p class="editorial-booking-progress__caption">مرحله {{ step }} از ۶</p>
+  <ol class="booking-stepper" aria-label="مراحل رزرو نوبت">
+    <li class="{% if step >= 1 %}is-active{% endif %}{% if step == 1 %} is-current{% endif %}" {% if step == 1 %}aria-current="step"{% endif %}><span class="editorial-step-index" aria-hidden="true">۱</span><span>خدمت</span></li>
+    <li class="{% if step >= 2 %}is-active{% endif %}{% if step == 2 %} is-current{% endif %}" {% if step == 2 %}aria-current="step"{% endif %}><span class="editorial-step-index" aria-hidden="true">۲</span><span>متخصص</span></li>
+    <li class="{% if step >= 3 %}is-active{% endif %}{% if step == 3 %} is-current{% endif %}" {% if step == 3 %}aria-current="step"{% endif %}><span class="editorial-step-index" aria-hidden="true">۳</span><span>زمان</span></li>
+    <li class="{% if step >= 4 %}is-active{% endif %}{% if step == 4 %} is-current{% endif %}" {% if step == 4 %}aria-current="step"{% endif %}><span class="editorial-step-index" aria-hidden="true">۴</span><span>اطلاعات</span></li>
+    <li class="{% if step >= 5 %}is-active{% endif %}{% if step == 5 %} is-current{% endif %}" {% if step == 5 %}aria-current="step"{% endif %}><span class="editorial-step-index" aria-hidden="true">۵</span><span>موبایل</span></li>
+    <li class="{% if step >= 6 %}is-active{% endif %}{% if step == 6 %} is-current{% endif %}" {% if step == 6 %}aria-current="step"{% endif %}><span class="editorial-step-index" aria-hidden="true">۶</span><span>تأیید</span></li>
+  </ol>
+</div>
 {% endwith %}

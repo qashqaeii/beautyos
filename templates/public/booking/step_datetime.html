@@ -2,10 +2,10 @@
 {% block booking_content %}
 {% include "partials/booking_progress.html" with step=3 %}
 <h1 class="display-editorial text-xl font-semibold text-espresso">{{ day_jalali }}</h1>
-<p class="mt-1 text-sm text-ink-secondary">انتخاب ساعت</p>
+<p class="mt-1 text-sm text-ink-secondary">یکی از ساعت‌های آزاد را برای نوبت خود انتخاب کنید.</p>
 <form method="post" action="{% url 'salons_public:booking_pick_slot' slug=salon.slug %}" class="mt-6">
   {% csrf_token %}
-  <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">
+  <div class="editorial-booking-slots grid grid-cols-3 gap-2 sm:grid-cols-4">
     {% for slot in slots %}
     <button type="submit" name="start_iso" value="{{ slot.isoformat }}" class="btn-secondary min-h-[44px] text-xs py-2">{{ slot|time:"H:i" }}</button>
     {% empty %}

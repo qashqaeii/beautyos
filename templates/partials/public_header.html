@@ -15,11 +15,11 @@
     <nav class="public-nav__links" aria-label="ناوبری اصلی">
       <a
         href="{% url 'website:home' %}"
-        class="public-nav-link {% if url_name == 'home' %}public-nav-link--active{% endif %}"
+        class="public-nav-link {% if url_name == 'home' %}public-nav-link--active{% endif %}" {% if url_name == 'home' %}aria-current="page"{% endif %}
       >خانه</a>
       <a
         href="{% url 'website:features' %}"
-        class="public-nav-link {% if url_name == 'features' %}public-nav-link--active{% endif %}"
+        class="public-nav-link {% if url_name == 'features' %}public-nav-link--active{% endif %}" {% if url_name == 'features' %}aria-current="page"{% endif %}
       >امکانات</a>
       <a
         href="{% url 'website:home' %}#showcase"
@@ -35,7 +35,7 @@
       >سوالات</a>
       <a
         href="{% url 'website:contact' %}"
-        class="public-nav-link {% if url_name == 'contact' %}public-nav-link--active{% endif %}"
+        class="public-nav-link {% if url_name == 'contact' %}public-nav-link--active{% endif %}" {% if url_name == 'contact' %}aria-current="page"{% endif %}
       >تماس با ما</a>
     </nav>
 
@@ -102,13 +102,13 @@
       </button>
     </div>
     <nav class="public-nav-drawer__links" aria-label="ناوبری موبایل">
-      <a href="{% url 'website:home' %}" class="public-nav-drawer__link {% if url_name == 'home' %}is-active{% endif %}" @click="navOpen = false">خانه</a>
-      <a href="{% url 'website:features' %}" class="public-nav-drawer__link {% if url_name == 'features' %}is-active{% endif %}" @click="navOpen = false">امکانات</a>
+      <a href="{% url 'website:home' %}" class="public-nav-drawer__link {% if url_name == 'home' %}is-active{% endif %}" {% if url_name == 'home' %}aria-current="page"{% endif %} @click="navOpen = false">خانه</a>
+      <a href="{% url 'website:features' %}" class="public-nav-drawer__link {% if url_name == 'features' %}is-active{% endif %}" {% if url_name == 'features' %}aria-current="page"{% endif %} @click="navOpen = false">امکانات</a>
       <a href="{% url 'website:home' %}#showcase" class="public-nav-drawer__link" @click="navOpen = false">محصول</a>
       <a href="{% url 'website:home' %}#start" class="public-nav-drawer__link" @click="navOpen = false">شروع</a>
       <a href="{% url 'website:home' %}#faq" class="public-nav-drawer__link" @click="navOpen = false">سوالات</a>
-      <a href="{% url 'website:faq' %}" class="public-nav-drawer__link {% if url_name == 'faq' %}is-active{% endif %}" @click="navOpen = false">راهنمای کامل</a>
-      <a href="{% url 'website:contact' %}" class="public-nav-drawer__link {% if url_name == 'contact' %}is-active{% endif %}" @click="navOpen = false">تماس با ما</a>
+      <a href="{% url 'website:faq' %}" class="public-nav-drawer__link {% if url_name == 'faq' %}is-active{% endif %}" {% if url_name == 'faq' %}aria-current="page"{% endif %} @click="navOpen = false">راهنمای کامل</a>
+      <a href="{% url 'website:contact' %}" class="public-nav-drawer__link {% if url_name == 'contact' %}is-active{% endif %}" {% if url_name == 'contact' %}aria-current="page"{% endif %} @click="navOpen = false">تماس با ما</a>
     </nav>
     <div class="public-nav-drawer__footer">
       {% if user.is_authenticated %}
