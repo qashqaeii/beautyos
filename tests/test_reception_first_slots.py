@@ -113,3 +113,32 @@ def test_reception_staff_filter_no_slot_message(client, salon, owner_membership)
         {"day": day.isoformat(), "service": service.pk, "staff": staff.pk},
     ).content.decode()
     assert "این متخصص در روز انتخاب‌شده وقت آزاد ندارد." in html
+
+
+@pytest.mark.django_db
+def test_reception_editorial_layout_preserves_booking_and_single_header(client, salon, owner_membership):
+    from django.contrib.staticfiles import finders
+
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+    url = reverse("reception:desk")
+    response = client.get(url)
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert html.count("<h1") == 1
+    assert 'class="maison-unified-header ' not in html
+    assert "luna-reception-shell" in html
+    assert "luna-reception.css" in html
+    assert "reception-desk-header__cta" in html
+    assert "reception-desk-service" in html
+    assert "reception-desk-staff" in html
+    for name in ("next", "pending"):
+        asset = f"images/photos/beautyos-reception-{name}.webp"
+        assert asset in html
+        assert finders.find(asset)
+    response = client.get(url, {"book": "1"})
+    assert response.status_code == 200
+    assert response.context["book_modal_open"]
+    assert "appointment-booking-modal-title" in response.content.decode()

@@ -13,6 +13,9 @@
     {% if request.resolver_match.app_name == 'finance' %}
     <div class="luna-finance-sidebar-brand"><strong dir="ltr">{{ BEAUTYOS_PRODUCT_NAME }}</strong><span>مدیریت سالن زیبایی</span></div>
     {% endif %}
+    {% if request.resolver_match.app_name == 'reception' %}
+    <div class="luna-reception-sidebar-brand"><strong dir="ltr">{{ BEAUTYOS_PRODUCT_NAME }}</strong><span>CRM سالن زیبایی</span></div>
+    {% endif %}
     {% if request.resolver_match.app_name == 'appointments' and request.resolver_match.url_name == 'calendar' %}<p class="editorial-calendar-brand-subtitle">سامانه مدیریت سالن زیبایی</p>{% endif %}
   </div>
   <div class="luna-sidebar-control">

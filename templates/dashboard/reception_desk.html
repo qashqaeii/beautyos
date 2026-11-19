@@ -1,6 +1,8 @@
 {% extends "layouts/app_shell.html" %}
 {% load humanize appointment_tags format_tags staff_tags static %}
+{% block shell_modifier %}luna-reception-shell{% endblock %}
 {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/luna-reception.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 {% if can_book_appointment and appointment_form %}
 <script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 <script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
@@ -39,8 +41,11 @@
 <div class="reception-desk-layout">
   <section class="reception-desk-priority dashboard-enter" aria-label="نوبت بعدی و تأییدها">
     <div class="reception-desk-priority__grid">
-      <div class="reception-desk-priority__next">
-        <p class="reception-desk-priority__eyebrow">نوبت بعدی</p>
+      <div class="reception-desk-priority__next{% if not next_appt %} luna-reception-priority-empty{% endif %}">
+        <header class="luna-reception-priority-head">
+          <span class="luna-reception-icon" aria-hidden="true"><i data-lucide="calendar-days"></i></span>
+          <h2 class="reception-desk-priority__eyebrow">نوبت بعدی</h2>
+        </header>
         {% if next_appt %}
         <div class="reception-desk-next__row">
           <time class="reception-desk-next__time tabular-nums" datetime="{{ next_appt.start_at|date:'c' }}">{{ next_appt.start_at|fa_time }}</time>
@@ -73,11 +78,13 @@
         <a href="{% url 'appointments:detail' pk=next_appt.pk %}" class="reception-desk-next__detail">جزئیات نوبت</a>
         {% else %}
         <p class="reception-desk-empty reception-desk-empty--inline">نوبت فعالی در صف نیست.</p>
+        <img class="luna-reception-empty-art" src="{% static 'images/photos/beautyos-reception-next.webp' %}" width="228" height="140" alt="" decoding="async">
         {% endif %}
       </div>
 
-      <div class="reception-desk-priority__pending">
-        <header class="reception-desk-priority__pending-head">
+      <div class="reception-desk-priority__pending{% if not pending_confirm %} luna-reception-priority-empty{% endif %}">
+        <header class="reception-desk-priority__pending-head luna-reception-priority-head">
+          <span class="luna-reception-icon" aria-hidden="true"><i data-lucide="hourglass"></i></span>
           <h2 class="reception-desk-priority__eyebrow reception-desk-priority__eyebrow--inline">در انتظار تأیید</h2>
           <span class="reception-desk-count tabular-nums">{{ pending_confirm|length|persian_digits }}</span>
         </header>
@@ -93,6 +100,7 @@
         </ul>
         {% else %}
         <p class="reception-desk-empty reception-desk-empty--inline">رزروی در انتظار تأیید نیست.</p>
+        <img class="luna-reception-empty-art" src="{% static 'images/photos/beautyos-reception-pending.webp' %}" width="236" height="140" alt="" decoding="async">
         {% endif %}
       </div>
     </div>
@@ -101,8 +109,8 @@
   <section class="reception-desk-workspace dashboard-enter" aria-label="وقت آزاد و تیم">
     <div class="reception-desk-workspace__grid">
       <div class="reception-desk-workspace__slots">
-        <h2 class="reception-desk-workspace__title">اولین وقت آزاد</h2>
-        <form method="get" class="reception-desk-slot-filters">
+        <h2 class="reception-desk-workspace__title"><i data-lucide="calendar-days" aria-hidden="true"></i>اولین وقت آزاد</h2>
+        <form method="get" action="{% url 'reception:desk' %}" class="reception-desk-slot-filters">
           <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
           <div class="reception-desk-slot-filters__field">
             <label class="reception-desk-service-form__label" for="reception-desk-service">خدمت</label>
@@ -145,10 +153,12 @@
                 <span class="reception-desk-slots-table__spec" role="cell">{% if row.staff.title %}{{ row.staff.title }}{% else %}—{% endif %}</span>
                 <span class="reception-desk-slots-table__time tabular-nums" role="cell">{{ row.start|fa_time }}</span>
                 <div class="reception-desk-slots-table__action" role="cell">
+                  {% if can_book_appointment %}
                   <a
-                    href="?book=1&amp;staff={{ row.staff.pk }}&amp;service={{ row.service.pk }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;start={{ row.start|date:'c'|urlencode }}"
+                    href="{% url 'reception:desk' %}?book=1&amp;staff={{ row.staff.pk }}&amp;service={{ row.service.pk }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;start={{ row.start|date:'c'|urlencode }}"
                     class="reception-desk-slot-btn"
                   >رزرو</a>
+                  {% else %}<span aria-label="بدون دسترسی رزرو">—</span>{% endif %}
                 </div>
               </div>
             </li>
@@ -156,23 +166,24 @@
           </ul>
         </div>
         {% else %}
-        <p class="reception-desk-empty reception-desk-empty--block">
-          {% if not selected_service %}
+        <div class="reception-desk-empty reception-desk-empty--block">
+          <i data-lucide="calendar-days" class="luna-reception-slot-empty-icon" aria-hidden="true"></i>
+          <p>{% if not selected_service %}
           برای دیدن وقت‌ها یک خدمت انتخاب کنید.
           {% elif slot_staff_no_availability %}
           این متخصص در روز انتخاب‌شده وقت آزاد ندارد.
           {% else %}
           وقت آزاد برای این خدمت نیست.
-          {% endif %}
-        </p>
+          {% endif %}</p>
+        </div>
         {% endif %}
       </div>
 
       <div class="reception-desk-workspace__team">
         <header class="reception-desk-workspace__head">
-          <h2 class="reception-desk-workspace__title !mb-0">تیم سالن</h2>
+          <h2 class="reception-desk-workspace__title !mb-0"><i data-lucide="users-round" aria-hidden="true"></i>تیم سالن</h2>
           {% if can_manage_staff %}
-          <a href="{% url 'staff:list' %}" class="reception-desk-card__link">مدیریت تیم</a>
+          <a href="{% url 'staff:list' %}" class="reception-desk-card__link">مدیریت تیم <i data-lucide="external-link" aria-hidden="true"></i></a>
           {% endif %}
         </header>
         <ul class="reception-desk-team reception-desk-team--grid">
@@ -198,11 +209,11 @@
 
   {% if quick_access_links %}
   <section class="reception-desk-quick dashboard-enter">
-    <h2 class="reception-desk-quick__title">دسترسی سریع</h2>
+    <h2 class="reception-desk-quick__title"><i data-lucide="zap" aria-hidden="true"></i>دسترسی سریع</h2>
     <div class="reception-desk-quick__row">
       {% for link in quick_access_links %}
       <a href="{{ link.url }}" class="reception-desk-quick__link">
-        <i data-lucide="{{ link.icon }}" class="reception-desk-quick__icon" aria-hidden="true"></i>
+        <span class="luna-reception-quick-icon" aria-hidden="true"><i data-lucide="{{ link.icon }}" class="reception-desk-quick__icon"></i></span>
         <span class="reception-desk-quick__label">{{ link.title }}</span>
         <i data-lucide="chevron-left" class="reception-desk-quick__arrow" aria-hidden="true"></i>
       </a>
