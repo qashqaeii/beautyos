@@ -170,6 +170,9 @@ def _beautyos_asset_version() -> str:
     stamps = []
     for rel in (
         "static/css/beautyos.css",
+        "static/css/editorial-foundation.css",
+        "static/css/editorial-workspace.css",
+        "static/css/editorial-public.css",
         "static/js/jalali-datepicker.js",
         "static/js/fa-money.js",
         "static/js/appointment-customer-picker.js",

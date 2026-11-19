@@ -1,0 +1,60 @@
+/* BeautyOS | Editorial Rose — shared shell and interaction refinement.
+   Runtime CSS: intentionally separate from compiled Tailwind. Existing theme tokens are authoritative. */
+.theme-app {
+  --editorial-radius: 16px;
+  --editorial-shadow: 0 3px 14px rgba(81,68,63,.055);
+  --editorial-shadow-hover: 0 8px 24px rgba(81,68,63,.09);
+  --editorial-focus: var(--color-primary-hover);
+  --editorial-readable-muted: #74655f;
+}
+.editorial-skip-link {
+  position: fixed; inset-block-start: 12px; inset-inline-start: 12px;
+  z-index: 100; padding: 10px 16px; border-radius: 10px;
+  background: var(--color-surface-elevated); color: var(--color-text-heading);
+  transform: translateY(-180%); box-shadow: var(--editorial-shadow);
+}
+.editorial-skip-link:focus { transform: none; }
+.theme-app :where(a,button,input,select,textarea,summary,[tabindex]):focus-visible {
+  outline: 2px solid var(--editorial-focus); outline-offset: 3px;
+}
+.theme-app :where(button,a,input,select,textarea) { -webkit-tap-highlight-color: transparent; }
+.theme-app :where(.btn-primary,.btn-secondary,.btn-public-primary,.btn-public-ghost) {
+  min-block-size: 42px; gap: 8px; line-height: 1.5;
+  transition: background-color .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.theme-app :where(button:disabled,input:disabled,select:disabled,textarea:disabled,[aria-disabled="true"]) {
+  cursor: not-allowed;
+}
+.theme-app :where(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),select,textarea).input-field {
+  min-inline-size: 0; max-inline-size: 100%; line-height: 1.65;
+  border-color: var(--color-border-strong);
+}
+.theme-app .input-field::placeholder { color: var(--editorial-readable-muted); opacity: 1; }
+.theme-app :where(.input-field,textarea,select)[aria-invalid="true"] { border-color: var(--color-danger); }
+.theme-app .maison-main { min-inline-size: 0; overscroll-behavior-y: contain; }
+.theme-app .maison-content { min-inline-size: 0; scroll-margin-block-start: 12px; }
+.theme-app .maison-unified-header__copy { min-inline-size: 0; }
+.theme-app .maison-page-title { line-height: 1.45; overflow-wrap: anywhere; }
+.theme-app .maison-page-subtitle { line-height: 1.75; overflow-wrap: anywhere; }
+.theme-app .maison-page-subtitle:empty, .theme-app .maison-page-date:empty { display: none; }
+.theme-app .maison-unified-header__actions, .theme-app .maison-page-actions { min-inline-size: 0; flex-wrap: wrap; }
+.theme-app .maison-sidebar .nav-link { min-block-size: 44px; }
+.theme-app .maison-sidebar .nav-link-active { font-weight: 700; }
+.theme-app .maison-sidebar .nav-link :where(svg,i) { flex-shrink: 0; }
+.theme-app .editorial-mobile-nav { display: flex; align-items: stretch; }
+.theme-app .editorial-mobile-nav > a { flex: 1 1 0; min-inline-size: 0; }
+.theme-app .maison-mobile-bar__link { min-block-size: 48px; }
+.theme-app .maison-mobile-bar__link.is-active { font-weight: 700; }
+.theme-app :where(.premium-card,.maison-panel,.page-toolbar) { min-inline-size: 0; }
+@media (max-width: 639px) {
+  .theme-app .maison-unified-header__actions { max-inline-size: 100%; }
+  .theme-app .maison-page-actions { gap: 6px; }
+  .theme-app :where(.btn-primary,.btn-secondary,.btn-public-primary,.btn-public-ghost) { min-block-size: 44px; }
+  .theme-app .input-field { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-app *, .theme-app *::before, .theme-app *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+}

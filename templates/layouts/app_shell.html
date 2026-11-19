@@ -21,6 +21,7 @@
   "
   :class="{ 'maison-app--sheet-open': quickSheetOpen || moreSheetOpen }"
 >
+  <a href="#workspace-content" class="editorial-skip-link">رفتن به محتوای اصلی</a>
   {% include "partials/sidebar.html" %}
   <div class="maison-main maison-scroll-minimal min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
     <div class="maison-htmx-progress htmx-indicator" aria-hidden="true"></div>
@@ -29,7 +30,7 @@
         <button
           type="button"
           class="maison-sidebar-toggle hidden shrink-0 lg:inline-flex"
-          aria-label="جمع کردن منو"
+           :aria-label="sidebarCollapsed ? 'باز کردن منو' : 'جمع کردن منو'" :aria-expanded="!sidebarCollapsed"
           @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('maisonSidebarCollapsed', sidebarCollapsed ? '1' : '0')"
         >
           <i data-lucide="panel-right" class="h-4 w-4"></i>
@@ -52,7 +53,7 @@
       </div>
     </header>
 
-    <main class="maison-content maison-content--enter">
+    <main id="workspace-content" tabindex="-1" class="maison-content maison-content--enter">
       {% block mobile_header %}{% endblock %}
       {% block content %}{% endblock %}
     </main>
