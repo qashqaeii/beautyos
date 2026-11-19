@@ -1,5 +1,5 @@
 {% load format_tags l10n %}
-<div class="overview-analytics-grid">
+<div class="overview-analytics-grid{% if analytics.revenue %} overview-analytics-grid--finance{% endif %}">
   {% if analytics.revenue %}
   <section class="overview-panel overview-revenue" aria-labelledby="overview-revenue-title">
     <div class="overview-panel-head">
@@ -19,7 +19,7 @@
         <polyline points="{{ analytics.revenue.points }}" stroke="#9D726E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" fill="none"/>
         {% for point in analytics.revenue.rows %}{% if trend_days == 7 %}<circle cx="{{ point.x|unlocalize }}" cy="{{ point.y|unlocalize }}" r="3" fill="#9D726E" stroke="#fff" stroke-width="1"/>{% endif %}{% endfor %}
       </svg>
-      <div class="overview-chart-labels">{% for item in analytics.revenue.labels %}<span>{{ item.label|fa_num }}</span>{% endfor %}</div>
+      <div class="overview-chart-labels">{% for item in analytics.revenue.labels %}<span style="--chart-label-x:{{ item.label_position|unlocalize }}%">{{ item.label|fa_num }}</span>{% endfor %}</div>
     </div>
     <details class="overview-chart-details"><summary>جزئیات روزانه</summary><dl>{% for item in analytics.revenue.rows %}<div><dt>{{ item.day|fa_jalali }}</dt><dd>{{ item.amount|fa_money }} تومان</dd></div>{% endfor %}</dl></details>
     {% else %}
@@ -30,7 +30,7 @@
   <section class="overview-panel overview-status" aria-labelledby="overview-status-title">
     <div class="overview-panel-head"><div><h2 id="overview-status-title">وضعیت نوبت‌ها</h2><p>تمام نوبت‌های روز انتخاب‌شده، شامل لغوشده</p></div></div>
     <div class="overview-status-body">
-      <div class="overview-donut" style="--status-stops:{{ analytics.status_gradient }}" aria-hidden="true"><div><strong>{{ analytics.status_total|fa_num }}</strong><span>کل نوبت‌ها</span></div></div>
+      <div class="overview-donut" style="--status-stops:{{ analytics.status_gradient }}" role="img" aria-label="کل نوبت‌ها: {{ analytics.status_total|fa_num }}"><div><strong>{{ analytics.status_total|fa_num }}</strong><span>کل نوبت‌ها</span></div></div>
       <ul class="overview-status-legend">{% for item in analytics.statuses %}<li><span class="overview-dot" style="--dot:{{ item.color }}"></span><span>{{ item.label }}</span><strong>{{ item.count|fa_num }}</strong></li>{% endfor %}</ul>
     </div>
   </section>

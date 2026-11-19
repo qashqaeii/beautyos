@@ -41,6 +41,7 @@ def _revenue(salon, day, days):
         row["x"] = round(12 + 576 * i / max(days - 1, 1), 2)
         row["y"] = round(150 - 126 * row["amount"] / scale, 2)
         row["label"] = to_jalali(row["day"])[5:]
+        row["label_position"] = round(row["x"] / 6, 3)
     points = " ".join(f'{r["x"]},{r["y"]}' for r in rows)
     return {
         "rows": rows, "labels": rows if days == 7 else [rows[i] for i in (0, 7, 14, 21, 29)],
@@ -65,7 +66,7 @@ def overview_analytics(salon, membership, day, trend_days=7):
     result = {
         "statuses": statuses, "status_total": total,
         "status_gradient": ", ".join(stops) if stops else "#E9D8D2 0% 100%",
-        "revenue": None, "customers": None, "staff": None,
+        "revenue": None, "customers": None, "staff": None, "staff_visible": False,
     }
     if has_permission(membership, P_FINANCE_REPORTS):
         result["revenue"] = _revenue(salon, day, 30 if trend_days == 30 else 7)

@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
@@ -48,6 +48,10 @@ def home(request):
         raise PermissionDenied
 
     day = parse_dashboard_day(request)
+    # Bound the overview to dates that can safely be converted to Jalali
+    # and expanded into adjacent days and a 30-day reporting window.
+    if not date(1900, 1, 1) <= day <= date(2200, 12, 31):
+        day = timezone.localdate()
     range_key = request.GET.get("range", "day")
     if range_key not in {"day", "week", "month"}:
         range_key = "day"
@@ -62,6 +66,7 @@ def home(request):
             "salon": request.salon,
             "membership": membership,
             "range_key": range_key,
+            "finance_period_label": {"day": "روز انتخاب‌شده", "week": "۷ روز منتهی به تاریخ انتخابی", "month": "از ابتدای ماه شمسی تا تاریخ انتخابی"}[range_key],
             "trend_days": trend_days,
             "today_iso": timezone.localdate().isoformat(),
             "prev_day": (day - timedelta(days=1)).isoformat(),

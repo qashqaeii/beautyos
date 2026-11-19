@@ -260,7 +260,7 @@ def get_overview_context(salon, membership, day: date, pay_start: datetime, pay_
     appt_qs = Appointment.scoped(salon).filter(start_at__gte=start, start_at__lt=end)
     overview = {
         "appointments_count": appt_qs.exclude(status=Appointment.Status.CANCELLED).count(),
-        "pending_count": Appointment.scoped(salon).filter(status=Appointment.Status.PENDING).count(),
+        "pending_count": appt_qs.filter(status=Appointment.Status.PENDING).count(),
     }
     finance = None
     if has_permission(membership, P_FINANCE_REPORTS):

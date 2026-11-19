@@ -45,7 +45,10 @@
 .overview-revenue-total span { font-size:.72rem; color:#756761; }
 .overview-chart { direction:ltr; margin:4px 0 0; }
 .overview-chart svg { display:block; width:100%; height:125px; }
-.overview-chart-labels { display:flex; justify-content:space-between; gap:4px; font-size:.65rem; color:#756761; }
+.overview-chart-labels { position:relative; height:1.5em; font-size:.65rem; color:#756761; }
+.overview-chart-labels span { position:absolute; left:clamp(0px,var(--chart-label-x),100%); transform:translateX(-50%); white-space:nowrap; }
+.overview-chart-labels span:first-child { left:0; transform:none; }
+.overview-chart-labels span:last-child { left:auto; right:0; transform:none; }
 .overview-chart-details { margin-top:12px; font-size:.75rem; color:#756761; }
 .overview-chart-details summary { cursor:pointer; color:#8a635f; min-height:32px; }
 .overview-chart-details dl { display:grid; gap:6px; }
@@ -74,7 +77,7 @@
  .luna-overview-shell .dash-page-header--overview { flex-direction:row; align-items:center; justify-content:space-between; padding:20px; flex-wrap:wrap; }
  .luna-overview-shell .dashboard-stat-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
  .overview-analytics-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
- .overview-revenue { grid-column:1 / -1; }
+ .overview-analytics-grid--finance .overview-revenue { grid-column:1 / -1; }
  .luna-overview-shell .dashboard-stat-mini__surface { min-height:102px; padding:15px; }
  .luna-overview-shell .dashboard-stat-mini__stack { flex-direction:row; align-items:center; gap:11px; }
  .luna-overview-shell .dashboard-stat-mini__value { font-size:clamp(1.15rem,1.8vw,1.7rem); }
@@ -86,10 +89,26 @@
  .luna-overview-shell .overview-sidebar-toggle { display:inline-flex; position:absolute; inset-block-start:9px; inset-inline-end:9px; min-height:30px; width:30px; padding:4px; }
  .luna-overview-shell .dash-page-header__dates { margin-inline-end:26px; }
  .overview-hero-art { display:block; background:linear-gradient(90deg,#fff7f3 7%,transparent 34%,transparent 48%,#fff7f3 72%),url("../images/photos/beautyos-register-hero.webp") no-repeat 44% 46% / 48% auto; opacity:.63; }
- .overview-analytics-grid { grid-template-columns:minmax(0,1fr) minmax(0,1.42fr); }
- .overview-revenue { grid-column:auto; grid-column:2; grid-row:1; }
- .overview-status { grid-column:1; grid-row:1; }
+ .overview-analytics-grid--finance { grid-template-columns:minmax(0,1fr) minmax(0,1.42fr); }
+ .overview-analytics-grid--finance .overview-revenue { grid-column:2; grid-row:1; }
+ .overview-analytics-grid--finance .overview-status { grid-column:1; grid-row:1; }
  .overview-panel { padding:18px; }
 }
 @media(min-width:1500px) { .luna-overview-shell .dashboard-stat-grid { gap:14px; } .luna-overview-shell .dashboard-stat-mini__surface { min-height:117px; } }
 @media(max-width:359px) { .overview-status-body { grid-template-columns:1fr; } .overview-customer-grid { grid-template-columns:1fr; } }
+
+/* Keep scope and numeric values readable at small widths and high zoom. */
+.overview-stat-scope { margin-top:4px; color:#756761; font-size:.66rem; line-height:1.5; }
+.luna-overview-shell .dashboard-stat-mini--featured .overview-stat-scope { color:#fff; }
+.luna-overview-shell .dashboard-stat-mini__digits { min-width:0; }
+.luna-overview-shell .dashboard-stat-mini__stack { min-width:0; }
+.luna-overview-shell .dash-page-header__dates { max-width:100%; }
+@media(min-width:640px) and (max-width:1279px) {
+ .luna-overview-shell .dashboard-stat-mini__stack { flex-direction:column; align-items:flex-start; gap:7px; }
+ .overview-status-body { grid-template-columns:1fr; }
+ .overview-status-legend { width:100%; }
+}
+@media(max-width:639px) {
+ .luna-overview-shell .dash-page-header__nav,.overview-today,.overview-range a { min-height:44px; }
+ .overview-chart-labels { font-size:.58rem; }
+}
