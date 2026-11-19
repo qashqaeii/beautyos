@@ -21,9 +21,14 @@ class ServicePackageForm(PersianModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["session_count"].min_value = 1
-        self.fields["validity_days"].min_value = 1
-        self.fields["validity_days"].max_value = 36500
+        self.fields["session_count"] = forms.IntegerField(
+            label=self.fields["session_count"].label, min_value=1, max_value=2147483647,
+            widget=forms.NumberInput(attrs={"class": "input-field"}),
+        )
+        self.fields["validity_days"] = forms.IntegerField(
+            label=self.fields["validity_days"].label, min_value=1, max_value=36500,
+            widget=forms.NumberInput(attrs={"class": "input-field"}),
+        )
         self.fields["price_toman"] = TomanAmountField(
             label="قیمت",
             min_value=1,
