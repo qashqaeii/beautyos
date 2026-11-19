@@ -10,6 +10,8 @@
   <input type="hidden" name="finance_tab" value="{{ tab }}">
   <input type="hidden" name="finance_range" value="{{ range_key }}">
   <input type="hidden" name="finance_day" value="{{ selected_day|date:'Y-m-d' }}">
+  <input type="hidden" name="finance_rows" value="{{ payment_page_size|default:5 }}">
+  <input type="hidden" name="finance_page" value="{{ payment_page.number|default:1 }}">
   {% endif %}
 
   <div class="inventory-create-modal__scroll maison-scroll-themed">

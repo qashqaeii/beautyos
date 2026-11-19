@@ -14,6 +14,7 @@
     <button type="button" x-ref="mobileAccountClose" aria-label="بستن" @click="closeAccountSheet()"><i data-lucide="x" aria-hidden="true"></i></button>
   </header>
   <div class="luna-account-actions">
+    {% if nav_finance %}<a href="{% url 'finance:overview' %}"><i data-lucide="wallet" aria-hidden="true"></i>مدیریت مالی</a>{% endif %}
     {% if nav_salon_settings %}
     <a href="{% url 'salons_settings:home' %}"><i data-lucide="building-2" aria-hidden="true"></i>اطلاعات سالن</a>
     {% endif %}

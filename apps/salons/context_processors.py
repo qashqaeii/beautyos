@@ -8,6 +8,7 @@ from apps.dashboard.nav import (
 )
 from apps.salons.permissions_policy import (
     P_SALON_SETTINGS,
+    P_FINANCE_REPORTS,
     has_permission,
     membership_permission_codes,
 )
@@ -43,6 +44,7 @@ def salon_context(request):
         "dashboard_theme_vars": theme_vars,
         "dashboard_theme_style": theme_style,
         "membership_permissions": sorted(membership_permission_codes(active_membership)),
+        "nav_finance": has_permission(active_membership, P_FINANCE_REPORTS),
         "nav_salon_settings": has_permission(active_membership, P_SALON_SETTINGS),
         "nav_overview": can_see_overview(active_membership),
         "nav_management": can_see_management(active_membership),

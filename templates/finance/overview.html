@@ -29,9 +29,10 @@
   @keydown.escape.window="paymentOpen && !window.__beautyosJalaliCalendarOpen ? closePayment() : null"
 >
   <header class="finance-page__header">
+    <div class="luna-finance-hero-art" aria-hidden="true"><img src="{% static 'images/photos/beautyos-finance-hero.webp' %}?v={{ BEAUTYOS_ASSET_VERSION }}" alt="" width="665" height="199" decoding="async"></div>
     <div class="finance-page__headline">
       <span class="finance-page__head-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
-      <div><h1 class="finance-page__title">مدیریت مالی</h1><p class="luna-finance-subtitle">درآمد، بدهی‌ها و تسویه حساب‌های سالن</p></div>
+      <div><h1 class="finance-page__title">مدیریت مالی</h1><p class="luna-finance-subtitle">درآمد، پرداخت‌ها و تسویه حساب‌های سالن زیبایی</p></div>
     </div>
   </header>
   <nav class="finance-page__tabs" aria-label="بخش‌های مالی">
@@ -42,47 +43,62 @@
   {% if tab != 'debts' %}
   <section class="finance-page__range-bar" aria-label="بازه گزارش">
     <div class="finance-page__range-pills" role="group" aria-label="بازه زمانی">
-      <a href="?tab={{ tab }}&amp;range=today" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}" {% if range_key == 'today' %}aria-current="true"{% endif %}>امروز</a>
+      <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=today" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}" {% if range_key == 'today' %}aria-current="true"{% endif %}>امروز</a>
       {% if tab == 'income' %}
-      <a href="?tab=income&amp;range=month" class="finance-page__range-pill {% if range_key == 'month' %}is-active{% endif %}" {% if range_key == 'month' %}aria-current="true"{% endif %}>ماه جاری</a>
-      <a href="?tab=income&amp;range=quarter" class="finance-page__range-pill {% if range_key == 'quarter' %}is-active{% endif %}" {% if range_key == 'quarter' %}aria-current="true"{% endif %}>سه ماه گذشته</a>
+      <a href="{% url 'finance:overview' %}?tab=income&amp;range=month" class="finance-page__range-pill {% if range_key == 'month' %}is-active{% endif %}" {% if range_key == 'month' %}aria-current="true"{% endif %}>ماه جاری</a>
+      <a href="{% url 'finance:overview' %}?tab=income&amp;range=quarter" class="finance-page__range-pill {% if range_key == 'quarter' %}is-active{% endif %}" {% if range_key == 'quarter' %}aria-current="true"{% endif %}>سه ماه گذشته</a>
       {% endif %}
-      <a href="?tab={{ tab }}&amp;range=day&amp;day={{ selected_day|date:'Y-m-d' }}" class="finance-page__range-pill {% if range_key == 'day' %}is-active{% endif %}" {% if range_key == 'day' %}aria-current="true"{% endif %}>انتخاب روز</a>
+      <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=day&amp;day={{ selected_day|date:'Y-m-d' }}" class="finance-page__range-pill {% if range_key == 'day' %}is-active{% endif %}" {% if range_key == 'day' %}aria-current="true"{% endif %}>انتخاب روز</a>
     </div>
-    <form method="get" action="{% url 'finance:overview' %}" class="finance-page__day-picker">
-      <input type="hidden" name="tab" value="{{ tab }}">
-      <input type="hidden" name="range" value="day">
-      {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
-    </form>
-    <p class="finance-page__range-caption"><span>{{ range_label }}</span><span class="finance-page__range-sep">·</span><span class="tabular-nums">{{ range_display_jalali|persian_digits }}</span></p>
+    <div class="luna-finance-date-group">
+      <form method="get" action="{% url 'finance:overview' %}" class="finance-page__day-picker">
+        <input type="hidden" name="tab" value="{{ tab }}">
+        <input type="hidden" name="range" value="day">
+        {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
+      </form>
+      {% if range_key == 'month' or range_key == 'quarter' %}
+      <p class="finance-page__range-caption"><span class="tabular-nums">{{ range_display_jalali|persian_digits }}</span></p>
+      {% endif %}
+    </div>
   </section>
   {% endif %}
 
   {% if tab == 'income' %}
   <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="درآمد و دریافتی‌ها">
-    <div class="finance-stat-grid">
+    <div class="finance-stat-grid luna-finance-income-grid">
       <article class="finance-stat-card luna-finance-featured">
         <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
         <p class="finance-stat-card__label">دریافتی کل</p>
-        <p class="finance-stat-card__value tabular-nums">{{ income.total_received|fa_money }} <span class="finance-stat-card__unit">تومان</span></p>
+        <p class="finance-stat-card__value tabular-nums"><bdi>{{ income.total_received|fa_money }}</bdi> <span class="finance-stat-card__unit">تومان</span></p>
+        <div class="luna-finance-compare">
+          {% if presentation.has_previous %}
+          <span class="luna-finance-delta luna-finance-delta--{{ presentation.direction }}"><i data-lucide="{% if presentation.direction == 'up' %}arrow-up-right{% elif presentation.direction == 'down' %}arrow-down-right{% else %}minus{% endif %}" aria-hidden="true"></i><bdi>{{ presentation.comparison|fa_num }}٪</bdi></span>
+          <span>{{ presentation.comparison_label }}</span>
+          {% else %}<span>دریافتی ثبت‌شده در بازه انتخابی</span>{% endif %}
+        </div>
+        {% include "finance/partials/income_sparkline.html" with series=presentation.series.received variant="received" trend_label=presentation.trend_label only %}
       </article>
       <article class="finance-stat-card">
         <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="coins"></i></span>
         <p class="finance-stat-card__label">بیعانه پرداخت کرده‌اند</p>
-        <p class="finance-stat-card__value tabular-nums">{{ income.deposit_customer_count|fa_num }} <span class="finance-stat-card__unit">مشتری</span></p>
+        <p class="finance-stat-card__value tabular-nums"><bdi>{{ income.deposit_customer_count|fa_num }}</bdi> <span class="finance-stat-card__unit">نفر</span></p>
+        <p class="finance-stat-card__hint">مشتریان با پرداخت بیعانه</p>
+        {% include "finance/partials/income_sparkline.html" with series=presentation.series.deposits variant="deposits" trend_label=presentation.trend_label only %}
       </article>
       <article class="finance-stat-card finance-stat-card--success">
         <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="circle-check"></i></span>
         <p class="finance-stat-card__label">تسویه کامل کرده‌اند</p>
-        <p class="finance-stat-card__value tabular-nums">{{ income.settled_customer_count|fa_num }} <span class="finance-stat-card__unit">مشتری</span></p>
+        <p class="finance-stat-card__value tabular-nums"><bdi>{{ income.settled_customer_count|fa_num }}</bdi> <span class="finance-stat-card__unit">نفر</span></p>
+        <p class="finance-stat-card__hint">مشتریان با تسویه کامل</p>
+        {% include "finance/partials/income_sparkline.html" with series=presentation.series.settled variant="settled" trend_label=presentation.trend_label only %}
       </article>
     </div>
 
     <div class="luna-finance-panel">
     <div class="finance-section-head">
-      <div class="luna-finance-panel-title"><i data-lucide="receipt-text" aria-hidden="true"></i><div><h2 class="finance-section-head__title">پرداخت‌های مشتریان</h2><p>حداکثر ۵۰ پرداخت اخیر در بازه انتخابی</p></div></div>
+      <div class="luna-finance-panel-title"><i data-lucide="receipt-text" aria-hidden="true"></i><div><h2 class="finance-section-head__title">پرداخت‌های مشتریان</h2><p>لیست پرداخت‌های ثبت‌شده توسط مشتریان سالن</p></div></div>
       {% if can_payment_create %}
-      <a href="{% querystring payment='1' %}" class="btn-primary finance-section-head__cta"><i data-lucide="plus" aria-hidden="true"></i>ثبت پرداخت مشتری</a>
+      <a href="{{ payment_return_url }}&amp;payment=1" class="btn-primary finance-section-head__cta"><i data-lucide="plus" aria-hidden="true"></i>ثبت پرداخت مشتری</a>
       {% endif %}
     </div>
 
@@ -99,16 +115,25 @@
         <tbody>
           {% for p in payments %}
           <tr>
-            <td class="finance-table__name" data-label="نام">{{ p.customer.full_name }}</td>
-            <td class="finance-table__money" data-label="مبلغ">{{ p.paid_amount_toman|fa_money }} تومان</td>
-            <td class="finance-table__meta" data-label="نوع"><span>{{ p.get_method_display }}</span> <span class="luna-finance-status luna-finance-status--{{ p.status }}">{{ p.get_status_display }}</span></td>
-            <td class="finance-table__date tabular-nums" data-label="تاریخ">{{ p.created_at|jalali_date|persian_digits }}</td>
+            <td class="finance-table__name" data-label="نام"><span class="luna-finance-customer"><span class="luna-finance-customer-icon" aria-hidden="true"><i data-lucide="user-round"></i></span><bdi dir="auto">{{ p.customer.full_name }}</bdi></span></td>
+            <td class="finance-table__money" data-label="مبلغ"><bdi>{{ p.paid_amount_toman|fa_money }}</bdi> <span class="luna-finance-table-unit">تومان</span></td>
+            <td class="finance-table__meta" data-label="نوع"><span class="luna-finance-status luna-finance-status--{{ p.status }}"><i data-lucide="{% if p.status == 'paid' %}circle-check{% elif p.status == 'partial' %}coins{% else %}clock{% endif %}" aria-hidden="true"></i>{% if p.status == 'paid' %}پرداخت کامل{% elif p.status == 'partial' %}پرداخت بخشی{% else %}{{ p.get_status_display }}{% endif %}</span><span class="luna-finance-method">{{ p.get_method_display }}</span></td>
+            <td class="finance-table__date tabular-nums" data-label="تاریخ"><span class="luna-finance-table-date"><i data-lucide="calendar-days" aria-hidden="true"></i><bdi>{{ p.created_at|jalali_date|persian_digits }}</bdi></span></td>
           </tr>
           {% empty %}
           <tr class="luna-finance-table-empty"><td colspan="4"><div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="wallet"></i></span><strong>هنوز پرداختی ثبت نشده است</strong><p>در بازه انتخاب‌شده هیچ پرداختی وجود ندارد.</p></div></td></tr>
           {% endfor %}
         </tbody>
       </table>
+    </div>
+    <div class="luna-finance-table-footer">
+      <span><i data-lucide="list" aria-hidden="true"></i> {% if payment_page.paginator.count %}نمایش {{ payment_page.start_index|fa_num }} تا {{ payment_page.end_index|fa_num }} از {{ payment_page.paginator.count|fa_num }} پرداخت{% else %}۰ پرداخت در این بازه{% endif %}</span>
+      <div class="luna-finance-pagination">
+        {% if payment_page.has_previous %}<a href="{% url 'finance:overview' %}?tab=income&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows={{ payment_page_size|unlocalize }}&amp;page={{ payment_page.previous_page_number|unlocalize }}" aria-label="صفحه قبل"><i data-lucide="chevron-right" aria-hidden="true"></i></a>{% endif %}
+        {% if payment_page.has_next %}<a href="{% url 'finance:overview' %}?tab=income&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows={{ payment_page_size|unlocalize }}&amp;page={{ payment_page.next_page_number|unlocalize }}" aria-label="صفحه بعد"><i data-lucide="chevron-left" aria-hidden="true"></i></a>{% endif %}
+        {% if payment_page_size == 5 and payment_page.paginator.count > 5 %}<a class="luna-finance-view-all" href="{% url 'finance:overview' %}?tab=income&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows=50">مشاهده همه پرداخت‌ها<i data-lucide="chevron-left" aria-hidden="true"></i></a>
+        {% elif payment_page_size == 50 %}<a class="luna-finance-view-all" href="{% url 'finance:overview' %}?tab=income&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows=5">نمایش خلاصه<i data-lucide="chevron-left" aria-hidden="true"></i></a>{% endif %}
+      </div>
     </div>
     </div>
   </section>

@@ -5,7 +5,8 @@ from datetime import date, datetime, timedelta
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Count, Q, Sum
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 
 from apps.commissions.models import CommissionEntry, CommissionSettlement
@@ -83,14 +84,68 @@ def income_metrics(salon, start_dt: datetime, end_dt: datetime) -> dict:
 
 
 def customer_payments_in_range(salon, start_dt: datetime, end_dt: datetime, *, limit: int = 50):
+    return customer_payment_queryset(salon, start_dt, end_dt)[:limit]
+
+
+def customer_payment_queryset(salon, start_dt: datetime, end_dt: datetime):
     return (
         Payment.scoped(salon)
-        .filter(created_at__gte=start_dt, created_at__lt=end_dt)
+        .filter(created_at__gte=start_dt, created_at__lt=end_dt, paid_amount_toman__gt=0)
         .exclude(status=Payment.Status.REFUNDED)
-        .filter(paid_amount_toman__gt=0)
         .select_related("customer")
-        .order_by("-created_at")[:limit]
+        .order_by("-created_at", "-pk")
     )
+
+
+def _sparkline(values):
+    """Small data-only chart. Do not draw a fictional trend for an empty series."""
+    if not any(values):
+        return None
+    peak = max(values)
+    points = " ".join(f"{round(3 + i * 114 / 6, 2)},{round(35 - 30 * amount / peak, 2)}" for i, amount in enumerate(values))
+    return {"points": points, "area": f"3,38 {points} 117,38"}
+
+
+def income_presentation(salon, range_ctx, income):
+    """Seven calendar days of actual receipts and distinct customers per day."""
+    end_day = min(range_ctx["end_date"], timezone.localdate())
+    if end_day < range_ctx["start_date"]:
+        return {"series": {}, "comparison": None, "comparison_label": "", "has_previous": False}
+    first = end_day - timedelta(days=6)
+    start, _ = day_bounds(first)
+    _, end = day_bounds(end_day)
+    daily = (
+        customer_payment_queryset(salon, start, end).order_by()
+        .annotate(day=TruncDate("created_at", tzinfo=timezone.get_current_timezone()))
+        .values("day")
+        .annotate(
+            received=Sum("paid_amount_toman"),
+            deposits=Count("customer_id", filter=Q(status=Payment.Status.PARTIAL), distinct=True),
+            settled=Count("customer_id", filter=Q(status=Payment.Status.PAID), distinct=True),
+        )
+    )
+    by_day = {row["day"]: row for row in daily}
+    values = {key: [int(by_day.get(first + timedelta(days=i), {}).get(key) or 0) for i in range(7)]
+              for key in ("received", "deposits", "settled")}
+    duration = (range_ctx["end_date"] - range_ctx["start_date"]).days + 1
+    # For an incomplete current month compare elapsed days to an equally long
+    # immediately preceding interval, not a full future-inclusive month.
+    elapsed = (end_day - range_ctx["start_date"]).days + 1
+    prev_start, _ = day_bounds(range_ctx["start_date"] - timedelta(days=elapsed))
+    _, prev_end = day_bounds(range_ctx["start_date"] - timedelta(days=1))
+    previous = customer_payment_queryset(salon, prev_start, prev_end).aggregate(total=Sum("paid_amount_toman"))["total"] or 0
+    current = income["total_received"]
+    if elapsed < duration:
+        current = customer_payment_queryset(salon, range_ctx["start_dt"], end).aggregate(total=Sum("paid_amount_toman"))["total"] or 0
+    change = round((current - previous) * 100 / previous) if previous else None
+    return {
+        "series": {key: _sparkline(data) for key, data in values.items()},
+        "trend_label": f"روند ۷ روز منتهی به {to_jalali(end_day)}",
+        "comparison": abs(change) if change is not None else None,
+        "direction": "up" if change is not None and change > 0 else "down" if change is not None and change < 0 else "flat",
+        "has_previous": bool(previous),
+        "comparison_label": "نسبت به روز قبل" if elapsed == 1 else "نسبت به بازه هم‌طول قبل",
+    }
 
 
 def open_debts_summary(salon) -> dict:

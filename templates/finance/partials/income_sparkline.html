@@ -1,0 +1,7 @@
+{% load format_tags %}
+{% if series %}
+<svg class="luna-finance-sparkline luna-finance-sparkline--{{ variant }}" viewBox="0 0 120 40" role="img" aria-label="{{ trend_label|persian_digits }}">
+  <polygon points="{{ series.area }}" fill="currentColor" opacity=".13"/>
+  <polyline points="{{ series.points }}" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+</svg>
+{% endif %}

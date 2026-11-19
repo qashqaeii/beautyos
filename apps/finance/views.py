@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.paginator import Paginator
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -11,8 +12,9 @@ from apps.finance.forms import PaymentForm, SalonDebtForm, SalonDebtPaymentForm
 from apps.finance.models import Payment, SalonDebt
 from apps.finance.services import (
     commission_day_overview,
-    customer_payments_in_range,
+    customer_payment_queryset,
     income_metrics,
+    income_presentation,
     open_debts_summary,
     parse_finance_range,
     record_salon_debt_payment,
@@ -73,6 +75,8 @@ def _finance_get_from_post(post) -> QueryDict:
     qd = QueryDict(mutable=True)
     qd["tab"] = post.get("finance_tab", "income")
     qd["range"] = post.get("finance_range", "today")
+    qd["rows"] = post.get("finance_rows", "5")
+    qd["page"] = post.get("finance_page", "1")
     day = post.get("finance_day")
     if day:
         qd["day"] = day
@@ -116,7 +120,23 @@ def _finance_overview_context(
         debt_form = SalonDebtForm()
     # Only query the active tab. The other panels are not rendered.
     income = income_metrics(request.salon, range_ctx["start_dt"], range_ctx["end_dt"]) if tab == "income" else None
-    payments = customer_payments_in_range(request.salon, range_ctx["start_dt"], range_ctx["end_dt"]) if tab == "income" else ()
+    payments = ()
+    payment_page = None
+    payment_page_size = 50 if get_query.get("rows") == "50" else 5
+    presentation = None
+    if tab == "income":
+        queryset = customer_payment_queryset(request.salon, range_ctx["start_dt"], range_ctx["end_dt"])
+        payment_page = Paginator(queryset, payment_page_size).get_page(get_query.get("page", 1))
+        payments = payment_page.object_list
+        presentation = income_presentation(request.salon, range_ctx, income)
+    # Normalized query also keeps links correct when an invalid payment POST
+    # renders this template from a different endpoint.
+    get_query["tab"] = tab
+    get_query["range"] = range_ctx["range_key"]
+    get_query["day"] = range_ctx["selected_day"].isoformat()
+    if tab == "income":
+        get_query["rows"] = str(payment_page_size)
+        get_query["page"] = str(payment_page.number)
     debts = open_debts_summary(request.salon) if tab == "debts" else {}
     commissions = commission_day_overview(request.salon, range_ctx["selected_day"]) if tab == "commissions" else None
 
@@ -125,6 +145,9 @@ def _finance_overview_context(
         "tab": tab,
         "income": income,
         "payments": payments,
+        "payment_page": payment_page,
+        "payment_page_size": payment_page_size,
+        "presentation": presentation,
         "debt_form": debt_form,
         "debt_form_open": debt_form_open,
         **debts,

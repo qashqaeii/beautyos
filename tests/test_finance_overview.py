@@ -120,3 +120,47 @@ def test_today_range_ignores_stale_day(client, owner_membership):
     response = client.get(reverse("finance:overview"), {"range": "today", "day": "2001-01-01"})
     assert response.status_code == 200
     assert response.context["selected_day"] == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_finance_dashboard_paginates_and_uses_real_scoped_trends(client, owner_membership, salon, salon_b):
+    from django.contrib.staticfiles import finders
+
+    today = timezone.localdate()
+    start, _ = day_bounds(today)
+    customer = Customer.objects.create(salon=salon, full_name="مشتری", phone="+989121233555")
+    other = Customer.objects.create(salon=salon_b, full_name="خارج از سالن", phone="+989121233556")
+    for index in range(6):
+        payment = Payment.objects.create(salon=salon, customer=customer, paid_amount_toman=100_000, status=Payment.Status.PAID)
+        Payment.objects.filter(pk=payment.pk).update(created_at=start + timedelta(minutes=index))
+    previous = Payment.objects.create(salon=salon, customer=customer, paid_amount_toman=300_000, status=Payment.Status.PARTIAL)
+    old_start, _ = day_bounds(today - timedelta(days=1))
+    Payment.objects.filter(pk=previous.pk).update(created_at=old_start)
+    hidden = Payment.objects.create(salon=salon_b, customer=other, paid_amount_toman=900_000, status=Payment.Status.PAID)
+    Payment.objects.filter(pk=hidden.pk).update(created_at=start)
+    client.force_login(owner_membership.user)
+    response = client.get(reverse("finance:overview"))
+    assert response.status_code == 200
+    assert response.context["income"]["total_received"] == 600_000
+    assert response.context["income"]["settled_customer_count"] == 1
+    assert response.context["presentation"]["comparison"] == 100
+    assert response.context["presentation"]["series"]["received"]
+    assert response.context["payment_page"].paginator.count == 6
+    assert len(response.context["payments"]) == 5
+    assert "خارج از سالن" not in response.content.decode()
+    assert "beautyos-finance-hero.webp" in response.content.decode()
+    assert finders.find("images/photos/beautyos-finance-hero.webp")
+    response = client.get(reverse("finance:overview"), {"page": 2})
+    assert len(response.context["payments"]) == 1
+    response = client.get(reverse("finance:overview"), {"rows": 50})
+    assert len(response.context["payments"]) == 6
+
+
+@pytest.mark.django_db
+def test_finance_empty_does_not_invent_change_or_sparklines(client, owner_membership):
+    client.force_login(owner_membership.user)
+    response = client.get(reverse("finance:overview"))
+    assert response.status_code == 200
+    assert response.context["presentation"]["comparison"] is None
+    assert not any(response.context["presentation"]["series"].values())
+    assert response.context["payment_page"].paginator.count == 0
