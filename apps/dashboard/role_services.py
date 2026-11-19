@@ -30,7 +30,9 @@ def parse_dashboard_day(request) -> date:
     day_str = request.GET.get("day")
     if day_str:
         try:
-            return datetime.strptime(day_str, "%Y-%m-%d").date()
+            parsed = datetime.strptime(day_str, "%Y-%m-%d").date()
+            if 1900 <= parsed.year <= 2200:
+                return parsed
         except ValueError:
             pass
     return timezone.localdate()

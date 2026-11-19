@@ -17,12 +17,12 @@ def _local_weekday(d: date) -> int:
 
 
 def staff_is_available(staff: StaffProfile, start: datetime, end: datetime) -> None:
-    if not staff.is_active or not staff.is_bookable:
+    if not staff.is_active or not staff.is_bookable or staff.is_deleted:
         raise SchedulingError("متخصص در دسترس نیست.")
 
     local_start = timezone.localtime(start)
     local_end = timezone.localtime(end)
-    if local_end <= local_start:
+    if local_end <= local_start or local_end.date() != local_start.date():
         raise SchedulingError("بازه زمانی نامعتبر است.")
 
     if local_start < timezone.localtime():
@@ -75,9 +75,14 @@ def create_appointment(
     if staff.salon_id != salon.pk or service.salon_id != salon.pk or customer.salon_id != salon.pk:
         raise SchedulingError("داده‌ها متعلق به این سالن نیستند.")
 
+    staff = StaffProfile.scoped(salon).select_for_update().filter(pk=staff.pk).first()
+    if staff is None or customer.is_deleted or not service.is_active or service.is_deleted:
+        raise SchedulingError("اطلاعات رزرو دیگر معتبر نیست.")
+    if not staff.services.filter(pk=service.pk).exists():
+        raise SchedulingError("این متخصص این خدمت را ارائه نمی‌دهد.")
+    if service.duration_minutes <= 0:
+        raise SchedulingError("مدت خدمت معتبر نیست.")
     end = start + timedelta(minutes=service.duration_minutes)
-
-    StaffProfile.objects.select_for_update().filter(pk=staff.pk).first()
     staff_is_available(staff, start, end)
 
     if has_overlap(salon, staff.pk, start, end):
@@ -113,6 +118,8 @@ def create_appointment(
 
 
 def iter_day_slots(staff: StaffProfile, day: date, service_duration: int, step_minutes=15):
+    if not staff.is_active or not staff.is_bookable or staff.is_deleted or service_duration <= 0 or step_minutes <= 0:
+        return
     weekday = _local_weekday(day)
     hours = StaffWorkHours.objects.filter(staff=staff, weekday=weekday, is_closed=False).first()
     if not hours:

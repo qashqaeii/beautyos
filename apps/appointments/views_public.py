@@ -1,4 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from django.db import transaction
+from django.http import Http404
 
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
@@ -28,6 +31,30 @@ from apps.services.models import Service
 from apps.staff.models import StaffProfile
 
 
+def _pk(value):
+    try:
+        pk = int(value)
+    except (TypeError, ValueError):
+        raise Http404 from None
+    if not 0 < pk <= 2**63 - 1:
+        raise Http404
+    return pk
+
+
+def _parse_slot(value):
+    try:
+        start = datetime.fromisoformat(value)
+        if timezone.is_naive(start):
+            start = timezone.make_aware(start, timezone.get_current_timezone())
+        local = timezone.localtime(start)
+        today = timezone.localdate()
+        if not today <= local.date() <= today + timedelta(days=365):
+            return None
+        return start
+    except (TypeError, ValueError, OverflowError):
+        return None
+
+
 def _salon(slug):
     return get_object_or_404(Salon, slug=slug, is_active=True, is_accepting_bookings=True)
 
@@ -41,9 +68,7 @@ def _booking_context(salon, **extra):
 
 
 def _ensure_booking_salon(request, salon, booking: dict) -> bool:
-    if booking.get("salon_id") and booking.get("salon_id") != str(salon.id):
-        return False
-    return True
+    return booking.get("salon_id") == str(salon.id)
 
 
 def booking_start(request, slug):
@@ -55,12 +80,15 @@ def booking_start(request, slug):
 def booking_staff(request, slug):
     salon = _salon(slug)
     service_id = request.GET.get("service")
-    service = get_object_or_404(Service.scoped(salon), pk=service_id, is_public=True)
+    service = get_object_or_404(Service.scoped(salon), pk=_pk(service_id), is_public=True, is_active=True, is_deleted=False)
     staff = (
         StaffProfile.scoped(salon)
         .filter(is_active=True, is_bookable=True, is_deleted=False, services=service)
         .distinct()
     )
+    previous = request.session.get("booking") or {}
+    if previous.get("salon_id") != str(salon.id) or previous.get("service_id") != service.pk:
+        request.session["booking"] = {}
     merge_booking_session(request, salon_id=str(salon.id), service_id=service.pk)
     return render(request, "public/booking/step_staff.html", _booking_context(salon, service=service, staff_list=staff))
 
@@ -70,16 +98,20 @@ def booking_datetime(request, slug):
     booking = request.session.get("booking") or {}
     if not _ensure_booking_salon(request, salon, booking):
         return redirect(reverse("salons_public:booking_start", kwargs={"slug": slug}))
-    service = get_object_or_404(Service.scoped(salon), pk=booking.get("service_id"))
-    staff = get_object_or_404(StaffProfile.scoped(salon), pk=request.GET.get("staff") or booking.get("staff_id"))
-    merge_booking_session(request, staff_id=staff.pk)
-
-    day_str = request.GET.get("day")
-    if day_str:
-        day = datetime.strptime(day_str, "%Y-%m-%d").date()
-    else:
-        day = timezone.localdate()
-    slots = list(iter_day_slots(staff, day, service.duration_minutes))
+    service = get_object_or_404(Service.scoped(salon), pk=_pk(booking.get("service_id")), is_public=True, is_active=True, is_deleted=False)
+    staff = get_object_or_404(StaffProfile.scoped(salon), pk=_pk(request.GET.get("staff") or booking.get("staff_id")),
+        is_active=True, is_bookable=True, is_deleted=False, services=service)
+    if booking.get("staff_id") != staff.pk:
+        merge_booking_session(request, staff_id=staff.pk, start_iso=None)
+    today = timezone.localdate()
+    try:
+        day = datetime.strptime(request.GET.get("day", ""), "%Y-%m-%d").date()
+    except ValueError:
+        day = today
+    if not today <= day <= today + timedelta(days=365):
+        day = today
+    earliest = timezone.now() + timedelta(minutes=getattr(getattr(salon, "settings", None), "booking_lead_time_minutes", 60))
+    slots = [slot for slot in iter_day_slots(staff, day, service.duration_minutes) if slot >= earliest]
     return render(
         request,
         "public/booking/step_datetime.html",
@@ -102,6 +134,9 @@ def booking_contact(request, slug):
     if request.method == "POST":
         name = request.POST.get("full_name", "").strip()
         phone_raw = request.POST.get("phone", "").strip()
+        if not 1 <= len(name) <= 120:
+            messages.error(request, "نام مشتری را حداکثر تا ۱۲۰ نویسه وارد کنید.")
+            return render(request, "public/booking/step_contact.html", _booking_context(salon, full_name=name, phone=phone_raw))
         try:
             phone = normalize_iran_mobile(phone_raw)
         except ValueError as exc:
@@ -150,8 +185,22 @@ def booking_contact(request, slug):
 
 
 def booking_pick_slot(request, slug):
-    if request.method == "POST":
-        merge_booking_session(request, start_iso=request.POST.get("start_iso"))
+    salon = _salon(slug)
+    booking = request.session.get("booking") or {}
+    if request.method == "POST" and _ensure_booking_salon(request, salon, booking) and booking.get("staff_id") and booking.get("service_id"):
+        start = _parse_slot(request.POST.get("start_iso"))
+        staff = get_object_or_404(StaffProfile.scoped(salon), pk=_pk(booking["staff_id"]), is_active=True, is_bookable=True, is_deleted=False)
+        service = get_object_or_404(Service.scoped(salon), pk=_pk(booking["service_id"]), is_active=True, is_public=True, is_deleted=False)
+        try:
+            if start is None:
+                raise SchedulingError("زمان انتخاب‌شده معتبر نیست.")
+            validate_public_booking_prerequisites(salon=salon, staff=staff, service=service, start=start)
+            if start not in list(iter_day_slots(staff, timezone.localtime(start).date(), service.duration_minutes)):
+                raise SchedulingError("این زمان دیگر قابل رزرو نیست.")
+        except SchedulingError as exc:
+            messages.error(request, exc.messages[0])
+            return redirect(reverse("salons_public:booking_datetime", kwargs={"slug": slug}) + f"?staff={staff.pk}")
+        merge_booking_session(request, start_iso=start.isoformat())
         return redirect(reverse("salons_public:booking_contact", kwargs={"slug": slug}))
     return redirect(reverse("salons_public:booking_start", kwargs={"slug": slug}))
 
@@ -213,26 +262,28 @@ def booking_confirm(request, slug):
         messages.error(request, "ابتدا شماره موبایل را تأیید کنید.")
         return redirect(reverse("salons_public:booking_verify", kwargs={"slug": slug}))
 
-    service = get_object_or_404(Service.scoped(salon), pk=booking["service_id"])
-    staff = get_object_or_404(StaffProfile.scoped(salon), pk=booking["staff_id"])
-    start = datetime.fromisoformat(booking["start_iso"])
-    if timezone.is_naive(start):
-        start = timezone.make_aware(start, timezone.get_current_timezone())
+    service = get_object_or_404(Service.scoped(salon), pk=_pk(booking["service_id"]))
+    staff = get_object_or_404(StaffProfile.scoped(salon), pk=_pk(booking["staff_id"]))
+    start = _parse_slot(booking["start_iso"])
+    if start is None:
+        messages.error(request, "زمان رزرو معتبر نیست.")
+        return redirect(reverse("salons_public:booking_datetime", kwargs={"slug": slug}) + f"?staff={staff.pk}")
 
     if request.method == "POST":
         try:
-            validate_public_booking_prerequisites(salon=salon, staff=staff, service=service, start=start)
-            customer = ensure_booking_customer(salon=salon, phone=booking["phone"], name=booking["name"])
-            appt = finalize_public_booking(
-                verification=verification,
-                request=request,
-                salon=salon,
-                booking=booking,
-                customer=customer,
-                staff=staff,
-                service=service,
-                start=start,
-            )
+            with transaction.atomic():
+                validate_public_booking_prerequisites(salon=salon, staff=staff, service=service, start=start)
+                customer = ensure_booking_customer(salon=salon, phone=booking["phone"], name=booking["name"])
+                appt = finalize_public_booking(
+                    verification=verification,
+                    request=request,
+                    salon=salon,
+                    booking=booking,
+                    customer=customer,
+                    staff=staff,
+                    service=service,
+                    start=start,
+                )
             request.session.pop("booking", None)
             return render(request, "public/booking/success.html", _booking_context(salon, appointment=appt))
         except BookingVerificationError:

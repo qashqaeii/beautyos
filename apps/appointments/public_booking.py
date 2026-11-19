@@ -32,6 +32,9 @@ def validate_public_booking_prerequisites(*, salon, staff, service, start) -> No
     staff = StaffProfile.scoped(salon).filter(pk=staff.pk).first()
     if staff is None or not staff.services.filter(pk=service.pk).exists():
         raise SchedulingError("این متخصص دیگر این خدمت را ارائه نمی‌دهد.")
+    lead = getattr(getattr(salon, "settings", None), "booking_lead_time_minutes", 60)
+    if start < timezone.now() + timedelta(minutes=lead):
+        raise SchedulingError("زمان رزرو کوتاه‌تر از مهلت تعیین‌شده سالن است.")
     end = start + timedelta(minutes=service.duration_minutes)
     staff_is_available(staff, start, end)
 
@@ -39,18 +42,14 @@ def validate_public_booking_prerequisites(*, salon, staff, service, start) -> No
 @transaction.atomic
 def ensure_booking_customer(*, salon, phone: str, name: str) -> Customer:
     phone = normalize_iran_mobile(phone)
+    if not 1 <= len(name.strip()) <= 120:
+        raise SchedulingError("نام مشتری معتبر نیست.")
+    # The unique constraint only covers active customers; do not query archived
+    # duplicates with get_or_create or overwrite an established CRM name.
     customer, _ = Customer.objects.get_or_create(
-        salon=salon,
-        phone=phone,
-        defaults={"full_name": name, "is_deleted": False},
+        salon=salon, phone=phone, is_deleted=False,
+        defaults={"full_name": name.strip()},
     )
-    if customer.is_deleted:
-        customer.is_deleted = False
-        customer.full_name = name
-        customer.save(update_fields=["is_deleted", "full_name", "updated_at"])
-    elif customer.full_name != name:
-        customer.full_name = name
-        customer.save(update_fields=["full_name", "updated_at"])
     return customer
 
 

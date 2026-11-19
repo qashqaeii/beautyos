@@ -75,9 +75,7 @@ def blog_index(request):
 
 
 def blog_post(request, slug):
-    post = get_object_or_404(BlogPost, slug=slug)
-    if post.status != BlogPost.Status.PUBLISHED or not post.published_at:
-        raise Http404
+    post = get_object_or_404(BlogPost.published_qs(), slug=slug)
     related_qs = BlogPost.published_qs().exclude(pk=post.pk)
     if post.category:
         related_qs = related_qs.filter(category=post.category)

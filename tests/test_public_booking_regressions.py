@@ -73,3 +73,15 @@ def test_confirm_rejected_when_staff_loses_service(
     body = resp.content.decode()
     assert resp.status_code == 200
     assert "ارائه نمی‌دهد" in body or "قابل رزرو نیست" in body
+
+@pytest.mark.django_db
+def test_public_booking_invalid_day_and_slot_are_safe(client, salon, public_booking_setup):
+    data = public_booking_setup
+    session = client.session
+    session["booking"] = {"salon_id":str(salon.pk),"service_id":data["service"].pk,"staff_id":data["staff"].pk}
+    session.save()
+    response = client.get(reverse("salons_public:booking_datetime", kwargs={"slug": salon.slug}), {"day": "bad-date"})
+    assert response.status_code == 200
+    response = client.post(reverse("salons_public:booking_pick_slot", kwargs={"slug": salon.slug}), {"start_iso": "not-a-date"})
+    assert response.status_code == 302
+    assert "/datetime/" in response.url
