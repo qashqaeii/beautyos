@@ -50,8 +50,8 @@
         <span>پنل سالن</span>
       </a>
       {% else %}
-      <a href="{% url 'accounts:login' %}" class="btn-public-ghost public-nav__login hidden min-[480px]:inline-flex">ورود</a>
-      <a href="{% url 'accounts:register' %}" class="btn-public-primary public-nav__cta">ثبت‌نام سالن</a>
+      <a href="{% url 'accounts:login' %}" class="btn-public-ghost public-nav__login hidden min-[480px]:inline-flex">{% if url_name == 'home' %}<i data-lucide="user-round" class="luna-nav-icon" aria-hidden="true"></i>{% endif %}ورود</a>
+      <a href="{% url 'accounts:register' %}" class="btn-public-primary public-nav__cta">{% if url_name == 'home' %}<i data-lucide="sparkles" class="luna-nav-icon" aria-hidden="true"></i>{% endif %}ثبت‌نام سالن</a>
       {% endif %}
 
       <button

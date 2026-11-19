@@ -8,7 +8,12 @@ def test_public_home_anonymous(client):
     assert response.status_code == 200
     html = response.content.decode()
     assert "ثبت‌نام سالن" in html
-    assert "آرامش لوکس" in html
+    assert "مدیریت هوشمند سالن زیبایی" in html
+    assert "در یک پلتفرم کامل" in html
+    assert "luna-home-hero.css" in html
+    assert "luna-hero__features" in html
+    assert "باشگاه مشتریان" in html
+    assert "public-announcement" not in html
     assert "رزرو و نوبت‌دهی آنلاین" in html
     assert reverse("accounts:login") in html or "/auth/login/" in html
 
@@ -36,3 +41,24 @@ def test_logout_post_redirects_home(client, owner_membership):
     assert response.url == reverse("website:home")
     follow = client.get(response.url)
     assert follow.status_code == 200
+
+@pytest.mark.django_db
+def test_home_selects_available_hero_asset(client, monkeypatch):
+    from apps.website import views
+
+    monkeypatch.setattr(views.finders, "find", lambda name: "/tmp/luna-salon-hero.webp")
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.context["hero_image_path"] == "images/photos/luna-salon-hero.webp"
+    assert not response.context["hero_image_is_fallback"]
+
+
+@pytest.mark.django_db
+def test_home_fallback_when_hero_asset_is_missing(client, monkeypatch):
+    from apps.website import views
+
+    monkeypatch.setattr(views.finders, "find", lambda name: None)
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.context["hero_image_is_fallback"]
+    assert "lavender_glow_beauty_portrait.webp" in response.content.decode()

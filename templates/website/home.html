@@ -1,55 +1,50 @@
 {% extends "layouts/public_site.html" %}
 {% load static %}
 {% block title %}CRM یکپارچه سالن زیبایی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block public_shell_modifier %}luna-landing{% endblock %}
+{% block public_announcement %}{% endblock %}
 {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/luna-home-hero.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 <meta name="description" content="بیوتی‌اواس — تقویم نوبت، مشتریان، تیم و گزارش درآمد در یک پنل؛ رزرو آنلاین برای مشتریان و مدیریت حرفه‌ای سالن.">
 {% endblock %}
 {% block public_content %}
 <div class="pub-home">
-  <section class="public-home-hero" aria-labelledby="home-hero-title">
-    <div class="public-home-hero__inner">
-      <div class="public-home-hero__copy">
-        <p class="public-home-hero__badge">
-          <strong>{{ BEAUTYOS_PRODUCT_NAME }}</strong>
-          <span class="public-home-hero__badge-sep" aria-hidden="true">·</span>
-          CRM سالن زیبایی
+  <section class="public-home-hero luna-hero" aria-labelledby="home-hero-title">
+    <div class="luna-hero__media" aria-hidden="true">
+      <img src="{% static hero_image_path %}?v={{ BEAUTYOS_ASSET_VERSION }}"
+           alt="" width="{{ hero_image_width }}" height="{{ hero_image_height }}"
+           class="luna-hero__photo{% if hero_image_is_fallback %} luna-hero__photo--fallback{% endif %}"
+           loading="eager" fetchpriority="high" decoding="async">
+      <div class="luna-hero__veil"></div>
+    </div>
+    <div class="luna-hero__inner">
+      <div class="luna-hero__copy">
+        <p class="luna-hero__badge">
+          <i data-lucide="sparkles" aria-hidden="true"></i>
+          CRM تخصصی سالن‌های زیبایی
         </p>
-        <h1 id="home-hero-title" class="public-home-hero__title">
-          <span class="public-home-hero__title-accent">آرامش لوکس</span>
-          برای مدیریت نوبت و تیم
+        <h1 id="home-hero-title" class="luna-hero__title">
+          <span>مدیریت هوشمند سالن زیبایی</span>
+          <span class="luna-hero__accent">در یک پلتفرم کامل</span>
         </h1>
-        <p class="public-home-hero__lead">
-          نرم‌افزار واقعی نوبت‌دهی، مشتری و مالی — یک پنل برای مالک، منشی و متخصص، بعلاوه صفحه رزرو آنلاین برای مشتریان.
+        <p class="luna-hero__lead">
+          از نوبت‌دهی و مدیریت مشتریان تا مالی، پورسانت و باشگاه مشتریان،
+          همه‌چیز برای رشد و نظم سالن شما.
         </p>
-        <div class="public-home-hero__actions">
-          <a href="{% url 'accounts:register' %}" class="btn-public-primary public-home-hero__cta-primary">
-            ثبت‌نام سالن
-          </a>
-          <a href="#showcase" class="btn-public-ghost public-home-hero__cta-secondary">
-            دیدن امکانات پنل
-          </a>
-        </div>
-        <ul class="public-home-hero__trust" aria-label="مزیت‌های کلیدی">
-          <li><i data-lucide="calendar-days" class="h-3.5 w-3.5 shrink-0" aria-hidden="true"></i>تقویم شمسی</li>
-          <li><i data-lucide="shield" class="h-3.5 w-3.5 shrink-0" aria-hidden="true"></i>دسترسی نقش‌محور</li>
-          <li><i data-lucide="mouse-pointer-click" class="h-3.5 w-3.5 shrink-0" aria-hidden="true"></i>بدون نصب</li>
+        <ul class="luna-hero__features" aria-label="قابلیت‌های اصلی">
+          <li><i data-lucide="calendar-days" aria-hidden="true"></i><span>نوبت‌دهی آنلاین</span></li>
+          <li><i data-lucide="users-round" aria-hidden="true"></i><span>مدیریت مشتریان</span></li>
+          <li><i data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i><span>گزارش‌های مالی</span></li>
+          <li><i data-lucide="layers" aria-hidden="true"></i><span>باشگاه مشتریان</span></li>
         </ul>
-      </div>
-      <div class="public-home-hero__visual">
-        <figure class="public-home-hero__figure">
-          <div class="public-home-hero__visual-frame">
-            <img
-              src="{% static 'images/dashboard/lavender_glow_beauty_portrait.webp' %}"
-              alt=""
-              class="public-home-hero__visual-img"
-              width="420"
-              height="525"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-            >
-          </div>
-        </figure>
+        <div class="luna-hero__actions">
+          {% if user.is_authenticated %}
+          <a href="{% url 'dashboard:home' %}" class="btn-public-primary luna-hero__primary"><i data-lucide="layout-dashboard" aria-hidden="true"></i>ورود به پنل سالن</a>
+          {% else %}
+          <a href="{% url 'accounts:register' %}" class="btn-public-primary luna-hero__primary"><i data-lucide="sparkles" aria-hidden="true"></i>ثبت‌نام سالن</a>
+          {% endif %}
+          <a href="#showcase" class="btn-public-ghost luna-hero__secondary"><i data-lucide="circle-play" aria-hidden="true"></i>دیدن امکانات</a>
+        </div>
       </div>
     </div>
   </section>

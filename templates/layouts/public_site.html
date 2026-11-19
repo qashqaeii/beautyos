@@ -2,8 +2,8 @@
 {% load static %}
 {% block body %}
 <style>[x-cloak]{display:none!important}</style>
-<div class="public-site beautyos-main-bg__shell min-h-screen min-h-[100dvh]" data-theme="luna_signature">
-  <p class="public-announcement" role="status">مدیریت حرفه‌ای نوبت و تیم سالن · رزرو آنلاین برای مشتریان</p>
+<div class="public-site beautyos-main-bg__shell min-h-screen min-h-[100dvh] {% block public_shell_modifier %}{% endblock %}" data-theme="luna_signature">
+  {% block public_announcement %}<p class="public-announcement" role="status">مدیریت حرفه‌ای نوبت و تیم سالن · رزرو آنلاین برای مشتریان</p>{% endblock %}
   {% include "partials/public_header.html" %}
   <a href="#public-content" class="editorial-skip-link">رفتن به محتوای اصلی</a>
   <main id="public-content" tabindex="-1">

@@ -1,3 +1,4 @@
+from django.contrib.staticfiles import finders
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 
@@ -24,11 +25,20 @@ def _public_ctx(**extra):
 
 def home(request):
     latest_posts = list(BlogPost.published_qs()[:3])
+    hero_path = "images/photos/luna-salon-hero.webp"
+    # The supplied image can be added locally before it is committed to Git.
+    hero_available = bool(finders.find(hero_path))
+    if not hero_available:
+        hero_path = "images/dashboard/lavender_glow_beauty_portrait.webp"
     return render(
         request,
         "website/home.html",
         _public_ctx(
             latest_posts=latest_posts,
+            hero_image_path=hero_path,
+            hero_image_width=1440 if hero_available else 420,
+            hero_image_height=960 if hero_available else 525,
+            hero_image_is_fallback=not hero_available,
             landing_highlights=HOME_LANDING_HIGHLIGHTS,
             home_value_props=HOME_VALUE_PROPS,
             module_spotlights=HOME_MODULE_SPOTLIGHTS,
