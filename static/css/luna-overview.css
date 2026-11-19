@@ -112,3 +112,6 @@
  .luna-overview-shell .dash-page-header__nav,.overview-today,.overview-range a { min-height:44px; }
  .overview-chart-labels { font-size:.58rem; }
 }
+
+/* Sidebar toggle now lives in the shared sidebar. */
+@media(min-width:1024px) { .luna-overview-shell .dash-page-header__dates { margin-inline-end:0; } }

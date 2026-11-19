@@ -16,5 +16,4 @@
     <a href="?day={{ next_day }}&amp;range={{ range_key }}&amp;trend={{ trend_days }}" class="dash-page-header__nav" aria-label="روز بعد"><i data-lucide="chevron-left" aria-hidden="true"></i></a>
     <a class="overview-today" href="?day={{ today_iso }}&amp;range={{ range_key }}&amp;trend={{ trend_days }}">امروز</a>
   </div>
-  <button type="button" class="overview-sidebar-toggle hidden lg:inline-flex" :aria-expanded="!sidebarCollapsed" :aria-label="sidebarCollapsed ? 'باز کردن منو' : 'جمع کردن منو'" @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('maisonSidebarCollapsed', sidebarCollapsed ? '1' : '0')"><i data-lucide="panel-right" aria-hidden="true"></i></button>
 </header>

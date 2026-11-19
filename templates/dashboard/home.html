@@ -4,7 +4,7 @@
 {% block page_eyebrow %}{{ today_jalali }}{% endblock %}
 {% block page_title %}نمای کلی سالن{% endblock %}
 {% block page_subtitle %}خلاصه عملکرد و برنامه امروز{% endblock %}
-{% block header_modifier %}dashboard-home-header{% endblock %}
+{% block header_modifier %}luna-legacy-home-header{% endblock %}
 {% block page_actions %}
 {% if finance %}
 <form method="get" class="flex flex-wrap items-center gap-2 text-xs">
@@ -24,17 +24,7 @@
 <a href="{% url 'appointments:create' %}" class="btn-primary text-xs"><i data-lucide="plus" class="h-4 w-4"></i> ثبت نوبت</a>
 {% endblock %}
 
-{% block mobile_header %}
-<header class="maison-mobile-head maison-reveal lg:hidden">
-  <div class="flex min-w-0 flex-1 items-center gap-2.5">
-    {% include "partials/site_logo.html" with logo_class="maison-mobile-head__logo" %}
-    <div class="min-w-0">
-      <p class="text-xs text-ink-secondary">روز زیبایی شما{% if user.first_name %}، {{ user.first_name }}{% endif %}</p>
-      <p class="truncate text-sm font-semibold text-ink">{{ active_salon.name }}</p>
-    </div>
-  </div>
-</header>
-{% endblock %}
+{% block mobile_header %}{% endblock %}
 
 {% block content %}
 {% if finance %}
