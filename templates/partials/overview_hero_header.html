@@ -1,15 +1,20 @@
 {% load static format_tags %}
 <header class="dash-page-header dash-page-header--overview dashboard-enter">
+  <div class="overview-hero-art" aria-hidden="true"></div>
   <div class="dash-page-header__copy">
+    <p class="overview-eyebrow"><i data-lucide="sparkles" aria-hidden="true"></i> گزارش عملکرد سالن</p>
     <h1 class="dash-page-header__title">نمای کلی سالن</h1>
     <p class="dash-page-header__subtitle">{{ active_salon.name }}</p>
   </div>
   <div class="dash-page-header__dates">
-    <a href="?day={{ prev_day }}{% if range_key %}&range={{ range_key }}{% endif %}" class="dash-page-header__nav" aria-label="روز قبل">‹</a>
+    <a href="?day={{ prev_day }}&amp;range={{ range_key }}&amp;trend={{ trend_days }}" class="dash-page-header__nav" aria-label="روز قبل"><i data-lucide="chevron-right" aria-hidden="true"></i></a>
     <form method="get" class="dash-page-header__jalali-form">
-      {% if range_key %}<input type="hidden" name="range" value="{{ range_key }}">{% endif %}
+      <input type="hidden" name="range" value="{{ range_key }}">
+      <input type="hidden" name="trend" value="{{ trend_days }}">
       {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
     </form>
-    <a href="?day={{ next_day }}{% if range_key %}&range={{ range_key }}{% endif %}" class="dash-page-header__nav" aria-label="روز بعد">›</a>
+    <a href="?day={{ next_day }}&amp;range={{ range_key }}&amp;trend={{ trend_days }}" class="dash-page-header__nav" aria-label="روز بعد"><i data-lucide="chevron-left" aria-hidden="true"></i></a>
+    <a class="overview-today" href="?day={{ today_iso }}&amp;range={{ range_key }}&amp;trend={{ trend_days }}">امروز</a>
   </div>
+  <button type="button" class="overview-sidebar-toggle hidden lg:inline-flex" :aria-expanded="!sidebarCollapsed" :aria-label="sidebarCollapsed ? 'باز کردن منو' : 'جمع کردن منو'" @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('maisonSidebarCollapsed', sidebarCollapsed ? '1' : '0')"><i data-lucide="panel-right" aria-hidden="true"></i></button>
 </header>

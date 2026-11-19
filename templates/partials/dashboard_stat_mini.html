@@ -7,6 +7,7 @@
   <div class="dashboard-stat-mini__surface">
     <div class="dashboard-stat-mini__stack">
       <span class="dashboard-stat-mini__icon" aria-hidden="true"><i data-lucide="{{ icon }}" class="beautyos-lucide beautyos-lucide--sm"></i></span>
+      <div class="overview-stat-copy">
       <p class="dashboard-stat-mini__label">{{ label }}</p>
       <p class="dashboard-stat-mini__value tabular-nums">
         <span
@@ -16,6 +17,7 @@
           data-stat-commas="{% if animate_money %}1{% else %}0{% endif %}"
         >{% if animate_money %}{{ anim_value|default:0|fa_money }}{% else %}{{ anim_value|default:0|fa_num }}{% endif %}</span>{% if suffix %}<span class="dashboard-stat-mini__unit">{{ suffix }}</span>{% endif %}
       </p>
+      </div>
     </div>
   </div>
 </div>

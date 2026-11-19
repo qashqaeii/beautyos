@@ -1,5 +1,7 @@
 {% extends "layouts/app_shell.html" %}
-{% load humanize static %}
+{% load humanize static format_tags l10n %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-overview.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block shell_modifier %}luna-overview-shell{% endblock %}
 {% block title %}نمای کلی · {{ active_salon.name }}{% endblock %}
 {% block header_modifier %}dashboard-lite-app-header{% endblock %}
 {% block page_title %}{% endblock %}
@@ -11,16 +13,20 @@
 <div class="dashboard-overview">
 {% include "partials/overview_hero_header.html" %}
 
+<section class="overview-kpis" aria-labelledby="overview-kpi-title">
+<div class="overview-section-heading"><h2 id="overview-kpi-title">خلاصه عملکرد</h2><span>آمار روز انتخاب‌شده</span></div>
 <div class="dashboard-stat-grid" data-overview-stat-grid data-salon-id="{{ active_salon.id }}" data-overview-day="{{ selected_day|date:'Y-m-d' }}">
   {% include "partials/dashboard_stat_mini.html" with icon="calendar-check" label="نوبت‌ها" stat_key="appointments" anim_value=overview.appointments_count stat_index=1 %}
-  {% include "partials/dashboard_stat_mini.html" with icon="clock" label="منتظر تأیید" stat_key="pending" anim_value=overview.pending_count stat_index=2 %}
+  {% include "partials/dashboard_stat_mini.html" with icon="clock" label="منتظر تأیید (کل)" stat_key="pending" anim_value=overview.pending_count stat_index=2 %}
   {% if show_finance and finance %}
   {% include "partials/dashboard_stat_mini.html" with icon="wallet" label="دریافتی کل" stat_key="total_received" anim_value=finance.total_received animate_money=True suffix="تومان" stat_index=3 featured=True %}
-  {% include "partials/dashboard_stat_mini.html" with icon="alert-circle" label="بدهی‌ها" stat_key="debts" anim_value=finance.receivable_appointment_count stat_index=4 %}
-  {% include "partials/dashboard_stat_mini.html" with icon="circle-check" label="تسویه‌شده" stat_key="settled" anim_value=finance.settled_count stat_index=5 settled=True %}
+  {% include "partials/dashboard_stat_mini.html" with icon="alert-circle" label="نوبت‌های بدهکار" stat_key="debts" anim_value=finance.receivable_appointment_count stat_index=4 %}
+  {% include "partials/dashboard_stat_mini.html" with icon="circle-check" label="پرداخت تسویه‌شده" stat_key="settled" anim_value=finance.settled_count stat_index=5 settled=True %}
   {% include "partials/dashboard_stat_mini.html" with icon="hand-coins" label="مانده وصول" stat_key="receivable" anim_value=finance.receivable_amount animate_money=True suffix="تومان" stat_index=6 %}
   {% endif %}
 </div>
+</section>
+{% include "dashboard/partials/overview_analytics.html" %}
 </div>
 <script src="{% static 'js/overview-stat-anim.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 {% endblock %}

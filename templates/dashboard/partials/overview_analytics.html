@@ -1,0 +1,55 @@
+{% load format_tags l10n %}
+<div class="overview-analytics-grid">
+  {% if analytics.revenue %}
+  <section class="overview-panel overview-revenue" aria-labelledby="overview-revenue-title">
+    <div class="overview-panel-head">
+      <div><h2 id="overview-revenue-title">روند دریافتی سالن</h2><p>پرداخت‌های ثبت‌شده تا روز انتخابی</p></div>
+      <nav class="overview-range" aria-label="بازه روند دریافتی">
+        <a href="?day={{ selected_day|date:'Y-m-d' }}&amp;range={{ range_key }}&amp;trend=7" {% if trend_days == 7 %}aria-current="true"{% endif %}>۷ روز</a>
+        <a href="?day={{ selected_day|date:'Y-m-d' }}&amp;range={{ range_key }}&amp;trend=30" {% if trend_days == 30 %}aria-current="true"{% endif %}>۳۰ روز</a>
+      </nav>
+    </div>
+    <div class="overview-revenue-total"><strong>{{ analytics.revenue.total|fa_money }}</strong><span>تومان در این بازه</span></div>
+    {% if analytics.revenue.maximum %}
+    <div class="overview-chart" role="img" aria-label="نمودار دریافتی روزانه؛ بیشترین دریافتی {{ analytics.revenue.maximum|fa_money }} تومان">
+      <svg viewBox="0 0 600 164" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="overview-revenue-fill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#B58D89" stop-opacity=".42"/><stop offset="1" stop-color="#B58D89" stop-opacity=".04"/></linearGradient></defs>
+        <path d="M12 24H588 M12 66H588 M12 108H588 M12 150H588" fill="none" stroke="#E5DCD6" stroke-dasharray="3 5" vector-effect="non-scaling-stroke"/>
+        <polygon points="{{ analytics.revenue.area }}" fill="url(#overview-revenue-fill)"/>
+        <polyline points="{{ analytics.revenue.points }}" stroke="#9D726E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" fill="none"/>
+        {% for point in analytics.revenue.rows %}{% if trend_days == 7 %}<circle cx="{{ point.x|unlocalize }}" cy="{{ point.y|unlocalize }}" r="3" fill="#9D726E" stroke="#fff" stroke-width="1"/>{% endif %}{% endfor %}
+      </svg>
+      <div class="overview-chart-labels">{% for item in analytics.revenue.labels %}<span>{{ item.label|fa_num }}</span>{% endfor %}</div>
+    </div>
+    <details class="overview-chart-details"><summary>جزئیات روزانه</summary><dl>{% for item in analytics.revenue.rows %}<div><dt>{{ item.day|fa_jalali }}</dt><dd>{{ item.amount|fa_money }} تومان</dd></div>{% endfor %}</dl></details>
+    {% else %}
+    <div class="overview-empty"><i data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i><p>در این بازه دریافتی ثبت نشده است.</p></div>
+    {% endif %}
+  </section>
+  {% endif %}
+  <section class="overview-panel overview-status" aria-labelledby="overview-status-title">
+    <div class="overview-panel-head"><div><h2 id="overview-status-title">وضعیت نوبت‌ها</h2><p>تمام نوبت‌های روز انتخاب‌شده، شامل لغوشده</p></div></div>
+    <div class="overview-status-body">
+      <div class="overview-donut" style="--status-stops:{{ analytics.status_gradient }}" aria-hidden="true"><div><strong>{{ analytics.status_total|fa_num }}</strong><span>کل نوبت‌ها</span></div></div>
+      <ul class="overview-status-legend">{% for item in analytics.statuses %}<li><span class="overview-dot" style="--dot:{{ item.color }}"></span><span>{{ item.label }}</span><strong>{{ item.count|fa_num }}</strong></li>{% endfor %}</ul>
+    </div>
+  </section>
+  {% if analytics.staff_visible %}
+  <section class="overview-panel" aria-labelledby="overview-staff-title">
+    <div class="overview-panel-head"><div><h2 id="overview-staff-title">عملکرد متخصصان</h2><p>تا ۵ متخصص برتر بر اساس نوبت انجام‌شده در روز انتخابی</p></div><span class="overview-panel-icon"><i data-lucide="users-round" aria-hidden="true"></i></span></div>
+    {% if analytics.staff %}
+    <ul class="overview-staff-list">{% for item in analytics.staff %}<li><div><span>{{ item.name }}</span><strong>{{ item.count|fa_num }} نوبت</strong></div><div class="overview-progress"><span style="width:{{ item.percent|unlocalize }}%"></span></div></li>{% endfor %}</ul>
+    {% else %}<div class="overview-empty"><i data-lucide="users-round" aria-hidden="true"></i><p>هنوز نوبت انجام‌شده‌ای ثبت نشده است.</p></div>{% endif %}
+  </section>
+  {% endif %}
+  {% if analytics.customers %}
+  <section class="overview-panel" aria-labelledby="overview-customer-title">
+    <div class="overview-panel-head"><div><h2 id="overview-customer-title">آمار مشتریان</h2><p>براساس ثبت مشتری و خدمات انجام‌شده در روز انتخابی</p></div><span class="overview-panel-icon"><i data-lucide="heart-handshake" aria-hidden="true"></i></span></div>
+    <div class="overview-customer-grid">
+      <div><span>مشتریان جدید</span><strong>{{ analytics.customers.new|fa_num }}</strong></div>
+      <div><span>مراجعه‌کنندگان</span><strong>{{ analytics.customers.visited|fa_num }}</strong></div>
+      <div><span>مشتریان بازگشتی</span><strong>{{ analytics.customers.returning|fa_num }}</strong></div>
+    </div>
+  </section>
+  {% endif %}
+</div>

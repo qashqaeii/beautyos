@@ -3,8 +3,10 @@ from datetime import timedelta
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
-from apps.core.utils.dates import today_jalali_label, to_jalali
+from apps.core.utils.dates import jalali_month_bounds, today_jalali_label, to_jalali
+from apps.dashboard.analytics import overview_analytics
 from apps.dashboard.nav import (
     can_see_calendar,
     can_see_management,
@@ -25,7 +27,7 @@ def _finance_range(day, range_key: str):
         pay_start = day_start - timedelta(days=6)
         return pay_start, day_end
     if range_key == "month":
-        pay_start = day_start.replace(day=1)
+        pay_start, _ = day_bounds(jalali_month_bounds(day)[0])
         return pay_start, day_end
     return day_start, day_end
 
@@ -47,8 +49,12 @@ def home(request):
 
     day = parse_dashboard_day(request)
     range_key = request.GET.get("range", "day")
+    if range_key not in {"day", "week", "month"}:
+        range_key = "day"
+    trend_days = 30 if request.GET.get("trend") == "30" else 7
     pay_start, pay_end = _finance_range(day, range_key)
     ctx = get_overview_context(request.salon, membership, day, pay_start, pay_end)
+    ctx["analytics"] = overview_analytics(request.salon, membership, day, trend_days)
     ctx.update(
         {
             "today_jalali": today_jalali_label(),
@@ -56,6 +62,8 @@ def home(request):
             "salon": request.salon,
             "membership": membership,
             "range_key": range_key,
+            "trend_days": trend_days,
+            "today_iso": timezone.localdate().isoformat(),
             "prev_day": (day - timedelta(days=1)).isoformat(),
             "next_day": (day + timedelta(days=1)).isoformat(),
             "show_finance": ctx["finance"] is not None,
