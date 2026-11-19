@@ -25,7 +25,7 @@ def salon_context(request):
     active_membership = None
     if request.user.is_authenticated:
         memberships = list(
-            SalonMembership.objects.filter(user=request.user, is_active=True)
+            SalonMembership.objects.filter(user=request.user, is_active=True, salon__is_active=True)
             .select_related("salon")
             .order_by("salon__name")
         )

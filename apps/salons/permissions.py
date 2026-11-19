@@ -6,7 +6,7 @@ from apps.salons.models import SalonMembership
 
 
 def role_at_least(membership, min_role: str) -> bool:
-    if membership is None:
+    if membership is None or not membership.is_active:
         return False
     return membership.role_rank >= SalonMembership.role_rank_for(min_role)
 

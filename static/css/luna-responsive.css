@@ -103,3 +103,12 @@
 .maison-app .maison-sidebar.is-collapsed .luna-sidebar-toggle { width:40px; }
 /* Also suppress legacy empty chrome in templates that have not opted out yet. */
 body.beautyos-main-bg .maison-app .maison-unified-header:has(.maison-page-title:empty):has(.maison-page-subtitle:empty):has(.maison-page-actions:empty) { display:none; }
+
+/* Tenant switch: explicit POST, scoped and usable in compact layouts. */
+.luna-salon-switch-list{display:grid;gap:4px;padding:8px 10px;min-width:0;max-height:150px;overflow:auto}
+.luna-salon-switch-list p{font-size:.72rem;color:var(--color-text-secondary,#75635b);padding:2px 5px}
+.luna-salon-switch-list button{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:7px 9px;text-align:start;border:1px solid transparent;border-radius:9px;font-size:.8rem;color:var(--color-text-primary,#51443f)}
+.luna-salon-switch-list button span{min-width:0;overflow-wrap:anywhere}
+.luna-salon-switch-list svg{flex:none;width:17px;height:17px}
+.luna-salon-switch-list button[aria-current=true]{background:#ead8d0;color:#684a41;border-color:#dfc8be}
+.luna-salon-switch-list button:not(:disabled):hover{background:#f0e3dc}

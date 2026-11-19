@@ -23,6 +23,16 @@
       <i data-lucide="panel-right" aria-hidden="true"></i><span x-show="!sidebarCollapsed" x-cloak>جمع کردن منو</span>
     </button>
   </div>
+  {% if user_memberships|length > 1 %}
+  <div class="luna-salon-switch-list" x-show="!sidebarCollapsed" x-cloak>
+    <p>سالن فعال</p>
+    {% for m in user_memberships %}
+    <form method="post" action="{% url 'salons_onboarding:switch' salon_id=m.salon_id %}">{% csrf_token %}
+      <button type="submit"{% if m.salon_id == active_salon.id %} aria-current="true" disabled{% endif %}><i data-lucide="store" aria-hidden="true"></i><span>{{ m.salon.name }}</span></button>
+    </form>
+    {% endfor %}
+  </div>
+  {% endif %}
   <nav id="workspace-sidebar-nav" class="maison-sidebar__nav theme-sidebar-nav maison-scroll-minimal min-h-0 flex-1 space-y-1 overflow-x-hidden overflow-y-auto overscroll-contain p-2.5" aria-label="منوی اصلی">
     {% include "partials/dashboard_nav_core.html" %}
   </nav>

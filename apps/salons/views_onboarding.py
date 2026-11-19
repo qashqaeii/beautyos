@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.core.exceptions import PermissionDenied
+from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -76,18 +79,18 @@ class SalonProfileOnboardingView(View):
 
 @method_decorator(login_required, name="dispatch")
 class SalonSwitchView(View):
-    def _switch(self, request, salon_id):
-        membership = SalonMembership.objects.filter(
-            user=request.user,
-            salon_id=salon_id,
-            is_active=True,
-        ).first()
-        if membership:
-            request.session["active_salon_id"] = str(salon_id)
-        return redirect(request.POST.get("next") or request.GET.get("next") or request.META.get("HTTP_REFERER") or "/")
-
     def post(self, request, salon_id):
-        return self._switch(request, salon_id)
-
-    def get(self, request, salon_id):
-        return self._switch(request, salon_id)
+        membership = SalonMembership.objects.filter(
+            user=request.user, salon_id=salon_id, is_active=True, salon__is_active=True,
+        ).first()
+        if membership is None:
+            raise PermissionDenied
+        request.session["active_salon_id"] = str(salon_id)
+        request.session.pop("onboarding_salon_id", None)
+        request.session.pop("booking", None)
+        next_url = request.POST.get("next", "")
+        # Never reuse an object-detail URL from the previous salon.
+        allowed = {reverse("dashboard:home")}
+        if next_url not in allowed or not url_has_allowed_host_and_scheme(next_url, allowed_hosts=set()):
+            next_url = reverse("dashboard:home")
+        return redirect(next_url)

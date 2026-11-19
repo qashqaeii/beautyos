@@ -14,6 +14,15 @@
     <button type="button" x-ref="mobileAccountClose" aria-label="بستن" @click="closeAccountSheet()"><i data-lucide="x" aria-hidden="true"></i></button>
   </header>
   <div class="luna-account-actions">
+    {% if user_memberships|length > 1 %}
+    <div class="luna-salon-switch-list"><p>تغییر سالن فعال</p>
+      {% for m in user_memberships %}
+      <form method="post" action="{% url 'salons_onboarding:switch' salon_id=m.salon_id %}">{% csrf_token %}
+        <button type="submit"{% if m.salon_id == active_salon.id %} aria-current="true" disabled{% endif %}><i data-lucide="store" aria-hidden="true"></i><span>{{ m.salon.name }}</span></button>
+      </form>
+      {% endfor %}
+    </div>
+    {% endif %}
     {% if nav_finance %}<a href="{% url 'finance:overview' %}"><i data-lucide="wallet" aria-hidden="true"></i>مدیریت مالی</a>{% endif %}
     {% if nav_salon_settings %}
     <a href="{% url 'salons_settings:home' %}"><i data-lucide="building-2" aria-hidden="true"></i>اطلاعات سالن</a>

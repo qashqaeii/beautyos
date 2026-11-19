@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from django.db.models import Case, When
 
 from apps.salons.models import Salon, SalonMembership
@@ -7,6 +9,7 @@ def _owner_memberships_qs(user):
     return SalonMembership.objects.filter(
         user=user,
         is_active=True,
+        salon__is_active=True,
         role=SalonMembership.Role.OWNER,
     ).select_related("salon", "salon__settings")
 
@@ -42,7 +45,7 @@ def sync_login_active_salon(request, user) -> None:
         request.session.modified = True
         return
     first = (
-        SalonMembership.objects.filter(user=user, is_active=True)
+        SalonMembership.objects.filter(user=user, is_active=True, salon__is_active=True)
         .order_by(
             Case(
                 When(role=SalonMembership.Role.OWNER, then=0),
@@ -62,22 +65,26 @@ def resolve_active_salon(request):
         return None, None
 
     salon_id = request.session.get("active_salon_id")
+    try:
+        salon_id = UUID(str(salon_id)) if salon_id else None
+    except (ValueError, TypeError, AttributeError):
+        salon_id = None
     if salon_id:
         membership = (
             SalonMembership.objects.filter(
                 user=request.user,
                 salon_id=salon_id,
                 is_active=True,
+                salon__is_active=True,
             )
             .select_related("salon", "salon__settings")
             .first()
         )
         if membership:
-            membership = prefer_sole_owner_membership(request, membership)
             return membership.salon, membership
 
     first = (
-        SalonMembership.objects.filter(user=request.user, is_active=True)
+        SalonMembership.objects.filter(user=request.user, is_active=True, salon__is_active=True)
         .select_related("salon", "salon__settings")
         .order_by(
             Case(
@@ -91,6 +98,7 @@ def resolve_active_salon(request):
     if first:
         request.session["active_salon_id"] = str(first.salon_id)
         return first.salon, first
+    request.session.pop("active_salon_id", None)
     return None, None
 
 
