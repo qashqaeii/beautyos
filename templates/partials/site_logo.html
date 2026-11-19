@@ -1,6 +1,6 @@
 {% load static %}
 <img
-  src="{% static BEAUTYOS_SITE_LOGO %}"
+  src="{% static BEAUTYOS_SITE_LOGO %}?v={{ BEAUTYOS_ASSET_VERSION }}"
   alt="{{ BEAUTYOS_PRODUCT_NAME }}"
   class="{{ logo_class|default:'h-10 w-auto max-w-[11rem] object-contain' }}"
   decoding="async"

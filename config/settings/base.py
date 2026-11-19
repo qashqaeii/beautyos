@@ -176,6 +176,7 @@ def _beautyos_asset_version() -> str:
         "static/css/editorial-calendar.css",
         "static/css/luna-home-hero.css",
         "static/images/photos/luna-salon-hero.webp",
+        "static/images/logos/beautyos-logo-3d.webp",
         "static/images/photos/bg1.webp",
         "static/images/photos/bg2.webp",
         "static/images/photos/bg3.webp",

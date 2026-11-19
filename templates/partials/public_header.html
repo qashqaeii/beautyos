@@ -7,7 +7,7 @@
 >
   <div class="public-nav__inner">
     <a href="{% url 'website:home' %}" class="public-nav__brand" title="{{ BEAUTYOS_PRODUCT_NAME }}">
-      <img src="{% static BEAUTYOS_SITE_LOGO %}" alt="" class="public-nav__logo" width="120" height="36">
+      <img src="{% static BEAUTYOS_SITE_LOGO %}?v={{ BEAUTYOS_ASSET_VERSION }}" alt="" class="public-nav__logo" width="1200" height="800">
       <span class="public-nav__brand-text">{{ BEAUTYOS_PRODUCT_NAME }}</span>
     </a>
 

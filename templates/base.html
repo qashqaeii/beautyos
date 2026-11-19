@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}</title>
-  <link rel="icon" href="{% static BEAUTYOS_SITE_LOGO %}" type="image/webp">
+  <link rel="icon" href="{% static BEAUTYOS_SITE_LOGO %}?v={{ BEAUTYOS_ASSET_VERSION }}" type="image/webp">
   <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
   <link href="https://fonts.bunny.net/css?family=vazirmatn:400,500,600,700|markazi-text:400,500,600,700" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/beautyos.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">

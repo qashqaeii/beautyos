@@ -11,6 +11,8 @@ def test_public_home_anonymous(client):
     assert "مدیریت هوشمند سالن زیبایی" in html
     assert "در یک پلتفرم کامل" in html
     assert "luna-home-hero.css" in html
+    assert "images/logos/beautyos-logo-3d.webp" in html
+    assert "images/logos/Logo.webp" not in html
     assert "luna-hero__features" in html
     assert html.count('class="luna-hero-feature"') == 4
     assert html.count('class="luna-hero-feature__icon"') == 4
@@ -65,3 +67,9 @@ def test_home_fallback_when_hero_asset_is_missing(client, monkeypatch):
     assert response.status_code == 200
     assert response.context["hero_image_is_fallback"]
     assert "lavender_glow_beauty_portrait.webp" in response.content.decode()
+
+
+def test_beautyos_brand_asset_exists():
+    from django.contrib.staticfiles import finders
+
+    assert finders.find("images/logos/beautyos-logo-3d.webp")
