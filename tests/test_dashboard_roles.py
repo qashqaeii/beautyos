@@ -165,3 +165,25 @@ def test_appointment_payment_summary_no_payment(salon):
     today_start, today_end = day_bounds(timezone.localdate())
     summary_mgr = get_manager_financial_summary(salon, today_start, today_end, today_start, today_end)
     assert "total_received" in summary_mgr
+
+
+@pytest.mark.django_db
+def test_management_editorial_design_preserves_links(client, salon, owner_membership):
+    from django.contrib.staticfiles import finders
+    from django.urls import reverse
+
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+    response = client.get(reverse("dashboard:management"))
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert "luna-management-shell" in html
+    assert "luna-management.css" in html
+    assert "beautyos-management-floral.webp" in html
+    assert html.count('class="dashboard-mgmt-card dashboard-enter"') == len(response.context["links"]) == 11
+    for link in response.context["links"]:
+        assert f'href="{link["url"]}"' in html
+    assert finders.find("css/luna-management.css")
+    assert finders.find("images/photos/beautyos-management-floral.webp")

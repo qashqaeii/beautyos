@@ -7,6 +7,9 @@
     <a href="{% url 'dashboard:home' %}" class="theme-sidebar-brand__logo maison-sidebar__product-logo maison-sidebar__product-logo--slim" title="{{ BEAUTYOS_PRODUCT_NAME }}">
       {% include "partials/site_logo.html" with logo_class="maison-sidebar__product-logo-img" %}
     </a>
+    {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'management' %}
+    <div class="management-sidebar-brand"><strong dir="ltr">{{ BEAUTYOS_PRODUCT_NAME }}</strong><span>CRM سالن زیبایی</span></div>
+    {% endif %}
     {% if request.resolver_match.app_name == 'appointments' and request.resolver_match.url_name == 'calendar' %}<p class="editorial-calendar-brand-subtitle">سامانه مدیریت سالن زیبایی</p>{% endif %}
   </div>
   <nav class="maison-sidebar__nav theme-sidebar-nav maison-scroll-minimal min-h-0 flex-1 space-y-1 overflow-x-hidden overflow-y-auto overscroll-contain p-2.5" aria-label="منوی اصلی">

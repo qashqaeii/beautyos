@@ -1,0 +1,149 @@
+/* BeautyOS management | Editorial Rose
+   The floral artwork is extracted from the approved design, not a screenshot UI.
+   Existing brand, application links and role policy remain authoritative. */
+.luna-management-shell {
+  --management-ink:#51443f;
+  --management-title:#49332c;
+  --management-muted:#74635c;
+  --management-rose:#9d726e;
+  --management-line:#e3cfc6;
+  background:#f5ebe5 url("../images/photos/bg2.webp") center / cover no-repeat;
+}
+.luna-management-shell .maison-content {
+  max-width:100rem; padding:12px 12px 24px;
+}
+.luna-management-shell .dashboard-mgmt-page {
+  display:flex; flex-direction:column; gap:16px; min-width:0;
+}
+.luna-management-shell .maison-unified-header.dashboard-lite-app-header {
+  min-height:0; margin:0 12px; padding:9px 0 0; background:transparent; border:0;
+}
+.luna-management-shell .maison-unified-header.dashboard-lite-app-header .maison-unified-header__actions { justify-content:flex-end; width:auto; }
+.luna-management-shell .app-user-chip { background:#fff9f5; border:1px solid rgba(227,207,198,.7); border-radius:999px; box-shadow:0 3px 10px rgba(81,68,63,.055); }
+.luna-management-shell .dashboard-mgmt-page .dash-page-header--mgmt {
+  position:relative; isolation:isolate; display:flex; align-items:center;
+  justify-content:flex-start; min-height:116px; max-height:none;
+  padding:15px; border:1px solid #fffaf7; border-radius:20px;
+  background:linear-gradient(115deg,#f0ded5,#fcf5f1 62%);
+  box-shadow:0 6px 20px rgba(105,72,57,.075);
+}
+.management-hero-art {
+  position:absolute; inset:0 auto 0 0; width:36%; border-radius:inherit;
+  overflow:hidden; pointer-events:none; z-index:-1;
+}
+.management-hero-art img { display:block; width:100%; height:100%; object-fit:cover; object-position:left center; }
+.management-hero-art::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 24%,#fcf5f1 100%); }
+@supports (mask-image:linear-gradient(#000,transparent)) {
+  .management-hero-art { mask-image:linear-gradient(90deg,#000 0%,#000 42%,transparent 100%); }
+  .management-hero-art::after { display:none; }
+}
+.management-hero-content { display:flex; align-items:center; gap:12px; width:100%; min-width:0; }
+.management-hero-emblem {
+  display:grid; place-items:center; flex:none; width:48px; height:48px;
+  border-radius:16px; border:1px solid #fdf7f2; color:#925b4e;
+  background:linear-gradient(145deg,#ecd0c3,#fff0e9);
+  box-shadow:inset 0 1px 4px rgba(157,114,110,.12),0 2px 7px rgba(81,68,63,.055);
+}
+.management-hero-emblem svg { width:26px;height:26px;stroke-width:1.65; }
+.management-hero-copy { min-width:0; }
+.luna-management-shell .dash-page-header__title { color:var(--management-title); font-size:clamp(1.25rem,2.1vw,1.9rem); line-height:1.45; font-weight:700; text-align:start; }
+.management-hero-copy p { color:var(--management-muted); font-size:.76rem; line-height:1.8; margin-top:5px; text-wrap:pretty; }
+.luna-management-shell .dashboard-mgmt-grid {
+  display:grid; grid-template-columns:minmax(0,1fr); gap:10px; padding:0;
+}
+.luna-management-shell .dashboard-mgmt-grid::before { display:none; }
+.luna-management-shell .dashboard-mgmt-card {
+  display:grid; grid-template-columns:48px minmax(0,1fr) 18px; align-items:center;
+  gap:12px; min-height:84px; max-height:none; min-width:0; padding:12px;
+  border-radius:17px; border:1px solid var(--management-line);
+  background:linear-gradient(145deg,#fffaf7 0%,#fbf3ee 100%);
+  box-shadow:inset 0 1px 0 #fffefa,0 4px 13px rgba(105,72,57,.06);
+  color:var(--management-ink); text-decoration:none;
+  transition:transform .22s cubic-bezier(.22,1,.36,1),box-shadow .22s ease,border-color .22s ease;
+}
+.luna-management-shell .dashboard-mgmt-card__icon {
+  display:grid; place-items:center; width:48px;height:48px; border-radius:14px;
+  color:#925e50; border:1px solid #e9d0c4;
+  background:linear-gradient(145deg,#fff4ee,#f0dcd1);
+  box-shadow:inset 0 1px 0 #fffdfb,0 2px 5px rgba(105,72,57,.055);
+}
+.luna-management-shell .dashboard-mgmt-card__icon svg { width:25px;height:25px;stroke-width:1.7; }
+.luna-management-shell .editorial-management-copy { min-width:0; gap:5px; text-align:start; }
+.luna-management-shell .dashboard-mgmt-card__title {
+  color:var(--management-title); font-size:.92rem; font-weight:700;
+  line-height:1.55; text-align:start; overflow-wrap:anywhere;
+}
+.luna-management-shell .editorial-management-description { color:var(--management-muted); font-size:.74rem; line-height:1.7; overflow-wrap:anywhere; }
+.luna-management-shell .editorial-management-arrow { width:18px;height:18px; color:#925b4e; opacity:.85; stroke-width:1.65; transition:transform .2s ease; }
+.luna-management-shell .dashboard-mgmt-card:focus-visible { outline:2px solid #925b4e; outline-offset:3px; }
+.management-sidebar-brand { display:none; }
+@media (hover:hover) and (pointer:fine) {
+  .luna-management-shell .dashboard-mgmt-card:hover { transform:translateY(-2px); border-color:#cba69a; box-shadow:0 8px 20px rgba(105,72,57,.09); }
+  .luna-management-shell .dashboard-mgmt-card:hover .dashboard-mgmt-card__icon { background:linear-gradient(145deg,#fff4ee,#ead2c6); }
+  .luna-management-shell .dashboard-mgmt-card:hover .editorial-management-arrow { transform:translateX(-3px); }
+}
+@media (max-width:639px) {
+  .luna-management-shell .maison-unified-header.dashboard-lite-app-header { display:none; }
+  .management-hero-art { width:31%; opacity:.45; }
+  .management-hero-content { gap:10px; }
+  .management-hero-copy { max-width:calc(100% - 58px); }
+  .luna-management-shell .dashboard-mgmt-card { min-height:83px; }
+}
+@media (min-width:640px) {
+  .luna-management-shell .maison-content { padding:18px 18px 28px; }
+  .luna-management-shell .dashboard-mgmt-page { gap:20px; }
+  .luna-management-shell .dashboard-mgmt-page .dash-page-header--mgmt { min-height:120px; padding:18px 22px; }
+  .management-hero-content { width:76%; gap:17px; }
+  .management-hero-emblem { width:64px;height:64px;border-radius:20px; }
+  .management-hero-emblem svg { width:32px;height:32px; }
+  .management-hero-copy { padding-inline-start:16px; border-inline-start:1px solid #dcc3ba; }
+  .management-hero-copy p { font-size:.85rem; }
+  .management-hero-art { width:53%; }
+  .luna-management-shell .dashboard-mgmt-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+  .luna-management-shell .dashboard-mgmt-card { grid-template-columns:56px minmax(0,1fr) 18px; min-height:105px; padding:15px; }
+  .luna-management-shell .dashboard-mgmt-card__icon { width:56px;height:56px; border-radius:17px; }
+  .luna-management-shell .dashboard-mgmt-card__icon svg { width:29px;height:29px; }
+  .luna-management-shell .dashboard-mgmt-card__title { font-size:1rem; }
+}
+@media (min-width:1024px) {
+  .luna-management-shell .maison-content { padding:14px clamp(16px,1.8vw,30px) 24px; }
+  .luna-management-shell .maison-unified-header.dashboard-lite-app-header { display:flex; margin-inline:clamp(16px,1.8vw,30px); }
+  .luna-management-shell .maison-unified-header.dashboard-lite-app-header .maison-unified-header__primary { display:flex; flex:0 0 auto; }
+  .luna-management-shell .maison-unified-header.dashboard-lite-app-header .maison-unified-header__copy { display:none; }
+  .luna-management-shell .maison-sidebar--premium { --color-sidebar:#f9eee8; }
+  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) { width:clamp(210px,18vw,284px); border-color:#fffaf7; box-shadow:0 8px 30px rgba(105,72,57,.055); }
+  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__brand { padding:16px 12px 19px; border-bottom:1px solid #e8d6cd!important; }
+  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__product-logo { min-height:65px;max-height:78px; margin-bottom:4px; padding:0; }
+  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .maison-sidebar__product-logo-img { max-height:70px; border-radius:12px; }
+  .luna-management-shell .maison-sidebar--premium:not(.is-collapsed) .management-sidebar-brand { display:grid; justify-items:center; gap:2px; }
+  .management-sidebar-brand strong { font:600 1.6rem/1.25 Georgia,serif; color:#754b40; }
+  .management-sidebar-brand span { color:#74635c; font-size:.71rem; }
+  .luna-management-shell .maison-sidebar .nav-link { min-height:46px; }
+  .luna-management-shell .maison-sidebar .nav-link-active { background:linear-gradient(110deg,#e6c8bc,#ecd9d1); color:#5e3c33; }
+  .luna-management-shell .maison-sidebar .nav-link-active::before { display:none; }
+}
+@media (min-width:1280px) {
+  .luna-management-shell .dashboard-mgmt-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(12px,1.25vw,20px); }
+  .luna-management-shell .dashboard-mgmt-card { min-height:clamp(104px,12.9vh,132px); grid-template-columns:clamp(50px,4.4vw,70px) minmax(0,1fr) 18px; gap:clamp(10px,1.1vw,17px); padding:clamp(13px,1.22vw,20px); }
+  .luna-management-shell .dashboard-mgmt-card__icon { width:100%; height:auto; aspect-ratio:1; border-radius:19px; }
+  .luna-management-shell .dashboard-mgmt-card__title { font-size:clamp(.97rem,1.13vw,1.16rem); }
+  .luna-management-shell .editorial-management-description { font-size:clamp(.73rem,.85vw,.86rem); }
+  .luna-management-shell .dashboard-mgmt-page .dash-page-header--mgmt { min-height:clamp(116px,14vh,140px); }
+  .management-hero-content { width:70%; }
+  .management-hero-emblem { width:76px;height:76px;border-radius:25px; }
+  .management-hero-emblem svg { width:37px;height:37px; }
+}
+@media (min-width:1024px) and (max-height:740px) {
+  .luna-management-shell .dashboard-mgmt-page { gap:13px; }
+  .luna-management-shell .dashboard-mgmt-page .dash-page-header--mgmt { min-height:94px; padding-block:11px; }
+  .management-hero-emblem { width:56px;height:56px; }
+  .luna-management-shell .dashboard-mgmt-grid { gap:10px; }
+  .luna-management-shell .dashboard-mgmt-card { min-height:87px; padding-block:10px; }
+}
+@keyframes management-card-in { from { opacity:.55; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:no-preference) {
+  .luna-management-shell .dashboard-mgmt-card { animation:management-card-in .36s cubic-bezier(.22,1,.36,1) backwards; animation-delay:calc(min(var(--management-card-index,0),10) * 32ms); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .luna-management-shell .dashboard-mgmt-card, .luna-management-shell .editorial-management-arrow { animation:none!important;transition:none!important;transform:none!important; }
+}

@@ -1,4 +1,7 @@
 {% extends "layouts/app_shell.html" %}
+{% load static %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-management.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block shell_modifier %}luna-management-shell{% endblock %}
 {% block title %}مدیریت · {{ active_salon.name }}{% endblock %}
 {% block header_modifier %}dashboard-lite-app-header{% endblock %}
 {% block page_title %}{% endblock %}
@@ -11,7 +14,7 @@
   {% include "partials/management_hero_header.html" %}
   <nav class="dashboard-mgmt-grid" aria-label="بخش‌های مدیریتی">
     {% for link in links %}
-    <a href="{{ link.url }}" class="dashboard-mgmt-card dashboard-enter">
+    <a href="{{ link.url }}" class="dashboard-mgmt-card dashboard-enter" style="--management-card-index:{{ forloop.counter0 }}">
       <span class="dashboard-mgmt-card__icon" aria-hidden="true"><i data-lucide="{{ link.icon }}" class="beautyos-lucide beautyos-lucide--sm"></i></span>
       <span class="editorial-management-copy">
         <span class="dashboard-mgmt-card__title">{{ link.title }}</span>

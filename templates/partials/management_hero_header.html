@@ -1,6 +1,13 @@
+{% load static %}
 <header class="dash-page-header dash-page-header--mgmt dashboard-enter">
-  <div class="dash-page-header__title-row">
-    <h1 class="dash-page-header__title">مدیریت سالن</h1>
-    <span class="dash-page-header__badge" aria-hidden="true"><i data-lucide="briefcase" class="beautyos-lucide beautyos-lucide--nav"></i></span>
+  <div class="management-hero-art" aria-hidden="true">
+    <img src="{% static 'images/photos/beautyos-management-floral.webp' %}?v={{ BEAUTYOS_ASSET_VERSION }}" width="668" height="126" alt="" decoding="async">
+  </div>
+  <div class="management-hero-content">
+    <span class="management-hero-emblem" aria-hidden="true"><i data-lucide="store"></i></span>
+    <div class="management-hero-copy">
+      <h1 class="dash-page-header__title">مدیریت سالن</h1>
+      <p>مدیریت جامع خدمات، مشتریان، تیم و امور مالی سالن زیبایی شما</p>
+    </div>
   </div>
 </header>
