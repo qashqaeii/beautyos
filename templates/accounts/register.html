@@ -10,7 +10,7 @@
 {% block auth_heading %}ثبت‌نام سالن جدید{% endblock %}
 {% block auth_subtitle %}مالک سالن با شماره موبایل خود ثبت‌نام می‌کند و پس از تأیید، سالن و پنل مدیریت ساخته می‌شود.{% endblock %}
 {% block auth_content %}
-<form method="post" class="space-y-5 luna-auth-register-form luna-auth-phone-form">
+<form method="post" class="luna-auth-register-form luna-auth-phone-form">
   {% csrf_token %}
   {% if phone_form.non_field_errors %}
   <div class="mb-1">{% include "accounts/partials/auth_flash.html" with message=phone_form.non_field_errors.0 variant="error" %}</div>
