@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="{% static 'css/editorial-foundation.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/editorial-workspace.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/editorial-public.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/luna-responsive.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
   <script defer src="https://unpkg.com/htmx.org@2.0.4"></script>
   <script defer src="{% static 'js/jalali-datepicker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
   <script defer src="{% static 'js/fa-money.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
@@ -28,7 +29,7 @@
 >
   {% block body %}{% endblock %}
   {% if messages %}
-  <div class="fixed bottom-20 left-4 z-50 flex max-w-sm flex-col gap-2 md:bottom-4" x-data>
+  <div class="maison-toast-stack fixed bottom-20 left-4 z-50 flex max-w-sm flex-col gap-2 md:bottom-4" x-data>
     {% for message in messages %}
     <div class="maison-toast maison-toast--enter rounded-xl border border-line bg-surface px-4 py-3 text-sm shadow-lift" role="status">
       {{ message }}

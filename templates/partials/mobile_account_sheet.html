@@ -1,0 +1,25 @@
+{% if user.is_authenticated %}
+<div class="maison-sheet-backdrop luna-mobile-account-backdrop" x-show="accountSheetOpen" x-transition.opacity @click="closeAccountSheet()" x-cloak aria-hidden="true"></div>
+<section id="mobile-account-sheet" class="maison-sheet luna-mobile-account-sheet lg:hidden" x-show="accountSheetOpen" x-cloak role="dialog" aria-modal="true" aria-labelledby="mobile-account-title"
+  @keydown.escape.window="if (accountSheetOpen) closeAccountSheet()"
+  @keydown.tab="
+    const items = Array.from($el.querySelectorAll('a[href],button:not([disabled])'));
+    if ($event.shiftKey && document.activeElement === items[0]) { $event.preventDefault(); items[items.length - 1].focus(); }
+    else if (!$event.shiftKey && document.activeElement === items[items.length - 1]) { $event.preventDefault(); items[0].focus(); }
+  ">
+  <div class="maison-sheet__handle" aria-hidden="true"></div>
+  <header class="luna-account-head">
+    <span class="luna-account-avatar"><i data-lucide="user-round" aria-hidden="true"></i></span>
+    <div><h2 id="mobile-account-title">{{ user.full_name|default:user.display_phone }}</h2><p>{{ active_salon.name }}</p></div>
+    <button type="button" x-ref="mobileAccountClose" aria-label="بستن" @click="closeAccountSheet()"><i data-lucide="x" aria-hidden="true"></i></button>
+  </header>
+  <div class="luna-account-actions">
+    {% if nav_salon_settings %}
+    <a href="{% url 'salons_settings:home' %}"><i data-lucide="building-2" aria-hidden="true"></i>اطلاعات سالن</a>
+    {% endif %}
+    <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
+      <button type="submit"><i data-lucide="log-out" aria-hidden="true"></i>خروج از حساب</button>
+    </form>
+  </div>
+</section>
+{% endif %}

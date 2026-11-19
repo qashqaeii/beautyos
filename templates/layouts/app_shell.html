@@ -6,6 +6,11 @@
     sidebarCollapsed: false,
     quickSheetOpen: false,
     moreSheetOpen: false,
+    accountSheetOpen: false,
+    closeAccountSheet() {
+      this.accountSheetOpen = false;
+      this.$nextTick(() => this.$refs.mobileAccountTrigger?.focus());
+    },
     navGroups: { business: false, finance: false, growth: true, digital: false },
     toggleNavGroup(key) {
       this.navGroups[key] = !this.navGroups[key];
@@ -19,7 +24,7 @@
       Object.keys(saved).forEach((k) => { if (k in navGroups) navGroups[k] = saved[k]; });
     } catch (e) {}
   "
-  :class="{ 'maison-app--sheet-open': quickSheetOpen || moreSheetOpen }"
+  :class="{ 'maison-app--sheet-open': quickSheetOpen || moreSheetOpen || accountSheetOpen }"
 >
   <a href="#workspace-content" class="editorial-skip-link">رفتن به محتوای اصلی</a>
   {% include "partials/sidebar.html" %}
@@ -62,6 +67,7 @@
   {% include "partials/quick_action_sheet.html" %}
   {% include "partials/mobile_more_sheet.html" %}
   {% include "partials/mobile_nav.html" %}
+  {% include "partials/mobile_account_sheet.html" %}
   {% block app_overlays %}{% endblock %}
 </div>
 <style>[x-cloak]{display:none!important}</style>

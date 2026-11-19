@@ -177,6 +177,7 @@ def _beautyos_asset_version() -> str:
         "static/css/luna-home-hero.css",
         "static/css/luna-auth.css",
         "static/css/luna-overview.css",
+        "static/css/luna-responsive.css",
         "static/js/overview-stat-anim.js",
         "static/images/photos/beautyos-register-hero.webp",
         "static/images/photos/luna-salon-hero.webp",
