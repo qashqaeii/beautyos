@@ -36,7 +36,20 @@ body.beautyos-main-bg .public-site.luna-landing {
   gap: 14px;
 }
 .luna-landing .public-nav__brand { gap: 10px; }
-.luna-landing .public-nav__logo { height: 38px; max-width: 105px; object-fit: contain; }
+.luna-landing .public-nav__logo {
+  display:block;
+  flex:none;
+  box-sizing:border-box;
+  width:66px;
+  height:44px;
+  max-width:none;
+  object-fit:cover;
+  object-position:center;
+  border-radius:13px;
+  border:1px solid rgba(163,107,98,.16);
+  background:#f8ede8;
+  box-shadow:0 2px 6px rgba(79,52,43,.07);
+}
 .luna-landing .public-nav__brand-text { color: var(--luna-hero-ink); font-size: 1.13rem; font-weight: 700; }
 .luna-landing .public-nav__links { gap: clamp(3px,1.15vw,19px); }
 .luna-landing .public-nav-link { font-size: .91rem; padding: 10px 13px; font-weight: 600; color: var(--luna-hero-ink); border-radius: 15px; }
@@ -179,7 +192,7 @@ body.beautyos-main-bg .public-site.luna-landing {
 }
 @media (max-width:639px) {
   .luna-landing .public-nav__inner { padding:10px 14px; gap:6px; }
-  .luna-landing .public-nav__logo { height:34px; max-width:68px; }
+  .luna-landing .public-nav__logo { width:54px; height:36px; border-radius:10px; }
   .luna-landing .public-nav__brand-text { display:none; }
   .luna-landing .public-nav__cta { min-height:40px; padding-inline:11px; font-size:.8rem; }
   .luna-landing .public-nav__actions { gap:6px; }
