@@ -26,10 +26,15 @@
     bookOpen: {{ book_modal_open|yesno:'true,false' }},
     closeModals() {
       this.bookOpen = false;
-      const params = new URLSearchParams(window.location.search);
-      params.delete('book');
-      const qs = params.toString();
-      window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+      const desk = new URL('{% url 'reception:desk' %}', window.location.origin);
+      desk.searchParams.set('day', '{{ selected_day|date:'Y-m-d'|escapejs }}');
+      {% if selected_service %}desk.searchParams.set('service', '{{ selected_service.pk|escapejs }}');{% endif %}
+      {% if selected_slot_staff_id %}desk.searchParams.set('staff', '{{ selected_slot_staff_id|escapejs }}');{% endif %}
+      if (window.location.pathname !== desk.pathname) {
+        window.location.replace(desk.pathname + desk.search);
+        return;
+      }
+      window.history.replaceState({}, '', desk.pathname + desk.search);
     }
   }"
   x-effect="document.documentElement.classList.toggle('app-modal-open', bookOpen)"
