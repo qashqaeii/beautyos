@@ -226,3 +226,29 @@ def test_audit_reports_cancelled_with_active_commission(salon, owner_membership)
     appt.save(update_fields=["status", "updated_at"])
     issues = audit_appointment_commission_consistency(salon=salon)
     assert any(i["appointment_id"] == appt.pk for i in issues)
+
+@pytest.mark.django_db
+def test_partial_commission_cancellation_offsets_future_settlement(salon, owner_membership):
+    from apps.commissions.services import staff_outstanding_commission
+    appt, staff = _booking_appt(salon, owner_membership)
+    complete_appointment(salon=salon, appointment_id=appt.pk)
+    create_settlement(salon, staff, 100_000)
+    cancel_appointment(salon=salon, appointment_id=appt.pk)
+    entry = CommissionEntry.objects.get(appointment=appt)
+    assert entry.status == CommissionEntry.Status.VOID
+    assert entry.settled_amount_toman == 100_000
+    reversal = entry.reversal_entries.get()
+    assert reversal.commission_amount_toman == -100_000
+    assert net_commission_effect_for_appointment(appt) == 0
+    next_entry = CommissionEntry.objects.create(salon=salon, staff=staff, base_amount_toman=500_000, commission_amount_toman=200_000)
+    assert staff_outstanding_commission(salon=salon, staff=staff) == 100_000
+    with pytest.raises(ValidationError):
+        create_settlement(salon, staff, 200_000)
+    settlement = create_settlement(salon, staff, 100_000)
+    assert settlement.amount_toman == 100_000
+    next_entry.refresh_from_db()
+    reversal.refresh_from_db()
+    assert next_entry.status == CommissionEntry.Status.SETTLED
+    assert reversal.status == CommissionEntry.Status.SETTLED
+    assert staff_outstanding_commission(salon=salon, staff=staff) == 0
+    assert net_commission_effect_for_appointment(appt) == 0

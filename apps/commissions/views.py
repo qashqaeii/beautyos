@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.db.models import Sum
+from django.db.models import F, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.commissions.forms import CommissionRuleForm, SettlementForm
@@ -25,7 +25,7 @@ def overview(request):
         CommissionEntry.scoped(request.salon)
         .filter(status=CommissionEntry.Status.RECOGNIZED)
         .values("staff_id", "staff__display_name")
-        .annotate(total=Sum("commission_amount_toman"))
+        .annotate(total=Sum(F("commission_amount_toman") - F("settled_amount_toman")))
     )
     return render(
         request,

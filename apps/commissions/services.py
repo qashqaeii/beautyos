@@ -63,25 +63,29 @@ def reverse_commission_for_appointment(appointment: Appointment) -> CommissionEn
     )
     if entry is None:
         return None
-    if entry.reversal_entries.filter(status=CommissionEntry.Status.RECOGNIZED).exists():
-        return entry.reversal_entries.filter(status=CommissionEntry.Status.RECOGNIZED).first()
+    existing = entry.reversal_entries.exclude(status=CommissionEntry.Status.VOID).first()
+    if existing:
+        return existing
 
     amount = int(entry.commission_amount_toman)
-    if amount <= 0:
+    if amount < 0:
         raise ValidationError("برگشت پورسانت نامعتبر است.")
 
+    # Void unpaid entitlement, but preserve the actual cash already paid.
+    paid = amount if entry.status == CommissionEntry.Status.SETTLED else int(entry.settled_amount_toman)
     if entry.status == CommissionEntry.Status.RECOGNIZED:
         entry.status = CommissionEntry.Status.VOID
         entry.save(update_fields=["status", "updated_at"])
-        return entry
+        if not paid:
+            return entry
 
-    if entry.status == CommissionEntry.Status.SETTLED:
+    if paid > 0:
         return CommissionEntry.objects.create(
             salon=entry.salon,
             appointment=None,
             staff=entry.staff,
             base_amount_toman=0,
-            commission_amount_toman=-amount,
+            commission_amount_toman=-paid,
             rule_snapshot={"reversal": True, "source_entry_id": entry.pk},
             status=CommissionEntry.Status.RECOGNIZED,
             reverses_entry=entry,
@@ -95,11 +99,10 @@ def net_commission_effect_for_appointment(appointment: Appointment) -> int:
     primary = CommissionEntry.objects.filter(appointment=appointment).first()
     if primary is None:
         return 0
-    total = 0
-    if primary.status != CommissionEntry.Status.VOID:
-        total += int(primary.commission_amount_toman)
+    total = (int(primary.settled_amount_toman) if primary.status == CommissionEntry.Status.VOID
+             else int(primary.commission_amount_toman))
     for rev in primary.reversal_entries.all():
-        if rev.status == CommissionEntry.Status.RECOGNIZED:
+        if rev.status != CommissionEntry.Status.VOID:
             total += int(rev.commission_amount_toman)
     return total
 
@@ -111,7 +114,7 @@ def audit_appointment_commission_consistency(*, salon=None) -> list[dict]:
     qs = Appointment.objects.all() if salon is None else Appointment.scoped(salon)
     issues = []
     for appt in qs.filter(status=Appointment.Status.CANCELLED):
-        primary = CommissionEntry.objects.filter(appointment=appt).exclude(status=CommissionEntry.Status.VOID).first()
+        primary = CommissionEntry.objects.filter(appointment=appt).first()
         if primary and net_commission_effect_for_appointment(appt) != 0:
             issues.append(
                 {
@@ -134,14 +137,18 @@ def staff_outstanding_commission(*, salon, staff) -> int:
     )
     total = 0
     for entry in entries:
-        total += max(0, int(entry.commission_amount_toman) - int(entry.settled_amount_toman))
-    return total
+        total += int(entry.commission_amount_toman) - int(entry.settled_amount_toman)
+    return max(0, total)
 
 
 @transaction.atomic
 def create_settlement(salon, staff, amount_toman: int, note: str = ""):
     from apps.commissions.models import CommissionSettlement
+    from apps.staff.models import StaffProfile
 
+    if staff.salon_id != salon.pk:
+        raise ValidationError("متخصص متعلق به این سالن نیست.")
+    StaffProfile.scoped(salon).select_for_update().get(pk=staff.pk)
     if amount_toman <= 0:
         raise ValidationError("مبلغ تسویه باید بزرگ‌تر از صفر باشد.")
 
@@ -151,7 +158,7 @@ def create_settlement(salon, staff, amount_toman: int, note: str = ""):
         .filter(staff=staff, status=CommissionEntry.Status.RECOGNIZED)
         .order_by("created_at")
     )
-    due_total = staff_outstanding_commission(salon=salon, staff=staff)
+    due_total = max(0, sum(int(e.commission_amount_toman) - int(e.settled_amount_toman) for e in outstanding))
     if amount_toman > due_total:
         raise ValidationError(f"مبلغ تسویه بیش از مانده قابل پرداخت است. مانده: {due_total} تومان.")
 
@@ -162,7 +169,16 @@ def create_settlement(salon, staff, amount_toman: int, note: str = ""):
         note=note,
         settled_at=timezone.now(),
     )
+    # Existing reversal credits offset future entitlement before additional cash.
     remaining = amount_toman
+    for entry in outstanding:
+        due = int(entry.commission_amount_toman) - int(entry.settled_amount_toman)
+        if due < 0:
+            remaining += -due
+            entry.settled_amount_toman = entry.commission_amount_toman
+            entry.status = CommissionEntry.Status.SETTLED
+            entry.settlement = settlement
+            entry.save(update_fields=["settled_amount_toman", "status", "settlement", "updated_at"])
     for entry in outstanding:
         if remaining <= 0:
             break
@@ -178,4 +194,6 @@ def create_settlement(salon, staff, amount_toman: int, note: str = ""):
             update_fields.extend(["status", "settlement"])
         entry.save(update_fields=update_fields)
         remaining -= apply
+    if remaining:
+        raise ValidationError("مانده پورسانت تغییر کرده است؛ دوباره تلاش کنید.")
     return settlement

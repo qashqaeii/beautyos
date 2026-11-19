@@ -381,7 +381,7 @@ def appointment_detail(request, pk):
             elif action == "complete":
                 complete_appointment(salon=request.salon, appointment_id=appt.pk)
                 messages.success(request, "مراجعه تکمیل شد.")
-        except AppointmentLifecycleError as exc:
-            messages.error(request, str(exc))
+        except (AppointmentLifecycleError, ValidationError) as exc:
+            messages.error(request, exc.messages[0] if isinstance(exc, ValidationError) else str(exc))
         return redirect("appointments:detail", pk=pk)
     return render(request, "appointments/detail.html", {"appointment": appt})
