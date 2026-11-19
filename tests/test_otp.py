@@ -24,7 +24,9 @@ def test_otp_issue_and_verify(monkeypatch):
 
 
 @pytest.mark.django_db
-def test_otp_invalid_code():
+def test_otp_invalid_code(settings, monkeypatch):
+    settings.DEBUG = True
+    monkeypatch.setattr(otp_service, "_generate_code", lambda: "123456")
     phone = "+989122222222"
     issue_otp(phone=phone, purpose=OTPChallenge.Purpose.LOGIN)
     with pytest.raises(OTPInvalid):
@@ -34,7 +36,8 @@ def test_otp_invalid_code():
 
 
 @pytest.mark.django_db
-def test_otp_rate_includes_consumed_challenges(monkeypatch):
+def test_otp_rate_includes_consumed_challenges(monkeypatch, settings):
+    settings.DEBUG = True
     from apps.accounts.services.otp import OTPRateLimited
     monkeypatch.setattr(otp_service, "_generate_code", lambda: "123456")
     phone = "+989123456789"

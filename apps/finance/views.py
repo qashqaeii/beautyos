@@ -199,7 +199,7 @@ def finance_overview(request):
             if not can_manage_debt:
                 raise PermissionDenied
             debt_id = _positive_pk(request.POST.get("debt_id"))
-            debt = get_object_or_404(SalonDebt, pk=debt_id, salon=request.salon, is_closed=False)
+            debt = get_object_or_404(SalonDebt, pk=debt_id, salon=request.salon)
             pay_form = SalonDebtPaymentForm(request.POST)
             if pay_form.is_valid():
                 try:
@@ -218,8 +218,9 @@ def finance_overview(request):
                     return redirect(_finance_redirect(**redirect_params))
             else:
                 messages.error(request, "مبلغ پرداخت بدهی معتبر نیست.")
-            redirect_params["tab"] = "debts"
-            return redirect(_finance_redirect(**redirect_params))
+            query = request.GET.copy()
+            query["tab"] = "debts"
+            return render(request, "finance/overview.html", _finance_overview_context(request, get_query=query), status=400)
         elif action == "settle_staff":
             if not can_settle_commission:
                 raise PermissionDenied
