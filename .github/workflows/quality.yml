@@ -1,0 +1,60 @@
+name: BeautyOS quality gate
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  django:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: beautyos
+          POSTGRES_USER: beautyos
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U beautyos"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.local
+      DATABASE_URL: postgresql://beautyos:ci-only-password@localhost:5432/beautyos
+      BEAUTYOS_SMS_PROVIDER: apps.accounts.sms.DevSMSProvider
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: pip install -r requirements/dev.txt
+      - run: npm ci
+      - run: npm run build:css
+      - run: python manage.py check
+      - run: python manage.py makemigrations --check --dry-run
+      - run: python manage.py migrate --noinput
+      - run: python -m compileall -q apps config tests
+      - name: Check JavaScript syntax
+        run: find static/js -name '*.js' -not -path '*/vendor/*' -print0 | xargs -0 -n 1 node --check
+      - name: PostgreSQL regression suite
+        run: pytest --create-db --junitxml=pytest-report.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: pytest-report.xml
+          if-no-files-found: ignore
