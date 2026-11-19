@@ -1,10 +1,11 @@
+{% load format_tags %}
 <li class="finance-comm-row finance-comm-row--settled">
   <div class="finance-comm-row__head">
     <div class="finance-comm-row__identity">
       <p class="finance-comm-row__name">{{ row.staff.display_name|default:row.staff.user }}</p>
-      <p class="finance-comm-row__percent">پرداخت امروز: <span class="tabular-nums">{{ row.settled_amount_today|fa_money }}</span> تومان</p>
+      <p class="finance-comm-row__percent">مبلغ پرداخت ثبت‌شده: <span class="tabular-nums">{{ row.settled_amount_today|fa_money }}</span> تومان</p>
     </div>
-    <label class="finance-comm-settle-form__label" for="settled-note-{{ row.staff.pk }}">یادداشت تسویه</label>
+    <p class="finance-comm-settle-form__label">یادداشت تسویه</p>
     {% if row.settlement_note %}
     <p id="settled-note-{{ row.staff.pk }}" class="finance-comm-row__note">{{ row.settlement_note }}</p>
     {% else %}

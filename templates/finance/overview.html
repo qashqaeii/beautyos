@@ -1,5 +1,8 @@
 {% extends "layouts/app_shell.html" %}
-{% load humanize format_tags %}
+{% load humanize format_tags static l10n %}
+{% block workspace_header %}{% endblock %}
+{% block shell_modifier %}luna-finance-shell{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
 {% block title %}مدیریت مالی{% endblock %}
 {% block page_title %}{% endblock %}
 {% block page_subtitle %}{% endblock %}
@@ -8,10 +11,11 @@
 <div
   class="finance-page"
   x-data="{
-    showDebtForm: false,
+    showDebtForm: {{ debt_form_open|default:False|yesno:'true,false' }},
     paymentOpen: {{ payment_modal_open|default:False|yesno:'true,false' }},
     closePayment() {
       this.paymentOpen = false;
+      if (window.location.pathname !== '{% url "finance:overview" %}') { window.location.replace('{{ payment_return_url|escapejs }}'); return; }
       const params = new URLSearchParams(window.location.search);
       if (params.has('payment')) {
         params.delete('payment');
@@ -20,69 +24,68 @@
       }
     }
   }"
-  x-effect="document.documentElement.classList.toggle('app-modal-open', showDebtForm || paymentOpen)"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', paymentOpen)"
   @beautyos-close-create-modal.window="paymentOpen ? closePayment() : null"
-  @keydown.escape.window="paymentOpen ? closePayment() : null"
+  @keydown.escape.window="paymentOpen && !window.__beautyosJalaliCalendarOpen ? closePayment() : null"
 >
   <header class="finance-page__header">
     <div class="finance-page__headline">
-      <span class="finance-page__head-icon" aria-hidden="true">
-        <i data-lucide="wallet" class="h-5 w-5"></i>
-      </span>
-      <h1 class="finance-page__title">مدیریت مالی</h1>
+      <span class="finance-page__head-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
+      <div><h1 class="finance-page__title">مدیریت مالی</h1><p class="luna-finance-subtitle">درآمد، بدهی‌ها و تسویه حساب‌های سالن</p></div>
     </div>
   </header>
-
-  <nav class="finance-page__tabs" role="tablist" aria-label="بخش‌های مالی">
-    <a href="{% querystring tab='income' %}" class="finance-page__tab {% if tab == 'income' %}is-active{% endif %}" {% if tab == 'income' %}aria-current="page"{% endif %}>درآمد و دریافتی‌ها</a>
-    <a href="{% querystring tab='debts' %}" class="finance-page__tab {% if tab == 'debts' %}is-active{% endif %}" {% if tab == 'debts' %}aria-current="page"{% endif %}>بدهی‌ها</a>
-    <a href="{% querystring tab='commissions' %}" class="finance-page__tab {% if tab == 'commissions' %}is-active{% endif %}" {% if tab == 'commissions' %}aria-current="page"{% endif %}>تسویه متخصص‌ها</a>
+  <nav class="finance-page__tabs" aria-label="بخش‌های مالی">
+    <a href="{% url 'finance:overview' %}?tab=income" class="finance-page__tab {% if tab == 'income' %}is-active{% endif %}" {% if tab == 'income' %}aria-current="page"{% endif %}><i data-lucide="coins" aria-hidden="true"></i><span>درآمد و دریافتی‌ها</span></a>
+    <a href="{% url 'finance:overview' %}?tab=debts" class="finance-page__tab {% if tab == 'debts' %}is-active{% endif %}" {% if tab == 'debts' %}aria-current="page"{% endif %}><i data-lucide="receipt-text" aria-hidden="true"></i><span>بدهی‌ها</span></a>
+    <a href="{% url 'finance:overview' %}?tab=commissions" class="finance-page__tab {% if tab == 'commissions' %}is-active{% endif %}" {% if tab == 'commissions' %}aria-current="page"{% endif %}><i data-lucide="users-round" aria-hidden="true"></i><span>تسویه متخصص‌ها</span></a>
   </nav>
-
-  <div class="finance-page__range-bar">
+  {% if tab != 'debts' %}
+  <section class="finance-page__range-bar" aria-label="بازه گزارش">
     <div class="finance-page__range-pills" role="group" aria-label="بازه زمانی">
-      <a href="{% querystring range='today' %}" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}">امروز</a>
-      <a href="{% querystring range='month' %}" class="finance-page__range-pill {% if range_key == 'month' %}is-active{% endif %}">ماه جاری</a>
-      <a href="{% querystring range='quarter' %}" class="finance-page__range-pill {% if range_key == 'quarter' %}is-active{% endif %}">سه ماه گذشته</a>
-      <a href="{% querystring range='day' %}" class="finance-page__range-pill {% if range_key == 'day' %}is-active{% endif %}">انتخاب روز</a>
+      <a href="?tab={{ tab }}&amp;range=today" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}" {% if range_key == 'today' %}aria-current="true"{% endif %}>امروز</a>
+      {% if tab == 'income' %}
+      <a href="?tab=income&amp;range=month" class="finance-page__range-pill {% if range_key == 'month' %}is-active{% endif %}" {% if range_key == 'month' %}aria-current="true"{% endif %}>ماه جاری</a>
+      <a href="?tab=income&amp;range=quarter" class="finance-page__range-pill {% if range_key == 'quarter' %}is-active{% endif %}" {% if range_key == 'quarter' %}aria-current="true"{% endif %}>سه ماه گذشته</a>
+      {% endif %}
+      <a href="?tab={{ tab }}&amp;range=day&amp;day={{ selected_day|date:'Y-m-d' }}" class="finance-page__range-pill {% if range_key == 'day' %}is-active{% endif %}" {% if range_key == 'day' %}aria-current="true"{% endif %}>انتخاب روز</a>
     </div>
-    <form method="get" class="finance-page__day-picker">
+    <form method="get" action="{% url 'finance:overview' %}" class="finance-page__day-picker">
       <input type="hidden" name="tab" value="{{ tab }}">
-      <input type="hidden" name="range" value="{% if range_key == 'day' %}day{% else %}{{ range_key }}{% endif %}">
+      <input type="hidden" name="range" value="day">
       {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
     </form>
-    <p class="finance-page__range-caption">
-      <span>{{ range_label }}</span>
-      <span class="finance-page__range-sep">·</span>
-      <span class="tabular-nums">{{ range_display_jalali|persian_digits }}</span>
-    </p>
-  </div>
+    <p class="finance-page__range-caption"><span>{{ range_label }}</span><span class="finance-page__range-sep">·</span><span class="tabular-nums">{{ range_display_jalali|persian_digits }}</span></p>
+  </section>
+  {% endif %}
 
   {% if tab == 'income' %}
-  <section class="finance-page__panel dashboard-enter">
+  <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="درآمد و دریافتی‌ها">
     <div class="finance-stat-grid">
-      <article class="finance-stat-card">
+      <article class="finance-stat-card luna-finance-featured">
+        <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
         <p class="finance-stat-card__label">دریافتی کل</p>
         <p class="finance-stat-card__value tabular-nums">{{ income.total_received|fa_money }} <span class="finance-stat-card__unit">تومان</span></p>
       </article>
       <article class="finance-stat-card">
+        <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="coins"></i></span>
         <p class="finance-stat-card__label">بیعانه پرداخت کرده‌اند</p>
         <p class="finance-stat-card__value tabular-nums">{{ income.deposit_customer_count|fa_num }} <span class="finance-stat-card__unit">مشتری</span></p>
       </article>
       <article class="finance-stat-card finance-stat-card--success">
+        <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="circle-check"></i></span>
         <p class="finance-stat-card__label">تسویه کامل کرده‌اند</p>
         <p class="finance-stat-card__value tabular-nums">{{ income.settled_customer_count|fa_num }} <span class="finance-stat-card__unit">مشتری</span></p>
       </article>
     </div>
 
+    <div class="luna-finance-panel">
     <div class="finance-section-head">
-      <h3 class="finance-section-head__title">پرداخت‌های مشتریان</h3>
+      <div class="luna-finance-panel-title"><i data-lucide="receipt-text" aria-hidden="true"></i><div><h2 class="finance-section-head__title">پرداخت‌های مشتریان</h2><p>حداکثر ۵۰ پرداخت اخیر در بازه انتخابی</p></div></div>
       {% if can_payment_create %}
-      <a href="{% querystring payment='1' %}" class="btn-primary finance-section-head__cta">ثبت پرداخت مشتری</a>
+      <a href="{% querystring payment='1' %}" class="btn-primary finance-section-head__cta"><i data-lucide="plus" aria-hidden="true"></i>ثبت پرداخت مشتری</a>
       {% endif %}
     </div>
 
-    {% if payments %}
     <div class="finance-table-wrap">
       <table class="finance-table">
         <thead>
@@ -98,57 +101,66 @@
           <tr>
             <td class="finance-table__name" data-label="نام">{{ p.customer.full_name }}</td>
             <td class="finance-table__money" data-label="مبلغ">{{ p.paid_amount_toman|fa_money }} تومان</td>
-            <td class="finance-table__meta" data-label="نوع">{{ p.get_method_display }}{% if p.status == 'partial' %} · بیعانه{% elif p.status == 'paid' %} · تسویه{% endif %}</td>
+            <td class="finance-table__meta" data-label="نوع"><span>{{ p.get_method_display }}</span> <span class="luna-finance-status luna-finance-status--{{ p.status }}">{{ p.get_status_display }}</span></td>
             <td class="finance-table__date tabular-nums" data-label="تاریخ">{{ p.created_at|jalali_date|persian_digits }}</td>
           </tr>
+          {% empty %}
+          <tr class="luna-finance-table-empty"><td colspan="4"><div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="wallet"></i></span><strong>هنوز پرداختی ثبت نشده است</strong><p>در بازه انتخاب‌شده هیچ پرداختی وجود ندارد.</p></div></td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-    {% else %}
-    <p class="finance-empty-inline">در این بازه پرداختی ثبت نشده است.</p>
-    {% endif %}
+    </div>
   </section>
   {% endif %}
 
   {% if tab == 'debts' %}
-  <section class="finance-page__panel dashboard-enter">
+  <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="بدهی‌های سالن">
     <article class="finance-stat-card finance-stat-card--wide finance-stat-card--warning">
+      <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="receipt-text"></i></span>
       <p class="finance-stat-card__label">مانده بدهی سالن</p>
       <p class="finance-stat-card__value tabular-nums">{{ total_balance|fa_money }} <span class="finance-stat-card__unit">تومان</span></p>
+      <p class="finance-stat-card__hint">مانده تمام بدهی‌های باز سالن، مستقل از بازه زمانی</p>
     </article>
 
+    <div class="luna-finance-panel">
     <div class="finance-section-head">
-      <h3 class="finance-section-head__title">بدهی‌های باز</h3>
+      <div class="luna-finance-panel-title"><i data-lucide="list" aria-hidden="true"></i><div><h2 class="finance-section-head__title">بدهی‌های باز</h2><p>پیگیری مانده و سررسید بدهی‌ها</p></div></div>
       {% if can_manage_debt %}
-      <button type="button" class="btn-primary finance-section-head__cta" @click="showDebtForm = !showDebtForm">+ ثبت بدهی</button>
+      <button type="button" class="btn-primary finance-section-head__cta" @click="showDebtForm = !showDebtForm" :aria-expanded="showDebtForm" aria-controls="finance-debt-form-panel"><i data-lucide="plus" aria-hidden="true"></i> ثبت بدهی</button>
       {% endif %}
     </div>
 
     {% if can_manage_debt %}
-    <div class="finance-debt-form-panel" x-show="showDebtForm" x-cloak x-transition>
-      <form method="post" class="finance-debt-form">
+    <div id="finance-debt-form-panel" class="finance-debt-form-panel" x-show="showDebtForm" x-cloak x-transition>
+      <form method="post" action="{% url 'finance:overview' %}?tab=debts" class="finance-debt-form">
         {% csrf_token %}
         <input type="hidden" name="action" value="add_debt">
+        {{ debt_form.non_field_errors }}
         <div class="finance-debt-form__grid">
           <div class="finance-debt-form__field">
             <label class="field-label" for="{{ debt_form.creditor_name.id_for_label }}">{{ debt_form.creditor_name.label }}</label>
             {{ debt_form.creditor_name }}
+            {{ debt_form.creditor_name.errors }}
           </div>
           <div class="finance-debt-form__field">
             <label class="field-label" for="{{ debt_form.creditor_type.id_for_label }}">{{ debt_form.creditor_type.label }}</label>
             {{ debt_form.creditor_type }}
+            {{ debt_form.creditor_type.errors }}
           </div>
           <div class="finance-debt-form__field">
             <label class="field-label" for="{{ debt_form.principal_toman.id_for_label }}">{{ debt_form.principal_toman.label }}</label>
             {{ debt_form.principal_toman }}
+            {{ debt_form.principal_toman.errors }}
           </div>
           <div class="finance-debt-form__field">
             <label class="field-label" for="{{ debt_form.due_date.id_for_label }}">{{ debt_form.due_date.label }}</label>
             {{ debt_form.due_date }}
+            {{ debt_form.due_date.errors }}
           </div>
+          <div class="finance-debt-form__field luna-finance-full"><label class="field-label" for="{{ debt_form.note.id_for_label }}">یادداشت (اختیاری)</label>{{ debt_form.note }}{{ debt_form.note.errors }}</div>
         </div>
-        <button type="submit" class="btn-primary finance-debt-form__submit">ذخیره بدهی</button>
+        <div class="luna-finance-form-actions"><button type="submit" class="btn-primary finance-debt-form__submit">ذخیره بدهی</button><button type="button" class="btn-secondary" @click="showDebtForm = false">انصراف</button></div>
       </form>
     </div>
     {% endif %}
@@ -168,11 +180,11 @@
           {% endif %}
         </div>
         {% if can_manage_debt %}
-        <form method="post" class="finance-debt-pay-form">
+        <form method="post" action="{% url 'finance:overview' %}?tab=debts" class="finance-debt-pay-form">
           {% csrf_token %}
           <input type="hidden" name="action" value="pay_debt">
           <input type="hidden" name="debt_id" value="{{ debt.pk }}">
-          <input type="number" name="amount_toman" class="input-field finance-debt-pay-form__amount" min="1" max="{{ debt.balance_toman }}" placeholder="مبلغ" required>
+          <input type="number" name="amount_toman" class="input-field finance-debt-pay-form__amount" min="1" max="{{ debt.balance_toman|unlocalize }}" placeholder="مبلغ (تومان)" aria-label="مبلغ پرداخت بدهی {{ debt.creditor_name }}" required>
           <button type="submit" class="btn-secondary finance-debt-pay-form__btn">ثبت پرداخت بدهی</button>
         </form>
         {% endif %}
@@ -180,27 +192,26 @@
       {% endfor %}
     </ul>
     {% else %}
-    <p class="finance-empty-inline">بدهی بازی ثبت نشده است.</p>
+    <div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="receipt-text"></i></span><strong>بدهی بازی ثبت نشده است</strong><p>بدهی‌های فعال سالن در این بخش نمایش داده می‌شوند.</p></div>
     {% endif %}
+    </div>
   </section>
   {% endif %}
 
   {% if tab == 'commissions' %}
   <section
-    class="finance-page__panel dashboard-enter"
+    class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="تسویه متخصص‌ها"
     x-data="{ commPanel: '{% if commissions.pending_rows %}pending{% elif commissions.settled_rows %}settled{% else %}pending{% endif %}' }"
   >
-    <p class="finance-comm-day-label">روز انتخاب‌شده: <span class="tabular-nums">{{ commissions.day_jalali|persian_digits }}</span></p>
-
     <div class="finance-stat-grid finance-stat-grid--two finance-comm-stat-grid">
       <button
         type="button"
         class="finance-stat-card finance-stat-card--success finance-stat-card--interactive text-start"
         :class="commPanel === 'settled' && 'is-active'"
         @click="commPanel = 'settled'"
-        aria-pressed="false"
         :aria-pressed="commPanel === 'settled'"
       >
+        <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="circle-check"></i></span>
         <p class="finance-stat-card__label">{% if range_key == 'today' %}تسویه‌شده امروز{% else %}تسویه‌شده در این روز{% endif %}</p>
         <p class="finance-stat-card__value tabular-nums">{{ commissions.settled_staff_count|fa_num }} <span class="finance-stat-card__unit">متخصص</span></p>
         <p class="finance-stat-card__hint">مشاهده یادداشت تسویه</p>
@@ -210,9 +221,9 @@
         class="finance-stat-card finance-stat-card--warning finance-stat-card--interactive text-start"
         :class="commPanel === 'pending' && 'is-active'"
         @click="commPanel = 'pending'"
-        aria-pressed="false"
         :aria-pressed="commPanel === 'pending'"
       >
+        <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="clock"></i></span>
         <p class="finance-stat-card__label">نیازمند پرداخت</p>
         <p class="finance-stat-card__value tabular-nums">{{ commissions.need_payment_staff_count|fa_num }} <span class="finance-stat-card__unit">متخصص</span></p>
         <p class="finance-stat-card__hint">ثبت مبلغ و یادداشت تسویه</p>
@@ -234,7 +245,7 @@
           {% endfor %}
         </ul>
         {% else %}
-        <p class="finance-empty-inline">در این روز هنوز تسویه‌ای برای متخصص ثبت نشده است.</p>
+        <div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="circle-check"></i></span><strong>تسویه‌ای ثبت نشده است</strong><p>تسویه متخصصان در روز انتخاب‌شده اینجا نمایش داده می‌شود.</p></div>
         {% endif %}
       </section>
 
@@ -252,9 +263,9 @@
           {% endfor %}
         </ul>
         {% elif commissions.staff_rows %}
-        <p class="finance-empty-inline">همهٔ متخصص‌های دارای سهم در این روز تسویه شده‌اند.</p>
+        <div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="circle-check"></i></span><strong>همه سهم‌ها تسویه شده‌اند</strong><p>در این روز متخصصی نیازمند پرداخت نیست.</p></div>
         {% else %}
-        <p class="finance-empty-inline">در این روز سهم پورسانتی شناسایی نشده است؛ پس از تکمیل نوبت‌ها اینجا نمایش داده می‌شود.</p>
+        <div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="users-round"></i></span><strong>هنوز سهم پورسانتی ثبت نشده است</strong><p>پس از تکمیل نوبت‌ها، سهم متخصصان نمایش داده می‌شود.</p></div>
         {% endif %}
       </section>
     </div>

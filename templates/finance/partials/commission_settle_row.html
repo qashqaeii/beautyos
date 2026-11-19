@@ -1,3 +1,4 @@
+{% load format_tags l10n %}
 <li class="finance-comm-row finance-comm-row--pending">
   <div class="finance-comm-row__head">
     <div class="finance-comm-row__identity">
@@ -9,7 +10,7 @@
       <div><dt>مانده</dt><dd class="tabular-nums finance-comm-row__due">{{ row.remainder_total|fa_money }}</dd></div>
     </dl>
     {% if can_settle_commission %}
-    <form method="post" class="finance-comm-settle-form">
+    <form method="post" action="{% url 'finance:overview' %}?tab=commissions&amp;range=day&amp;day={{ selected_day|date:'Y-m-d' }}" class="finance-comm-settle-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="settle_staff">
       <input type="hidden" name="staff_id" value="{{ row.staff.pk }}">
@@ -20,8 +21,8 @@
         id="settle-amount-{{ row.staff.pk }}"
         class="input-field finance-comm-settle-form__amount"
         min="1"
-        max="{{ row.remainder_total }}"
-        value="{{ row.remainder_total }}"
+        max="{{ row.remainder_total|unlocalize }}"
+        value="{{ row.remainder_total|unlocalize }}"
         required
       />
       <label class="finance-comm-settle-form__label" for="settle-note-{{ row.staff.pk }}">یادداشت</label>
@@ -32,6 +33,7 @@
         rows="2"
         placeholder="توضیح پرداخت به متخصص (اختیاری)"
       ></textarea>
+      <p class="luna-finance-settle-hint">پرداخت از قدیمی‌ترین سهم‌های باز متخصص کسر می‌شود.</p>
       <button type="submit" class="btn-primary finance-comm-settle-form__btn">ثبت تسویه</button>
     </form>
     {% endif %}
