@@ -1,11 +1,16 @@
 {% load format_tags appointment_tags %}
 <section class="appt-month-card dashboard-enter" aria-labelledby="appt-month-heading">
   <header class="appt-month-card__head">
-    <a href="{{ prev_month_href }}" class="appt-month-card__nav" aria-label="ماه قبل">
-      <i data-lucide="chevron-right" class="appt-month-card__nav-icon" aria-hidden="true"></i>
-    </a>
-    <div class="appt-month-card__head-center">
-      <h2 id="appt-month-heading" class="appt-month-card__title">{{ jalali_month_name }}</h2>
+    <div class="editorial-calendar-month-nav">
+      <a href="{{ prev_month_href }}" class="appt-month-card__nav" aria-label="ماه قبل">
+        <i data-lucide="chevron-right" class="appt-month-card__nav-icon" aria-hidden="true"></i>
+      </a>
+      <h2 id="appt-month-heading" class="appt-month-card__title">{{ jalali_month_name }} {{ jalali_year|persian_digits }}</h2>
+      <a href="{{ next_month_href }}" class="appt-month-card__nav" aria-label="ماه بعد">
+        <i data-lucide="chevron-left" class="appt-month-card__nav-icon" aria-hidden="true"></i>
+      </a>
+    </div>
+    <div class="editorial-calendar-filter">
       {% if show_staff_filter %}
       <div
         class="appt-month-staff-filter"
@@ -17,9 +22,9 @@
           class="appt-month-staff-filter__trigger"
           @click="open = !open"
           :aria-expanded="open"
-          aria-haspopup="listbox"
+          aria-controls="calendar-staff-options"
         >
-          <span class="appt-month-staff-filter__label">متخصصان</span>
+          <i data-lucide="users-round" class="editorial-calendar-filter-icon" aria-hidden="true"></i>
           {% if selected_staff %}
           <span
             class="appt-month-staff-filter__swatch"
@@ -31,17 +36,18 @@
           <i data-lucide="chevron-down" class="appt-month-staff-filter__chevron" aria-hidden="true"></i>
         </button>
         <div
-          class="appt-month-staff-filter__menu"
+          id="calendar-staff-options" class="appt-month-staff-filter__menu"
           x-show="open"
           x-transition
           @click.outside="open = false"
           x-cloak
-          role="listbox"
+          role="group"
           aria-label="انتخاب متخصص"
         >
           <a
             href="?{{ staff_filter_all_query }}"
             class="appt-month-staff-filter__option{% if not selected_staff_id %} is-active{% endif %}"
+            {% if not selected_staff_id %}aria-current="true"{% endif %}
             @click="open = false"
           >
             <span class="appt-month-staff-filter__option-text">همه متخصصان</span>
@@ -53,6 +59,7 @@
           <a
             href="?{{ staff_filter_queries|dict_item:member.pk }}"
             class="appt-month-staff-filter__option{% if selected_staff_id == member.pk %} is-active{% endif %}"
+            {% if selected_staff_id == member.pk %}aria-current="true"{% endif %}
             @click="open = false"
           >
             <span
@@ -78,10 +85,8 @@
         {{ selected_staff.full_display_name }}
       </p>
       {% endif %}
+
     </div>
-    <a href="{{ next_month_href }}" class="appt-month-card__nav" aria-label="ماه بعد">
-      <i data-lucide="chevron-left" class="appt-month-card__nav-icon" aria-hidden="true"></i>
-    </a>
   </header>
   {% if show_staff_legend %}
   <ul class="appt-month-legend" aria-label="رنگ متخصصان">
@@ -109,12 +114,12 @@
     <span class="appt-month-card__pad" role="presentation" aria-hidden="true"></span>
     {% else %}
     <a
-      href="?{{ month_query }}&amp;day={{ cell.iso }}"
+      href="?{{ month_day_query }}&amp;day={{ cell.iso }}"
       class="appt-month-card__day{% if cell.is_today %} appt-month-card__day--today{% endif %}{% if cell.is_selected %} appt-month-card__day--selected{% endif %}"
       {% if cell.selected_tint %}style="--appt-day-tint: {{ cell.selected_tint }}"{% endif %}
       role="gridcell"
       aria-current="{% if cell.is_selected %}date{% else %}false{% endif %}"
-      aria-label="{{ cell.jd|persian_digits }}"
+      aria-label="{{ cell.jd|persian_digits }} {{ jalali_month_name }} {{ jalali_year|persian_digits }}{% if cell.is_today %}، امروز{% endif %}"
     >
       <span class="appt-month-card__day-num tabular-nums">{{ cell.jd|persian_digits }}</span>
       {% if cell.dots or cell.dots_extra %}

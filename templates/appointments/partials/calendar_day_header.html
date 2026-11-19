@@ -1,4 +1,14 @@
 {% load format_tags %}
 <header class="appt-month-page-head dashboard-enter">
-  <h1 class="appt-month-page-head__title">تقویم {{ jalali_year|persian_digits }}</h1>
+  <div class="editorial-calendar-heading">
+    <span class="editorial-calendar-heading__icon" aria-hidden="true"><i data-lucide="calendar-days"></i></span>
+    <div class="editorial-calendar-heading__copy">
+      <h1 class="appt-month-page-head__title">تقویم {{ jalali_year|persian_digits }}</h1>
+      <p>مدیریت نوبت‌ها و برنامه‌ریزی سالن</p>
+    </div>
+  </div>
+  <div class="editorial-calendar-heading__actions">
+    <span class="editorial-calendar-today"><i data-lucide="calendar" aria-hidden="true"></i><span>{{ calendar_today_label|persian_digits }}</span></span>
+    <button type="button" class="editorial-calendar-sidebar-toggle hidden lg:inline-flex" :aria-label="sidebarCollapsed ? 'باز کردن منو' : 'جمع کردن منو'" :aria-expanded="!sidebarCollapsed" @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('maisonSidebarCollapsed', sidebarCollapsed ? '1' : '0')"><i data-lucide="panel-right" aria-hidden="true"></i></button>
+  </div>
 </header>

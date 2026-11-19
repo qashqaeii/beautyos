@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <div
-  class="maison-app beautyos-main-bg__shell flex h-[100dvh] max-h-[100dvh] overflow-hidden"
+  class="maison-app beautyos-main-bg__shell {% block shell_modifier %}{% endblock %} flex h-[100dvh] max-h-[100dvh] overflow-hidden"
   x-data="{
     sidebarCollapsed: false,
     quickSheetOpen: false,

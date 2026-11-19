@@ -2,6 +2,7 @@
 {% load appointment_tags format_tags static %}
 {% block title %}تقویم {{ jalali_year|persian_digits }} · BeautyOS{% endblock %}
 {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/editorial-calendar.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 {% if can_book_appointment and appointment_form %}
 <script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 <script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
@@ -10,6 +11,7 @@
 {% endif %}
 {% endif %}
 {% endblock %}
+{% block shell_modifier %}editorial-calendar-shell{% endblock %}
 {% block header_modifier %}dashboard-lite-app-header{% endblock %}
 {% block page_title %}{% endblock %}
 {% block page_subtitle %}{% endblock %}
@@ -35,7 +37,7 @@
 >
   {% include "appointments/partials/calendar_day_header.html" %}
 
-  <div class="appt-month-body mt-3 space-y-3">
+  <div class="appt-month-body">
     {% include "appointments/partials/calendar_month_card.html" %}
     {% include "appointments/partials/calendar_day_appointments.html" %}
   </div>

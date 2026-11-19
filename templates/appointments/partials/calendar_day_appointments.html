@@ -1,13 +1,14 @@
-{% load appointment_tags format_tags %}
+{% load appointment_tags format_tags static %}
 {% if selected_day %}
-<section class="appt-month-day-list dashboard-enter" aria-labelledby="appt-month-day-list-heading">
+<section class="appt-month-day-list dashboard-enter{% if not appointments %} editorial-calendar-empty-card{% endif %}" aria-labelledby="appt-month-day-list-heading">
   <header class="appt-month-day-list__head">
     <h2 id="appt-month-day-list-heading" class="appt-month-day-list__title">
-      نوبت‌های <span class="tabular-nums">{{ day_jalali|persian_digits }}</span>
+      <i data-lucide="calendar-days" class="editorial-calendar-day-icon" aria-hidden="true"></i>
+      <span>نوبت‌های <span class="tabular-nums">{{ day_jalali|persian_digits }}</span></span>
     </h2>
     {% if can_book_appointment %}
     <a
-      href="?{{ month_query }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;book=1"
+      href="?{{ month_query }}&amp;book=1"
       class="btn-primary appt-month-day-list__book text-xs sm:text-sm"
     >
       <i data-lucide="plus" class="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true"></i>
@@ -37,7 +38,10 @@
     {% endfor %}
   </ul>
   {% else %}
-  <p class="appt-month-day-list__empty">برای این روز نوبتی ثبت نشده است.</p>
+  <div class="editorial-calendar-empty">
+    <div class="editorial-calendar-empty__art" aria-hidden="true"><img src="{% static 'images/photos/bg3.webp' %}?v={{ BEAUTYOS_ASSET_VERSION }}" width="1254" height="1254" alt="" decoding="async"></div>
+    <p class="appt-month-day-list__empty">برای این روز نوبتی ثبت نشده است.</p>
+  </div>
   {% endif %}
 </section>
 {% endif %}

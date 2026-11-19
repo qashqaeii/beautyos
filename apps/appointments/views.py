@@ -190,14 +190,19 @@ def calendar_day(request):
         selected_staff_color=selected_staff_color,
     )
 
+    today_year, today_month, today_day = (int(part) for part in to_jalali(today).split("/"))
+    weekday_names = ("دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه", "یکشنبه")
+    calendar_today_label = f"{weekday_names[today.weekday()]} {today_day} {JALALI_MONTH_NAMES_FA[today_month - 1]} {today_year}"
     ctx = {
+        "calendar_today_label": calendar_today_label,
+        "month_day_query": f"month={month_param}{staff_suffix}",
         "can_book_appointment": can_book,
         "jalali_year": jy,
         "jalali_month": jm,
         "jalali_month_name": JALALI_MONTH_NAMES_FA[jm - 1],
         "month_param": month_param,
-        "prev_month_href": f"?{calendar_query(month=prev_month_param, day=selected_day if selected_day and date_in_jalali_month(selected_day, prev_jy, prev_jm) else None)}",
-        "next_month_href": f"?{calendar_query(month=next_month_param, day=selected_day if selected_day and date_in_jalali_month(selected_day, next_jy, next_jm) else None)}",
+        "prev_month_href": f"?month={prev_month_param}{staff_suffix}",
+        "next_month_href": f"?month={next_month_param}{staff_suffix}",
         "calendar_month": calendar_month,
         "selected_day": selected_day,
         "day_jalali": to_jalali(selected_day) if selected_day else "",
