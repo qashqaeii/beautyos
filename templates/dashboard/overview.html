@@ -15,8 +15,8 @@
 {% include "partials/overview_hero_header.html" %}
 
 <section class="overview-kpis" aria-labelledby="overview-kpi-title">
-<div class="overview-section-heading"><h2 id="overview-kpi-title">خلاصه عملکرد</h2><span>آمار روز انتخاب‌شده</span></div>
-<div class="dashboard-stat-grid" data-overview-stat-grid data-salon-id="{{ active_salon.id }}" data-overview-day="{{ selected_day|date:'Y-m-d' }}">
+<div class="overview-section-heading"><h2 id="overview-kpi-title">خلاصه عملکرد</h2><span>روز انتخاب‌شده</span></div>
+<div class="dashboard-stat-grid{% if show_finance and finance %} dashboard-stat-grid--finance{% endif %}" data-overview-stat-grid data-salon-id="{{ active_salon.id }}" data-overview-day="{{ selected_day|date:'Y-m-d' }}">
   {% include "partials/dashboard_stat_mini.html" with icon="calendar-check" label="نوبت‌های لغونشده" stat_key="appointments" anim_value=overview.appointments_count stat_index=1 %}
   {% include "partials/dashboard_stat_mini.html" with icon="clock" label="منتظر تأیید" stat_key="pending" anim_value=overview.pending_count stat_index=2 %}
   {% if show_finance and finance %}

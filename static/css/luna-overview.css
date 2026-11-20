@@ -115,3 +115,90 @@
 
 /* Sidebar toggle now lives in the shared sidebar. */
 @media(min-width:1024px) { .luna-overview-shell .dash-page-header__dates { margin-inline-end:0; } }
+
+/* Compact analytical layout: scoped to /app/, no fixed dashboard height or nested scroll.
+   The six-column mode responds to usable content width, not just screen width. */
+.luna-overview-shell .maison-content{container-name:overview;container-type:inline-size}
+.luna-overview-shell .dashboard-overview{gap:10px}
+.luna-overview-shell .dash-page-header--overview{gap:10px;padding:12px 14px;border-radius:14px;box-shadow:none}
+.luna-overview-shell .dash-page-header__subtitle{font-size:.8rem;line-height:1.65;margin-top:2px}
+.luna-overview-shell .dashboard-stat-grid{gap:8px}
+.luna-overview-shell .dashboard-stat-mini{min-width:0}
+.luna-overview-shell .dashboard-stat-mini__surface{padding:10px;min-height:80px;height:100%;border-radius:12px;box-shadow:0 2px 8px #51443f07}
+.luna-overview-shell .dashboard-stat-mini__stack{flex-direction:row;align-items:center;gap:7px}
+.luna-overview-shell .dashboard-stat-mini__icon{width:30px;height:30px;border-radius:9px;flex:none}
+.luna-overview-shell .dashboard-stat-mini__icon svg{width:17px;height:17px}
+.luna-overview-shell .dashboard-stat-mini__label{font-size:.75rem;line-height:1.5}
+.luna-overview-shell .dashboard-stat-mini__value{font-size:clamp(1rem,1.65vw,1.42rem);line-height:1.35;margin-top:3px;gap:2px 5px;flex-wrap:wrap}
+.luna-overview-shell .dashboard-stat-mini__unit{font-size:.67rem}
+.luna-overview-shell .overview-stat-scope{margin-top:2px;font-size:.65rem}
+.overview-section-heading{margin-bottom:6px}
+.overview-section-heading h2,.overview-panel h2{font-size:.94rem;line-height:1.5}
+.overview-analytics-grid{gap:9px}
+.overview-panel{padding:12px;border-radius:13px;box-shadow:0 2px 9px #51443f08}
+.overview-panel-head{gap:6px}
+.overview-panel-head>div{min-width:0}
+.overview-panel-head p{margin-top:2px;font-size:.72rem}
+.overview-panel-icon{width:30px;height:30px;border-radius:9px;flex:none}
+.overview-panel-icon svg{width:17px;height:17px}
+.overview-range{padding:2px}
+.overview-range a{min-height:32px;padding:4px 10px}
+.overview-revenue-total{margin:7px 0 3px}
+.overview-revenue-total strong{font-size:1.25rem}
+.overview-chart svg{height:110px}
+.overview-chart-details{margin-top:5px}
+.overview-chart-details summary{min-height:26px}
+.overview-status-body{gap:10px;margin-top:10px}
+.overview-donut{width:min(100%,132px);padding:12px}
+.overview-status-legend{gap:4px}
+.overview-status-legend li{line-height:1.65}
+.overview-staff-list{gap:7px;margin-top:9px}
+.overview-staff-list li>div:first-child{font-size:.78rem;line-height:1.45}
+.overview-staff-list li>div:first-child>span{min-width:0;overflow-wrap:anywhere}
+.overview-staff-list strong{white-space:nowrap}
+.overview-progress{height:4px;margin-top:4px}
+.overview-customer-grid{gap:7px;margin-top:10px}
+.overview-customer-grid>div{padding:10px 8px;gap:4px;border:1px solid #eadbd4;background:#f8eee8;border-radius:10px}
+.overview-customer-grid strong{font-size:1.3rem;line-height:1.4}
+.overview-empty{min-height:94px;padding:8px;gap:6px}
+@media(min-width:640px){
+ .luna-overview-shell .maison-content{padding:12px 16px 20px}
+ .luna-overview-shell .dash-page-header--overview{min-height:78px;padding:12px 16px}
+ .luna-overview-shell .dash-page-header__title{font-size:1.5rem}
+ .luna-overview-shell .dashboard-stat-grid:not(.dashboard-stat-grid--finance){grid-template-columns:repeat(2,minmax(0,1fr))}
+ .luna-overview-shell .dashboard-stat-mini__surface{min-height:76px}
+}
+@media(min-width:1024px){
+ .luna-overview-shell .maison-content{padding:10px 16px 18px}
+ .luna-overview-shell .dash-page-header--overview{min-height:76px}
+ .luna-overview-shell .dash-page-header__nav,.luna-overview-shell .overview-today{min-height:36px;min-width:36px;border-radius:9px}
+ .overview-hero-art{opacity:.42}
+ .overview-analytics-grid--finance{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+ .overview-analytics-grid--finance .overview-revenue{grid-column:1;grid-row:1}
+ .overview-analytics-grid--finance .overview-status{grid-column:2;grid-row:1}
+ .overview-status-body{grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr)}
+ .overview-panel{padding:12px 14px}
+ .overview-customer-grid>div{min-height:76px;align-content:center}
+}
+@container overview (min-width:940px){
+ .luna-overview-shell .dashboard-stat-grid--finance{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+ .luna-overview-shell .dashboard-stat-mini__stack{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:3px 5px}
+ .luna-overview-shell .overview-stat-copy{grid-column:1/-1;grid-row:2}
+ .luna-overview-shell .dashboard-stat-mini__icon{grid-column:2;grid-row:1;width:27px;height:27px;border-radius:8px}
+ .luna-overview-shell .dashboard-stat-mini__surface{min-height:94px;padding:8px 10px}
+ .luna-overview-shell .dashboard-stat-mini__value{font-size:clamp(1.05rem,1.25vw,1.28rem)}
+}
+@media(max-width:639px){
+ .luna-overview-shell .maison-content{padding:10px 10px 20px}
+ .luna-overview-shell .dash-page-header--overview{padding:11px 12px}
+ .luna-overview-shell .dashboard-stat-mini__surface{min-height:82px}
+ .luna-overview-shell .dashboard-stat-mini__stack{align-items:flex-start}
+ .luna-overview-shell .dashboard-stat-mini__icon{width:27px;height:27px}
+ .luna-overview-shell .dashboard-stat-mini__value{font-size:1.05rem}
+ .overview-range a{min-height:44px}
+ .overview-status-body{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+}
+@media(max-width:359px){
+ .luna-overview-shell .dashboard-stat-mini__stack{flex-direction:column}
+ .overview-status-body,.overview-customer-grid{grid-template-columns:1fr}
+}

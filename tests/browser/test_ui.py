@@ -172,6 +172,16 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
             try:
                 # Typical 1366x768 laptop with browser chrome leaves roughly 640 CSS px.
                 page.set_viewport_size({"width":1366,"height":640})
+                page.goto(live_server.url+"/app/",wait_until="load")
+                page.evaluate("document.fonts.ready")
+                page.evaluate("window.scrollTo(0,0)")
+                for selector in (".overview-kpis",".overview-revenue",".overview-status"):
+                    pw.expect(page.locator(selector)).to_be_in_viewport(ratio=1)
+                for selector in ("#overview-staff-title","#overview-customer-title"):
+                    pw.expect(page.locator(selector)).to_be_in_viewport(ratio=1)
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+2")
+                assert page.evaluate("window.scrollY")==0
+                page.screenshot(path=str(ARTIFACT/"1366-overview-compact.png"),animations="disabled")
                 page.goto(live_server.url+reverse("loyalty:overview"),wait_until="load")
                 page.evaluate("document.fonts.ready")
                 page.evaluate("window.scrollTo(0,0)")
@@ -182,7 +192,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 assert page.evaluate("window.scrollY")==0
                 page.screenshot(path=str(ARTIFACT/"1366-loyalty-compact.png"),animations="disabled")
             except Exception as exc:
-                errors.append(f"1366/loyalty first viewport: {exc}")
+                errors.append(f"1366/overview or loyalty first viewport: {exc}")
             finally:
                 page.set_viewport_size({"width":width,"height":height})
 
