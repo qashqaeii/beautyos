@@ -63,6 +63,8 @@ def cancel_appointment(*, salon, appointment_id: int) -> Appointment:
     if appt.status == Appointment.Status.CANCELLED:
         return appt
 
+    from apps.customers.models import Customer
+    Customer.scoped(salon).select_for_update(no_key=True).get(pk=appt.customer_id)
     had_completed = appt.status == Appointment.Status.COMPLETED
     if had_completed:
         reverse_commission_for_appointment(appt)

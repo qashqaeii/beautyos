@@ -14,7 +14,7 @@ from apps.loyalty.models import Referral, LoyaltyVoucher
 def register_referral(*, salon, referrer_id, referred_id, actor):
     if referrer_id == referred_id:
         raise ValidationError("معرف و مشتری جدید باید متفاوت باشند.")
-    customers={c.pk:c for c in Customer.scoped(salon).select_for_update().filter(pk__in=[referrer_id,referred_id],is_deleted=False).order_by("pk")}
+    customers={c.pk:c for c in Customer.scoped(salon).select_for_update(no_key=True).filter(pk__in=[referrer_id,referred_id],is_deleted=False).order_by("pk")}
     if len(customers)!=2:
         raise ValidationError("مشتریان معتبر نیستند.")
     previous=Referral.scoped(salon).filter(referred_id=referred_id).first()
@@ -36,7 +36,7 @@ def register_referral(*, salon, referrer_id, referred_id, actor):
 
 def award_referral(appointment):
     # Caller locks appointment. Lock referred customer to serialize with registration.
-    Customer.scoped(appointment.salon).select_for_update().get(pk=appointment.customer_id)
+    Customer.scoped(appointment.salon).select_for_update(no_key=True).get(pk=appointment.customer_id)
     row=Referral.scoped(appointment.salon).select_for_update().filter(referred_id=appointment.customer_id,status="pending").first()
     if not row or appointment.status!=Appointment.Status.COMPLETED or not active_policy(appointment.salon):
         return None

@@ -59,6 +59,7 @@ def _reduce_source(*, salon, kind, key, target, note):
     return award
 
 
+@transaction.atomic
 def award_payment(payment):
     from apps.finance.models import Payment
     if payment.status not in (Payment.Status.PAID, Payment.Status.PARTIAL) or payment.paid_amount_toman <= 0:
@@ -66,13 +67,18 @@ def award_payment(payment):
     policy = active_policy(payment.salon)
     if not policy:
         return None
+    from apps.customers.models import Customer
+    Customer.scoped(payment.salon).select_for_update(no_key=True).get(pk=payment.customer_id)
     unit = policy.spend_per_point_toman
     return grant_source(salon=payment.salon, customer=payment.customer, kind="payment", key=payment.pk,
         points=payment.paid_amount_toman // unit, unit=unit, note=f"امتیاز دریافت شماره {payment.pk}")
 
 
+@transaction.atomic
 def reconcile_refund(payment):
     from apps.finance.models import Refund
+    from apps.customers.models import Customer
+    Customer.scoped(payment.salon).select_for_update(no_key=True).get(pk=payment.customer_id)
     refunded = Refund.scoped(payment.salon).filter(payment=payment).aggregate(total=Sum("amount_toman"))["total"] or 0
     net = max(0, payment.paid_amount_toman - refunded)
     return _reduce_source(salon=payment.salon, kind="payment", key=payment.pk,
@@ -93,3 +99,14 @@ def award_visit(appointment):
 def reverse_visit(appointment):
     return _reduce_source(salon=appointment.salon, kind="visit", key=appointment.pk,
         target=lambda award: 0, note=f"اصلاح امتیاز نوبت لغوشده {appointment.pk}")
+
+
+@transaction.atomic
+def award_package(purchase):
+    policy=active_policy(purchase.salon)
+    if not policy or purchase.price_paid_toman<=0:return None
+    from apps.customers.models import Customer
+    Customer.scoped(purchase.salon).select_for_update(no_key=True).get(pk=purchase.customer_id)
+    unit=policy.spend_per_point_toman
+    return grant_source(salon=purchase.salon,customer=purchase.customer,kind="package",key=purchase.pk,
+        points=purchase.price_paid_toman//unit,unit=unit,note=f"امتیاز خرید پکیج {purchase.pk}")

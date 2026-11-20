@@ -206,3 +206,13 @@ class LoyaltyVoucher(TenantModelMixin, TimeStampedModel):
 
     class Meta:
         constraints = [models.CheckConstraint(condition=models.Q(amount_toman__gt=0),name="loyalty_voucher_positive")]
+
+
+class MembershipCycle(TenantModelMixin, TimeStampedModel):
+    """A renewable membership is an ordinary paid package, not a second charge."""
+    purchase = models.OneToOneField("packages.CustomerPackage", on_delete=models.PROTECT, related_name="membership_cycle")
+    renewed_from = models.OneToOneField("self", on_delete=models.PROTECT, null=True, blank=True, related_name="renewal")
+    request_key = models.UUIDField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","request_key"],name="loyalty_membership_request")]

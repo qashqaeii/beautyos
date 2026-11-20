@@ -355,6 +355,7 @@ def record_customer_payment(*, salon, form, actor):
     return payment
 
 
+@transaction.atomic
 def create_appointment_deposit(
     *,
     salon,

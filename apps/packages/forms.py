@@ -1,4 +1,5 @@
 from django import forms
+from django.db import transaction
 from django.utils import timezone
 
 from apps.core.fields import TomanAmountField
@@ -51,12 +52,13 @@ class SellPackageForm(PersianForm):
             self.fields["customer"].queryset = Customer.scoped(salon).filter(is_deleted=False)
             self.fields["package"].queryset = ServicePackage.scoped(salon).filter(is_active=True)
 
+    @transaction.atomic
     def save(self, salon):
         package = self.cleaned_data["package"]
         from datetime import timedelta
 
         expires = timezone.now() + timedelta(days=package.validity_days)
-        return CustomerPackage.objects.create(
+        purchase = CustomerPackage.objects.create(
             salon=salon,
             customer=self.cleaned_data["customer"],
             package=package,
@@ -64,3 +66,6 @@ class SellPackageForm(PersianForm):
             price_paid_toman=package.price_toman,
             expires_at=expires,
         )
+        from apps.loyalty.automation import award_package
+        award_package(purchase)
+        return purchase

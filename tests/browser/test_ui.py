@@ -60,6 +60,8 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
     salon, staff, customer, appt, account = browser_data
     from apps.appointments.models import Appointment
     from apps.finance.models import Invoice, Payment, ProductSale, Refund
+    from apps.loyalty.models import LoyaltyVoucher
+    voucher=LoyaltyVoucher.objects.create(salon=salon,customer=customer,title="اعتبار تست",amount_toman=50000,expires_on=timezone.localdate())
     from apps.inventory.models import InventoryItem
     item=InventoryItem.scoped(salon).get(name="شامپو تخصصی")
     item.purchase_price_toman=150000
@@ -104,6 +106,10 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
         ("loyalty-program",reverse("loyalty:program")),
         ("loyalty-rewards",reverse("loyalty:rewards")),
         ("loyalty-birthdays",reverse("loyalty:birthdays")),
+        ("loyalty-referrals",reverse("loyalty:referrals")),
+        ("loyalty-vouchers",reverse("loyalty:vouchers")),
+        ("loyalty-memberships",reverse("loyalty:memberships")),
+        ("loyalty-insights",reverse("loyalty:insights")),
         ("retention","/retention/"),("waitlist","/waitlist/"),
         ("portfolio","/portfolio/"),("members","/members/"),("settings","/settings/"),
         ("appointment-detail",reverse("appointments:detail",args=[appt.pk])),
@@ -214,7 +220,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
             page.goto(live_server.url+url,wait_until="load")
             pw.expect(page.locator(f"input[name='appointment'][value='{completed.pk}']")).to_be_checked()
             pw.expect(page.locator(".finance-checkout-wrap .fin-line bdi")).to_have_text("۱٬۲۵۰٬۰۰۰ تومان")
-            page.locator("input[name='discount']").fill("50000")
+            page.locator("select[name='voucher']").select_option(str(voucher.pk))
             page.locator("input[name='card']").fill("1200000")
             pw.expect(page.locator(".finance-checkout-wrap .fin-received-total strong")).to_have_text("۰ تومان")
             page.get_by_role("button",name="ثبت فاکتور و پرداخت").click()
@@ -251,6 +257,8 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
     invoice=Invoice.scoped(salon).get()
     assert invoice.received_toman==1200000 and invoice.balance_at_issue_toman==0
     assert Payment.scoped(salon).filter(invoice=invoice).count()==1
+    voucher.refresh_from_db()
+    assert voucher.invoice_id==invoice.pk and invoice.discount_toman==50000
     sale=ProductSale.scoped(salon).get()
     assert sale.revenue_toman==250000 and sale.cost_toman==150000
     assert Refund.scoped(salon).filter(payment=sale.payment,amount_toman=250000).exists()
