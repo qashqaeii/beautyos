@@ -1,126 +1,92 @@
 {% extends "layouts/app_shell.html" %}
+{% load static format_tags %}
 {% block title %}ساعات کاری · {{ profile.display_name }}{% endblock %}
 {% block workspace_header %}{% endblock %}
 {% block page_title %}{% endblock %}
 {% block page_subtitle %}{% endblock %}
 
 {% block content %}
-<div class="staff-hours-page">
-  <header class="staff-hours-page__header">
-    <div class="staff-hours-page__headline">
-      <span class="staff-hours-page__head-icon" aria-hidden="true">
-        <i data-lucide="clock" class="staff-hours-page__lucide"></i>
-      </span>
-      <div class="staff-hours-page__titles">
-        <h1 class="staff-hours-page__title">ساعات کاری</h1>
-        <p class="staff-hours-page__subtitle">{{ profile.display_name }}</p>
-      </div>
-    </div>
-    <a href="{% url 'staff:detail' pk=profile.pk %}" class="staff-hours-page__back">بازگشت به پروفایل</a>
+<div class="staff-hours-page staff-hours-page--minimal">
+  <header class="staff-hours-page__header staff-hours-page__header--minimal">
+    <a href="{% url 'staff:detail' pk=profile.pk %}" class="staff-hours-page__back-link">
+      <i data-lucide="chevron-right" class="staff-hours-page__lucide" aria-hidden="true"></i>
+      <span>بازگشت</span>
+    </a>
+    <h1 class="staff-hours-page__title">ساعات کاری · {{ profile.display_name }}</h1>
   </header>
 
-  <div class="staff-hours-layout">
-    <section class="staff-hours-card staff-hours-card--form" aria-labelledby="staff-hours-form-title">
-      <h2 id="staff-hours-form-title" class="staff-hours-card__title">تنظیم ساعت کاری</h2>
-      <p class="staff-hours-form__hint text-xs text-ink-muted">
-        ذخیره برای همان <strong>روز هفته</strong> اعمال می‌شود (شنبه تا جمعه)، نه فقط تاریخ نمایشی.
-      </p>
-      <form
-        method="post"
-        class="staff-hours-form"
-        x-data="staffHoursWeekdaySync('{{ week_start|date:'Y-m-d' }}')"
-        data-staff-hours-form
-      >
-        {% csrf_token %}
+  <section class="staff-hours-surface" aria-label="برنامهٔ هفتگی">
+    <div class="staff-hours-surface__toolbar">
+      <p class="staff-hours-week-range tabular-nums">{{ week_range_jalali|persian_digits }}</p>
+      {% include "partials/jalali_week_picker.html" with week_anchor=week_anchor %}
+    </div>
+    <ol class="staff-hours-week-list">
+      {% for row in week_schedule %}
+      <li class="staff-hours-week-row{% if row.record and row.record.is_closed %} staff-hours-week-row--closed{% endif %}">
+        <span class="staff-hours-week-row__day">{{ row.label }}</span>
+        <span class="staff-hours-week-row__meta tabular-nums">{{ row.jalali|persian_digits }}</span>
+        <span class="staff-hours-week-row__hours" dir="ltr">
+          {% if row.record and not row.record.is_closed %}
+          {{ row.record.start_time|time:"H:i"|persian_digits }} – {{ row.record.end_time|time:"H:i"|persian_digits }}
+          {% elif row.record and row.record.is_closed %}
+          <span class="staff-hours-week-row__closed">تعطیل</span>
+          {% else %}
+          <span class="staff-hours-week-row__muted">—</span>
+          {% endif %}
+        </span>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
 
-        <div class="staff-hours-field">
-          <label class="field-label" for="{{ form.reference_date.id_for_label }}">{{ form.reference_date.label }}</label>
-          {{ form.reference_date }}
-          {% if form.reference_date.errors %}<p class="staff-hours-field__error">{{ form.reference_date.errors.0 }}</p>{% endif %}
-          <p class="staff-hours-field__meta text-xs text-ink-muted" x-show="dateHint" x-text="dateHint" x-cloak></p>
-        </div>
+  <section class="staff-hours-edit" aria-labelledby="staff-hours-form-title">
+    <h2 id="staff-hours-form-title" class="staff-hours-edit__title">ویرایش روز</h2>
+    <p class="staff-hours-edit__hint">ذخیره برای همان روز هفته (شنبه تا جمعه) اعمال می‌شود.</p>
+    <form
+      method="post"
+      class="staff-hours-form staff-hours-form--compact"
+      x-data="staffHoursWeekdaySync('{{ week_start|date:'Y-m-d' }}')"
+      data-staff-hours-form
+    >
+      {% csrf_token %}
+      <div class="staff-hours-form__reference-hidden" aria-hidden="true">
+        {{ form.reference_date }}
+      </div>
 
-        <div class="staff-hours-field">
+      <div class="staff-hours-form__grid">
+        <div class="staff-hours-field staff-hours-field--grow">
           <label class="field-label" for="{{ form.weekday.id_for_label }}">{{ form.weekday.label }}</label>
           {{ form.weekday }}
           {% if form.weekday.errors %}<p class="staff-hours-field__error">{{ form.weekday.errors.0 }}</p>{% endif %}
         </div>
-
         <div class="staff-hours-field staff-hours-field--closed">
           <label class="staff-hours-checkbox">
             {{ form.is_closed }}
             <span>{{ form.is_closed.label }}</span>
           </label>
         </div>
-
-        <div class="staff-hours-time-stack" data-time-stack>
-          <div class="staff-hours-field">
-            <label class="field-label" for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
-            {{ form.start_time }}
-            {% if form.start_time.errors %}<p class="staff-hours-field__error">{{ form.start_time.errors.0 }}</p>{% endif %}
-          </div>
-          <div class="staff-hours-field">
-            <label class="field-label" for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
-            {{ form.end_time }}
-            {% if form.end_time.errors %}<p class="staff-hours-field__error">{{ form.end_time.errors.0 }}</p>{% endif %}
-          </div>
-        </div>
-
-        <button type="submit" class="staff-hours-form__submit btn-primary w-full sm:w-auto">ذخیره برنامهٔ هفتگی</button>
-      </form>
-    </section>
-
-    <section class="staff-hours-card staff-hours-card--schedule" aria-labelledby="staff-hours-schedule-title">
-      <div class="staff-hours-schedule-head">
-        <div>
-          <h2 id="staff-hours-schedule-title" class="staff-hours-card__title staff-hours-card__title--flush">برنامهٔ هفتگی</h2>
-          <p class="staff-hours-week-range tabular-nums text-xs text-ink-muted">{{ week_range_jalali|persian_digits }}</p>
-        </div>
-        {% include "partials/jalali_week_picker.html" with week_anchor=week_anchor %}
       </div>
-      <div class="staff-hours-table-wrap">
-        <table class="staff-hours-table">
-          <thead>
-            <tr>
-              <th scope="col">روز هفته</th>
-              <th scope="col">تاریخ</th>
-              <th scope="col">شروع</th>
-              <th scope="col">پایان</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for row in week_schedule %}
-            <tr>
-              <th scope="row" class="staff-hours-table__day">{{ row.label }}</th>
-              <td class="staff-hours-table__jalali tabular-nums">{{ row.jalali|persian_digits }}</td>
-              <td class="staff-hours-table__time" dir="ltr">
-                {% if row.record and not row.record.is_closed %}
-                {{ row.record.start_time|time:"H:i"|persian_digits }}
-                {% elif row.record and row.record.is_closed %}
-                <span class="staff-hours-table__closed">تعطیل</span>
-                {% else %}
-                <span class="staff-hours-table__muted">—</span>
-                {% endif %}
-              </td>
-              <td class="staff-hours-table__time" dir="ltr">
-                {% if row.record and not row.record.is_closed %}
-                {{ row.record.end_time|time:"H:i"|persian_digits }}
-                {% elif row.record and row.record.is_closed %}
-                <span class="staff-hours-table__muted">—</span>
-                {% else %}
-                <span class="staff-hours-table__muted">—</span>
-                {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+
+      <div class="staff-hours-form__grid staff-hours-time-stack" data-time-stack>
+        <div class="staff-hours-field">
+          <label class="field-label" for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
+          {{ form.start_time }}
+          {% if form.start_time.errors %}<p class="staff-hours-field__error">{{ form.start_time.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="staff-hours-field">
+          <label class="field-label" for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
+          {{ form.end_time }}
+          {% if form.end_time.errors %}<p class="staff-hours-field__error">{{ form.end_time.errors.0 }}</p>{% endif %}
+        </div>
       </div>
-    </section>
-  </div>
+
+      <button type="submit" class="btn-primary staff-hours-form__submit">ذخیره</button>
+    </form>
+  </section>
 </div>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    if (window.lucide) window.lucide.createIcons();
     const form = document.querySelector("[data-staff-hours-form]");
     if (!form) return;
 

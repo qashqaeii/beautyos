@@ -77,6 +77,10 @@
 .maison-app.management-suite .editorial-module-grid{gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr))}
 .maison-app.management-suite .editorial-ledger>li{padding:9px 11px;gap:8px}
 .maison-app.management-suite :is(.staff-profile-header,.customer-detail-header,.staff-hours-page__header){padding:12px 14px;margin-block-end:10px;gap:9px;border-radius:13px;box-shadow:none}
+.maison-app.management-suite .staff-hours-page--minimal{max-width:min(100%,26rem);padding-block-end:20px}
+.maison-app.management-suite .staff-hours-page__header--minimal{padding:0;margin-block-end:4px;background:transparent;border:0}
+.maison-app.management-suite .staff-hours-surface,.maison-app.management-suite .staff-hours-edit{border-radius:12px;border-color:var(--suite-line);background:var(--suite-paper);box-shadow:none}
+.maison-app.management-suite .staff-hours-surface__toolbar{border-color:var(--suite-line)}
 .maison-app.management-suite .staff-profile-page>.grid{gap:10px}
 .maison-app.management-suite .staff-profile-page>.grid>.card{padding:13px;border-radius:13px;box-shadow:none}
 .maison-app.management-suite :is(.customer-detail-columns,.customer-detail-summary){gap:10px;margin-block:0 10px}

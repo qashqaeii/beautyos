@@ -2041,6 +2041,111 @@
   .staff-hours-page {
     @apply mx-auto w-full max-w-[900px] pb-24 pt-1 md:pb-8 md:pt-3;
   }
+  .staff-hours-page--minimal {
+    @apply max-w-[28rem] gap-5;
+  }
+  .staff-hours-page--minimal {
+    display: flex;
+    flex-direction: column;
+  }
+  .staff-hours-page__header--minimal {
+    @apply mb-0 flex flex-col gap-1 border-0 bg-transparent p-0 shadow-none;
+  }
+  .staff-hours-page__back-link {
+    @apply inline-flex items-center gap-1 text-sm text-ink-muted transition hover:text-ink;
+  }
+  .staff-hours-page__header--minimal .staff-hours-page__title {
+    @apply text-base font-semibold text-ink;
+  }
+  .staff-hours-surface {
+    @apply rounded-xl border bg-white px-3 py-3;
+    border-color: color-mix(in srgb, var(--color-border) 88%, transparent);
+  }
+  .staff-hours-surface__toolbar {
+    @apply mb-3 flex flex-wrap items-center justify-between gap-2 border-b pb-3;
+    border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+  }
+  .staff-hours-surface__toolbar .staff-hours-week-range {
+    @apply m-0 text-sm font-medium text-ink;
+  }
+  .staff-hours-surface__toolbar .staff-hours-week-picker {
+    @apply flex-row items-center gap-2;
+  }
+  .staff-hours-surface__toolbar .staff-hours-week-picker__label {
+    @apply sr-only;
+  }
+  .staff-hours-week-list {
+    @apply m-0 list-none space-y-0 p-0;
+  }
+  .staff-hours-week-row {
+    display: grid;
+    grid-template-columns: minmax(4.5rem, 1fr) minmax(4.5rem, auto) minmax(5.5rem, auto);
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent);
+  }
+  .staff-hours-week-row:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .staff-hours-week-row__day {
+    @apply text-sm font-medium text-ink;
+  }
+  .staff-hours-week-row__meta {
+    @apply text-xs text-ink-muted;
+  }
+  .staff-hours-week-row__hours {
+    @apply text-left text-sm tabular-nums text-ink-secondary;
+    justify-self: end;
+  }
+  .staff-hours-week-row__closed {
+    @apply text-xs font-medium text-ink-muted;
+  }
+  .staff-hours-week-row__muted {
+    @apply text-ink-muted;
+  }
+  .staff-hours-week-row--closed .staff-hours-week-row__day {
+    @apply text-ink-muted;
+  }
+  .staff-hours-edit {
+    @apply rounded-xl border bg-white px-3 py-3;
+    border-color: color-mix(in srgb, var(--color-border) 88%, transparent);
+  }
+  .staff-hours-edit__title {
+    @apply mb-1 text-sm font-semibold text-ink;
+  }
+  .staff-hours-edit__hint {
+    @apply mb-3 text-xs leading-relaxed text-ink-muted;
+  }
+  .staff-hours-form--compact {
+    @apply gap-3;
+  }
+  .staff-hours-form__reference-hidden {
+    @apply sr-only;
+  }
+  .staff-hours-form__grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 380px) {
+    .staff-hours-form__grid {
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+    }
+    .staff-hours-field--grow {
+      grid-column: 1;
+    }
+    .staff-hours-field--closed {
+      grid-column: 2;
+      justify-self: stretch;
+      padding-bottom: 0.15rem;
+    }
+  }
+  .staff-hours-form--compact .staff-hours-form__submit {
+    @apply mt-1 w-full justify-center;
+  }
   .staff-hours-page__header {
     @apply mb-4 flex flex-wrap items-start justify-between gap-3 rounded-2xl border px-4 py-3.5 md:px-5;
     border-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-border));
