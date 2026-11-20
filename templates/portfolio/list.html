@@ -6,7 +6,7 @@
   <p class="text-sm text-muted">تصاویر منتشرشده در صفحه عمومی سالن نمایش داده می‌شوند.</p>
   <a href="{% url 'portfolio:create' %}" class="btn-primary text-sm">افزودن تصویر</a>
 </div>
-<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+<div class="suite-catalog-grid suite-gallery">
   {% for item in items %}
   <article class="editorial-module-card !p-0 overflow-hidden">
     {% if item.image %}<img src="{{ item.image.url }}" alt="" class="aspect-[4/3] w-full object-cover" loading="lazy" decoding="async">{% else %}<div class="flex h-40 items-center justify-center bg-ivory text-muted">بدون تصویر</div>{% endif %}
@@ -18,4 +18,5 @@
   </article>
   {% empty %}<div class="col-span-full">{% url 'portfolio:create' as create_url %}{% include "partials/empty_state.html" with icon="images" title="گالری خالی است" description="نمونه‌کارهای سالن را اضافه کنید." cta_url=create_url cta_label="افزودن تصویر" %}</div>{% endfor %}
 </div>
+{% include "partials/suite_pagination.html" with pager=portfolio_page %}
 {% endblock %}

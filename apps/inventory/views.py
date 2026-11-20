@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -42,10 +43,11 @@ def _inventory_list_context(
     categories = inventory_category_queryset(request.salon)
     items = list(_inventory_list_queryset(request.salon, query=query, category_key=category_key))
     low_count = sum(1 for i in items if i.is_low_stock or i.is_out_of_stock)
+    pager = Paginator(items, 12).get_page(request.GET.get("page"))
     if item_form is None:
         item_form = InventoryItemCreateForm(salon=request.salon)
     return {
-        "items": items,
+        "items": pager.object_list, "inventory_page": pager,
         "categories": categories,
         "query": query,
         "category_key": category_key,

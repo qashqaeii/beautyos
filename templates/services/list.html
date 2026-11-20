@@ -1,4 +1,5 @@
 {% extends "layouts/app_shell.html" %}
+{% load format_tags %}
 {% block title %}خدمات{% endblock %}
 {% block page_title %}خدمات سالن{% endblock %}
 {% block page_subtitle %}مدت، قیمت و وضعیت خدمات{% endblock %}
@@ -39,7 +40,7 @@
   @keydown.escape.window="editOpen ? closeEdit() : (createOpen && closeCreate())"
 >
   <div class="page-toolbar editorial-module-toolbar">
-    <p>{{ services|length }} خدمت در فهرست سالن</p>
+    <form method="get" class="suite-filter-form" role="search"><label class="suite-search"><i data-lucide="search" aria-hidden="true"></i><input type="search" name="q" class="input-field" value="{{ q }}" aria-label="جست‌وجوی خدمت" placeholder="نام خدمت یا دسته‌بندی"></label><button class="btn-secondary">جست‌وجو</button>{% if q %}<a class="suite-clear" href="{% url 'services:list' %}">پاک کردن</a>{% endif %}</form><p>{{ service_page.paginator.count|fa_num }} خدمت</p>
     <button type="button" class="btn-primary" @click="createOpen = true"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>خدمت جدید</button>
   </div>
 
@@ -52,9 +53,9 @@
   {% endif %}
 
   {% if services %}
-  <div class="grid gap-4 md:grid-cols-2">
+  <div class="suite-catalog-grid">
     {% for s in services %}
-    <article class="maison-service-card !flex-row !items-start">
+    <article class="maison-service-card suite-service-card !flex-row !items-start">
       <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-soft to-surface-muted text-accent">
         <i data-lucide="sparkles" class="h-6 w-6"></i>
       </div>
@@ -62,18 +63,21 @@
         <h3 class="font-semibold text-espresso">{{ s.name }}</h3>
         <p class="mt-1 text-sm text-ink-secondary">
           {% if s.category %}{{ s.category.name }} · {% endif %}
-          {{ s.duration_minutes }} دقیقه · {{ s.price_toman|floatformat:0 }} تومان
+          {{ s.duration_minutes|fa_num }} دقیقه · {{ s.price_toman|fa_money }} تومان
         </p>
-        {% if not s.is_active %}<span class="badge-pending mt-2">غیرفعال</span>{% endif %}
+        {% if s.is_active %}<span class="staff-team-badge staff-team-badge--ok">فعال</span>{% else %}<span class="staff-team-badge staff-team-badge--muted">غیرفعال</span>{% endif %}
       </div>
       <a href="{% url 'services:list' %}?edit={{ s.pk }}" class="btn-secondary self-start text-xs">ویرایش</a>
     </article>
     {% endfor %}
   </div>
   {% else %}
+  {% if q %}<div class="suite-empty"><p>خدمتی با این عبارت یافت نشد.</p><a class="btn-secondary" href="{% url 'services:list' %}">پاک کردن جست‌وجو</a></div>{% else %}
   {% url 'services:list' as list_url %}
   {% include "partials/empty_state.html" with icon="scissors" title="خدمات سالن هنوز تعریف نشده‌اند" description="خدمات را اضافه کنید تا در رزرو و صفحه عمومی نمایش داده شوند." cta_url=list_url|add:"?create=1" cta_label="افزودن خدمت" %}
   {% endif %}
+  {% endif %}
+  {% include "partials/suite_pagination.html" with pager=service_page %}
 
   {% include "services/partials/service_create_modal.html" %}
   {% include "services/partials/service_edit_modal.html" %}

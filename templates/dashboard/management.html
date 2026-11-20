@@ -1,7 +1,7 @@
 {% extends "layouts/app_shell.html" %}
 {% load static %}
 {% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-management.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
-{% block shell_modifier %}luna-management-shell{% endblock %}
+{% block shell_modifier %}luna-management-shell management-suite{% endblock %}
 {% block title %}مدیریت · {{ active_salon.name }}{% endblock %}
 {% block header_modifier %}dashboard-lite-app-header{% endblock %}
 {% block workspace_header %}{% endblock %}

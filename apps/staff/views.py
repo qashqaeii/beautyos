@@ -1,12 +1,14 @@
 from datetime import date, timedelta
 
 from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from apps.core.utils.dates import to_jalali, week_start_saturday
+from apps.core.utils.dates import to_jalali, week_start_saturday, jalali_month_bounds
 
 from apps.appointments.models import Appointment
 from apps.salons import invitations
@@ -41,16 +43,60 @@ def _staff_list_context(
     membership = getattr(request, "membership", None)
     if view_mode is None:
         view_mode = _resolve_staff_view_mode(request)
-    staff = (
-        StaffProfile.scoped(request.salon)
-        .filter(is_deleted=False)
+    from apps.services.models import Service
+    from django.db.models import Prefetch
+
+    salon = request.salon
+    staff = list(StaffProfile.scoped(salon).filter(is_deleted=False)
         .select_related("membership__user")
-        .prefetch_related("services")
-    )
+        .prefetch_related(Prefetch("services", queryset=Service.scoped(salon).filter(is_deleted=False).order_by("name", "pk"), to_attr="directory_services"))
+        .order_by("display_name", "pk"))
+    today = timezone.localdate()
+    month_start, month_end = jalali_month_bounds(today)
+    daily = Q(start_at__date=today) & ~Q(status__in=(Appointment.Status.CANCELLED, Appointment.Status.NO_SHOW))
+    monthly = Q(start_at__date__range=(month_start, month_end), status=Appointment.Status.COMPLETED)
+    stats = {row["staff_id"]: row for row in Appointment.scoped(salon).filter(staff_id__in=[s.pk for s in staff])
+        .filter(daily | monthly).order_by().values("staff_id").annotate(today_count=Count("pk", filter=daily), month_count=Count("pk", filter=monthly))}
+    active_services = set()
+    for s in staff:
+        s.today_count = stats.get(s.pk, {}).get("today_count", 0)
+        s.month_count = stats.get(s.pk, {}).get("month_count", 0)
+        s.directory_bookable = s.is_active and s.membership.is_active and s.is_bookable
+        s.directory_active = s.is_active and s.membership.is_active
+        s.service_count = len(s.directory_services)
+        s.service_tags = s.directory_services[:3]
+        s.extra_service_count = max(0, s.service_count - 3)
+        if s.directory_active:
+            active_services.update(service.pk for service in s.directory_services if service.is_active)
+    total = len(staff)
+    directory_stats = {
+        "total": total,
+        "active": sum(s.directory_active for s in staff),
+        "bookable": sum(s.directory_bookable for s in staff),
+        "today": sum(s.today_count for s in staff),
+        "services": len(active_services),
+    }
+    q = (request.GET.get("q") or "").strip()[:120]
+    status = request.GET.get("status", "")
+    if status not in ("bookable", "unbookable", "inactive"):
+        status = ""
+    specialty = (request.GET.get("specialty") or "")[:80]
+    specialties = sorted({s.title for s in staff if s.title})
+    if specialty not in specialties:
+        specialty = ""
+    filtered = [s for s in staff if
+        (not q or q.casefold() in (s.full_display_name + " " + s.title + " " + " ".join(service.name for service in s.directory_services)).casefold())
+        and (not specialty or s.title == specialty)
+        and (not status or (status == "bookable" and s.directory_bookable)
+            or (status == "unbookable" and s.directory_active and not s.directory_bookable)
+            or (status == "inactive" and not s.directory_active))]
+    page = Paginator(filtered, 6 if view_mode == "card" else 12).get_page(request.GET.get("page"))
     if form is None:
         form = StaffInviteForm()
     return {
-        "staff_list": staff,
+        "staff_list": page.object_list,
+        "staff_page": page, "directory_stats": directory_stats, "q": q,
+        "status": status, "specialty": specialty, "specialties": specialties,
         "view_mode": view_mode,
         "can_add_staff": has_permission(membership, P_STAFF_MANAGE),
         "form": form,

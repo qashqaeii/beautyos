@@ -27,15 +27,14 @@
   <header class="inventory-page__header">
     <div class="inventory-page__headline">
       <span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="boxes"></i></span><div class="editorial-directory-copy"><h1 class="inventory-page__title">محصولات و موجودی</h1>
-      {% if low_count %}
-      <p class="inventory-page__hint">{{ low_count|fa_num }} قلم نیاز به توجه</p></div>
-      {% endif %}
+      <p class="inventory-page__hint">موجودی، دسته‌بندی و گردش کالا</p></div>
     </div>
     <button type="button" class="btn-primary inventory-page__add" @click="createOpen = true">
       + افزودن محصول
     </button>
   </header>
 
+  <section class="suite-kpis suite-kpis--two"><article class="suite-kpi"><span class="suite-icon"><i data-lucide="boxes" aria-hidden="true"></i></span><div><small>اقلام در فهرست فعلی</small><strong>{{ inventory_page.paginator.count|fa_num }}</strong></div></article><article class="suite-kpi"><span class="suite-icon"><i data-lucide="alert-circle" aria-hidden="true"></i></span><div><small>نیازمند تأمین در فهرست فعلی</small><strong>{{ low_count|fa_num }}</strong></div></article></section>
   <form method="get" class="inventory-page__filters" role="search">
     <div class="inventory-page__search">
       <input
@@ -144,6 +143,7 @@
   {% include "partials/empty_state.html" with icon="boxes" title="محصولی ثبت نشده" description="اولین محصول را اضافه کنید یا فیلترها را تغییر دهید." cta_url=list_url|add:"?create=1" cta_label="افزودن محصول" %}
   {% endif %}
 
+  {% include "partials/suite_pagination.html" with pager=inventory_page %}
   {% include "inventory/partials/item_create_modal.html" %}
 </div>
 <script>

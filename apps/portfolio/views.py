@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.portfolio.forms import PortfolioItemForm
@@ -12,7 +13,8 @@ from apps.salons.permissions import require_role
 @require_role(SalonMembership.Role.MANAGER)
 def portfolio_list(request):
     items = PortfolioItem.scoped(request.salon).filter(is_deleted=False).order_by("sort_order", "-created_at")
-    return render(request, "portfolio/list.html", {"items": items})
+    pager = Paginator(items, 6).get_page(request.GET.get("page"))
+    return render(request, "portfolio/list.html", {"items": pager.object_list, "portfolio_page": pager})
 
 
 @salon_required

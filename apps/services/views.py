@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -40,11 +42,15 @@ def _service_list_context(
     edit_new_category_name: str = "",
     edit_advanced_open: bool = False,
 ):
-    services = Service.scoped(request.salon).filter(is_deleted=False).select_related("category")
+    services = Service.scoped(request.salon).filter(is_deleted=False).select_related("category").order_by("sort_order","pk")
+    q = (request.GET.get("q") or "").strip()[:120]
+    if q:
+        services = services.filter(Q(name__icontains=q)|Q(category__name__icontains=q))
+    pager = Paginator(services, 9).get_page(request.GET.get("page"))
     if form is None:
         form = ServiceCreateForm(salon=request.salon)
     return {
-        "services": services,
+        "services": pager.object_list, "service_page": pager, "q": q,
         "form": form,
         "create_modal_open": create_modal_open,
         "category_panel_open": category_panel_open,
