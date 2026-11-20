@@ -80,7 +80,7 @@ def _customer_list_context(
         tag_id=tag_id,
         ordering=ordering,
     )
-    paginator = Paginator(qs, 20)
+    paginator = Paginator(qs, 8 if view_mode == 'card' else 12)
     page = paginator.get_page(request.GET.get("page"))
 
     from apps.customers.models import CustomerTag

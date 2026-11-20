@@ -1,6 +1,6 @@
 <nav class="list-view-switch" role="group" aria-label="تغییر نمای فهرست">
   <a
-    href="{% querystring view='card' %}"
+    href="{% querystring view='card' page=None %}"
     class="list-view-switch__btn {% if view_mode == 'card' %}is-active{% endif %}"
     aria-label="نمای کارتی"
     title="نمای کارتی"
@@ -10,7 +10,7 @@
     <span class="sr-only">نمای کارتی</span>
   </a>
   <a
-    href="{% querystring view='table' %}"
+    href="{% querystring view='table' page=None %}"
     class="list-view-switch__btn {% if view_mode == 'table' %}is-active{% endif %}"
     aria-label="نمای جدولی"
     title="نمای جدولی"

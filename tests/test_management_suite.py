@@ -26,3 +26,39 @@ def test_staff_directory_filters_and_isolation(client,salon,salon_b,owner_member
     assert list(client.get(reverse("staff:list"),{"status":"inactive"}).context["staff_list"])==[profile]
     finance=client.get(reverse("finance:overview"))
     assert "beautyos-main-bg__shell management-suite" not in finance.content.decode()
+
+
+@pytest.mark.django_db
+def test_staff_card_pagination_and_real_appointment_counts(client,salon,owner_membership):
+    from datetime import timedelta
+    from django.utils import timezone
+    from apps.appointments.models import Appointment
+    from apps.customers.models import Customer
+    from apps.services.models import Service
+
+    rows=[]
+    for i in range(7):
+        membership=owner_membership if i==0 else SalonMembership.objects.create(salon=salon,
+            user=User.objects.create_user(phone=f"+98912123290{i}"),role=SalonMembership.Role.SPECIALIST)
+        profile,_=StaffProfile.objects.get_or_create(salon=salon,membership=membership)
+        profile.display_name=f"متخصص {i}"
+        profile.save()
+        rows.append(profile)
+    service=Service.objects.create(salon=salon,name="رنگ مو",price_toman=200000)
+    for profile in rows:
+        profile.services.add(service)
+    customer=Customer.objects.create(salon=salon,full_name="مشتری",phone="+989121232919")
+    start=timezone.now()
+    for offset,status in [(0,Appointment.Status.COMPLETED),(1,Appointment.Status.CANCELLED)]:
+        a=start+timedelta(minutes=offset*10)
+        Appointment.objects.create(salon=salon,customer=customer,staff=rows[0],service=service,start_at=a,
+            end_at=a+timedelta(minutes=5),status=status,price_toman=200000)
+    client.force_login(owner_membership.user)
+    result=client.get(reverse("staff:list"),{"view":"card"})
+    assert len(result.context["staff_list"])==6
+    assert result.context["staff_page"].paginator.count==7
+    assert result.context["directory_stats"]["services"]==1
+    assert result.context["directory_stats"]["today"]==1
+    assert result.context["staff_list"][0].month_count==1
+    assert len(client.get(reverse("staff:list"),{"page":2}).context["staff_list"])==1
+    assert len(client.get(reverse("staff:list"),{"view":"table"}).context["staff_list"])==7

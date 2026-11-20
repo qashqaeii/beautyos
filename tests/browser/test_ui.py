@@ -438,3 +438,49 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         assert not errors
         context.close()
         browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_staff_board_populated_short_notebook(live_server, client, owner_membership):
+    from apps.accounts.models import User
+    from apps.salons.models import SalonMembership
+    from apps.staff.models import StaffProfile
+    from apps.services.models import Service
+    salon=owner_membership.salon
+    service=Service.objects.create(salon=salon,name="رنگ و لایت",price_toman=2500000)
+    for i in range(7):
+        membership=owner_membership if i==0 else SalonMembership.objects.create(salon=salon,
+            user=User.objects.create_user(phone=f"+98912123180{i}"),role=SalonMembership.Role.SPECIALIST)
+        profile,_=StaffProfile.objects.get_or_create(salon=salon,membership=membership)
+        profile.display_name=f"متخصص زیبایی {i+1}"
+        profile.title="متخصص مو"
+        profile.save()
+        profile.services.add(service)
+    client.force_login(owner_membership.user)
+    session=client.session
+    session["active_salon_id"]=str(salon.pk)
+    session.save()
+    ARTIFACT.mkdir(exist_ok=True)
+    with pw.sync_playwright() as playwright:
+        browser=playwright.chromium.launch(headless=True)
+        context=browser.new_context(viewport={"width":1366,"height":640},locale="fa-IR",reduced_motion="reduce")
+        context.add_cookies([{"name":settings.SESSION_COOKIE_NAME,"value":client.cookies[settings.SESSION_COOKIE_NAME].value,"url":live_server.url}])
+        page=context.new_page()
+        response=page.goto(live_server.url+reverse("staff:list")+"?view=card",wait_until="load")
+        assert response.status==200
+        page.evaluate("document.fonts.ready")
+        pw.expect(page.locator(".suite-kpi")).to_have_count(5)
+        pw.expect(page.locator(".suite-staff-card")).to_have_count(6)
+        pw.expect(page.locator(".suite-staff-card").nth(5)).to_be_in_viewport(ratio=.5)
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+2")
+        assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'")
+        page.screenshot(path=str(ARTIFACT/"1366-staff-board.png"),animations="disabled")
+        page.get_by_role("navigation",name="صفحه‌بندی").get_by_role("link",name="بعدی").click()
+        pw.expect(page.locator(".suite-staff-card")).to_have_count(1)
+        page.get_by_role("searchbox",name="جست‌وجوی متخصص").fill("زیبایی 1")
+        page.get_by_role("button",name="جست‌وجو",exact=True).click()
+        pw.expect(page.locator(".suite-staff-card")).to_have_count(1)
+        page.goto(live_server.url+reverse("finance:overview"),wait_until="load")
+        assert page.locator(".maison-app.management-suite").count()==0
+        context.close()
+        browser.close()

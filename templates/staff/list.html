@@ -99,6 +99,8 @@
               <td class="p-3 text-sm">
                 {% if s.directory_bookable %}
                 <span class="staff-team-badge staff-team-badge--ok">قابل رزرو</span>
+                {% elif not s.directory_active %}
+                <span class="staff-team-badge staff-team-badge--muted">غیرفعال</span>
                 {% else %}
                 <span class="staff-team-badge staff-team-badge--muted">غیر قابل رزرو</span>
                 {% endif %}
@@ -125,7 +127,7 @@
           {% if s.directory_bookable %}<span class="staff-team-badge staff-team-badge--ok">قابل رزرو</span>{% elif not s.directory_active %}<span class="staff-team-badge staff-team-badge--muted">غیرفعال</span>{% else %}<span class="staff-team-badge staff-team-badge--muted">غیرقابل رزرو</span>{% endif %}
         </div>
         <div class="suite-service-tags" aria-label="خدمات متخصص">{% for service in s.service_tags %}<span title="{{ service.name }}">{{ service.name }}</span>{% empty %}<small>خدمتی تعریف نشده</small>{% endfor %}{% if s.extra_service_count %}<span>+{{ s.extra_service_count|fa_num }}</span>{% endif %}</div>
-        <dl class="staff-team-card__stats"><div class="staff-team-card__stat"><dd><i data-lucide="scissors" aria-hidden="true"></i>{{ s.month_count|fa_num }}</dd><dt>خدمات انجام‌شده ماه</dt></div><div class="staff-team-card__stat"><dd><i data-lucide="calendar-days" aria-hidden="true"></i>{{ s.today_count|fa_num }}</dd><dt>نوبت امروز</dt></div></dl>
+        <dl class="staff-team-card__stats"><div class="staff-team-card__stat"><dt>خدمات انجام‌شده ماه</dt><dd><i data-lucide="scissors" aria-hidden="true"></i>{{ s.month_count|fa_num }}</dd></div><div class="staff-team-card__stat"><dt>نوبت امروز</dt><dd><i data-lucide="calendar-days" aria-hidden="true"></i>{{ s.today_count|fa_num }}</dd></div></dl>
         <div class="suite-card-actions"><a href="{% url 'staff:detail' pk=s.pk %}" class="staff-team-card__profile-link">مشاهده پروفایل<i data-lucide="chevron-left" class="staff-team-card__profile-icon" aria-hidden="true"></i></a><a class="suite-icon-action" href="{% url 'staff:detail' pk=s.pk %}?edit=1" aria-label="ویرایش {{ s.full_display_name }}" title="ویرایش پروفایل"><i data-lucide="pencil" aria-hidden="true"></i></a><a class="suite-icon-action" href="{% url 'staff:hours' pk=s.pk %}" title="ساعات کاری" aria-label="ساعات کاری {{ s.full_display_name }}"><i data-lucide="clock" aria-hidden="true"></i></a></div>
       </article>
       {% endfor %}

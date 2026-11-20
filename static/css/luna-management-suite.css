@@ -129,3 +129,33 @@
  .maison-app.management-suite .suite-catalog-grid{grid-template-columns:minmax(0,1fr)}
  .maison-app.management-suite .suite-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* Match the same data-card, table and panel rhythm in the growth modules.
+   These selectors cannot match finance because its namespace never receives management-suite. */
+.maison-app.management-suite .suite-staff-card .staff-team-card__stat{display:flex;flex-direction:column;gap:2px}.suite-staff-card .staff-team-card__stat dd{order:-1}
+.maison-app.management-suite .fin-panel{padding:12px;border:1px solid var(--suite-line);border-radius:13px;box-shadow:none;background:var(--suite-paper)}
+.maison-app.management-suite .fin-panel-head{gap:8px;margin-bottom:8px}
+.maison-app.management-suite .fin-panel-head h2{font-size:.92rem;line-height:1.5}
+.maison-app.management-suite .fin-account-grid{gap:8px}
+.maison-app.management-suite .fin-account-card{min-width:0;padding:10px;gap:4px;border-radius:10px;background:#faf0ea;border:1px solid var(--suite-line);box-shadow:none}
+.maison-app.management-suite .fin-tools-grid{gap:10px}
+.maison-app.management-suite .fin-line{padding-block:8px;gap:8px}
+.maison-app.management-suite .suite-settings .premium-card.space-y-4>*+*{margin-block-start:10px}
+.maison-app.management-suite .suite-settings .premium-card>div.p-5{padding:11px 13px}
+.maison-app.management-suite .suite-settings .input-field{min-height:38px}
+.maison-app.management-suite .suite-settings .public-auth-field input:not([type=checkbox]){min-height:38px}
+.maison-app.management-suite .suite-settings .suite-hours-grid>li{min-width:0}
+.maison-app.management-suite .suite-settings .suite-hours-grid>li input{width:100%;min-width:0}
+@media (min-width:1024px){
+ .maison-app.management-suite:not(.club-shell) .fin-account-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,155px),1fr))}
+ .maison-app.management-suite .suite-gallery{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .maison-app.management-suite .suite-staff-card .staff-team-card__identity{min-height:45px}
+ .maison-app.management-suite .suite-staff-card .suite-service-tags{min-height:24px}
+}
+@media (min-width:1024px) and (max-height:760px){
+ .maison-app.management-suite .staff-team-page{padding-bottom:8px}
+ .maison-app.management-suite .suite-staff-card .staff-team-card__stats{padding-block:6px}
+ .maison-app.management-suite .suite-staff-card .staff-team-card__profile-link,.maison-app.management-suite .suite-staff-card .suite-icon-action{min-height:32px;height:32px}
+ .maison-app.management-suite .suite-staff-card .suite-icon-action{width:32px}
+ .maison-app.management-suite .suite-pagination{margin-top:8px}
+}
