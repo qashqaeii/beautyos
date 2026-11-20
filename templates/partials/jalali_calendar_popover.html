@@ -3,9 +3,9 @@
   <div
     x-ref="popover"
     class="jalali-date__popover jalali-date__popover--portal"
-    :class="birthPicker && 'jalali-date__popover--birth'"
+    :class="{ 'jalali-date__popover--birth': birthPicker, 'jalali-date__popover--compact': directNavigation }"
     :style="popoverStyle"
-    x-effect="open && $nextTick(() => positionPopover())"
+    x-effect="if (open) { const month = viewJm; const year = viewJy; $nextTick(() => positionPopover()); }"
     x-show="open"
     x-cloak
     role="dialog"
@@ -39,11 +39,11 @@
           <span class="jalali-date__nav-icon" aria-hidden="true">›</span>
         </button>
         <div class="jalali-date__direct-selects">
-          <select class="jalali-date__direct-select" x-model.number="viewJm" @change="setViewMonth(Number($event.target.value))" aria-label="انتخاب ماه">
-            <template x-for="month in monthOptions" :key="month.value"><option :value="month.value" :disabled="month.disabled" x-text="month.label"></option></template>
+          <select class="jalali-date__direct-select" @change="setViewMonth(Number($event.target.value))" aria-label="انتخاب ماه">
+            <template x-for="month in monthOptions" :key="month.value"><option :value="month.value" :selected="month.value === viewJm" :disabled="month.disabled" x-text="month.label"></option></template>
           </select>
-          <select class="jalali-date__direct-select" x-model.number="viewJy" @change="setViewYear(Number($event.target.value))" aria-label="انتخاب سال">
-            <template x-for="year in yearOptions" :key="year.value"><option :value="year.value" x-text="year.label"></option></template>
+          <select class="jalali-date__direct-select" @change="setViewYear(Number($event.target.value))" aria-label="انتخاب سال">
+            <template x-for="year in yearOptions" :key="year.value"><option :value="year.value" :selected="year.value === viewJy" x-text="year.label"></option></template>
           </select>
         </div>
         <button type="button" class="jalali-date__nav" @click.stop="nextMonth()" :disabled="!canMoveMonth(1)" aria-label="ماه بعد">

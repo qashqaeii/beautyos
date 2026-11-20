@@ -257,6 +257,10 @@
           }
         }
         const r = anchor.getBoundingClientRect();
+        if (this.directNavigation) {
+          this.positionCompactPopover(r);
+          return;
+        }
         const width = Math.min(POPOVER_WIDTH, window.innerWidth - POPOVER_EDGE * 2);
         const gap = 6;
         let top = r.bottom + gap;
@@ -285,6 +289,34 @@
           maxWidth: `calc(100vw - ${POPOVER_EDGE * 2}px)`,
           maxHeight: `${Math.min(POPOVER_EST_HEIGHT, window.innerHeight - viewportPad * 2)}px`,
           overflowY: "auto",
+          zIndex: String(POPOVER_Z_INDEX),
+        };
+        this._applyPopoverStyle();
+      },
+      positionCompactPopover(r) {
+        const pop = this.$refs.popover;
+        if (!pop || !pop.getClientRects().length) return;
+        const edge = POPOVER_EDGE;
+        const gap = 6;
+        const width = Math.min(272, window.innerWidth - edge * 2);
+        const available = Math.max(1, window.innerHeight - edge * 2);
+        // Give the actual month's grid room first, instead of clipping it to a fixed estimate.
+        Object.assign(pop.style, {width: `${width}px`, maxHeight: "none", overflowY: "visible"});
+        const naturalHeight = Math.ceil(pop.getBoundingClientRect().height);
+        const height = Math.min(naturalHeight, available);
+        const below = window.innerHeight - r.bottom - gap - edge;
+        const above = r.top - gap - edge;
+        const useAbove = below < height && above > below;
+        const targetTop = useAbove ? r.top - gap - height : r.bottom + gap;
+        const top = Math.max(edge, Math.min(targetTop, window.innerHeight - edge - height));
+        const left = Math.max(edge, Math.min(r.left + (r.width - width) / 2, window.innerWidth - edge - width));
+        this.popoverPlacement = useAbove ? "above" : "below";
+        this.popoverStyle = {
+          position: "fixed", top: `${top}px`, left: `${left}px`,
+          width: `${width}px`, maxWidth: `calc(100vw - ${edge * 2}px)`,
+          // Only exceptionally short viewports need an accessible scrolling fallback.
+          maxHeight: naturalHeight > available ? `${available}px` : "none",
+          overflowY: naturalHeight > available ? "auto" : "visible",
           zIndex: String(POPOVER_Z_INDEX),
         };
         this._applyPopoverStyle();

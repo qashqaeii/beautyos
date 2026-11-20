@@ -397,6 +397,22 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         trigger.click()
         calendar=page.locator(".jalali-date__popover--portal:visible")
         pw.expect(calendar.get_by_role("gridcell",name="۲۹",exact=True)).to_have_attribute("aria-current","date")
+        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_value("1405")
+        pw.expect(calendar.get_by_label("انتخاب ماه",exact=True)).to_have_value("8")
+
+        def assert_compact():
+            pw.expect(calendar.get_by_role("button",name="امروز",exact=True)).to_be_in_viewport(ratio=1)
+            pw.expect(calendar).to_be_in_viewport(ratio=1)
+            assert calendar.evaluate("(el) => el.scrollHeight <= el.clientHeight+1 && el.scrollWidth <= el.clientWidth+1")
+            assert calendar.evaluate("(el) => getComputedStyle(el).overflowY") == "visible"
+
+        assert_compact()
+        # Exercise a month that requires six calendar rows, not only a short month.
+        import jdatetime
+        month=next(m for m in range(1,13) if (jdatetime.date(1405,m,1).weekday() + (31 if m<=6 else 30 if m<=11 else 29))>35)
+        calendar.get_by_label("انتخاب ماه",exact=True).select_option(str(month))
+        pw.expect(calendar.get_by_role("gridcell")).to_have_count(42)
+        assert_compact()
         calendar.get_by_label("انتخاب سال",exact=True).select_option("1403")
         calendar.get_by_label("انتخاب ماه",exact=True).select_option("12")
         pw.expect(calendar.get_by_role("gridcell",name="۳۰",exact=True)).to_be_enabled()
@@ -405,6 +421,9 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         assert parse_qs(urlsplit(page.url).query)=={"day":["2025-03-20"],"range":["week"],"trend":["30"]}
         pw.expect(trigger).to_contain_text("۱۴۰۳/۱۲/۳۰")
         trigger.click()
+        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_value("1403")
+        pw.expect(calendar.get_by_label("انتخاب ماه",exact=True)).to_have_value("12")
+        assert_compact()
         calendar.get_by_label("انتخاب سال",exact=True).select_option("1404")
         pw.expect(calendar.get_by_role("gridcell",name="۳۰",exact=True)).to_have_count(0)
         calendar.get_by_role("button",name="ماه بعد",exact=True).click()

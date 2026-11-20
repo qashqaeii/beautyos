@@ -59,10 +59,56 @@
   }
 }
 
-/* Inline report date picker: direct month/year selection without a larger popover. */
-.jalali-date__popover-head--direct { gap: 4px; padding-bottom: 7px; }
-.jalali-date__direct-selects { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr); gap: 5px; flex: 1; min-width: 0; }
-.jalali-date__direct-select { min-width: 0; width: 100%; min-height: 34px; padding: 4px 5px; border: 1px solid #e5d6cf; border-radius: 8px; background: #fffaf7; color: #51443f; font: inherit; font-size: .78rem; font-weight: 650; }
+/* Compact report date picker (overview, finance and other inline dates).
+   Native controls remain keyboard accessible; the entire month fits at ordinary heights. */
+.jalali-date__popover--compact {
+  --jalali-day-size: 30px;
+  box-sizing: border-box;
+  border: 1px solid #e9d9d2;
+  border-radius: 13px;
+  background: #fffdfb;
+  padding: 9px;
+  box-shadow: 0 6px 22px #51443f16;
+  color: #51443f;
+}
+.jalali-date__popover--compact .jalali-date__popover-head--direct {
+  gap: 4px; margin-bottom: 5px; padding-bottom: 7px; border-color: #f0e5df;
+}
+.jalali-date__direct-selects {
+  display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr); gap: 5px; flex: 1; min-width: 0;
+}
+.jalali-date__direct-select {
+  min-width: 0; width: 100%; min-height: 32px; padding: 3px 6px; border: 1px solid #eadbd4;
+  border-radius: 8px; background: #f9f1ec; color: #51443f; font: inherit; font-size: .8rem; font-weight: 650;
+}
 .jalali-date__direct-select:focus-visible { outline: 2px solid #9d726e; outline-offset: 1px; }
-.jalali-date__popover-head--direct .jalali-date__nav:disabled { opacity: .35; }
-@media(max-width:639px) { .jalali-date__direct-select { min-height: 40px; font-size: 1rem; } }
+.jalali-date__popover--compact .jalali-date__nav { width: 25px; height: 32px; border-radius: 8px; }
+.jalali-date__popover-head--direct .jalali-date__nav:disabled { opacity: .35; cursor: default; }
+.jalali-date__popover--compact .jalali-date__weekdays {
+  margin: 0 0 4px; gap: 2px; font-size: .68rem; color: #77655e; line-height: 1.6;
+}
+.jalali-date__popover--compact .jalali-date__grid { gap: 2px; }
+.jalali-date__popover--compact .jalali-date__day {
+  height: var(--jalali-day-size); min-height: 0; padding: 0; border-radius: 8px; font-size: .8rem;
+}
+.jalali-date__popover--compact .jalali-date__day--selected { background: #946b65; color: #fff; }
+.jalali-date__popover--compact .jalali-date__day--today:not(.jalali-date__day--selected) { box-shadow: inset 0 0 0 1px #b89287; color: #78564e; }
+.jalali-date__popover--compact .jalali-date__day:hover:not(:disabled):not(.jalali-date__day--selected) { background: #f4e7e1; }
+.jalali-date__popover--compact .jalali-date__popover-foot {
+  margin-top: 5px; padding-top: 5px; border-top: 1px solid #f0e5df;
+}
+.jalali-date__popover--compact .jalali-date__today-link {
+  width: 100%; min-height: 28px; border-radius: 7px; background: #f8efea; color: #865d55; font-weight: 650; text-decoration: none;
+}
+.jalali-date__popover--compact .jalali-date__today-link:hover { background: #efdfd7; }
+@media(max-width:639px) {
+  .jalali-date__popover--compact { --jalali-day-size: 34px; }
+  .jalali-date__direct-select { min-height: 36px; font-size: 1rem; }
+  .jalali-date__popover--compact .jalali-date__nav { height: 36px; }
+  .jalali-date__popover--compact .jalali-date__today-link { min-height: 34px; }
+}
+@media(max-height:380px) {
+  .jalali-date__popover--compact { --jalali-day-size: 26px; padding: 6px; }
+  .jalali-date__popover--compact .jalali-date__popover-head--direct { margin-bottom: 3px; padding-bottom: 4px; }
+  .jalali-date__popover--compact .jalali-date__popover-foot { margin-top: 3px; padding-top: 3px; }
+}
