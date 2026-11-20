@@ -3,8 +3,8 @@
 {% block page_subtitle %}دعوت و نقش‌ها{% endblock %}
 {% block content %}
 <div class="grid gap-6 lg:grid-cols-2">
-  <section class="premium-card">
-    <h2 class="mb-4 font-semibold text-espresso">دعوت عضو جدید</h2>
+  <section class="editorial-module-card">
+    <h2 class="font-semibold text-espresso">دعوت عضو جدید</h2>
     <form method="post" action="{% url 'salons_members:invite' %}" class="space-y-3">
       {% csrf_token %}
       {{ invite_form.phone.label_tag }}{{ invite_form.phone }}
@@ -26,7 +26,7 @@
     <p class="mt-4 text-xs text-ink-muted">لینک پذیرش: `/members/accept/&lt;token&gt;/` پس از ورود کاربر با همان موبایل</p>
   </section>
   <section class="premium-card">
-    <h2 class="mb-4 font-semibold text-espresso">اعضای فعال</h2>
+    <h2 class="font-semibold text-espresso">اعضای فعال</h2>
     <ul class="divide-y divide-line text-sm">
       {% for m in members %}
       <li class="py-3 flex flex-wrap items-center justify-between gap-2">

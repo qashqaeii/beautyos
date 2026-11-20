@@ -1,20 +1,21 @@
 {% extends "layouts/app_shell.html" %}
 {% block page_title %}نمونه‌کارها{% endblock %}
+{% block page_subtitle %}گالری و نمایش خدمات سالن{% endblock %}
 {% block content %}
-<div class="page-toolbar">
+<div class="editorial-module-toolbar">
   <p class="text-sm text-muted">تصاویر منتشرشده در صفحه عمومی سالن نمایش داده می‌شوند.</p>
   <a href="{% url 'portfolio:create' %}" class="btn-primary text-sm">افزودن تصویر</a>
 </div>
 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
   {% for item in items %}
-  <article class="card overflow-hidden p-0">
-    {% if item.image %}<img src="{{ item.image.url }}" alt="" class="h-40 w-full object-cover">{% else %}<div class="flex h-40 items-center justify-center bg-ivory text-muted">بدون تصویر</div>{% endif %}
+  <article class="editorial-module-card !p-0 overflow-hidden">
+    {% if item.image %}<img src="{{ item.image.url }}" alt="" class="aspect-[4/3] w-full object-cover" loading="lazy" decoding="async">{% else %}<div class="flex h-40 items-center justify-center bg-ivory text-muted">بدون تصویر</div>{% endif %}
     <div class="p-4">
       <h3 class="font-medium text-aubergine">{{ item.title }}</h3>
       <p class="mt-1 text-xs text-muted">{% if item.is_published %}منتشر{% else %}پیش‌نویس{% endif %}</p>
-      <a href="{% url 'portfolio:edit' pk=item.pk %}" class="mt-2 inline-block text-sm text-lavender">ویرایش</a>
+      <a href="{% url 'portfolio:edit' pk=item.pk %}" class="btn-secondary mt-3 text-xs">ویرایش</a>
     </div>
   </article>
-  {% empty %}<p class="col-span-full card text-center text-muted">گالری خالی است</p>{% endfor %}
+  {% empty %}<div class="col-span-full">{% url 'portfolio:create' as create_url %}{% include "partials/empty_state.html" with icon="images" title="گالری خالی است" description="نمونه‌کارهای سالن را اضافه کنید." cta_url=create_url cta_label="افزودن تصویر" %}</div>{% endfor %}
 </div>
 {% endblock %}

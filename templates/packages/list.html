@@ -1,27 +1,31 @@
 {% extends "layouts/app_shell.html" %}
 {% load humanize %}
-{% block page_title %}پکیج‌ها{% endblock %}
-{% block page_subtitle %}فروش و جلسات{% endblock %}
+{% block page_title %}پکیج‌های خدمات{% endblock %}
+{% block page_subtitle %}مدیریت پکیج‌ها، فروش و جلسات مشتریان{% endblock %}
 {% block content %}
-<div class="page-toolbar">
-  <a href="{% url 'packages:create' %}" class="btn-secondary text-sm">تعریف پکیج</a>
-  <a href="{% url 'packages:sell' %}" class="btn-primary text-sm">فروش به مشتری</a>
-</div>
+<div class="editorial-module-toolbar"><p>پکیج‌ها را تعریف کنید و جلسات فروخته‌شده را پیگیری کنید.</p><div class="editorial-module-actions"><a href="{% url 'packages:create' %}" class="btn-secondary"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>تعریف پکیج</a><a href="{% url 'packages:sell' %}" class="btn-primary"><i data-lucide="shopping-bag" class="h-4 w-4" aria-hidden="true"></i>فروش به مشتری</a></div></div>
 {% if packages %}
-<div class="grid gap-4 md:grid-cols-2 mb-8">
+<section class="editorial-section" aria-labelledby="package-list-heading"><div class="editorial-section-head"><h2 id="package-list-heading">پکیج‌های سالن</h2></div>
+<div class="editorial-module-grid">
   {% for p in packages %}
-  <article class="premium-card"><h3 class="font-semibold text-espresso">{{ p.name }}</h3><p class="text-sm text-ink-secondary">{{ p.session_count }} جلسه · {{ p.price_toman|fa_money }} تومان</p></article>
+  <article class="editorial-module-card"><div class="editorial-module-card__head"><span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="package"></i></span><div><h3>{{ p.name }}</h3><p>{{ p.session_count|fa_num }} جلسه · {{ p.validity_days|fa_num }} روز اعتبار</p></div></div>
+    <div class="editorial-module-value">{{ p.price_toman|fa_money }} <span class="text-xs font-normal">تومان</span></div>
+    {% if p.description %}<p>{{ p.description }}</p>{% endif %}
+    <p>{% if p.is_active %}فعال{% else %}غیرفعال{% endif %}</p>
+  </article>
   {% endfor %}
-</div>
+</div></section>
+{% else %}
+{% url 'packages:create' as create_url %}
+{% include "partials/empty_state.html" with icon="package" title="پکیجی تعریف نشده" description="برای فروش چند جلسه خدمات، یک پکیج تعریف کنید." cta_url=create_url cta_label="تعریف پکیج" %}
 {% endif %}
+<section class="editorial-section" aria-labelledby="package-sales-heading"><div class="editorial-section-head"><h2 id="package-sales-heading">فروش اخیر</h2></div>
 {% if sales %}
-<h3 class="mb-3 font-medium text-espresso">فروش اخیر</h3>
-<ul class="card divide-y divide-line text-sm">
+<ul class="editorial-ledger">
   {% for s in sales %}
-  <li class="flex justify-between py-2"><span>{{ s.customer.full_name }} · {{ s.package.name }}</span><span>{{ s.sessions_remaining }} باقی‌مانده</span></li>
+  <li><span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="user-round"></i></span><div class="editorial-ledger-copy"><strong>{{ s.customer.full_name }}</strong><small>{{ s.package.name }}</small></div><span class="editorial-ledger-aside">{{ s.sessions_remaining|fa_num }} جلسه باقی‌مانده</span></li>
   {% endfor %}
 </ul>
-{% elif not packages %}
-{% include "partials/empty_state.html" with icon="package" title="پکیجی تعریف نشده" cta_url="/packages/new/" cta_label="تعریف پکیج" %}
-{% endif %}
+{% else %}<p class="text-sm text-ink-secondary">هنوز فروشی ثبت نشده است.</p>{% endif %}
+</section>
 {% endblock %}

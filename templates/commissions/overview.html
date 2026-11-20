@@ -3,25 +3,25 @@
 {% block page_title %}پورسانت{% endblock %}
 {% block page_subtitle %}شناسایی و تسویه{% endblock %}
 {% block content %}
-<div class="page-toolbar">
+<div class="editorial-module-toolbar"><p>مدیریت سهم متخصصان و قوانین پرداخت</p><div class="editorial-module-actions">
   <a href="{% url 'commissions:rules' %}" class="btn-secondary text-sm">قوانین</a>
   <a href="{% url 'commissions:rule_create' %}" class="btn-primary text-sm">قانون جدید</a>
-</div>
+</div></div>
 {% if by_staff %}
-<section class="mb-6 grid gap-3 sm:grid-cols-2">
+<section class="editorial-section"><div class="editorial-section-head"><h2>مانده قابل تسویه</h2></div><div class="editorial-module-grid">
   {% for row in by_staff %}
-  <div class="stat-card flex items-center justify-between">
+  <article class="editorial-module-card"><div class="editorial-module-card__head"><span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
     <div>
-      <p class="kpi-label">مانده تسویه</p>
-      <p class="kpi-value">{{ row.total|fa_money }} <span class="text-base font-normal">تومان</span></p>
+      <p>مانده تسویه</p>
+      <p class="editorial-module-value">{{ row.total|fa_money }} <span class="text-base font-normal">تومان</span></p>
     </div>
     <a href="{% url 'commissions:settle' staff_id=row.staff_id %}" class="btn-secondary text-xs">تسویه</a>
-  </div>
+  </div></article>
   {% endfor %}
-</section>
+</div></section>
 {% endif %}
 {% if entries %}
-<div class="premium-card overflow-x-auto p-0">
+<div class="editorial-section-head"><h2>سوابق پورسانت</h2></div><div class="premium-card overflow-x-auto p-0">
   <table class="w-full text-sm">
     <thead class="border-b border-line bg-surface-muted text-ink-secondary"><tr><th class="p-3 text-right">متخصص</th><th class="p-3 text-right">مبلغ</th><th class="p-3 text-right">وضعیت</th></tr></thead>
     <tbody>
