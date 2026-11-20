@@ -29,3 +29,19 @@ def test_form_dialog_uses_shared_design_and_a11y(path):
 
 def test_modal_family_includes_all_eleven_form_dialogs():
     assert len(MODALS) >= 11
+
+
+def test_staff_profile_form_has_grouped_controls_and_native_upload():
+    from apps.staff.forms import StaffProfileForm
+    from apps.core.modal_widgets import ProfileImageWidget
+    from django.forms import CheckboxSelectMultiple
+    form = StaffProfileForm()
+    assert isinstance(form.fields["avatar"].widget, ProfileImageWidget)
+    assert isinstance(form.fields["services"].widget, CheckboxSelectMultiple)
+    source=(ROOT / "templates/staff/partials/staff_edit_form.html").read_text(encoding="utf-8")
+    for name in ("avatar","display_name","title","bio","is_active","is_bookable","calendar_color","services"):
+        assert "{{ form."+name+" }}" in source
+    assert 'enctype="multipart/form-data"' in source
+    assert "luna-form-section" in source
+    assert "luna-switch" in source
+    assert "luna-service-section" in source

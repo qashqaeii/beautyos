@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from apps.core.forms import PersianModelForm
+from apps.core.modal_widgets import ProfileImageWidget
 from apps.core.widgets import JalaliDateWidget
 from apps.core.utils.phone import normalize_iran_mobile
 from apps.customers.models import Customer, CustomerNote, CustomerTag
@@ -105,6 +106,7 @@ class CustomerForm(PersianModelForm):
             "birth_date": forms.DateInput(attrs={"class": "input-field"}),
             "status": forms.Select(attrs={"class": "input-field"}),
             "tags": forms.SelectMultiple(attrs={"class": "input-field"}),
+            "avatar": ProfileImageWidget(attrs={"accept": "image/*"}),
             "marketing_consent": forms.CheckboxInput(attrs={"class": "rounded border-aubergine/20"}),
             "is_vip": forms.CheckboxInput(attrs={"class": "rounded border-aubergine/20"}),
         }

@@ -1,0 +1,14 @@
+<div class="luna-upload" data-luna-upload>
+  <span class="luna-upload__preview" aria-hidden="true">
+    <i data-lucide="user-round" {% if widget.is_initial %}hidden{% endif %}></i>
+    <img alt="" data-luna-preview {% if widget.is_initial %}src="{{ widget.value.url }}" data-original-src="{{ widget.value.url }}"{% else %}hidden{% endif %}>
+  </span>
+  <div class="luna-upload__copy">
+    <strong>تصویر پروفایل</strong>
+    <small data-luna-file-name aria-live="polite">{% if widget.is_initial %}تصویر فعلی ذخیره شده است{% else %}یک تصویر انتخاب کنید{% endif %}</small>
+    <div class="luna-upload__actions">
+      <label class="luna-upload__button"><i data-lucide="image-plus" aria-hidden="true"></i><span>انتخاب تصویر</span><input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}></label>
+      {% if widget.is_initial and not widget.required %}<label class="luna-upload__remove"><input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}>حذف تصویر</label>{% endif %}
+    </div>
+  </div>
+</div>

@@ -12,7 +12,7 @@
   {% endif %}
 
   <div class="inventory-create-modal__scroll maison-scroll-themed">
-    <div class="customer-form__fields customer-form__fields--modal space-y-3">
+    <div class="customer-form__fields customer-form__fields--modal luna-customer-edit-grid">
       <div class="customer-form-field">
         <label class="field-label" for="{{ edit_form.phone_input.id_for_label }}">{{ edit_form.phone_input.label }}</label>
         {{ edit_form.phone_input }}
@@ -28,7 +28,7 @@
         {{ edit_form.email }}
         {% if edit_form.email.errors %}<p class="customer-form-field__error">{{ edit_form.email.errors.0 }}</p>{% endif %}
       </div>
-      <div class="customer-form__primary-grid customer-form__primary-grid--modal">
+      <div class="customer-form__primary-grid customer-form__primary-grid--modal luna-field--full">
         <div class="customer-form-field">
           <label class="field-label" for="{{ edit_form.birth_date.id_for_label }}">{{ edit_form.birth_date.label }}</label>
           {{ edit_form.birth_date }}
@@ -40,13 +40,12 @@
           {% if edit_form.status.errors %}<p class="customer-form-field__error">{{ edit_form.status.errors.0 }}</p>{% endif %}
         </div>
       </div>
-      <div class="customer-form-field">
+      <div class="customer-form-field luna-field--full">
         <label class="field-label" for="{{ edit_form.tags.id_for_label }}">{{ edit_form.tags.label }}</label>
         {{ edit_form.tags }}
         {% if edit_form.tags.errors %}<p class="customer-form-field__error">{{ edit_form.tags.errors.0 }}</p>{% endif %}
       </div>
-      <div class="customer-form-field">
-        <span class="field-label" id="customer-edit-avatar-label">{{ edit_form.avatar.label }}</span>
+      <div class="customer-form-field luna-field--full">
         {{ edit_form.avatar }}
         {% if edit_form.avatar.errors %}<p class="customer-form-field__error">{{ edit_form.avatar.errors.0 }}</p>{% endif %}
       </div>

@@ -158,3 +158,108 @@ html.app-modal-open .maison-toast-stack { z-index:240; pointer-events:none; }
   .luna-modal .staff-timeoff-form__range-fields { grid-template-columns:minmax(0,1fr); }
 }
 @media (prefers-reduced-motion:reduce) { .luna-confirm-root,.luna-confirm-root * { animation:none!important;transition:none!important; } }
+
+/* One quiet, compact modal language for teleported forms and native club dialogs. */
+body.theme-app { --dialog-ink:#51443f; --dialog-title:#50372f; --dialog-muted:#78645b; --dialog-line:#eadbd3; --dialog-accent:#986c64; --dialog-cream:#fffdfa; }
+body.theme-app :is(.luna-modal-root .luna-modal,.club-dialog.luna-native-dialog,.luna-confirm-panel) {background:var(--dialog-cream);border:1px solid var(--dialog-line);color:var(--dialog-ink);box-shadow:0 18px 52px #432b2726;}
+body.theme-app :is(.luna-modal .inventory-create-modal__head,.club-dialog .club-dialog__header) {
+  background:linear-gradient(110deg,#faf1ec,#fffdfa 70%);padding:13px 16px;border-bottom:1px solid var(--dialog-line);gap:10px;
+}
+body.theme-app :is(.luna-modal-emblem,.club-dialog .club-dialog__icon) {width:37px;height:37px;border-radius:11px;background:#f1e2db;color:var(--dialog-accent)}
+body.theme-app :is(.luna-modal .inventory-create-modal__title,.club-dialog .club-dialog__header h2) {font-size:1.04rem;font-weight:750;line-height:1.45;color:var(--dialog-title)}
+body.theme-app :is(.luna-modal-subtitle,.club-dialog .club-dialog__header p) {font-size:.73rem;line-height:1.65;color:var(--dialog-muted);margin-top:3px}
+body.theme-app :is(.luna-modal .inventory-create-modal__close,.club-dialog .club-dialog__close) {width:36px;height:36px;min-width:36px;min-height:36px;border:1px solid #eddfd8;background:#fffaf7;border-radius:10px;color:var(--dialog-accent)}
+body.theme-app :is(.luna-modal .inventory-create-modal__scroll,.club-dialog .club-dialog__body) {padding:13px 16px;scrollbar-width:thin;scrollbar-color:#d8c4bb transparent;overscroll-behavior:contain}
+body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) {
+  display:flex;flex-flow:row-reverse wrap;justify-content:flex-start;gap:8px;padding:10px 16px max(10px,env(safe-area-inset-bottom,0px));background:#fffaf7;border-top:1px solid var(--dialog-line)
+}
+body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) :is(.btn-primary,.btn-secondary) {display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;border-radius:10px;box-shadow:none;font-size:.84rem;font-weight:650;padding:7px 15px;}
+body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) .btn-primary {color:#fff;background:#95675f;border:1px solid #95675f;}
+body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) .btn-secondary {color:#79534b;background:#fffdfa;border:1px solid #e3cec4;}
+body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) .btn-primary:hover:not(:disabled) {background:#82584f}
+body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) svg {width:17px;height:17px;flex:none}
+body.theme-app :is(.luna-modal,.club-dialog) :is(input,select,textarea).input-field {border:1px solid #e3d2c9;border-radius:9px;background:#fffdfa;color:var(--dialog-ink);box-shadow:none;min-width:0}
+body.theme-app :is(.luna-modal,.club-dialog) :is(input,select,textarea).input-field:focus {border-color:#ab8277;outline:0;box-shadow:0 0 0 3px #b58a8026}
+body.theme-app :is(.luna-modal,.club-dialog) [aria-invalid="true"].input-field {border-color:#b65350}
+body.theme-app :is(.luna-modal,.club-dialog) :is(.field-label,.club-form-field>label,.luna-field>label) {font-weight:650;font-size:.79rem;line-height:1.5;color:var(--dialog-title)}
+body.theme-app :is(.luna-modal,.club-dialog) :is(.errorlist,.luna-modal-errors) {color:#a7423d;font-size:.75rem;line-height:1.6;overflow-wrap:anywhere}
+body.theme-app :is(.luna-modal,.club-dialog) :is(.customer-form-checkbox,.service-form-checkbox) {display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #eee0d9;border-radius:9px;background:#faf3ee;color:var(--dialog-ink);min-height:36px;font-size:.79rem;}
+body.theme-app :is(.luna-modal,.club-dialog) input[type=checkbox] {accent-color:#9b7269}
+body.theme-app .luna-modal :is(.customer-form-advanced,.service-form-advanced,.appt-booking-advanced) {border-color:#eadbd3;border-radius:10px;background:#fbf4f0;box-shadow:none;}
+body.theme-app .luna-modal :is(.customer-form-advanced__toggle,.service-form-advanced__toggle,.appt-booking-advanced__toggle) {font-weight:650;font-size:.79rem;min-height:36px;color:var(--dialog-ink);}
+body.theme-app .luna-modal :is(.customer-form-file__btn,.service-form-file__btn) {border:1px solid #e4d1c8;background:#fffaf7;color:#875d53;border-radius:8px;min-height:34px;padding:6px 10px;box-shadow:none;}
+body.theme-app .luna-modal .appt-booking-section--modal {border-color:#ebddd6}
+body.theme-app .club-dialog.luna-native-dialog {border-radius:16px}
+body.theme-app .club-dialog.luna-native-dialog::backdrop {background:#35282659;backdrop-filter:blur(2px)}
+body.theme-app .luna-confirm-panel {padding:17px;border-radius:15px}
+body.theme-app .luna-confirm-panel :is(.btn-primary,.btn-public-ghost) {min-height:40px;font-size:.84rem;border-radius:10px}
+body.theme-app .maison-sheet:not(.luna-modal) {border:1px solid var(--dialog-line);background:var(--dialog-cream);box-shadow:0 12px 36px #432b271b}
+.luna-profile-body{display:grid;gap:10px;align-content:start}
+.luna-form-section{min-width:0;border:1px solid #ecded6;background:#fffdfa;border-radius:12px;padding:10px;display:grid;gap:9px}
+.luna-section-title{display:flex;align-items:center;gap:7px;color:#77534a;margin:0;min-width:0}
+.luna-section-title h3{font-size:.81rem;font-weight:750;margin:0}
+.luna-section-title svg{width:17px;height:17px;stroke-width:1.7;flex:none;color:#9b7166}
+.luna-section-title .luna-section-chevron{margin-inline-start:auto}
+.luna-form-grid,.luna-customer-edit-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:9px 11px;min-width:0}
+.luna-field{display:grid;gap:4px;min-width:0;align-content:start}
+.luna-field--full{grid-column:1/-1}
+.luna-field>label{display:flex;justify-content:space-between;gap:5px}
+.luna-field>label small{font-size:.66rem;color:#907c72;font-weight:400}
+body.theme-app .luna-profile-form textarea.input-field{min-height:52px;height:52px}
+.luna-upload{display:flex;gap:12px;align-items:center;min-width:0;border:1px solid #eee1da;background:#faf3ef;border-radius:11px;padding:10px;color:#51443f}
+.luna-upload__preview{width:56px;height:56px;display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid #e6cfc4;border-radius:50%;background:#eddbd2;color:#9a6f64;flex:none}
+.luna-upload__preview svg{width:25px;height:25px;stroke-width:1.5}
+.luna-upload__preview img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.luna-upload [hidden]{display:none!important}
+.luna-upload__copy{display:grid;gap:4px;min-width:0;flex:1}
+.luna-upload__copy strong{font-size:.82rem;font-weight:700}
+.luna-upload__copy small{font-size:.71rem;color:#78645b;overflow-wrap:anywhere}
+.luna-upload__actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.luna-upload__button{position:relative;display:inline-flex;align-items:center;gap:5px;min-height:31px;padding:5px 9px;background:#fffdfa;border:1px solid #e3cec4;border-radius:8px;font-size:.72rem;font-weight:650;color:#865b51;cursor:pointer}
+.luna-upload__button svg{width:15px;height:15px}
+.luna-upload__button input[type=file]{position:absolute;width:100%;height:100%;inset:0;opacity:0;cursor:pointer}
+.luna-upload__button:focus-within{outline:2px solid #9b7269;outline-offset:2px}
+.luna-upload__remove{display:inline-flex;align-items:center;gap:4px;font-size:.71rem;color:#9e514b;cursor:pointer}
+.luna-upload__remove input{accent-color:#a55b54}
+.luna-switch{position:relative;display:flex;justify-content:space-between;align-items:center;gap:6px;padding:8px;border:1px solid #eee1da;border-radius:9px;background:#faf4ef;cursor:pointer;min-height:47px}
+.luna-switch span{min-width:0;display:grid;gap:2px}.luna-switch strong{font-size:.77rem;font-weight:700}.luna-switch small{font-size:.66rem;color:#78645b}
+.luna-switch input{position:absolute;inset-inline-end:8px;inset-block-start:50%;transform:translateY(-50%);width:34px;height:22px;opacity:0;cursor:pointer}
+.luna-switch>i{display:flex;align-items:center;justify-content:flex-end;flex:none;width:34px;height:20px;padding:3px;border-radius:15px;background:#d7cbc5;pointer-events:none}
+.luna-switch>i:after{content:"";width:14px;height:14px;border-radius:50%;background:white}
+.luna-switch input:checked+i{background:#77967b;justify-content:flex-start}
+.luna-switch input:focus-visible+i{outline:2px solid #956d65;outline-offset:2px}
+.luna-color-field{min-width:0;margin:0;padding:0;border:0}.luna-color-field legend{font-size:.77rem;font-weight:650;margin-bottom:5px;color:#50372f}
+.luna-profile-form .staff-calendar-color-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.luna-profile-form .staff-calendar-color-picker label{position:relative;display:flex;gap:5px;min-height:32px;padding:5px 6px;font-size:.66rem;border:1px solid #eee0d9;background:#fffdfa;border-radius:8px;line-height:1.4}
+.luna-profile-form .staff-calendar-color-picker label:before{content:"";width:13px;height:13px;border-radius:50%;background:#eee1da;border:1px solid #0001;flex:none}
+.luna-profile-form .staff-calendar-color-picker label:has(input[value="#BBA5CB"]):before{background:#BBA5CB}
+.luna-profile-form .staff-calendar-color-picker label:has(input[value="#A8BFA5"]):before{background:#A8BFA5}
+.luna-profile-form .staff-calendar-color-picker label:has(input[value="#9CB6C5"]):before{background:#9CB6C5}
+.luna-profile-form .staff-calendar-color-picker label:has(input[value="#B99183"]):before{background:#B99183}
+.luna-profile-form .staff-calendar-color-picker label:has(input[value="#D5BC83"]):before{background:#D5BC83}
+.luna-profile-form .staff-calendar-color-picker label:has(input:checked){border-color:#af857b;background:#f7ebe5}
+.luna-profile-form .staff-calendar-color-picker label:has(input:focus-visible){outline:2px solid #956d65;outline-offset:2px}
+.luna-service-section summary{cursor:pointer;list-style:none;min-height:24px}.luna-service-section summary::-webkit-details-marker{display:none}
+.luna-service-section[open] .luna-section-chevron{transform:rotate(180deg)}
+.luna-section-hint{font-size:.72rem;color:#78645b;margin:5px 0}
+.luna-service-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:5px}
+.luna-service-choices label{font-size:.75rem;display:flex;align-items:center;gap:5px;padding:6px;border:1px solid #eee0d9;border-radius:8px;overflow-wrap:anywhere}
+.luna-service-choices label:has(input:checked){background:#f5e8e2;border-color:#d9b9ac}
+.luna-service-choices input{flex:none}
+@media(min-width:640px){
+ body.theme-app :is(.luna-modal-root .luna-modal,.club-dialog.luna-native-dialog){border-radius:16px}
+ body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) .btn-primary{min-width:112px;flex:0 1 auto}
+ body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) .btn-secondary{min-width:80px;flex:0 1 auto}
+ .luna-form-grid,.luna-customer-edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .luna-customer-edit-grid>:not([hidden]){margin:0}
+ .luna-profile-body{gap:8px}
+}
+@media(max-width:639px){
+ body.theme-app :is(.luna-modal .inventory-create-modal__head,.club-dialog .club-dialog__header){padding:11px 13px}
+ body.theme-app :is(.luna-modal .inventory-create-modal__scroll,.club-dialog .club-dialog__body){padding:11px 13px}
+ body.theme-app :is(.luna-modal .inventory-create-modal__foot,.club-dialog .club-dialog__footer) :is(.btn-primary,.btn-secondary){min-height:44px;flex:1 1 0}
+ .luna-switch-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .luna-profile-form .staff-calendar-color-picker{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .luna-service-choices{grid-template-columns:minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:reduce){.luna-switch>i,.luna-section-chevron{transition:none}}

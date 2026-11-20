@@ -46,6 +46,32 @@
       else if(event.shiftKey && current===first) { event.preventDefault(); last.focus(); }
       else if(!event.shiftKey && current===last) { event.preventDefault(); first.focus(); }
     });
+    // Form-native image fields keep Django's clear checkbox and multipart submission.
+    document.addEventListener("change", event => {
+      const input=event.target;
+      const wrap=input.closest?.("[data-luna-upload]");
+      if(!wrap) return;
+      const file=wrap.querySelector("input[type=file]");
+      const clear=wrap.querySelector("input[type=checkbox]");
+      const img=wrap.querySelector("[data-luna-preview]");
+      const text=wrap.querySelector("[data-luna-file-name]");
+      if(!file || !img || !text) return;
+      if(input===clear && clear.checked) file.value="";
+      if(input===file && file.files.length && clear) clear.checked=false;
+      if(img.dataset.objectUrl){ URL.revokeObjectURL(img.dataset.objectUrl); delete img.dataset.objectUrl; }
+      const selected=file.files[0];
+      const original=img.dataset.originalSrc || "";
+      const removed=!!clear?.checked;
+      if(selected && selected.type.startsWith("image/")){
+        img.dataset.objectUrl=URL.createObjectURL(selected);
+        img.src=img.dataset.objectUrl;
+      }else if(original && !removed){img.src=original;}
+      else {img.removeAttribute("src");}
+      img.hidden=!img.hasAttribute("src");
+      const preview=wrap.querySelector(".luna-upload__preview svg,.luna-upload__preview i");
+      if(preview) preview.toggleAttribute("hidden",!img.hidden);
+      text.textContent=selected?selected.name:removed?"تصویر در زمان ذخیره حذف می‌شود":original?"تصویر فعلی ذخیره شده است":"یک تصویر انتخاب کنید";
+    });
     queue();
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init,{once:true}); else init();

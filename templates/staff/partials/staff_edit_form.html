@@ -1,36 +1,33 @@
-<form
-  method="post"
-  action="{% url 'staff:edit' pk=profile.pk %}"
-  enctype="multipart/form-data"
-  class="inventory-create-modal__form customer-form"
-  id="staff-edit-form"
->
+<form method="post" action="{% url 'staff:edit' pk=profile.pk %}" enctype="multipart/form-data" class="inventory-create-modal__form customer-form luna-profile-form" id="staff-edit-form">
   {% csrf_token %}
-  {% if form.non_field_errors %}
-    <p class="customer-form-field__error inventory-create-modal__form-error">{{ form.non_field_errors.0 }}</p>
-  {% endif %}
-
-  <div class="inventory-create-modal__scroll maison-scroll-themed">
-    <div class="customer-form__fields customer-form__fields--modal space-y-3">
-      {% for field in form.visible_fields %}
-      <div class="customer-form-field{% if field.field.widget.input_type == 'checkbox' %} customer-form-field--checkbox{% endif %}">
-        {% if field.field.widget.input_type == 'checkbox' %}
-        <label class="customer-form-checkbox">
-          {{ field }}
-          <span>{{ field.label }}</span>
-        </label>
-        {% else %}
-        <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% endif %}
-        {% if field.errors %}<p class="customer-form-field__error">{{ field.errors.0 }}</p>{% endif %}
+  {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+  <div class="inventory-create-modal__scroll maison-scroll-themed luna-profile-body">
+    {% if form.non_field_errors %}<div class="luna-modal-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <section class="luna-form-section" aria-label="اطلاعات فردی">
+      <div class="luna-section-title"><i data-lucide="user-round" aria-hidden="true"></i><h3>اطلاعات فردی</h3></div>
+      {{ form.avatar }}{{ form.avatar.errors }}
+      <div class="luna-form-grid">
+        <div class="luna-field"><label for="{{ form.display_name.id_for_label }}">نام و نام خانوادگی</label>{{ form.display_name }}{{ form.display_name.errors }}</div>
+        <div class="luna-field"><label for="{{ form.title.id_for_label }}">تخصص</label>{{ form.title }}{{ form.title.errors }}</div>
+        <div class="luna-field luna-field--full"><label for="{{ form.bio.id_for_label }}">بیوگرافی <small>اختیاری</small></label>{{ form.bio }}{{ form.bio.errors }}</div>
       </div>
-      {% endfor %}
-    </div>
+    </section>
+    <section class="luna-form-section" aria-label="تنظیمات کاری">
+      <div class="luna-section-title"><i data-lucide="sliders-horizontal" aria-hidden="true"></i><h3>تنظیمات کاری</h3></div>
+      <div class="luna-form-grid luna-switch-grid">
+        <div><label class="luna-switch"><span><strong>فعال</strong><small>عضو فعال تیم سالن</small></span>{{ form.is_active }}<i aria-hidden="true"></i></label>{{ form.is_active.errors }}</div>
+        <div><label class="luna-switch"><span><strong>قابل رزرو</strong><small>امکان ثبت نوبت</small></span>{{ form.is_bookable }}<i aria-hidden="true"></i></label>{{ form.is_bookable.errors }}</div>
+      </div>
+      <fieldset class="luna-color-field"><legend>رنگ تقویم</legend>{{ form.calendar_color }}{{ form.calendar_color.errors }}</fieldset>
+    </section>
+    <details class="luna-form-section luna-service-section" {% if form.services.errors %}open{% endif %}>
+      <summary class="luna-section-title"><i data-lucide="scissors" aria-hidden="true"></i><h3>خدمات قابل ارائه</h3><i class="luna-section-chevron" data-lucide="chevron-down" aria-hidden="true"></i></summary>
+      <p class="luna-section-hint">خدمات مربوط به این متخصص را انتخاب کنید.</p>
+      {{ form.services }}{{ form.services.errors }}
+    </details>
   </div>
-
   <footer class="inventory-create-modal__foot">
-    <button type="submit" class="btn-primary customer-form__submit-modal">ذخیره</button>
+    <button type="submit" class="btn-primary customer-form__submit-modal"><i data-lucide="check" aria-hidden="true"></i>ذخیره تغییرات</button>
     <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-modal')">انصراف</button>
   </footer>
 </form>

@@ -4,6 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from apps.core.forms import PersianForm, PersianModelForm
+from apps.core.modal_widgets import ProfileImageWidget
 from apps.core.widgets import JalaliDateWidget
 from apps.core.utils.phone import normalize_iran_mobile
 from apps.services.models import Service
@@ -85,14 +86,16 @@ class StaffProfileForm(PersianModelForm):
             "display_name": forms.TextInput(attrs={"class": "input-field"}),
             "title": forms.TextInput(attrs={"class": "input-field"}),
             "bio": forms.Textarea(attrs={"class": "input-field", "rows": 3}),
-            "avatar": forms.ClearableFileInput(attrs={"class": "input-field", "accept": "image/*"}),
-            "services": forms.SelectMultiple(attrs={"class": "input-field"}),
+            "avatar": ProfileImageWidget(attrs={"accept": "image/*"}),
+            "services": forms.CheckboxSelectMultiple(attrs={"class": "luna-service-choices"}),
             "calendar_color": forms.RadioSelect(attrs={"class": "staff-calendar-color-picker"}),
         }
 
     def __init__(self, *args, salon=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.salon = salon
+        self.fields["display_name"].label = "نام و نام خانوادگی"
+        self.fields["title"].label = "تخصص"
         self.fields["avatar"].label = "عکس پروفایل"
         self.fields["avatar"].required = False
         self.fields["calendar_color"].label = "رنگ تقویم"

@@ -221,6 +221,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 errors.append(f"{width}/{name} interaction: {exc}")
         modal("/customers/",".customers-list-page__add","مشتری جدید")
         modal("/staff/",".staff-team-page__add","افزودن متخصص")
+        modal(reverse("staff:detail",args=[staff.pk]),"button.staff-profile-header__btn:has-text('ویرایش')","ویرایش پروفایل")
         # Native loyalty dialogs keep forms in the parent view and return focus on Escape.
         for route,dialog_id in [("overview","club-adjust"),("overview","club-program"),("rewards","club-reward"),("rewards","club-redeem"),("referrals","club-referral"),("vouchers","club-voucher"),("memberships","club-membership")]:
             try:
@@ -411,7 +412,8 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         import jdatetime
         month=next(m for m in range(1,13) if (jdatetime.date(1405,m,1).weekday() + (31 if m<=6 else 30 if m<=11 else 29))>35)
         calendar.get_by_label("انتخاب ماه",exact=True).select_option(str(month))
-        pw.expect(calendar.get_by_role("gridcell")).to_have_count(42)
+        assert calendar.locator(".jalali-date__grid > button").count() == 42
+        pw.expect(calendar.get_by_label("انتخاب ماه", exact=True)).to_have_value(str(month))
         assert_compact()
         calendar.get_by_label("انتخاب سال",exact=True).select_option("1403")
         calendar.get_by_label("انتخاب ماه",exact=True).select_option("12")

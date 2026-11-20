@@ -1,0 +1,4 @@
+# Editorial Rose modal refresh
+- One visual system in luna-modals.css for the eleven shared Alpine form dialogs, seven native loyalty forms, logout confirmation, and existing workspace action sheets. Existing dimensions, close handlers, CSRF, endpoints and calendar layer retained.
+- Staff editor uses explicit individual details, profile image upload/removal, work switches, palette swatches, and collapsible actual service checkboxes. Avatar widget retains Django's native multipart and clear protocol; browser filename/preview uses local blob only. Customer editor uses the same image widget. Long bodies can scroll while headers/actions remain visible; no decorative side image that consumes form space.
+- No migration or business logic change. Browser regression adds staff editor and corrects the calendar six-row assertion to count real layout cells, including empty cells.
