@@ -21,6 +21,7 @@ npm run build:css
 $env:DJANGO_SETTINGS_MODULE="config.settings.local"
 python manage.py migrate
 python manage.py seed_demo --scenario full
+python manage.py seed_demo_salon --reset   # women's demo salon (demo-salon-a only)
 python manage.py runserver
 ```
 
