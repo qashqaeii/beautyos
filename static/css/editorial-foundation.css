@@ -58,3 +58,11 @@
     transition-duration: .01ms !important; scroll-behavior: auto !important;
   }
 }
+
+/* Inline report date picker: direct month/year selection without a larger popover. */
+.jalali-date__popover-head--direct { gap: 4px; padding-bottom: 7px; }
+.jalali-date__direct-selects { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr); gap: 5px; flex: 1; min-width: 0; }
+.jalali-date__direct-select { min-width: 0; width: 100%; min-height: 34px; padding: 4px 5px; border: 1px solid #e5d6cf; border-radius: 8px; background: #fffaf7; color: #51443f; font: inherit; font-size: .78rem; font-weight: 650; }
+.jalali-date__direct-select:focus-visible { outline: 2px solid #9d726e; outline-offset: 1px; }
+.jalali-date__popover-head--direct .jalali-date__nav:disabled { opacity: .35; }
+@media(max-width:639px) { .jalali-date__direct-select { min-height: 40px; font-size: 1rem; } }

@@ -33,7 +33,25 @@
         />
       </header>
     </template>
-    <template x-if="!birthPicker">
+    <template x-if="directNavigation">
+      <header class="jalali-date__popover-head jalali-date__popover-head--direct">
+        <button type="button" class="jalali-date__nav" @click.stop="prevMonth()" :disabled="!canMoveMonth(-1)" aria-label="ماه قبل">
+          <span class="jalali-date__nav-icon" aria-hidden="true">›</span>
+        </button>
+        <div class="jalali-date__direct-selects">
+          <select class="jalali-date__direct-select" x-model.number="viewJm" @change="setViewMonth(Number($event.target.value))" aria-label="انتخاب ماه">
+            <template x-for="month in monthOptions" :key="month.value"><option :value="month.value" :disabled="month.disabled" x-text="month.label"></option></template>
+          </select>
+          <select class="jalali-date__direct-select" x-model.number="viewJy" @change="setViewYear(Number($event.target.value))" aria-label="انتخاب سال">
+            <template x-for="year in yearOptions" :key="year.value"><option :value="year.value" x-text="year.label"></option></template>
+          </select>
+        </div>
+        <button type="button" class="jalali-date__nav" @click.stop="nextMonth()" :disabled="!canMoveMonth(1)" aria-label="ماه بعد">
+          <span class="jalali-date__nav-icon" aria-hidden="true">‹</span>
+        </button>
+      </header>
+    </template>
+    <template x-if="!birthPicker && !directNavigation">
       <header class="jalali-date__popover-head">
         <button type="button" class="jalali-date__nav" @click.stop="prevMonth()" aria-label="ماه قبل">
           <span class="jalali-date__nav-icon" aria-hidden="true">›</span>

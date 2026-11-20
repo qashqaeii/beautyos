@@ -25,14 +25,8 @@
   const WEEKDAYS_FA = ["ش", "ی", "د", "س", "چ", "پ", "ج"]; /* شنبه … جمعه */
 
   function jalaliIsLeap(jy) {
-    const breaks = [1, 5, 9, 13, 17, 22, 26, 30];
-    const bl = jy - (jy >= 0 ? 474 : 473);
-    const gy = 474 + (bl % 2820);
-    let leap = 0;
-    for (let i = 0; i < breaks.length; i++) {
-      if (gy === breaks[i]) leap = 1;
-    }
-    return (((gy + 2346) % 2820) + leap + 2816) % 2816 < 681;
+    // Match jdatetime's 33-year leap cycle used by the Django backend.
+    return [1, 5, 9, 13, 17, 22, 26, 30].includes(((jy % 33) + 33) % 33);
   }
 
   function jalaliMonthLength(jy, jm) {
@@ -75,14 +69,14 @@
   }
 
   function jalaliToGregorian(jy, jm, jd) {
-    jy -= jy >= 0 ? 979 : 978;
+    jy -= 979;
     let days =
       365 * jy +
       Math.floor(jy / 33) * 8 +
       Math.floor(((jy % 33) + 3) / 4) +
       (jm < 7 ? (jm - 1) * 31 : (jm - 7) * 30 + 186) +
-      jd -
-      1;
+      jd +
+      78; // Gregorian epoch offset; inverse of the -80 in gregorianToJalali.
     let gy = 1600 + 400 * Math.floor(days / 146097);
     days %= 146097;
     if (days > 36524) {
@@ -92,8 +86,10 @@
     }
     gy += 4 * Math.floor(days / 1461);
     days %= 1461;
-    gy += Math.floor((days - 1) / 365);
-    if (days > 365) days = (days - 1) % 365;
+    if (days > 365) {
+      gy += Math.floor((days - 1) / 365);
+      days = (days - 1) % 365;
+    }
     const gd_m = [0, 31, (gy % 4 === 0 && gy % 100 !== 0) || gy % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     let gm = 0;
     let gd = days + 1;
@@ -205,6 +201,7 @@
   function jalaliPopoverMixin() {
     return {
       birthPicker: false,
+      directNavigation: false,
       popoverStyle: {},
       popoverPlacement: "below",
       jalaliDismissPointer(event) {
@@ -746,8 +743,13 @@
       },
     }));
 
-    Alpine.data("jalaliDaySubmit", (initialIso) => ({
+    Alpine.data("jalaliDaySubmit", (initialIso, serverToday) => ({
       ...jalaliPopoverMixin(),
+      directNavigation: true,
+      monthsFaList: MONTHS_FA,
+      minIso: "1900-01-01",
+      maxIso: "2200-12-31",
+      _dayForm: null,
       iso: initialIso || todayIso(),
       display: displayFromIso(initialIso || todayIso()),
       open: false,
@@ -755,11 +757,52 @@
       viewJm: 1,
       weekdays: WEEKDAYS_FA,
       init() {
+        // Capture the original form before the calendar is teleported into body.
+        this._dayForm = this.$el.closest("form");
         const j = jalaliFromIso(this.iso) || jalaliFromIso(todayIso());
         this.viewJy = j.jy;
         this.viewJm = j.jm;
         this.display = displayFromIso(this.iso);
         this.$nextTick(() => lucideRefreshIn(this.$el));
+      },
+      get yearOptions() {
+        const first = jalaliFromIso(this.minIso).jy;
+        const last = jalaliFromIso(this.maxIso).jy;
+        return Array.from({ length: last-first+1 }, (_, i) => ({value:first+i,label:toFa(first+i)}));
+      },
+      get monthOptions() {
+        return MONTHS_FA.map((label,i)=>({value:i+1,label,disabled:!this.monthInBounds(this.viewJy,i+1)}));
+      },
+      monthInBounds(jy,jm) {
+        return isoFromJalali(jy,jm,1)<=this.maxIso &&
+          isoFromJalali(jy,jm,jalaliMonthLength(jy,jm))>=this.minIso;
+      },
+      isIsoDisabled(iso) {
+        return !iso || iso<this.minIso || iso>this.maxIso;
+      },
+      setViewYear(year) {
+        const first=jalaliFromIso(this.minIso),last=jalaliFromIso(this.maxIso);
+        if (!Number.isInteger(year) || year<first.jy || year>last.jy) return;
+        this.viewJy=year;
+        if (year===first.jy) this.viewJm=Math.max(first.jm,this.viewJm);
+        if (year===last.jy) this.viewJm=Math.min(last.jm,this.viewJm);
+      },
+      setViewMonth(month) {
+        if (Number.isInteger(month) && month>=1 && month<=12 && this.monthInBounds(this.viewJy,month)) this.viewJm=month;
+      },
+      shiftedMonth(delta) {
+        const index=this.viewJy*12+this.viewJm-1+delta;
+        return {jy:Math.floor(index/12),jm:index%12+1};
+      },
+      canMoveMonth(delta) {
+        const {jy,jm}=this.shiftedMonth(delta);
+        return this.monthInBounds(jy,jm);
+      },
+      moveMonth(delta) {
+        if (!this.canMoveMonth(delta)) return;
+        const {jy,jm}=this.shiftedMonth(delta);
+        this.viewJy=jy;
+        this.viewJm=jm;
       },
       get monthLabelFa() {
         return `${MONTHS_FA[this.viewJm - 1]} ${toFa(this.viewJy)}`;
@@ -768,7 +811,7 @@
         const len = jalaliMonthLength(this.viewJy, this.viewJm);
         const firstWd = jalaliWeekday(this.viewJy, this.viewJm, 1);
         const cells = [];
-        const today = todayIso();
+        const today = serverToday || todayIso();
         for (let i = 0; i < firstWd; i++) cells.push({ inMonth: false, label: "" });
         for (let d = 1; d <= len; d++) {
           const iso = isoFromJalali(this.viewJy, this.viewJm, d);
@@ -780,32 +823,26 @@
             label: toFa(d),
             selected: this.iso === iso,
             today: today === iso,
+            disabled: this.isIsoDisabled(iso),
           });
         }
         while (cells.length % 7 !== 0) cells.push({ inMonth: false, label: "" });
         return cells;
       },
-      prevMonth() {
-        if (this.viewJm === 1) {
-          this.viewJm = 12;
-          this.viewJy -= 1;
-        } else this.viewJm -= 1;
-      },
-      nextMonth() {
-        if (this.viewJm === 12) {
-          this.viewJm = 1;
-          this.viewJy += 1;
-        } else this.viewJm += 1;
-      },
+      prevMonth() { this.moveMonth(-1); },
+      nextMonth() { this.moveMonth(1); },
       pick(cell) {
-        if (!cell.inMonth) return;
-        this.iso = isoFromJalali(cell.jy, cell.jm, cell.jd);
+        if (!cell.inMonth || cell.disabled) return;
+        const iso = isoFromJalali(cell.jy, cell.jm, cell.jd);
+        if (this.isIsoDisabled(iso)) return;
+        this.iso = iso;
         this.display = displayFromIso(this.iso);
         this.closeCalendar();
         this.submitDayForm();
       },
       pickToday() {
-        const iso = todayIso();
+        const iso = serverToday || todayIso();
+        if (this.isIsoDisabled(iso)) return;
         this.iso = iso;
         this.display = displayFromIso(iso);
         const j = jalaliFromIso(iso);
@@ -817,7 +854,7 @@
         this.submitDayForm();
       },
       submitDayForm() {
-        const form = this.$el.closest("form");
+        const form = this._dayForm;
         if (!form) return;
         const hidden = form.querySelector('[name="day"]');
         if (hidden) hidden.value = this.iso;

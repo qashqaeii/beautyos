@@ -2,7 +2,7 @@
 <div
   class="jalali-date jalali-date--inline"
   data-jalali-date
-  x-data="jalaliDaySubmit('{{ iso_day|default:'' }}')"
+  x-data="jalaliDaySubmit('{{ iso_day|default:''|escapejs }}', '{{ today_iso|default:''|escapejs }}')"
   @keydown.escape.window="closeCalendar()"
   @pointerdown.window="jalaliDismissPointer($event)"
 >
@@ -14,11 +14,12 @@
     @pointerdown.stop
     @click.stop.prevent="toggleCalendar()"
     :aria-expanded="open"
+    aria-haspopup="dialog"
     aria-label="باز کردن تقویم شمسی"
   >
     <i data-lucide="calendar-days" class="jalali-date__inline-trigger-icon" aria-hidden="true"></i>
     <span class="jalali-date__inline-trigger-label tabular-nums" x-text="display">{{ fallback_jalali|default:''|persian_digits }}</span>
   </button>
-  <input type="hidden" name="day" :value="iso" />
+  <input type="hidden" name="day" value="{{ iso_day|default:'' }}" :value="iso" />
   {% include "partials/jalali_calendar_popover.html" %}
 </div>

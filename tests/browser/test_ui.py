@@ -374,3 +374,46 @@ def test_overview_populated_notebook_first_fold(live_server, client, owner_membe
         assert page.locator(".overview-chart-details").evaluate("(el) => el.open")
         context.close()
         browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(360,800),(1366,640)])
+def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_membership, width, height):
+    from urllib.parse import parse_qs
+    client.force_login(owner_membership.user)
+    session=client.session
+    session["active_salon_id"]=str(owner_membership.salon_id)
+    session.save()
+    with pw.sync_playwright() as playwright:
+        browser=playwright.chromium.launch(headless=True)
+        context=browser.new_context(viewport={"width":width,"height":height},locale="fa-IR",reduced_motion="reduce")
+        context.add_cookies([{"name":settings.SESSION_COOKIE_NAME,"value":client.cookies[settings.SESSION_COOKIE_NAME].value,"url":live_server.url}])
+        page=context.new_page()
+        errors=[]
+        page.on("pageerror",lambda error:errors.append(str(error)))
+        page.goto(live_server.url+"/app/?day=2026-11-20&range=week&trend=30",wait_until="load")
+        trigger=page.locator(".dash-page-header__jalali-form [data-jalali-calendar-trigger]")
+        pw.expect(trigger).to_contain_text("۱۴۰۵/۰۸/۲۹")
+        trigger.click()
+        calendar=page.locator(".jalali-date__popover--portal:visible")
+        pw.expect(calendar.get_by_role("gridcell",name="۲۹",exact=True)).to_have_attribute("aria-current","date")
+        calendar.get_by_label("انتخاب سال",exact=True).select_option("1403")
+        calendar.get_by_label("انتخاب ماه",exact=True).select_option("12")
+        pw.expect(calendar.get_by_role("gridcell",name="۳۰",exact=True)).to_be_enabled()
+        with page.expect_navigation(wait_until="load"):
+            calendar.get_by_role("gridcell",name="۳۰",exact=True).click()
+        assert parse_qs(urlsplit(page.url).query)=={"day":["2025-03-20"],"range":["week"],"trend":["30"]}
+        pw.expect(trigger).to_contain_text("۱۴۰۳/۱۲/۳۰")
+        trigger.click()
+        calendar.get_by_label("انتخاب سال",exact=True).select_option("1404")
+        pw.expect(calendar.get_by_role("gridcell",name="۳۰",exact=True)).to_have_count(0)
+        calendar.get_by_role("button",name="ماه بعد",exact=True).click()
+        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_value("1405")
+        pw.expect(calendar.get_by_label("انتخاب ماه",exact=True)).to_have_value("1")
+        with page.expect_navigation(wait_until="load"):
+            calendar.get_by_role("gridcell",name="۱",exact=True).click()
+        pw.expect(trigger).to_contain_text("۱۴۰۵/۰۱/۰۱")
+        assert parse_qs(urlsplit(page.url).query)["day"]==["2026-03-21"]
+        assert not errors
+        context.close()
+        browser.close()
