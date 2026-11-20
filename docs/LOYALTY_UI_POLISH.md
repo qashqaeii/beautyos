@@ -1,0 +1,4 @@
+# Loyalty UI / Editorial Rose
+- Approved reference: photo banner, compact toolbar, policy state, 4+3 feature cards, horizontal real KPI tiles, grouped tier cards and member ranking. Reuses the locally hosted finance hero still life; no fake data or decorative imagery in dialogs.
+- Native modal forms: policy, adjust, reward creation/redemption, referral, voucher and membership purchase. Existing URLs, permissions, POST/CSRF and validations preserved; invalid form opens automatically and keeps field values. Program route remains usable independently. Long lists, history, birthdays and insights stay as dedicated views.
+- Shared responsive styling, local JS, native modal focus/escape, bounded height and visible footer; no dashboard inner scroll. Browser QA covers all seven dialogs at existing three viewport sizes.

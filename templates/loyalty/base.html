@@ -1,0 +1,8 @@
+{% extends "layouts/app_shell.html" %}
+{% block extra_head %}{% include "loyalty/partials/assets.html" %}{% endblock %}
+{% block content %}
+<div class="club-subpage">
+  <nav class="club-breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'loyalty:overview' %}"><i data-lucide="arrow-right" aria-hidden="true"></i>بازگشت به باشگاه مشتریان</a></nav>
+  {% block club_content %}{% endblock %}
+</div>
+{% endblock %}

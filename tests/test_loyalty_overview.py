@@ -51,3 +51,21 @@ def test_loyalty_member_detail(client, salon, owner_membership):
     response = client.get(reverse("loyalty:member", kwargs={"pk": account.pk}))
     assert response.status_code == 200
     assert account.customer.full_name in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_club_dialog_bound_errors_and_policy(client,salon,owner_membership):
+    client.force_login(owner_membership.user)
+    response=client.get(reverse("loyalty:overview"))
+    assert response.status_code==200
+    assert b'id="club-program"' in response.content and b'id="club-adjust"' in response.content
+    response=client.post(reverse("loyalty:overview"),{"action":"adjust","points_delta":"2"})
+    assert response.status_code==200 and response.context["adjust_form"].errors
+    assert b"data-club-autopen" in response.content
+    response=client.post(reverse("loyalty:program"),{"origin":"overview","enabled":"on","spend_per_point_toman":"1","visit_points":"5"})
+    assert response.status_code==200 and response.context["policy_form"].errors
+    assert b'id="club-program"' in response.content and b"data-club-autopen" in response.content
+    response=client.post(reverse("loyalty:program"),{"origin":"overview","enabled":"on","spend_per_point_toman":"100000","visit_points":"5"})
+    assert response.status_code==302
+    from apps.loyalty.models import LoyaltyPolicy
+    assert LoyaltyPolicy.scoped(salon).get().enabled

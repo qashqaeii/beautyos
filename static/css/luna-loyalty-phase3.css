@@ -11,3 +11,75 @@
 
 @media(min-width:850px){.loyalty-phase3-nav{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .loyalty-insight-bar{height:7px;border-radius:10px;background:#eee0da;overflow:hidden}.loyalty-insight-bar span{display:block;height:100%;background:#9d726e;border-radius:10px}.loyalty-insight-kpi{min-height:90px;align-content:center}.loyalty-insight-kpi strong{font-size:1.45rem}
+
+/* Editorial Rose loyalty dashboard. Scoped to loyalty; global shell remains unchanged. */
+.club-shell .maison-content{max-width:100rem;padding:14px 16px 26px}
+.club-dashboard{--club-ink:#503b35;--club-muted:#75635d;--club-line:#eadbd4;--club-paper:#fffaf8;--club-rose:#986b65;display:grid;gap:12px;width:100%;max-width:none;min-width:0;color:var(--club-ink);padding-block:0 22px}
+.club-hero{position:relative;display:flex;align-items:center;min-height:135px;isolation:isolate;overflow:hidden;border:1px solid #e8d4cc;border-radius:18px;background:linear-gradient(110deg,#efdbd2,#fbf2ee 65%);padding:20px}
+.club-hero__art{position:absolute;inset:0 auto 0 0;width:54%;z-index:-1;overflow:hidden}
+.club-hero__art img{width:100%;height:100%;object-fit:cover;object-position:left center}
+.club-hero__art::after{content:"";position:absolute;inset:0;background:linear-gradient(to right,transparent 40%,#fbf2ee 100%)}
+.club-hero__copy{display:flex;align-items:center;gap:14px;min-width:0;max-width:57%}
+.club-hero__icon,.club-program__icon,.club-kpi-icon{display:grid;place-items:center;flex:none;color:#98665d;background:#f0dfd7;border-radius:12px}
+.club-hero__icon{width:55px;height:55px}.club-hero__icon svg{width:29px;height:29px;stroke-width:1.6}
+.club-hero h1{font-size:clamp(1.24rem,2.4vw,1.95rem);line-height:1.5;font-weight:750;color:var(--club-ink)}
+.club-hero p{font-size:.8rem;line-height:1.7;color:var(--club-muted);margin-top:4px}
+.club-workspace{display:grid;gap:12px;min-width:0}
+.club-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.club-toolbar__label{display:flex;gap:7px;align-items:center;font-size:.78rem;color:#78655d;font-weight:600}
+.club-toolbar__actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.club-toolbar__actions :is(a,button){display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;font-size:.78rem}
+.club-toolbar__actions svg,.club-toolbar__label svg{width:17px;height:17px;stroke-width:1.7;flex:none}
+.club-program{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--club-line);border-radius:15px;background:var(--club-paper);box-shadow:0 3px 11px #63433b08}
+.club-program__icon{width:40px;height:40px}.club-program__icon svg{width:22px;height:22px;stroke-width:1.65}
+.club-program h2{font-size:.9rem;font-weight:700}.club-program p{font-size:.75rem;color:var(--club-muted);line-height:1.8;margin-top:3px}
+.club-status{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-size:.72rem;font-weight:650;color:#83574e;background:#f5e3de;border-radius:8px;padding:7px 10px}.club-status i{width:7px;height:7px;border-radius:50%;background:#ae7b71}.club-status--on{background:#e4efdf;color:#3e6848}.club-status--on i{background:#5d885d}
+.club-program__control{display:grid;place-items:center;min-width:44px;min-height:40px}.club-status-track{display:flex;align-items:center;justify-content:flex-end;width:42px;height:24px;padding:3px;border-radius:20px;background:#d9d3d0;border:1px solid #c9c1bc}.club-status-track i{width:17px;height:17px;border-radius:50%;background:white;box-shadow:0 1px 3px #332c2730}.club-status-track.is-on{justify-content:flex-start;background:#739678;border-color:#64896b}
+.club-dashboard .club-feature-nav{margin:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.club-dashboard .club-feature-nav a{min-height:48px;border-radius:12px;box-shadow:0 2px 8px #63433b06;background:var(--club-paper);font-weight:650}
+.club-dashboard .club-feature-nav a:last-child{grid-column:1/-1}
+.club-dashboard .club-feature-nav a.club-feature-nav__highlight{background:linear-gradient(115deg,#b58a83,#976b66);border-color:#a77a73;color:#fff}
+.club-dashboard .club-feature-nav a.club-feature-nav__highlight svg{color:#fff}
+.club-dashboard .club-feature-nav a:hover{border-color:#b48b80;box-shadow:0 3px 11px #63433b15}
+.club-dashboard .loyalty-stats-grid{margin:0;gap:9px}
+.maison-app .club-dashboard .loyalty-stat{display:flex;align-items:flex-start;gap:11px;padding:13px;min-height:100px;border:1px solid var(--club-line);border-radius:14px;background:var(--club-paper);box-shadow:0 4px 14px #63433b09}
+.club-kpi-icon{width:39px;height:39px}.club-kpi-icon svg{width:22px;height:22px;stroke-width:1.65}.club-kpi-icon--sage{background:#e7eee0;color:#527454}
+.club-kpis .loyalty-stat>div{min-width:0;flex:1}.club-kpis .loyalty-stat__label{font-size:.76rem;color:var(--club-muted);line-height:1.6}
+.club-kpis .loyalty-stat__value{font-size:clamp(1.18rem,2vw,1.7rem);color:var(--club-ink);font-weight:750;line-height:1.4;overflow-wrap:anywhere;margin:4px 0}.club-kpis small{font-size:.68rem;color:var(--club-muted);line-height:1.6}
+.club-tiers{padding:13px;border:1px solid var(--club-line);border-radius:15px;background:var(--club-paper);box-shadow:0 3px 11px #63433b08}
+.club-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.club-section-head h2,.club-dashboard .loyalty-panel__heading{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.94rem;color:var(--club-ink);margin:0}.club-section-head h2 svg,.club-dashboard .loyalty-panel__heading svg{color:var(--club-rose);width:22px;height:22px;stroke-width:1.65;flex:none}.club-section-head>span{color:var(--club-muted);font-size:.69rem}
+.club-dashboard .loyalty-tier-grid{margin:0;gap:8px}
+.club-dashboard .loyalty-tier-chip{display:flex;gap:10px;align-items:center;border:1px solid #ffffffc9;padding:11px 12px;min-width:0;min-height:81px;border-radius:12px;box-shadow:inset 0 0 0 1px #ffffff5c;position:relative;overflow:hidden}
+.club-tier-icon{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#ffffff66}.club-tier-icon svg{width:23px;height:23px;stroke-width:1.6}
+.club-dashboard .loyalty-tier-chip--standard{background:linear-gradient(123deg,#f3f3e8,#dce5d3);color:#4c704a}
+.club-dashboard .loyalty-tier-chip--silver{background:linear-gradient(123deg,#f8f7f6,#e3dedc);color:#716e72}
+.club-dashboard .loyalty-tier-chip--gold{background:linear-gradient(123deg,#fcf8ee,#f0dfc1);color:#9a6827}
+.club-dashboard .loyalty-tier-chip--platinum{background:linear-gradient(123deg,#f7eef5,#e9d9e9);color:#795386}
+.club-dashboard .loyalty-tier-chip__label{font-size:.88rem;color:inherit;font-weight:750;line-height:1.5}.club-dashboard .loyalty-tier-chip__min,.club-dashboard .loyalty-tier-chip__count{font-size:.7rem;line-height:1.55;color:#675950}
+.maison-app .club-dashboard :is(.loyalty-members-panel,.loyalty-activity-panel){border:1px solid var(--club-line);border-radius:15px;background:var(--club-paper);padding:14px;margin:0;box-shadow:0 3px 12px #63433b09}
+.club-dashboard .loyalty-activity-panel .loyalty-panel__heading{margin-bottom:9px}
+.club-dashboard .loyalty-search-form{position:relative;max-width:290px}.club-dashboard .loyalty-search-form>svg{width:17px;height:17px;color:#9b7168;flex:none}
+.club-dashboard .loyalty-search-form__input{min-height:38px;background:#fffdfb}.club-dashboard .loyalty-members-table__head{background:#f2e5df;border:0;border-radius:9px;padding:10px;font-size:.74rem}.club-dashboard .loyalty-members-table__row--body{padding:9px 10px}
+.club-dashboard .loyalty-panel__empty{display:grid;justify-items:center;gap:9px;padding:22px 12px;font-size:.79rem}.club-dashboard .loyalty-panel__empty svg{width:32px;height:32px;color:#ad867d;stroke-width:1.4}
+.club-subpage,.club-member-page{min-width:0;display:grid;align-content:start;gap:12px;width:100%;max-width:100rem;margin-inline:auto}
+.club-breadcrumb a{display:inline-flex;align-items:center;gap:7px;color:#875d54;font-size:.8rem;font-weight:650;min-height:35px}.club-breadcrumb svg{width:17px;height:17px;stroke-width:1.7}
+.club-subpage .fin-panel{padding:15px;border-radius:15px;box-shadow:0 3px 12px #63433b09}.club-subpage .fin-panel-head .btn-primary{color:#fff}
+.club-subpage .fin-panel-head svg{flex:none}.club-subpage .fin-panel-head h2{font-size:.95rem}
+.club-record-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.club-subpage .loyalty-reward-card{padding:12px;background:#fffdfb;box-shadow:none}.club-subpage .fin-account-card{border:1px solid #ecded7;background:#fbf3ee}
+.club-subpage .fin-line>:first-child{min-width:0;overflow-wrap:anywhere}
+.club-member-page .loyalty-page__hero{margin:0;border-radius:15px}.club-member-page :is(.loyalty-activity-panel,.loyalty-member-summary,.loyalty-progress-panel){margin:0}
+html.club-dialog-open{overflow:hidden}
+.club-dialog{position:fixed;inset:0;margin:auto;width:min(calc(100% - 24px),520px);max-width:520px;max-height:min(84dvh,560px);padding:0;border:1px solid #eadbd4;border-radius:17px;background:#fffdfa;color:#503b35;box-shadow:0 18px 65px #4f302b35;overflow:hidden;text-align:start;direction:rtl}
+.club-dialog--compact{max-width:420px}.club-dialog::backdrop{background:#3a292957;backdrop-filter:blur(2px)}
+.club-dialog[open]{animation:club-dialog-in .15s ease-out}.club-dialog__form{display:flex;flex-direction:column;max-height:min(84dvh,560px);min-height:0;margin:0}
+.club-dialog__header{display:flex;align-items:center;gap:10px;flex:none;padding:12px 14px;border-bottom:1px solid #efe4de}.club-dialog__header>div{flex:1;min-width:0}.club-dialog__header h2{font-size:1rem;font-weight:750;line-height:1.5;outline:none}.club-dialog__header p{font-size:.72rem;color:#75635b;margin-top:3px;line-height:1.6}.club-dialog__icon{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#f1e3dd;color:#95675f;flex:none}.club-dialog__icon svg,.club-dialog__close svg{width:19px;height:19px;stroke-width:1.65}.club-dialog__close{display:grid;place-items:center;width:36px;height:36px;border-radius:9px;color:#765d54;flex:none}.club-dialog__close:hover{background:#f1e4df}
+.club-dialog__body{display:grid;gap:10px;padding:13px 14px;overflow:auto;min-height:0;overscroll-behavior:contain}.club-dialog__footer{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:1px solid #efe4de;flex:none;background:#fffdfa}.club-dialog__footer :is(button,a){min-height:40px;font-size:.8rem}
+.club-form-field{display:grid;gap:5px;min-width:0}.club-form-field>label,.club-form-switch{font-size:.8rem;font-weight:650}.club-form-field .input-field{width:100%;min-width:0;min-height:40px}.club-form-field small,.club-form-help{font-size:.73rem;line-height:1.8;color:#75635b}.club-dialog .errorlist,.club-form-alert{font-size:.75rem;color:#a23e3e}.club-form-alert{background:#f9e7e5;padding:7px;border-radius:8px}
+.club-form-switch{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;padding:10px;border-radius:10px;background:#f6ede9;cursor:pointer}.club-form-switch input{position:absolute;inset-inline-end:10px;width:42px;height:24px;opacity:0;cursor:pointer}.club-switch-track{display:flex;align-items:center;justify-content:flex-end;width:42px;height:24px;border-radius:20px;background:#cfc7c3;padding:3px;flex:none}.club-switch-track:after{content:"";width:18px;height:18px;background:#fff;border-radius:50%;box-shadow:0 1px 3px #0002}.club-form-switch input:checked+.club-switch-track{background:#6d9672;justify-content:flex-start}.club-form-switch input:focus-visible+.club-switch-track{outline:2px solid #95675f;outline-offset:3px}
+@keyframes club-dialog-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:768px){.club-dashboard .club-feature-nav{grid-template-columns:repeat(12,minmax(0,1fr))}.club-dashboard .club-feature-nav a{grid-column:span 3}.club-dashboard .club-feature-nav a:nth-child(n+5){grid-column:span 4}.club-record-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1024px){.club-shell .maison-content{padding-inline:20px}.club-hero{min-height:146px;padding:22px}.club-dashboard .loyalty-stats-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.club-dashboard .loyalty-tier-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:767px){.club-shell .maison-content{padding:10px 10px 20px}.club-hero{min-height:114px;padding:13px}.club-hero__copy{max-width:79%;gap:8px}.club-hero__icon{width:39px;height:39px;border-radius:10px}.club-hero__icon svg{width:21px;height:21px}.club-hero p{font-size:.7rem}.club-hero__art{width:40%;opacity:.54}.club-toolbar__label{display:none}.club-toolbar__actions{width:100%;justify-content:flex-start}.club-toolbar__actions :is(a,button){flex:1}.club-program{grid-template-columns:auto minmax(0,1fr) auto;gap:8px;padding:10px}.club-program__icon{width:32px;height:32px}.club-program__icon svg{width:18px;height:18px}.club-program__control{grid-column:3;grid-row:2;min-height:24px}.club-program__copy{grid-row:span 2}.club-program__icon{grid-row:span 2}.club-program p{font-size:.7rem}.club-status{padding:5px 7px}.club-kpis .loyalty-stat{gap:7px;padding:10px;min-height:91px}.club-kpi-icon{width:31px;height:31px}.club-kpi-icon svg{width:18px;height:18px}.club-dashboard .club-feature-nav a{flex-direction:row;min-height:46px;font-size:.73rem;gap:6px}.club-dashboard .club-feature-nav a svg{width:18px;height:18px}.club-tier-icon{width:29px;height:29px}.club-tier-icon svg{width:19px;height:19px}.club-dashboard .loyalty-tier-chip{gap:7px;padding:9px;min-height:75px}.club-record-grid{grid-template-columns:minmax(0,1fr)}.club-dialog,.club-dialog__form{max-height:min(92dvh,650px)}.club-dialog__footer button{flex:1}}
+@media(prefers-reduced-motion:reduce){.club-dialog[open]{animation:none}}

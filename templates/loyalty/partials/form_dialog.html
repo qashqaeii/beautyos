@@ -1,0 +1,18 @@
+{% comment %}Native modal: retains real POST, csrf, bound fields and server errors.{% endcomment %}
+<dialog class="club-dialog{% if compact %} club-dialog--compact{% endif %}" id="{{ dialog_id }}" aria-labelledby="{{ dialog_id }}-title" {% if form.errors %}data-club-autopen{% endif %}>
+  <form method="post" {% if form_url %}action="{{ form_url }}"{% endif %} class="club-dialog__form">
+    {% csrf_token %}{% if action %}<input type="hidden" name="action" value="{{ action }}">{% endif %}{% if origin %}<input type="hidden" name="origin" value="{{ origin }}">{% endif %}
+    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+    <header class="club-dialog__header"><span class="club-dialog__icon"><i data-lucide="{{ glyph|default:'sparkles' }}" aria-hidden="true"></i></span><div><h2 id="{{ dialog_id }}-title" tabindex="-1">{{ heading }}</h2>{% if subtitle %}<p>{{ subtitle }}</p>{% endif %}</div><button type="button" class="club-dialog__close" data-club-close aria-label="بستن"><i data-lucide="x" aria-hidden="true"></i></button></header>
+    <div class="club-dialog__body">
+      {% if description %}<p class="club-form-help">{{ description }}</p>{% endif %}
+      {{ form.non_field_errors }}
+      {% if form.errors %}<p class="club-form-alert" role="alert">اطلاعات فرم را بررسی کنید.</p>{% endif %}
+      {% for field in form.visible_fields %}
+      {% if field.name == 'enabled' %}<label class="club-form-switch"><span>{{ field.label }}</span>{{ field }}<span class="club-switch-track" aria-hidden="true"></span></label>{{ field.errors }}
+      {% else %}<div class="club-form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{{ field.errors }}</div>{% endif %}
+      {% endfor %}
+    </div>
+    <footer class="club-dialog__footer"><button type="button" class="btn-secondary" data-club-close>انصراف</button><button type="submit" class="btn-primary">{{ submit|default:"ذخیره" }}</button></footer>
+  </form>
+</dialog>

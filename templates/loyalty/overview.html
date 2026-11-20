@@ -1,126 +1,65 @@
 {% extends "layouts/app_shell.html" %}
 {% load static format_tags %}
+{% block title %}باشگاه مشتریان{% endblock %}
 {% block header_modifier %}dashboard-lite-app-header{% endblock %}
+{% block shell_modifier %}club-shell{% endblock %}
 {% block workspace_header %}{% endblock %}
 {% block page_title %}{% endblock %}
 {% block page_subtitle %}{% endblock %}
 {% block mobile_header %}{% endblock %}
-{% block extra_head %}
-<script defer src="{% static 'js/loyalty-overview.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
-<link rel="stylesheet" href="{% static 'css/luna-loyalty-phase3.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
-{% endblock %}
+{% block extra_head %}{% include "loyalty/partials/assets.html" %}{% endblock %}
 {% block content %}
-<div class="loyalty-page mx-auto w-full max-w-5xl pb-24 md:pb-8" x-data="{ adjustOpen: {% if adjust_open %}true{% else %}false{% endif %} }">
-  <header class="loyalty-page__hero dashboard-enter">
-    <div class="loyalty-page__hero-copy">
-      <h1 class="loyalty-page__title">باشگاه مشتریان</h1>
-      <p class="loyalty-page__subtitle">امتیاز وفاداری، سطوح عضویت و فعالیت اخیر سالن</p>
-    </div>
-    <div class="flex flex-wrap gap-2"><a class="btn-secondary text-sm" href="{% url 'loyalty:program' %}"><i data-lucide="settings-2" aria-hidden="true"></i>تنظیمات باشگاه</a>
-    <button type="button" class="btn-secondary loyalty-page__adjust-toggle text-sm" @click="adjustOpen = !adjustOpen">
-      <i data-lucide="plus-circle" class="h-4 w-4" aria-hidden="true"></i>
-      ثبت تغییر امتیاز
-    </button></div>
+<div class="loyalty-page club-dashboard">
+  <header class="club-hero">
+    <picture class="club-hero__art" aria-hidden="true"><img src="{% static 'images/photos/beautyos-finance-hero.webp' %}?v={{ BEAUTYOS_ASSET_VERSION }}" alt="" width="665" height="199" decoding="async"></picture>
+    <div class="club-hero__copy"><span class="club-hero__icon"><i data-lucide="users-round" aria-hidden="true"></i></span><div><h1>باشگاه مشتریان</h1><p>امتیاز وفاداری، سطوح عضویت و فعالیت اخیر سالن</p></div></div>
   </header>
-
-  <section class="loyalty-adjust-panel dashboard-enter">
-    <div class="flex items-center justify-between gap-2 flex-wrap"><h2 class="loyalty-panel__heading">برنامه امتیازدهی</h2><span class="loyalty-tier-badge {% if policy.enabled %}loyalty-tier-badge--silver{% else %}loyalty-tier-badge--standard{% endif %}">{% if policy.enabled %}فعال{% else %}غیرفعال{% endif %}</span></div>
-    {% if policy.enabled %}<p class="text-sm text-ink-secondary">هر {{ policy.spend_per_point_toman|fa_money }} تومان دریافت = یک امتیاز · هر مراجعه انجام‌شده {{ policy.visit_points|fa_num }} امتیاز</p>{% else %}<p class="text-sm text-ink-secondary">با فعال‌سازی برنامه، امتیاز خرید و مراجعه به‌صورت خودکار ثبت می‌شود.</p>{% endif %}
-  </section>
-
-  <nav class="loyalty-phase3-nav" aria-label="امکانات باشگاه">
-    <a href="{% url 'loyalty:rewards' %}"><i data-lucide="gift" aria-hidden="true"></i><span>جوایز و مصرف امتیاز</span></a>
-    <a href="{% url 'loyalty:birthdays' %}"><i data-lucide="cake" aria-hidden="true"></i><span>تولد مشتریان</span></a>
-    <a href="{% url 'loyalty:referrals' %}"><i data-lucide="users-round" aria-hidden="true"></i><span>معرفی دوستان</span></a>
-    <a href="{% url 'loyalty:vouchers' %}"><i data-lucide="ticket-percent" aria-hidden="true"></i><span>تخفیف اختصاصی</span></a>
-    <a href="{% url 'loyalty:memberships' %}"><i data-lucide="credit-card" aria-hidden="true"></i><span>عضویت دوره‌ای</span></a>
-    <a href="{% url 'loyalty:insights' %}"><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>تحلیل وفاداری</span></a>
-    <a href="{% url 'loyalty:program' %}"><i data-lucide="settings-2" aria-hidden="true"></i><span>قوانین امتیازدهی</span></a>
-  </nav>
-  <div class="loyalty-stats-grid dashboard-enter">
-    <article class="loyalty-stat">
-      <p class="loyalty-stat__label">اعضای باشگاه</p>
-      <p class="loyalty-stat__value tabular-nums">{{ stats.member_count|fa_num }}</p>
-    </article>
-    <article class="loyalty-stat">
-      <p class="loyalty-stat__label">مجموع امتیاز فعال</p>
-      <p class="loyalty-stat__value tabular-nums">{{ stats.total_points|fa_num }}</p>
-    </article>
-    <article class="loyalty-stat">
-      <p class="loyalty-stat__label">میانگین امتیاز</p>
-      <p class="loyalty-stat__value tabular-nums">{{ stats.avg_points|fa_num }}</p>
-    </article>
-    <article class="loyalty-stat">
-      <p class="loyalty-stat__label">امتیاز این ماه</p>
-      <p class="loyalty-stat__value tabular-nums">{{ stats.points_earned_month|fa_num }}</p>
-      {% if stats.points_redeemed_month %}
-      <p class="loyalty-stat__hint">مصرف {{ stats.points_redeemed_month|fa_num }}</p>
-      {% endif %}
-    </article>
-  </div>
-
-  <section class="loyalty-tier-grid dashboard-enter" aria-label="توزیع سطوح عضویت">
-    {% for row in tier_rows %}
-    <article class="loyalty-tier-chip loyalty-tier-chip--{{ row.key }}">
-      <span class="loyalty-tier-chip__label">{{ row.label }}</span>
-      <span class="loyalty-tier-chip__count tabular-nums">{{ row.count|fa_num }} نفر</span>
-      <span class="loyalty-tier-chip__min">از {{ row.min_points|fa_num }} امتیاز</span>
-    </article>
-    {% endfor %}
-  </section>
-
-  {% if messages %}
-  <div class="loyalty-panel__messages space-y-2 dashboard-enter">
-    {% for message in messages %}
-    <p class="loyalty-panel__flash text-sm{% if message.tags %} loyalty-panel__flash--{{ message.tags }}{% endif %}">{{ message }}</p>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  <section
-    class="loyalty-adjust-panel dashboard-enter"
-    x-show="adjustOpen"
-    x-cloak
-    x-transition.opacity.duration.150ms
-  >
-    <h2 class="loyalty-panel__heading">ثبت دستی تغییر امتیاز</h2>
-    <form method="post" class="loyalty-adjust-form">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="adjust">
-      {% if adjust_form.errors %}<div role="alert" class="text-sm text-ink-secondary">{{ adjust_form.errors }}</div>{% endif %}
-      <div class="loyalty-adjust-form__grid">
-        <div class="loyalty-adjust-form__field">
-          <label class="loyalty-adjust-form__label" for="id_customer">مشتری</label>
-          {{ adjust_form.customer }}
-        </div>
-        <div class="loyalty-adjust-form__field">
-          <label class="loyalty-adjust-form__label" for="id_points_delta">تغییر امتیاز</label>
-          <input type="number" name="points_delta" id="id_points_delta" class="input-field text-sm" required>
-          <p class="loyalty-adjust-form__hint">مثبت برای افزایش، منفی برای کاهش</p>
-        </div>
-        <div class="loyalty-adjust-form__field loyalty-adjust-form__field--wide">
-          <label class="loyalty-adjust-form__label" for="id_note">توضیح</label>
-          <input type="text" name="note" id="id_note" class="input-field text-sm" maxlength="255" required placeholder="علت تغییر امتیاز">
-        </div>
+  <div class="club-workspace">
+    <div class="club-toolbar">
+      <span class="club-toolbar__label"><i data-lucide="layout-dashboard" aria-hidden="true"></i>نمای کلی باشگاه</span>
+      <div class="club-toolbar__actions"><a href="{% url 'loyalty:program' %}" data-club-open="club-program" class="btn-secondary"><i data-lucide="settings-2" aria-hidden="true"></i>تنظیمات باشگاه</a><button type="button" class="btn-primary" data-club-open="club-adjust"><i data-lucide="plus-circle" aria-hidden="true"></i>ثبت تغییر امتیاز</button></div>
+    </div>
+    <section class="club-program" aria-label="وضعیت برنامه امتیازدهی">
+      <span class="club-program__icon"><i data-lucide="gift" aria-hidden="true"></i></span>
+      <div class="club-program__copy"><h2>برنامه امتیازدهی</h2>{% if policy.enabled %}<p>هر {{ policy.spend_per_point_toman|fa_money }} تومان یک امتیاز · هر مراجعه {{ policy.visit_points|fa_num }} امتیاز</p>{% else %}<p>با فعال‌سازی برنامه، امتیاز خرید و مراجعه به‌صورت خودکار ثبت می‌شود.</p>{% endif %}</div>
+      <span class="club-status {% if policy.enabled %}club-status--on{% endif %}"><i></i>{% if policy.enabled %}فعال{% else %}غیرفعال{% endif %}</span>
+      <a href="{% url 'loyalty:program' %}" data-club-open="club-program" class="club-program__control" title="تنظیم وضعیت برنامه" aria-label="تنظیم وضعیت برنامه"><span class="club-status-track {% if policy.enabled %}is-on{% endif %}" aria-hidden="true"><i></i></span></a>
+    </section>
+    <nav class="loyalty-phase3-nav club-feature-nav" aria-label="امکانات باشگاه">
+      <a href="{% url 'loyalty:rewards' %}"><i data-lucide="gift" aria-hidden="true"></i><span>جوایز و مصرف امتیاز</span></a>
+      <a href="{% url 'loyalty:birthdays' %}"><i data-lucide="cake" aria-hidden="true"></i><span>تولد مشتریان</span></a>
+      <a href="{% url 'loyalty:referrals' %}"><i data-lucide="users-round" aria-hidden="true"></i><span>معرفی دوستان</span></a>
+      <a href="{% url 'loyalty:vouchers' %}"><i data-lucide="ticket-percent" aria-hidden="true"></i><span>تخفیف اختصاصی</span></a>
+      <a href="{% url 'loyalty:memberships' %}"><i data-lucide="credit-card" aria-hidden="true"></i><span>عضویت دوره‌ای</span></a>
+      <a class="club-feature-nav__highlight" href="{% url 'loyalty:insights' %}"><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>تحلیل وفاداری</span></a>
+      <a href="{% url 'loyalty:program' %}" data-club-open="club-program"><i data-lucide="sliders-horizontal" aria-hidden="true"></i><span>قوانین امتیازدهی</span></a>
+    </nav>
+    <section class="loyalty-stats-grid club-kpis" aria-label="شاخص‌های باشگاه">
+      <article class="loyalty-stat"><span class="club-kpi-icon club-kpi-icon--sage"><i data-lucide="users-round" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">اعضای باشگاه</p><p class="loyalty-stat__value tabular-nums">{{ stats.member_count|fa_num }}</p><small>نفر</small></div></article>
+      <article class="loyalty-stat"><span class="club-kpi-icon"><i data-lucide="coins" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">مجموع امتیاز فعال</p><p class="loyalty-stat__value tabular-nums">{{ stats.total_points|fa_num }}</p><small>{{ stats.active_with_balance|fa_num }} عضو دارای امتیاز</small></div></article>
+      <article class="loyalty-stat"><span class="club-kpi-icon"><i data-lucide="award" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">میانگین امتیاز</p><p class="loyalty-stat__value tabular-nums">{{ stats.avg_points|fa_num }}</p><small>امتیاز هر عضو</small></div></article>
+      <article class="loyalty-stat"><span class="club-kpi-icon"><i data-lucide="calendar-check" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">امتیاز این ماه</p><p class="loyalty-stat__value tabular-nums">{{ stats.points_earned_month|fa_num }}</p><small>مصرف {{ stats.points_redeemed_month|fa_num }} امتیاز</small></div></article>
+    </section>
+    <section class="club-tiers" aria-label="توزیع سطوح عضویت">
+      <header class="club-section-head"><h2><i data-lucide="layers" aria-hidden="true"></i>سطوح عضویت</h2><span>براساس موجودی امتیاز</span></header>
+      <div class="loyalty-tier-grid">
+      {% for row in tier_rows %}
+      <article class="loyalty-tier-chip loyalty-tier-chip--{{ row.key }}"><span class="club-tier-icon"><i data-lucide="{% if row.key == 'platinum' %}gem{% elif row.key == 'gold' %}crown{% elif row.key == 'silver' %}star{% else %}leaf{% endif %}" aria-hidden="true"></i></span><div><span class="loyalty-tier-chip__label">{{ row.label }}</span><span class="loyalty-tier-chip__min">از {{ row.min_points|fa_num }} امتیاز</span><span class="loyalty-tier-chip__count tabular-nums">{{ row.count|fa_num }} نفر</span></div></article>
+      {% endfor %}
       </div>
-      <div class="loyalty-adjust-form__actions">
-        <button type="submit" class="btn-primary text-sm">ذخیره</button>
-        <button type="button" class="btn-secondary text-sm" @click="adjustOpen = false">بستن</button>
-      </div>
-    </form>
-  </section>
-
+    </section>
+    {% if messages %}<div class="loyalty-panel__messages space-y-2">{% for message in messages %}<p role="status" class="loyalty-panel__flash text-sm{% if message.tags %} loyalty-panel__flash--{{ message.tags }}{% endif %}">{{ message }}</p>{% endfor %}</div>{% endif %}
   <section class="loyalty-members-panel dashboard-enter">
     <div class="loyalty-members-panel__head">
       <h2 class="loyalty-panel__heading">
-        رتبه‌بندی اعضا
+        <i data-lucide="trophy" aria-hidden="true"></i> رتبه‌بندی اعضا
         {% if search_q %}
         <span class="loyalty-members-panel__filtered">· نتیجه جستجو</span>
         {% endif %}
       </h2>
       <form method="get" class="loyalty-search-form" role="search">
         <label class="sr-only" for="loyalty-search-q">جستجوی مشتری</label>
-        <input
+        <i data-lucide="search" aria-hidden="true"></i><input
           type="search"
           name="q"
           id="loyalty-search-q"
@@ -183,14 +122,14 @@
     </p>
     {% endif %}
     {% else %}
-    <p class="loyalty-panel__empty">
+    <p class="loyalty-panel__empty"><i data-lucide="users-round" aria-hidden="true"></i>
       {% if search_q %}عضوی با این جستجو پیدا نشد.{% else %}هنوز امتیازی برای مشتریان ثبت نشده است. برنامه امتیازدهی را فعال کنید یا امتیاز دستی ثبت کنید.{% endif %}
     </p>
     {% endif %}
   </section>
 
   <section class="loyalty-activity-panel dashboard-enter">
-    <h2 class="loyalty-panel__heading">فعالیت اخیر</h2>
+    <h2 class="loyalty-panel__heading"><i data-lucide="history" aria-hidden="true"></i> فعالیت اخیر</h2>
     {% if recent_rows %}
     <ul class="loyalty-activity-list">
       {% for row in recent_rows %}
@@ -216,28 +155,14 @@
       {% endfor %}
     </ul>
     {% else %}
-    <p class="loyalty-panel__empty">تراکنش امتیازی ثبت نشده است.</p>
+    <p class="loyalty-panel__empty"><i data-lucide="history" aria-hidden="true"></i>تراکنش امتیازی ثبت نشده است.</p>
     {% endif %}
   </section>
 
-  <section class="loyalty-rules-panel dashboard-enter" aria-label="قوانین سطح‌بندی">
-    <h2 class="loyalty-panel__heading">سطوح عضویت</h2>
-    <ul class="loyalty-rules-list">
-      {% for rule in rules %}
-      <li class="loyalty-rules-list__item">
-        <span class="loyalty-rules-list__label">{{ rule.label }}</span>
-        <span class="loyalty-rules-list__min tabular-nums">از {{ rule.min_points|fa_num }} امتیاز</span>
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
+
+  </div>
+  {% url 'loyalty:overview' as adjust_url %}{% url 'loyalty:program' as program_url %}
+  {% include "loyalty/partials/form_dialog.html" with form=adjust_form dialog_id="club-adjust" heading="ثبت تغییر امتیاز" subtitle="اصلاح دستی موجودی امتیاز عضو" glyph="plus-circle" action="adjust" compact=True form_url=adjust_url submit="ذخیره تغییر امتیاز" %}
+  {% include "loyalty/partials/form_dialog.html" with form=policy_form dialog_id="club-program" heading="تنظیمات باشگاه" subtitle="قوانین خرید، مراجعه و پاداش" glyph="settings-2" origin="overview" form_url=program_url description="قوانین جدید فقط بر عملیات بعدی اعمال می‌شوند. مقدار صفر برای پاداش تولد، معرفی یا مراجعه به معنی عدم اعطای آن است." submit="ذخیره تنظیمات" %}
 </div>
-<script>
-  document.addEventListener("alpine:initialized", function () {
-    if (window.lucide) window.lucide.createIcons();
-  });
-  document.addEventListener("DOMContentLoaded", function () {
-    if (window.lucide) window.lucide.createIcons();
-  });
-</script>
 {% endblock %}

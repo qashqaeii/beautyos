@@ -1,15 +1,13 @@
-{% extends "layouts/app_shell.html" %}{% load static format_tags l10n %}
+{% extends "loyalty/base.html" %}{% load static format_tags l10n %}
 {% block page_title %}جوایز باشگاه{% endblock %}{% block page_subtitle %}تعریف پاداش، مصرف امتیاز و تحویل هدیه{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}"><link rel="stylesheet" href="{% static 'css/luna-loyalty-phase3.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
-{% block content %}<div class="space-y-3">
-  <section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="gift" aria-hidden="true"></i>کاتالوگ پاداش‌ها</h2><a href="{% url 'loyalty:overview' %}">باشگاه مشتریان</a></header>
+
+{% block club_content %}<div class="space-y-3">
+  <section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="gift" aria-hidden="true"></i>کاتالوگ پاداش‌ها</h2><div class="club-toolbar__actions"><button class="btn-secondary" type="button" data-club-open="club-redeem"><i data-lucide="gift" aria-hidden="true"></i>مصرف امتیاز</button><button class="btn-primary" type="button" data-club-open="club-reward"><i data-lucide="plus" aria-hidden="true"></i>پاداش جدید</button></div></header>
   <p class="fin-muted">هدیه، خدمت رایگان یا مزیت اختصاصی را تعریف کنید. مصرف امتیاز جدا از پرداخت مالی است؛ تخفیف فاکتور یا خروج کالا در این مرحله خودکار اعمال نمی‌شود.</p>
   {% if messages %}{% for message in messages %}<p role="status" class="fin-muted">{{ message }}</p>{% endfor %}{% endif %}
   <div class="fin-account-grid">{% for reward in rewards %}<article class="loyalty-reward-card"><h3>{{ reward.title }}</h3><span>{{ reward.points_cost|fa_num }} امتیاز</span><p class="fin-muted">{{ reward.description }}</p><form method="post">{% csrf_token %}<input type="hidden" name="pk" value="{{ reward.pk|unlocalize }}">{% if reward.is_active %}<button class="btn-secondary" name="action" value="pause">غیرفعال کردن</button>{% else %}<button class="btn-secondary" name="action" value="activate">فعال کردن</button>{% endif %}</form></article>{% empty %}<p class="fin-muted">هنوز پاداشی تعریف نشده است.</p>{% endfor %}</div></section>
-  <div class="fin-tools-grid">
-  <section class="fin-panel"><header class="fin-panel-head"><h2>تعریف پاداش جدید</h2></header><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="create">{% include "finance/partials/tool_form.html" with form=create_form %}<button class="btn-primary">ثبت پاداش</button></form></section>
-  <section class="fin-panel"><header class="fin-panel-head"><h2>مصرف امتیاز</h2></header><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="redeem">{% include "finance/partials/tool_form.html" with form=redeem_form %}<button class="btn-primary">ثبت درخواست پاداش</button></form><p class="fin-muted">ابتدا امتیاز کسر می‌شود. بعد از تحویل واقعی، پاداش را تحویل‌شده ثبت کنید. لغو درخواست در انتظار، امتیاز را بازمی‌گرداند.</p></section>
-  </div>
-  <section class="fin-panel"><header class="fin-panel-head"><h2>درخواست‌های اخیر</h2></header>
+  <section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="history" aria-hidden="true"></i>درخواست‌های اخیر</h2></header>
   {% for row in redemptions %}<article class="loyalty-reward-card"><div class="fin-line"><span><strong>{{ row.title_snapshot }}</strong> · {{ row.account.customer.full_name }}</span><bdi>{{ row.points_cost|fa_num }} امتیاز</bdi></div><span class="loyalty-reward-status">{{ row.get_status_display }} · {{ row.created_at|fa_jalali }}</span>{% if row.status == 'pending' %}<form method="post" class="flex gap-2 flex-wrap">{% csrf_token %}<input type="hidden" name="pk" value="{{ row.pk|unlocalize }}"><button class="btn-primary" name="action" value="fulfilled">تأیید تحویل</button><button class="btn-secondary" name="action" value="cancelled">لغو و بازگشت امتیاز</button></form>{% endif %}</article>{% empty %}<p class="fin-muted">درخواستی ثبت نشده است.</p>{% endfor %}</section>
+{% include "loyalty/partials/form_dialog.html" with form=create_form dialog_id="club-reward" heading="تعریف پاداش جدید" glyph="gift" action="create" compact=True submit="ثبت پاداش" %}
+{% include "loyalty/partials/form_dialog.html" with form=redeem_form dialog_id="club-redeem" heading="مصرف امتیاز" glyph="ticket" action="redeem" compact=True description="امتیاز هنگام ثبت کسر می‌شود. لغو درخواست پیش از تحویل، امتیاز را بازمی‌گرداند." submit="ثبت درخواست پاداش" %}
 </div>{% endblock %}

@@ -5,8 +5,9 @@
 {% block page_title %}{% endblock %}
 {% block page_subtitle %}{% endblock %}
 {% block mobile_header %}{% endblock %}
+{% block extra_head %}{% include "loyalty/partials/assets.html" %}{% endblock %}
 {% block content %}
-<div class="loyalty-page loyalty-page--member mx-auto w-full max-w-3xl pb-24 md:pb-8">
+<div class="loyalty-page loyalty-page--member club-member-page mx-auto w-full max-w-4xl pb-24 md:pb-8">
   <header class="loyalty-page__hero dashboard-enter">
     <div class="loyalty-page__hero-copy min-w-0">
       <a href="{% url 'loyalty:overview' %}" class="loyalty-back-link text-sm">

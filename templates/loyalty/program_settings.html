@@ -1,8 +1,8 @@
-{% extends "layouts/app_shell.html" %}
+{% extends "loyalty/base.html" %}
 {% load static %}
 {% block page_title %}تنظیمات باشگاه مشتریان{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
-{% block content %}
+
+{% block club_content %}
 <section class="fin-panel max-w-lg mx-auto">
   <header class="fin-panel-head"><h2><i data-lucide="sparkles" aria-hidden="true"></i>قوانین امتیازدهی</h2><a href="{% url 'loyalty:overview' %}">باشگاه مشتریان</a></header>
   <p class="fin-muted">امتیاز خرید از مبلغ هر دریافت واقعی، بدون بخش اعشاری، محاسبه می‌شود. امتیاز مراجعه فقط پس از تکمیل نوبت ثبت می‌شود. استرداد و لغو نوبت امتیاز مربوط را اصلاح می‌کنند؛ حتی اگر برنامه غیرفعال شده باشد. سقف امتیاز هر رویداد خرید ۱٬۰۰۰٬۰۰۰ است.</p>

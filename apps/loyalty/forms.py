@@ -24,7 +24,8 @@ class LoyaltyAdjustForm(forms.Form):
         self.fields["customer"].queryset = Customer.scoped(salon).filter(is_deleted=False).order_by(
             "full_name"
         )
-        self.fields["customer"].widget.attrs.update({"class": "input-field text-sm w-full"})
+        for field in self.fields.values():
+            field.widget.attrs["class"]="input-field text-sm w-full"
 
 
 from apps.core.fields import TomanAmountField

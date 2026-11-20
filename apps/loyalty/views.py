@@ -51,6 +51,23 @@ def overview(request):
     else:
         form = LoyaltyAdjustForm(salon=salon)
 
+    return _render_overview(request, form)
+
+
+def _policy_form(salon, data=None):
+    policy=LoyaltyPolicy.scoped(salon).first()
+    initial={key:getattr(policy or LoyaltyPolicy(),key) for key in ("enabled","spend_per_point_toman","visit_points","birthday_points","referral_points")}
+    return policy, LoyaltyPolicyForm(data,initial=initial)
+
+
+def _render_overview(request, form=None, policy_form=None):
+    salon=request.salon
+    q=(request.GET.get("q") or "").strip()
+    if form is None:
+        form=LoyaltyAdjustForm(salon=salon)
+    policy,default_policy_form=_policy_form(salon)
+    if policy_form is None:
+        policy_form=default_policy_form
     stats = loyalty_overview_stats(salon)
 
     accounts_qs = (
@@ -90,7 +107,8 @@ def overview(request):
         "loyalty/overview.html",
         {
             "stats": stats,
-            "policy": LoyaltyPolicy.scoped(salon).first(),
+            "policy": policy,
+            "policy_form": policy_form,
             "tier_rows": tier_count_rows(stats),
             "members": members,
             "member_count": len(members),
@@ -130,9 +148,7 @@ def member_detail(request, pk: int):
 @require_http_methods(["GET","POST"])
 def program_settings(request):
     salon=request.salon
-    policy=LoyaltyPolicy.scoped(salon).first()
-    initial={key:getattr(policy or LoyaltyPolicy(),key) for key in ("enabled","spend_per_point_toman","visit_points","birthday_points","referral_points")}
-    form=LoyaltyPolicyForm(request.POST if request.method=="POST" else None,initial=initial)
+    policy,form=_policy_form(salon, request.POST if request.method=="POST" else None)
     if request.method=="POST" and form.is_valid():
         with transaction.atomic():
             row,_=LoyaltyPolicy.objects.select_for_update().get_or_create(salon=salon)
@@ -143,4 +159,6 @@ def program_settings(request):
                 entity_type="loyalty_policy",entity_id=str(row.pk),message="تنظیم برنامه وفاداری",metadata=form.cleaned_data)
         messages.success(request,"تنظیمات باشگاه ذخیره شد.")
         return redirect("loyalty:overview")
+    if request.method=="POST" and request.POST.get("origin")=="overview":
+        return _render_overview(request,policy_form=form)
     return render(request,"loyalty/program_settings.html",{"form":form})

@@ -193,6 +193,22 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 errors.append(f"{width}/{name} interaction: {exc}")
         modal("/customers/",".customers-list-page__add","مشتری جدید")
         modal("/staff/",".staff-team-page__add","افزودن متخصص")
+        # Native loyalty dialogs keep forms in the parent view and return focus on Escape.
+        for route,dialog_id in [("overview","club-adjust"),("overview","club-program"),("rewards","club-reward"),("rewards","club-redeem"),("referrals","club-referral"),("vouchers","club-voucher"),("memberships","club-membership")]:
+            try:
+                page.goto(live_server.url+reverse("loyalty:"+route),wait_until="load")
+                trigger=page.locator(f"[data-club-open='{dialog_id}']").first
+                trigger.click()
+                dialog=page.locator("#"+dialog_id)
+                pw.expect(dialog).to_be_visible()
+                bounds=dialog.bounding_box()
+                assert bounds and bounds["width"]<=min(width,520)+2 and bounds["height"]<=min(height*.92,650)+2
+                pw.expect(dialog.locator(".club-dialog__footer")).to_be_visible()
+                page.keyboard.press("Escape")
+                pw.expect(dialog).not_to_be_visible()
+                pw.expect(trigger).to_be_focused()
+            except Exception as exc:
+                errors.append(f"{width}/{dialog_id}: {exc}")
         modal(reverse("staff:detail",args=[staff.pk]),"a.staff-profile-header__btn[href*='book=1']","رزرو نوبت")
         try:
             page.goto(live_server.url+"/app/",wait_until="load")
