@@ -45,3 +45,59 @@
   .maison-app :is(.list-view-switch__btn,.finance-page__tab,.reception-desk-slot-btn,.waitlist-confirm-btn) { min-height: 44px; }
   .theme-app .inventory-create-modal { max-height: calc(100dvh - 16px - env(safe-area-inset-bottom,0px)); }
 }
+
+/* Final directory and profile system: shared across the remaining modules. */
+.maison-app {
+  --rose-paper:#fffaf7; --rose-wash:#f5eae4; --rose-line:#e6d7cf;
+  --rose-ink:#51443f; --rose-muted:#74635b; --rose-accent:#9d726e;
+}
+.maison-app :is(.customers-list-page__header,.staff-team-page__header,.inventory-page__header,.staff-profile-header,.customer-detail-header,.staff-hours-page__header,.loyalty-page__hero,.retention-page__hero,.waitlist-page__hero) {
+  min-width:0; padding:clamp(15px,1.65vw,24px);
+  background:linear-gradient(110deg,#fffaf7 12%,#f4e7e0 100%);
+  border:1px solid var(--rose-line); border-radius:16px;
+  box-shadow:0 4px 18px rgba(81,68,63,.045); margin-block-end:16px;
+}
+.maison-app :is(.customers-list-page__headline,.staff-team-page__headline,.inventory-page__headline) { display:flex; align-items:center; gap:12px; min-width:0; }
+.maison-app .editorial-directory-copy {min-width:0;flex:1}
+.maison-app .editorial-directory-copy > h1 {font-size:clamp(1.15rem,1.7vw,1.45rem);line-height:1.5;font-weight:700;color:var(--rose-ink)}
+.maison-app .editorial-directory-copy > p {font-size:.78rem;line-height:1.85;color:var(--rose-muted);margin-top:2px}
+.maison-app :is(.customers-list-page__head-icon,.staff-team-page__head-icon,.editorial-directory-icon) {flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#ead8d0;color:#8a6057;border:1px solid #e3cfc5}
+.maison-app .editorial-directory-icon svg {width:22px;height:22px;stroke-width:1.65}
+.maison-app :is(.customers-list-page__workspace,.inventory-page__filters,.staff-team-page__toolbar,.services-page > .page-toolbar) {border-radius:16px}
+.maison-app :is(.customers-list-card,.staff-team-card,.inventory-card,.maison-service-card,.customer-detail-card,.staff-hours-card,.loyalty-members-panel,.loyalty-activity-panel,.loyalty-rules-panel,.retention-queue-panel,.waitlist-queue-panel) {border-color:var(--rose-line);background:var(--rose-paper)}
+.maison-app :is(.customers-list-card,.staff-team-card,.inventory-card,.maison-service-card) {transition:box-shadow .18s ease,border-color .18s ease}
+.maison-app :is(.customers-list-card__name,.staff-team-card__name,.inventory-card__name,.customer-detail-header__name,.staff-profile-header__name) {color:var(--rose-ink);overflow-wrap:anywhere}
+.maison-app :is(.customer-detail-header__avatar,.staff-profile-header__avatar,.staff-team-avatar) {object-fit:cover;flex:none}
+.maison-app :is(.customer-detail-header__identity,.staff-profile-header__identity,.staff-profile-header__copy,.customer-detail-summary__item,.staff-team-card__stats) {min-width:0}
+.maison-app :is(.customer-detail-summary__value,.staff-team-card__stats dd) {overflow-wrap:anywhere}
+.maison-app :is(.customer-detail-card__head,.loyalty-panel__heading,.staff-hours-card__title) {color:var(--rose-ink)}
+.maison-app :is(.customer-detail-empty,.loyalty-panel__empty,.retention-queue-panel__empty,.waitlist-queue-panel__empty) {padding-block:20px;color:var(--rose-muted)}
+.maison-app .staff-profile-page > .grid > .card {background:var(--rose-paper);border:1px solid var(--rose-line);border-radius:16px;box-shadow:var(--editorial-shadow);min-width:0}
+.maison-app .editorial-section {min-width:0;margin-block:0 18px}
+.maison-app .editorial-section-head {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.maison-app .editorial-section-head h2 {font-weight:700;color:var(--rose-ink);font-size:1rem}
+.maison-app .editorial-section-head p {font-size:.78rem;color:var(--rose-muted)}
+.maison-app .editorial-module-toolbar {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;padding:12px 14px;background:rgba(255,250,247,.76);border:1px solid var(--rose-line);border-radius:14px}
+.maison-app .editorial-module-toolbar > p {font-size:.82rem;color:var(--rose-muted);line-height:1.8;min-width:0}
+.maison-app .editorial-module-actions {display:flex;flex-wrap:wrap;gap:8px}
+.maison-app .editorial-module-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.maison-app .editorial-module-card {display:flex;flex-direction:column;gap:12px;min-width:0;border:1px solid var(--rose-line);border-radius:16px;padding:18px;background:var(--rose-paper);box-shadow:var(--editorial-shadow)}
+.maison-app .editorial-module-card__head {display:flex;align-items:center;gap:12px;min-width:0}
+.maison-app .editorial-module-card__head > div {min-width:0;flex:1}
+.maison-app .editorial-module-card h3 {font-size:1rem;font-weight:700;color:var(--rose-ink);overflow-wrap:anywhere}
+.maison-app .editorial-module-card p {font-size:.8rem;line-height:1.8;color:var(--rose-muted)}
+.maison-app .editorial-module-value {font-size:1.18rem;font-weight:700;color:var(--rose-ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.maison-app .editorial-ledger {list-style:none;margin:0;padding:0;border:1px solid var(--rose-line);border-radius:16px;background:var(--rose-paper);box-shadow:var(--editorial-shadow);overflow:hidden}
+.maison-app .editorial-ledger > li {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;min-width:0}
+.maison-app .editorial-ledger > li+li {border-top:1px solid var(--rose-line)}
+.maison-app .editorial-ledger-copy {flex:1;min-width:0;overflow-wrap:anywhere}
+.maison-app .editorial-ledger-copy strong {display:block;font-size:.88rem;color:var(--rose-ink);font-weight:650}
+.maison-app .editorial-ledger-copy small {display:block;font-size:.75rem;color:var(--rose-muted);line-height:1.8}
+.maison-app .editorial-ledger-aside {text-align:end;font-size:.85rem;font-weight:650;color:var(--rose-ink);font-variant-numeric:tabular-nums;max-width:48%;overflow-wrap:anywhere}
+.maison-app .maison-empty.editorial-empty {min-height:190px;background:linear-gradient(145deg,#fffaf7,#fbf2ed);border:1px dashed #ddc9bf;box-shadow:none;gap:7px}
+.editorial-empty__icon {display:grid;place-items:center;width:62px;height:62px;border-radius:19px;background:#f0dfd7;color:#9d726e;border:1px solid #ead5ca;margin-bottom:5px}
+.editorial-empty__icon svg {width:30px;height:30px;stroke-width:1.5}
+.editorial-empty p {line-height:1.85}
+@media(hover:hover) and (pointer:fine) {
+ .maison-app .editorial-module-card:hover {border-color:#ccb0a6;box-shadow:var(--editorial-shadow-hover)}
+}

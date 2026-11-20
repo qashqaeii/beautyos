@@ -112,3 +112,30 @@ body.beautyos-main-bg .maison-app .maison-unified-header:has(.maison-page-title:
 .luna-salon-switch-list svg{flex:none;width:17px;height:17px}
 .luna-salon-switch-list button[aria-current=true]{background:#ead8d0;color:#684a41;border-color:#dfc8be}
 .luna-salon-switch-list button:not(:disabled):hover{background:#f0e3dc}
+
+/* Directory/profile mobile finish; no fixed-width panels or nested page scroll. */
+@media(max-width:639px) {
+ .maison-app :is(.customers-list-page__header,.staff-team-page__header,.inventory-page__header,.staff-profile-header,.customer-detail-header,.staff-hours-page__header,.loyalty-page__hero,.retention-page__hero,.waitlist-page__hero) {padding:13px;border-radius:14px;gap:12px}
+ .maison-app :is(.customers-list-page__add,.staff-team-page__add,.inventory-page__add) {width:100%;justify-content:center;min-height:44px}
+ .maison-app :is(.customer-detail-header__actions,.staff-profile-header__actions) {display:flex;flex-wrap:wrap;width:100%;gap:7px}
+ .maison-app :is(.customer-detail-header__actions,.staff-profile-header__actions) > :is(a,button) {flex:1 1 130px;min-height:44px;justify-content:center;white-space:normal}
+ .maison-app :is(.customer-detail-summary,.staff-team-grid,.customers-list-grid) {min-width:0;gap:10px}
+ .maison-app .customer-detail-columns {display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+ .maison-app .customer-detail-pay-row {display:flex;flex-wrap:wrap;gap:8px}
+ .maison-app .editorial-module-toolbar {padding:11px}
+ .maison-app .editorial-module-actions {width:100%}
+ .maison-app .editorial-module-actions > :is(a,button) {flex:1 1 120px;justify-content:center}
+ .maison-app .editorial-module-card {padding:14px}
+ .maison-app .editorial-ledger > li {padding:12px;gap:8px}
+ .maison-app .editorial-ledger-aside {font-size:.8rem}
+ .maison-app .maison-empty.editorial-empty {min-height:160px;padding:18px 12px}
+ .maison-app .maison-page-title {font-size:clamp(1.1rem,4.8vw,1.35rem)}
+ .maison-app .services-page .maison-service-card {flex-wrap:wrap}
+ .maison-app .services-page .maison-service-card > a {margin-inline-start:auto}
+ .maison-app .maison-content :is(input,select,textarea):not([type=checkbox]):not([type=radio]):not([type=hidden]) {max-width:100%;min-width:0}
+ .maison-app .editorial-module-grid {grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:1023px) {
+ .maison-app .maison-main {scroll-padding-bottom:calc(85px + env(safe-area-inset-bottom,0px))}
+ .maison-app .luna-mobile-nav .maison-mobile-bar__link {flex-direction:column}
+}

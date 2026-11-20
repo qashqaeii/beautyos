@@ -1,8 +1,8 @@
-<div class="maison-empty maison-reveal">
-  {% if icon %}<i data-lucide="{{ icon }}" class="mb-4 h-10 w-10 text-ink-secondary" aria-hidden="true"></i>{% endif %}
+<div class="maison-empty maison-reveal editorial-empty">
+  {% if icon %}<span class="editorial-empty__icon" aria-hidden="true"><i data-lucide="{{ icon }}"></i></span>{% endif %}
   <h3 class="text-base font-semibold text-ink">{{ title }}</h3>
   {% if description %}<p class="mt-2 max-w-sm text-sm text-ink-secondary">{{ description }}</p>{% endif %}
   {% if cta_url and cta_label %}
-  <a href="{{ cta_url }}" class="btn-primary mt-6 text-sm">{{ cta_label }}</a>
+  <a href="{{ cta_url }}" class="btn-primary mt-3 text-sm">{{ cta_label }}</a>
   {% endif %}
 </div>

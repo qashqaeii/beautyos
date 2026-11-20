@@ -43,3 +43,19 @@
   .public-site .public-nav__actions { flex-wrap: nowrap; gap: 6px; }
   .booking-shell .booking-stepper { gap: 3px; }
 }
+
+/* Salon storefronts retain their own content and identity, with calmer frames. */
+.public-lavender .luna-hero-arch__frame {border-radius:20px;background:#f3e6df}
+.public-lavender .luna-service-card {min-width:0;overflow-wrap:anywhere;border-radius:16px}
+.public-lavender .luna-public-nav__inner {gap:8px;min-width:0;flex-wrap:wrap}
+.public-lavender .luna-public-nav__links {min-width:0;flex-wrap:wrap}
+.public-lavender .btn-luna-book,.salon-public .btn-public {min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.public-lavender .luna-hero__title,.salon-public h1 {overflow-wrap:anywhere}
+.booking-shell .booking-stepper li {overflow-wrap:anywhere}
+@media(max-width:639px) {
+ .public-lavender .luna-hero-arch {max-width:250px}
+ .public-lavender .luna-public-nav__inner {padding-inline:12px}
+ .public-lavender .luna-public-nav__links {font-size:.75rem}
+ .salon-public main {padding-inline:16px}
+ .booking-shell :is(input,select,textarea):not([type=radio]):not([type=checkbox]) {font-size:16px;max-width:100%}
+}

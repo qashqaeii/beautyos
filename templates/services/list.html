@@ -38,9 +38,9 @@
   @beautyos-close-edit-modal.window="closeEdit()"
   @keydown.escape.window="editOpen ? closeEdit() : (createOpen && closeCreate())"
 >
-  <div class="page-toolbar">
-    <p class="text-sm text-ink-secondary">{{ services|length }} خدمت فعال در سیستم</p>
-    <button type="button" class="btn-primary" @click="createOpen = true">خدمت جدید</button>
+  <div class="page-toolbar editorial-module-toolbar">
+    <p>{{ services|length }} خدمت در فهرست سالن</p>
+    <button type="button" class="btn-primary" @click="createOpen = true"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>خدمت جدید</button>
   </div>
 
   {% if messages %}

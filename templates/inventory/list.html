@@ -26,9 +26,9 @@
 >
   <header class="inventory-page__header">
     <div class="inventory-page__headline">
-      <h1 class="inventory-page__title">محصولات و موجودی</h1>
+      <span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="boxes"></i></span><div class="editorial-directory-copy"><h1 class="inventory-page__title">محصولات و موجودی</h1>
       {% if low_count %}
-      <p class="inventory-page__hint">{{ low_count|fa_num }} قلم نیاز به توجه</p>
+      <p class="inventory-page__hint">{{ low_count|fa_num }} قلم نیاز به توجه</p></div>
       {% endif %}
     </div>
     <button type="button" class="btn-primary inventory-page__add" @click="createOpen = true">
