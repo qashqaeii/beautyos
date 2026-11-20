@@ -245,3 +245,13 @@
 @media(min-width:1024px) and (min-height:761px){
  .overview-chart svg{height:clamp(110px,14vh,150px)}
 }
+
+/* On short, wide laptop screens, show a populated top-five list in two lanes.
+   Single/short lists and mobile layouts retain the existing single column. */
+@media(min-width:1024px) and (max-height:760px){
+ @container overview (min-width:940px){
+  .overview-staff-list:has(>li:nth-child(4)){grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 14px}
+  .overview-staff-list:has(>li:nth-child(4)) li{min-width:0}
+  .overview-staff-list:has(>li:nth-child(4)) li>div:first-child{flex-wrap:nowrap;align-items:baseline}
+ }
+}
