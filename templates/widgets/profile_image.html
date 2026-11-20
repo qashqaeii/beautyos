@@ -8,7 +8,7 @@
     <small data-luna-file-name aria-live="polite">{% if widget.is_initial %}تصویر فعلی ذخیره شده است{% else %}یک تصویر انتخاب کنید{% endif %}</small>
     <div class="luna-upload__actions">
       <label class="luna-upload__button"><i data-lucide="image-plus" aria-hidden="true"></i><span>انتخاب تصویر</span><input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}></label>
-      {% if widget.is_initial and not widget.required %}<label class="luna-upload__remove"><input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}>حذف تصویر</label>{% endif %}
+      {% if widget.is_initial and not widget.required %}<label class="luna-upload__remove"><input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.checked %} checked{% endif %}{% if widget.attrs.disabled %} disabled{% endif %}>حذف تصویر</label>{% endif %}
     </div>
   </div>
 </div>

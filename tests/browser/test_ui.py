@@ -412,7 +412,7 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         import jdatetime
         month=next(m for m in range(1,13) if (jdatetime.date(1405,m,1).weekday() + (31 if m<=6 else 30 if m<=11 else 29))>35)
         calendar.get_by_label("انتخاب ماه",exact=True).select_option(str(month))
-        assert calendar.locator(".jalali-date__grid > button").count() == 42
+        pw.expect(calendar.locator(".jalali-date__grid > button")).to_have_count(42)
         pw.expect(calendar.get_by_label("انتخاب ماه", exact=True)).to_have_value(str(month))
         assert_compact()
         calendar.get_by_label("انتخاب سال",exact=True).select_option("1403")

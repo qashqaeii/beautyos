@@ -45,3 +45,38 @@ def test_staff_profile_form_has_grouped_controls_and_native_upload():
     assert "luna-form-section" in source
     assert "luna-switch" in source
     assert "luna-service-section" in source
+
+
+@pytest.mark.django_db
+def test_staff_editor_upload_clear_and_service_selection(client, salon, owner_membership, settings, tmp_path):
+    from io import BytesIO
+    from PIL import Image
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from django.urls import reverse
+    from apps.staff.models import StaffProfile
+    from apps.services.models import Service
+
+    settings.MEDIA_ROOT = tmp_path
+    staff, _ = StaffProfile.objects.get_or_create(salon=salon, membership=owner_membership)
+    service = Service.objects.create(salon=salon, name="خدمت نمونه")
+    client.force_login(owner_membership.user)
+    response = client.get(reverse("staff:detail", args=[staff.pk]), {"edit": "1"})
+    assert response.status_code == 200
+    assert 'data-luna-upload' in response.content.decode()
+    buffer = BytesIO()
+    Image.new("RGB", (12, 12), "#b99183").save(buffer, format="PNG")
+    data = {"display_name": "متخصص نمونه", "title": "رنگ مو", "bio": "نمونه",
+            "is_active": "on", "is_bookable": "on", "calendar_color": "",
+            "services": [service.pk]}
+    response = client.post(reverse("staff:edit", args=[staff.pk]), {
+        **data, "avatar": SimpleUploadedFile("sample.png", buffer.getvalue(), content_type="image/png")})
+    assert response.status_code == 302
+    staff.refresh_from_db()
+    assert staff.avatar and staff.services.filter(pk=service.pk).exists()
+    response = client.get(reverse("staff:detail", args=[staff.pk]), {"edit": "1"})
+    assert 'name="avatar-clear"' in response.content.decode()
+    response = client.post(reverse("staff:edit", args=[staff.pk]), {**data, "avatar-clear": "on"})
+    assert response.status_code == 302
+    staff.refresh_from_db()
+    assert not staff.avatar
+    assert staff.services.filter(pk=service.pk).exists()
