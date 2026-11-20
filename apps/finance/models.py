@@ -221,3 +221,37 @@ class ExpenseOccurrence(TenantModelMixin, TimeStampedModel):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["salon","schedule","due_day"],name="finance_expense_occurrence_day")]
+
+
+class ProductSale(TenantModelMixin, TimeStampedModel):
+    payment = models.OneToOneField("finance.Payment", on_delete=models.PROTECT, related_name="product_sale")
+    item = models.ForeignKey("inventory.InventoryItem", on_delete=models.PROTECT, related_name="finance_sales")
+    movement = models.OneToOneField("inventory.StockMovement", on_delete=models.PROTECT, related_name="product_sale")
+    item_name = models.CharField(max_length=120)
+    quantity = models.DecimalField(max_digits=12, decimal_places=2)
+    unit_price_toman = models.BigIntegerField()
+    unit_cost_toman = models.BigIntegerField()
+    revenue_toman = models.BigIntegerField()
+    cost_toman = models.BigIntegerField()
+    request_key = models.UUIDField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","request_key"],name="finance_product_sale_request")]
+
+
+class ProductReturn(TenantModelMixin, TimeStampedModel):
+    sale = models.OneToOneField("finance.ProductSale", on_delete=models.PROTECT, related_name="return_record")
+    refund = models.OneToOneField("finance.Refund", on_delete=models.PROTECT, related_name="product_return")
+    movement = models.OneToOneField("inventory.StockMovement", on_delete=models.PROTECT, related_name="product_return")
+
+
+class MaterialCost(TenantModelMixin, TimeStampedModel):
+    movement = models.OneToOneField("inventory.StockMovement", on_delete=models.PROTECT, related_name="material_cost")
+    appointment = models.ForeignKey("appointments.Appointment", on_delete=models.PROTECT, related_name="material_costs")
+    item_name = models.CharField(max_length=120)
+    unit_cost_toman = models.BigIntegerField()
+    cost_toman = models.BigIntegerField()
+    request_key = models.UUIDField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","request_key"],name="finance_material_request")]

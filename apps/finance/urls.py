@@ -1,12 +1,15 @@
 from django.urls import path
 
-from apps.finance import views, checkout_views, cash_close, ledger_views, period_views
+from apps.finance import views, checkout_views, cash_close, ledger_views, period_views, stock_views
 
 app_name = "finance"
 
 urlpatterns = [
     path("", views.finance_overview, name="overview"),
     path("accounts/", ledger_views.accounts_view, name="accounts"),
+    path("product-sales/", stock_views.product_sales, name="product_sales"),
+    path("product-sales/<int:sale_id>/return/", stock_views.product_return, name="product_return"),
+    path("materials/", stock_views.materials, name="materials"),
     path("staff-finance/", period_views.staff_finance, name="staff_finance"),
     path("recurring/", period_views.recurring_expenses, name="recurring"),
     path("payments/<int:payment_id>/refund/", ledger_views.refund_view, name="refund"),

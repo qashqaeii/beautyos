@@ -91,8 +91,18 @@ def finance_dashboard(salon, range_ctx):
         amount = int(entry.commission_amount_toman)
         commission += amount
         service_rows[by_service[entry.appointment_id]]["commission"] += amount
+    from apps.finance.models import MaterialCost, ProductSale, ProductReturn
+    for row in service_rows.values(): row["materials"]=0
+    for cost in MaterialCost.scoped(salon).filter(appointment_id__in=completed_ids):
+        service_rows[by_service[cost.appointment_id]]["materials"]+=cost.cost_toman
     for row in service_rows.values():
-        row["contribution"] = row["revenue"] - row["commission"]
+        row["contribution"] = row["revenue"] - row["commission"] - row["materials"]
+    material_total=_total(MaterialCost.scoped(salon).filter(created_at__gte=start,created_at__lt=end),"cost_toman")
+    product_sales=ProductSale.scoped(salon).filter(created_at__gte=start,created_at__lt=end)
+    product_returns=ProductReturn.scoped(salon).filter(created_at__gte=start,created_at__lt=end)
+    product_revenue=_total(product_sales,"revenue_toman")-_total(product_returns,"sale__revenue_toman")
+    product_cost=_total(product_sales,"cost_toman")-_total(product_returns,"sale__cost_toman")
+    inventory_purchases=_total(expenses.filter(category=Expense.Category.INVENTORY_PURCHASE),"amount_toman")
     expenses_total = _total(expenses, "amount_toman")
     received = _total(receipts, "paid_amount_toman")
     from apps.finance.ledger import refund_total
@@ -132,9 +142,10 @@ def finance_dashboard(salon, range_ctx):
     rent_total=_total(periods.filter(kind="rent"),"amount_toman")
     return {
         "salary_total":salary_total,"rent_total":rent_total,
+        "product_revenue":product_revenue,"product_cost":product_cost,"material_total":material_total,"inventory_purchases":inventory_purchases,
         "recurring_due":RecurringExpense.scoped(salon).filter(is_active=True,next_due__lte=timezone.localdate()).count(),
         "received": received, "refunded": refunded, "net_received": received-refunded, "earned": earned, "expenses": expenses_total, "commission": commission,
-        "operating_estimate": earned + rent_total - expenses_total - commission - salary_total,
+        "operating_estimate": earned + rent_total + product_revenue - (expenses_total-inventory_purchases) - commission - salary_total - material_total - product_cost,
         "receipt_count": receipts.count(), "methods": methods,
         "method_cut1": round(method_totals.get("cash", 0) * 100 / received, 2) if received else 0,
         "method_cut2": round((method_totals.get("cash", 0) + method_totals.get("card", 0)) * 100 / received, 2) if received else 0,

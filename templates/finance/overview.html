@@ -72,6 +72,7 @@
     {% include "finance/partials/management_dashboard.html" %}
   {% endif %}
   {% if tab == 'cash' and can_payment_create %}
+  <section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="shopping-bag" aria-hidden="true"></i>فروش محصولات</h2><a class="btn-primary" href="{% url 'finance:product_sales' %}">ثبت فروش محصول</a></header><p class="fin-muted">فروش نقدی یا بانکی همراه با کاهش خودکار موجودی کالا.</p></section>
   <section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="lock" aria-hidden="true"></i>کنترل صندوق روزانه</h2><a class="btn-primary" href="{% url 'finance:cash_close' %}?day={{ selected_day|date:'Y-m-d' }}">بستن صندوق</a></header><p class="fin-muted">ثبت موجودی نقدی پایان روز و مغایرت‌ها.</p></section>
   {% endif %}
   {% if tab == 'receipts' or tab == 'cash' %}

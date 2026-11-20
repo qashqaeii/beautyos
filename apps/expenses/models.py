@@ -9,6 +9,7 @@ class Expense(TenantModelMixin, TimeStampedModel):
         RENT = "rent", "اجاره"
         PAYROLL = "payroll", "حقوق"
         SUPPLIES = "supplies", "مواد مصرفی"
+        INVENTORY_PURCHASE = "inventory_purchase", "خرید موجودی انبار"
         EQUIPMENT = "equipment", "تجهیزات"
         MARKETING = "marketing", "تبلیغات"
         UTILITIES = "utilities", "قبوض"

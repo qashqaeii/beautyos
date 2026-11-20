@@ -4,7 +4,7 @@
   <article class="fin-kpi fin-kpi--primary"><div><span>درآمد خدمات</span><i data-lucide="trending-up" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.earned|fa_money }}</bdi></strong><small>تومان · خدمات انجام‌شده</small></article>
   <article class="fin-kpi"><div><span>هزینه‌ها</span><i data-lucide="layers" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.expenses|fa_money }}</bdi></strong><small>تومان · هزینه ثبت‌شده</small></article>
   <article class="fin-kpi"><div><span>سهم متخصصان</span><i data-lucide="users-round" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.commission|fa_money }}</bdi></strong><small>تومان · سهم شناسایی‌شده</small></article>
-  <article class="fin-kpi"><div><span>سود عملیاتی برآوردی</span><i data-lucide="sprout" class="fin-success" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.operating_estimate|fa_money }}</bdi></strong><small>تومان · پس از هزینه و پورسانت</small></article>
+  <article class="fin-kpi"><div><span>سود عملیاتی برآوردی</span><i data-lucide="sprout" class="fin-success" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.operating_estimate|fa_money }}</bdi></strong><small>تومان · پس از هزینه، حقوق و بهای مستقیم</small></article>
 </section>
 {% endif %}
 <section class="fin-insights-grid" aria-label="روند و ترکیب دریافتی">
@@ -60,6 +60,7 @@
     <div class="fin-line"><span>حقوق ثبت‌شده در بازه</span><bdi>{{ dashboard.salary_total|fa_money }} تومان</bdi></div>
     <div class="fin-line"><span>اجاره جایگاه ثبت‌شده</span><bdi>{{ dashboard.rent_total|fa_money }} تومان</bdi></div>
     {% if can_manage_expenses %}<div class="fin-line"><a href="{% url 'finance:recurring' %}">هزینه‌های دوره‌ای سررسیدشده</a><bdi>{{ dashboard.recurring_due|fa_num }}</bdi></div>{% endif %}
+    <div class="fin-line"><span>خالص فروش محصولات</span><bdi>{{ dashboard.product_revenue|fa_money }} تومان</bdi></div>
     <div class="fin-line"><span>فروش پکیج ثبت‌شده در بازه</span><bdi>{{ dashboard.package_sales|fa_money }} تومان</bdi></div>
   </article>
 </section>
@@ -67,12 +68,16 @@
 {% if tab == 'reports' %}
 <section class="fin-panel">
   <header class="fin-panel-head"><h2><i data-lucide="scissors" aria-hidden="true"></i>عملکرد خدمات</h2></header>
-  <p class="fin-muted">سهم باقی‌مانده هر خدمت پیش از هزینه مواد و هزینه عمومی. فروش پکیج در لحظه فروش درآمد خدمات محسوب نمی‌شود.</p>
+  <p class="fin-muted">سهم باقی‌مانده هر خدمت پس از پورسانت و مواد مصرف ثبت‌شده، پیش از هزینه عمومی. فروش پکیج در لحظه فروش درآمد خدمات محسوب نمی‌شود.</p>
   <div class="fin-report-table">
   {% for row in dashboard.service_rows %}
-    <div class="fin-report-row"><strong>{{ row.name }}</strong><span>{{ row.count|fa_num }} خدمت</span><span>درآمد <bdi>{{ row.revenue|fa_money }}</bdi></span><span>سهم متخصص <bdi>{{ row.commission|fa_money }}</bdi></span><span>مانده <bdi>{{ row.contribution|fa_money }}</bdi> تومان</span></div>
+    <div class="fin-report-row"><strong>{{ row.name }}</strong><span>{{ row.count|fa_num }} خدمت</span><span>درآمد <bdi>{{ row.revenue|fa_money }}</bdi></span><span>سهم متخصص <bdi>{{ row.commission|fa_money }}</bdi></span><span>مواد <bdi>{{ row.materials|fa_money }}</bdi></span><span>مانده <bdi>{{ row.contribution|fa_money }}</bdi> تومان</span></div>
   {% empty %}<div class="fin-empty">خدمت انجام‌شده‌ای در این بازه ثبت نشده است.</div>{% endfor %}
   </div>
-  <p class="fin-muted">برآورد عملیاتی شامل هزینه‌های ثبت‌شده و سهم خدمات انجام‌شده است؛ مالیات، استهلاک و مواد ثبت‌نشده را پوشش نمی‌دهد.</p>
+  <div class="fin-line"><span>خالص فروش محصولات</span><bdi>{{ dashboard.product_revenue|fa_money }} تومان</bdi></div>
+  <div class="fin-line"><span>بهای خالص کالای فروش‌رفته</span><bdi>{{ dashboard.product_cost|fa_money }} تومان</bdi></div>
+  <div class="fin-line"><span>بهای مواد مصرف‌شده در بازه</span><bdi>{{ dashboard.material_total|fa_money }} تومان</bdi></div>
+  <div class="fin-line"><span>خرید موجودی (خارج از هزینه عملیاتی)</span><bdi>{{ dashboard.inventory_purchases|fa_money }} تومان</bdi></div>
+  <p class="fin-muted">خرید موجودی را در دسته خرید موجودی انبار ثبت کنید، نه مواد مصرفی؛ هزینه مواد هنگام مصرف محاسبه می‌شود. حقوق تعریف‌شده در قرارداد را دوباره در هزینه عمومی وارد نکنید. برآورد مالیات، استهلاک و مواد ثبت‌نشده را پوشش نمی‌دهد.</p>
 </section>
 {% endif %}

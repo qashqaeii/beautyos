@@ -50,6 +50,8 @@ def apply_movement(
     if quantity <= 0:
         raise ValidationError("مقدار باید مثبت باشد.")
 
+    if kind not in StockMovement.Kind.values or (appointment and appointment.salon_id != salon.pk):
+        raise ValidationError("نوع گردش یا نوبت معتبر نیست.")
     locked = InventoryItem.objects.select_for_update().get(pk=item.pk, salon=salon)
 
     if kind == StockMovement.Kind.OUT:
