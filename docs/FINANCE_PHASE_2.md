@@ -18,3 +18,7 @@
 - Cash reconciliation is not a bank-account ledger; the manual amounts do not create duplicate expense or payment rows.
 - Expense reports use Jalali month boundaries and include partial receipts, without labeling cash receipts minus expenses as net profit. Expense creation validates positive amounts and records an audit event.
 - Financial overview uses actual line chart and receipt-method donut inspired by the approved design.
+
+## Refund and account reconciliation
+- Refunds are immutable partial/full receipt reversal events (manager only), capped by original payment and idempotent; active service balance is reopened. Original receipt and discount remain unchanged. Cash reconciliation uses net method amounts; dashboard shows gross, refunds and net separately. No external bank payment API.
+- Account balances are explicitly reconciled: opening-day balance + unique source postings + transfers + documented other cash movements. Source allocation is manual to avoid pretending which bank received a historical payment. Transfers never affect revenue. No bank synchronization.

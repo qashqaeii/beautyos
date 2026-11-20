@@ -24,6 +24,11 @@ def cash_totals(salon, day):
     rows = Payment.scoped(salon).filter(created_at__gte=start, created_at__lt=end,
         paid_amount_toman__gt=0).exclude(status=Payment.Status.REFUNDED).order_by().values("method").annotate(total=Sum("paid_amount_toman"))
     totals = {row["method"]: int(row["total"]) for row in rows}
+    from apps.finance.models import Refund
+    refunds = Refund.scoped(salon).filter(created_at__gte=start,created_at__lt=end).order_by().values("payment__method").annotate(total=Sum("amount_toman"))
+    for row in refunds:
+        method=row["payment__method"]
+        totals[method]=totals.get(method,0)-int(row["total"])
     return {method: totals.get(method, 0) for method in Payment.Method.values}
 
 

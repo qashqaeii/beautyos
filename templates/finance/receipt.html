@@ -15,9 +15,11 @@
       <div class="flex justify-between gap-3"><dt>روش</dt><dd>{{ payment.get_method_display }}</dd></div>
       <div class="flex justify-between gap-3"><dt>وضعیت ثبت</dt><dd>{{ payment.get_status_display }}</dd></div>
       <div class="flex justify-between gap-3 border-t border-line pt-4 font-bold"><dt>مبلغ ثبت‌شده</dt><dd>{{ payment.paid_amount_toman|fa_money }} تومان</dd></div>
+      <div class="flex justify-between gap-3"><dt>استرداد ثبت‌شده</dt><dd>{{ refund_total|fa_money }} تومان</dd></div>
     </dl>
+    {% for refund in refunds %}<div class="text-sm">{{ refund.created_at|fa_jalali }} · {{ refund.amount_toman|fa_money }} تومان · {{ refund.reason }}</div>{% endfor %}
     <p class="text-xs text-ink-secondary">این سند رسید یک ثبت پرداخت است، نه فاکتور کامل مراجعه.</p>
   </article>
-  <div class="receipt-actions flex gap-2 mt-4"><button type="button" class="btn-primary" onclick="window.print()">چاپ / ذخیره PDF</button><a href="{% url 'dashboard:home' %}" class="btn-secondary">بازگشت</a></div>
+  <div class="receipt-actions flex gap-2 mt-4 flex-wrap">{% if can_refund and payment.paid_amount_toman > refund_total %}<a class="btn-secondary" href="{% url 'finance:refund' payment.pk %}">استرداد وجه</a>{% endif %}<button type="button" class="btn-primary" onclick="window.print()">چاپ / ذخیره PDF</button><a href="{% url 'dashboard:home' %}" class="btn-secondary">بازگشت</a></div>
 </div>
 {% endblock %}

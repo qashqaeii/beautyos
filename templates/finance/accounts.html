@@ -1,0 +1,16 @@
+{% extends "layouts/app_shell.html" %}
+{% load static format_tags %}
+{% block page_title %}حساب‌های مالی{% endblock %}{% block page_subtitle %}موجودی ثبت‌شده و انتقال بین حساب‌ها{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block content %}
+<div class="space-y-3">
+<section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="landmark"></i>موجودی حساب‌ها</h2><a href="{% url 'finance:overview' %}">مدیریت مالی</a></header>
+<p class="fin-muted">موجودی بر اساس مانده افتتاح و گردش‌های تخصیص‌یافته است؛ بانک به صورت آنلاین متصل نیست. سندهای قبل از افتتاح را دوباره وارد نکنید.</p>
+<div class="fin-account-grid">{% for row in accounts %}<article class="fin-account-card"><span>{{ row.account.name }} · {{ row.account.get_kind_display }}</span><strong>{{ row.balance|fa_money }}</strong><small>تومان · از {{ row.account.opening_day|fa_jalali }}</small></article>{% empty %}<p class="fin-muted">ابتدا یک حساب تعریف کنید.</p>{% endfor %}</div></section>
+<div class="fin-tools-grid">
+<section class="fin-panel"><header class="fin-panel-head"><h2>حساب جدید</h2></header><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="account">{% include "finance/partials/tool_form.html" with form=account_form %}<button class="btn-primary">ایجاد حساب</button></form></section>
+<section class="fin-panel"><header class="fin-panel-head"><h2>انتقال و گردش وجه</h2></header><p class="fin-muted">انتقال درآمد یا هزینه جدید نیست. سایر ورود و خروج صرفاً برای گردش‌های خارج از اسناد مالی است.</p><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="movement">{% include "finance/partials/tool_form.html" with form=movement_form %}<button class="btn-primary">ثبت گردش</button></form></section>
+<section class="fin-panel"><header class="fin-panel-head"><h2>تخصیص سند به حساب</h2></header><p class="fin-muted">تا ۳۰ سند تخصیص‌نیافته اخیر از هر نوع؛ مبلغ از سند اصلی خوانده می‌شود و فقط یک بار قابل تخصیص است.</p><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="posting">{% include "finance/partials/tool_form.html" with form=posting_form %}<button class="btn-primary">تخصیص به حساب</button></form></section>
+<section class="fin-panel"><header class="fin-panel-head"><h2>گردش‌های اخیر</h2></header>{% for row in movements %}<div class="fin-line"><span>{{ row.from_account.name|default:"ورود" }} ← {{ row.to_account.name|default:"خروج" }}<small>{{ row.day|fa_jalali }} · {{ row.note }}</small></span><bdi>{{ row.amount_toman|fa_money }} تومان</bdi></div>{% empty %}<p class="fin-muted">گردشی ثبت نشده است.</p>{% endfor %}</section>
+</div></div>
+{% endblock %}

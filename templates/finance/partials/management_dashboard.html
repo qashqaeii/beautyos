@@ -36,7 +36,9 @@
       </div>
       <div class="fin-method-list">{% for method in dashboard.methods %}<div class="fin-line"><span><i class="fin-dot fin-method-{{ forloop.counter }}"></i>{{ method.name }}</span><bdi>{{ method.amount|fa_money }}</bdi></div>{% endfor %}</div>
     </div>
-    <p class="fin-muted">روش ثبت پرداخت؛ موجودی واقعی حساب بانکی نیست.</p>
+    <div class="fin-line"><span>استرداد در بازه</span><bdi>{{ dashboard.refunded|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>خالص دریافتی</span><bdi>{{ dashboard.net_received|fa_money }} تومان</bdi></div>
+    <p class="fin-muted">نمودار روش پرداخت ناخالص است؛ موجودی حساب بانکی نیست.</p>
   </article>
 </section>
 {% if tab == 'income' or tab == 'cash' %}

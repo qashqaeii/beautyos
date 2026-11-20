@@ -21,7 +21,8 @@ def appointment_amounts(appointment):
     valid = [p for p in appointment.payments.all() if p.salon_id == appointment.salon_id
              and p.customer_id == appointment.customer_id and p.status != Payment.Status.REFUNDED]
     gross = max(0, int(appointment.price_toman))
-    paid = sum(max(0, int(p.paid_amount_toman)) for p in valid)
+    from apps.finance.ledger import payment_refunded
+    paid = sum(max(0, int(p.paid_amount_toman) - payment_refunded(p)) for p in valid)
     discount = sum(max(0, int(p.discount_toman)) for p in valid)
     return gross, paid, discount, max(0, gross - paid - discount)
 

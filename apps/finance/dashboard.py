@@ -95,6 +95,8 @@ def finance_dashboard(salon, range_ctx):
         row["contribution"] = row["revenue"] - row["commission"]
     expenses_total = _total(expenses, "amount_toman")
     received = _total(receipts, "paid_amount_toman")
+    from apps.finance.ledger import refund_total
+    refunded = refund_total(salon,start,end)
     method_totals = dict(receipts.order_by().values("method").annotate(
         total=Sum("paid_amount_toman")).values_list("method", "total"))
     methods = [{"name": label, "amount": int(method_totals.get(key, 0)),
@@ -125,7 +127,7 @@ def finance_dashboard(salon, range_ctx):
     paid_debt = _total(SalonDebtPayment.scoped(salon).filter(
         created_at__gte=start, created_at__lt=end), "amount_toman")
     return {
-        "received": received, "earned": earned, "expenses": expenses_total, "commission": commission,
+        "received": received, "refunded": refunded, "net_received": received-refunded, "earned": earned, "expenses": expenses_total, "commission": commission,
         "operating_estimate": earned - expenses_total - commission,
         "receipt_count": receipts.count(), "methods": methods,
         "method_cut1": round(method_totals.get("cash", 0) * 100 / received, 2) if received else 0,

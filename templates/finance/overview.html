@@ -42,6 +42,7 @@
     <a href="{% url 'finance:overview' %}?tab=commissions" class="finance-page__tab {% if tab == 'commissions' %}is-active{% endif %}" {% if tab == 'commissions' %}aria-current="page"{% endif %}><i data-lucide="users-round" aria-hidden="true"></i><span>تسویه متخصصان</span></a>
     {% if can_manage_expenses %}<a href="{% url 'expenses:overview' %}" class="finance-page__tab"><i data-lucide="layers" aria-hidden="true"></i><span>هزینه‌ها</span></a>{% endif %}
     <a href="{% url 'finance:overview' %}?tab=debts" class="finance-page__tab {% if tab == 'debts' %}is-active{% endif %}" {% if tab == 'debts' %}aria-current="page"{% endif %}><i data-lucide="arrow-left-right" aria-hidden="true"></i><span>بدهی و مطالبات</span></a>
+    <a href="{% url 'finance:accounts' %}" class="finance-page__tab"><i data-lucide="landmark" aria-hidden="true"></i><span>حساب‌ها</span></a>
     <a href="{% url 'finance:overview' %}?tab=reports" class="finance-page__tab {% if tab == 'reports' %}is-active{% endif %}" {% if tab == 'reports' %}aria-current="page"{% endif %}><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>گزارش‌ها</span></a>
   </nav>
   {% if tab != 'debts' %}

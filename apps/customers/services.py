@@ -48,7 +48,9 @@ def refresh_customer_stats(customer: Customer):
         .filter(customer=customer, status__in=[Payment.Status.PAID, Payment.Status.PARTIAL], paid_amount_toman__gt=0)
         .aggregate(total=Sum("paid_amount_toman"))
     )
-    customer.total_spent_toman = paid["total"] or 0
+    from apps.finance.models import Refund
+    refunded = Refund.scoped(customer.salon).filter(payment__customer=customer).aggregate(total=Sum("amount_toman"))["total"] or 0
+    customer.total_spent_toman = max(0, (paid["total"] or 0) - refunded)
     customer.save(
         update_fields=[
             "total_visits",

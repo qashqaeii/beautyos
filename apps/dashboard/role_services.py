@@ -55,7 +55,8 @@ def appointment_payment_summary(appt: Appointment) -> dict:
     if not payments:
         return {"label": "بدون پرداخت", "owed_toman": price, "paid_toman": 0, "status_code": "none"}
     # The appointment price is a single obligation, not the sum of installment invoices.
-    paid = sum(max(0, p.paid_amount_toman) for p in payments)
+    from apps.finance.ledger import payment_refunded
+    paid = sum(max(0, p.paid_amount_toman - payment_refunded(p)) for p in payments)
     discount = sum(max(0, p.discount_toman) for p in payments)
     owed = max(price - discount - paid, 0)
     status = Payment.Status.PAID if owed == 0 else Payment.Status.PARTIAL if paid else Payment.Status.PENDING

@@ -1,0 +1,1 @@
+{% csrf_token %}{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}{{ form.non_field_errors }}{% for field in form.visible_fields %}<label for="{{ field.id_for_label }}"><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>{% endfor %}

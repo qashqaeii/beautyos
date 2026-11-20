@@ -127,3 +127,47 @@ class CashClose(TenantModelMixin, TimeStampedModel):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["salon", "day"], name="finance_cashclose_day")]
+
+
+class Refund(TenantModelMixin, TimeStampedModel):
+    payment = models.ForeignKey("finance.Payment", on_delete=models.PROTECT, related_name="refunds")
+    request_key = models.UUIDField()
+    amount_toman = models.BigIntegerField()
+    reason = models.CharField(max_length=255)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["salon", "request_key"], name="finance_refund_request_key"),
+            models.CheckConstraint(condition=models.Q(amount_toman__gt=0), name="finance_refund_positive"),
+        ]
+
+
+class FinancialAccount(TenantModelMixin, TimeStampedModel):
+    name = models.CharField(max_length=100)
+    kind = models.CharField(max_length=10, choices=[("cash", "صندوق نقدی"), ("bank", "حساب بانکی")])
+    opening_toman = models.BigIntegerField(default=0)
+    opening_day = models.DateField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["salon", "name"], name="finance_account_name"),
+        ]
+
+
+class AccountMovement(TenantModelMixin, TimeStampedModel):
+    from_account = models.ForeignKey("finance.FinancialAccount", on_delete=models.PROTECT, null=True, blank=True, related_name="outgoing")
+    to_account = models.ForeignKey("finance.FinancialAccount", on_delete=models.PROTECT, null=True, blank=True, related_name="incoming")
+    amount_toman = models.BigIntegerField()
+    day = models.DateField()
+    source_kind = models.CharField(max_length=24, blank=True)
+    source_id = models.BigIntegerField(null=True, blank=True)
+    request_key = models.UUIDField()
+    note = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["salon", "request_key"], name="finance_movement_request_key"),
+            models.UniqueConstraint(fields=["salon", "source_kind", "source_id"], condition=models.Q(source_id__isnull=False), name="finance_movement_source"),
+            models.CheckConstraint(condition=models.Q(amount_toman__gt=0), name="finance_movement_positive"),
+            models.CheckConstraint(condition=(models.Q(from_account__isnull=False)|models.Q(to_account__isnull=False)) & ~(models.Q(from_account=models.F("to_account")) & models.Q(from_account__isnull=False) & models.Q(to_account__isnull=False)), name="finance_movement_accounts"),
+        ]

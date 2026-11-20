@@ -1,0 +1,4 @@
+{% extends "layouts/app_shell.html" %}{% load static format_tags %}
+{% block page_title %}استرداد وجه{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block content %}<section class="fin-panel max-w-lg mx-auto"><header class="fin-panel-head"><h2>{{ payment.customer.full_name }}</h2><a href="{% url 'finance:receipt' payment.pk %}">بازگشت به رسید</a></header><div class="fin-received-total"><small>حداکثر مبلغ قابل استرداد</small><strong>{{ available|fa_money }} تومان</strong></div><p class="fin-muted">این عملیات فقط ثبت برگشت وجه واقعی است و دستور انتقال بانکی صادر نمی‌کند. اگر خدمت لغو نشده باشد، مبلغ برگشتی دوباره به مانده مشتری اضافه می‌شود.</p><form method="post" class="fin-tools-form">{% include "finance/partials/tool_form.html" %}<button class="btn-primary" {% if not available %}disabled{% endif %}>ثبت استرداد</button></form></section>{% endblock %}

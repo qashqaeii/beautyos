@@ -326,4 +326,8 @@ def payment_receipt(request, payment_id):
     payment = get_object_or_404(Payment.scoped(request.salon).select_related(
         "customer", "appointment__service", "appointment__staff"
     ), pk=payment_id)
-    return render(request, "finance/receipt.html", {"payment": payment})
+    from apps.finance.ledger import payment_refunded
+    return render(request, "finance/receipt.html", {"payment": payment,
+        "refunds":payment.refunds.filter(salon=request.salon).order_by("-pk"),
+        "refund_total":payment_refunded(payment),
+        "can_refund":has_permission(getattr(request,"membership",None),P_FINANCE_REPORTS) and payment.status!=Payment.Status.REFUNDED})
