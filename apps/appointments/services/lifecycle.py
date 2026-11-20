@@ -48,6 +48,8 @@ def complete_appointment(*, salon, appointment_id: int) -> Appointment:
     appt.completed_at = timezone.now()
     appt.save(update_fields=["status", "completed_at", "updated_at"])
     recognize_commission_for_appointment(appt)
+    from apps.loyalty.automation import award_visit
+    award_visit(appt)
     refresh_customer_stats(appt.customer)
     return appt
 
@@ -61,6 +63,8 @@ def cancel_appointment(*, salon, appointment_id: int) -> Appointment:
     had_completed = appt.status == Appointment.Status.COMPLETED
     if had_completed:
         reverse_commission_for_appointment(appt)
+        from apps.loyalty.automation import reverse_visit
+        reverse_visit(appt)
 
     appt.status = Appointment.Status.CANCELLED
     appt.cancelled_at = timezone.now()

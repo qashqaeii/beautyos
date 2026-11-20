@@ -346,6 +346,8 @@ def record_customer_payment(*, salon, form, actor):
         if line:
             payment.invoice_id=line.invoice_id
     payment.save()
+    from apps.loyalty.automation import award_payment
+    award_payment(payment)
     refresh_customer_stats(payment.customer)
     AuditLog.objects.create(salon=salon, actor=actor, action=AuditLog.Action.CREATE,
         entity_type="payment", entity_id=str(payment.pk),
@@ -380,5 +382,7 @@ def create_appointment_deposit(
         status=status,
         notes="بیعانه هنگام رزرو",
     )
+    from apps.loyalty.automation import award_payment
+    award_payment(payment)
     refresh_customer_stats(customer)
     return payment

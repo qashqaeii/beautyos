@@ -6,7 +6,7 @@ from apps.core.tenant import TenantModelMixin
 
 class LoyaltyAccount(TenantModelMixin, TimeStampedModel):
     customer = models.OneToOneField("customers.Customer", on_delete=models.CASCADE, related_name="loyalty")
-    points_balance = models.IntegerField(default=0)
+    points_balance = models.BigIntegerField(default=0)
     tier = models.CharField(max_length=32, default="standard")
 
     class Meta:
@@ -21,7 +21,7 @@ class LoyaltyTransaction(TenantModelMixin, TimeStampedModel):
 
     account = models.ForeignKey(LoyaltyAccount, on_delete=models.PROTECT, related_name="transactions")
     kind = models.CharField(max_length=10, choices=Kind.choices)
-    points = models.IntegerField()
+    points = models.BigIntegerField()
     reference = models.CharField(max_length=64, blank=True)
     note = models.CharField(max_length=255, blank=True)
 
@@ -41,8 +41,11 @@ def ledger_add_points(*, salon, customer, points: int, reference: str = "", note
     from django.db import transaction
     from django.db.models import F
 
-    if points <= 0:
+    if not isinstance(points, int) or not 0 < points <= 1000000000:
         raise ValueError("points must be positive for earn")
+
+    if customer.salon_id != salon.pk:
+        raise ValueError("customer belongs to another salon")
 
     with transaction.atomic():
         account, _ = LoyaltyAccount.objects.select_for_update().get_or_create(
@@ -65,8 +68,11 @@ def ledger_redeem_points(*, salon, customer, points: int, reference: str = "", n
     from django.db import transaction
     from django.db.models import F
 
-    if points <= 0:
+    if not isinstance(points, int) or not 0 < points <= 1000000000:
         raise ValueError("points must be positive for redeem")
+
+    if customer.salon_id != salon.pk:
+        raise ValueError("customer belongs to another salon")
 
     with transaction.atomic():
         account = LoyaltyAccount.objects.select_for_update().get(salon=salon, customer=customer)
@@ -89,8 +95,11 @@ def ledger_adjust_points(*, salon, customer, points_delta: int, note: str = "") 
     from django.db import transaction
     from django.db.models import F
 
-    if points_delta == 0:
-        raise ValueError("points_delta cannot be zero")
+    if not isinstance(points_delta, int) or not 0 < abs(points_delta) <= 1000000000:
+        raise ValueError("points_delta invalid")
+
+    if customer.salon_id != salon.pk:
+        raise ValueError("customer belongs to another salon")
 
     with transaction.atomic():
         account, _ = LoyaltyAccount.objects.select_for_update().get_or_create(
@@ -122,3 +131,33 @@ def transaction_signed_points(tx: LoyaltyTransaction) -> int:
         except (TypeError, ValueError):
             return tx.points
     return tx.points
+
+
+class LoyaltyPolicy(TenantModelMixin, TimeStampedModel):
+    enabled = models.BooleanField(default=False)
+    spend_per_point_toman = models.BigIntegerField(default=100000)
+    visit_points = models.PositiveIntegerField(default=0)
+    birthday_points = models.PositiveIntegerField(default=0)
+    referral_points = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["salon"], name="loyalty_one_policy_per_salon"),
+            models.CheckConstraint(condition=models.Q(spend_per_point_toman__gte=1000), name="loyalty_min_spend_unit"),
+        ]
+
+
+class LoyaltyAward(TenantModelMixin, TimeStampedModel):
+    """Original entitlement and remaining entitlement after reversals."""
+    account = models.ForeignKey(LoyaltyAccount, on_delete=models.PROTECT, related_name="awards")
+    source_kind = models.CharField(max_length=16)
+    source_key = models.CharField(max_length=64)
+    original_points = models.PositiveIntegerField(default=0)
+    remaining_points = models.PositiveIntegerField(default=0)
+    spend_unit_toman = models.BigIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["salon", "source_kind", "source_key"], name="loyalty_unique_source_award"),
+            models.CheckConstraint(condition=models.Q(remaining_points__lte=models.F("original_points")), name="loyalty_award_remaining"),
+        ]

@@ -23,6 +23,7 @@
     <div class="loyalty-member-summary__points">
       <p class="loyalty-member-summary__label">موجودی امتیاز</p>
       <p class="loyalty-member-summary__value tabular-nums">{{ account.points_balance|fa_num }}</p>
+      {% if account.points_balance < 0 %}<p class="text-xs text-ink-secondary">امتیاز مصرف‌شده پس از استرداد؛ با امتیازهای بعدی جبران می‌شود.</p>{% endif %}
     </div>
     <div class="loyalty-member-summary__meta">
       <p><span class="tabular-nums">{{ account.customer.total_visits|fa_num }}</span> مراجعه</p>

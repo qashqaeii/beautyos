@@ -68,6 +68,8 @@ def sell_product(*,salon,customer_id,item_id,quantity,unit_price,method,request_
             revenue_toman=revenue,cost_toman=cost,request_key=key)
     except IntegrityError as exc:
         raise ValidationError("درخواست تکراری است.") from exc
+    from apps.loyalty.automation import award_payment
+    award_payment(payment)
     refresh_customer_stats(customer)
     _audit(salon,actor,sale,"product_sale","فروش محصول",{"revenue":revenue,"cost":cost,"payment_id":payment.pk})
     return sale
@@ -94,6 +96,8 @@ def return_product(*,salon,sale_id,reason,request_key,actor):
     except IntegrityError as exc:
         raise ValidationError("شناسه درخواست تکراری است.") from exc
     row=ProductReturn.objects.create(salon=salon,sale=sale,refund=refund,movement=movement)
+    from apps.loyalty.automation import reconcile_refund
+    reconcile_refund(payment)
     refresh_customer_stats(payment.customer)
     _audit(salon,actor,row,"product_return","برگشت محصول و وجه",{"sale_id":sale.pk,"refund_id":refund.pk})
     return row

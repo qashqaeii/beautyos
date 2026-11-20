@@ -78,6 +78,8 @@ def refund_payment(*, salon, payment_id, amount, reason, request_key, actor):
         "payment":payment,"amount_toman":amount,"reason":reason})
     if not created:
         return check(row)
+    from apps.loyalty.automation import reconcile_refund
+    reconcile_refund(payment)
     refresh_customer_stats(payment.customer)
     _audit(salon, actor, row, "refund", "ثبت استرداد", {"payment_id":payment.pk,"amount_toman":amount})
     return row

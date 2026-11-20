@@ -10,7 +10,7 @@ class LoyaltyAdjustForm(forms.Form):
         required=True,
     )
     points_delta = forms.IntegerField(
-        label="تغییر امتیاز",
+        label="تغییر امتیاز", min_value=-1000000, max_value=1000000,
         help_text="مثبت برای افزایش، منفی برای کاهش",
     )
     note = forms.CharField(
@@ -25,3 +25,17 @@ class LoyaltyAdjustForm(forms.Form):
             "full_name"
         )
         self.fields["customer"].widget.attrs.update({"class": "input-field text-sm w-full"})
+
+
+from apps.core.fields import TomanAmountField
+from apps.loyalty.models import LoyaltyPolicy
+
+
+class LoyaltyPolicyForm(forms.Form):
+    enabled = forms.BooleanField(label="فعال‌سازی امتیازدهی خودکار", required=False)
+    spend_per_point_toman = TomanAmountField(label="مبلغ لازم برای یک امتیاز", min_value=1000, max_value=1000000000)
+    visit_points = forms.IntegerField(label="امتیاز هر مراجعه انجام‌شده", min_value=0, max_value=10000)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["visit_points"].widget.attrs["class"] = "input-field"

@@ -120,6 +120,8 @@ def issue_invoice(*, salon, customer_id, appointment_ids, request_key, discount,
             payment = Payment.objects.create(salon=salon, customer=customer, appointment=appointment,
                 invoice=invoice, total_amount_toman=previous_balance, discount_toman=applied_discount,
                 paid_amount_toman=amount, method=method, status=status, notes="ثبت از صندوق یکپارچه")
+            from apps.loyalty.automation import award_payment
+            award_payment(payment)
             AuditLog.objects.create(salon=salon, actor=actor, action=AuditLog.Action.CREATE,
                 entity_type="payment", entity_id=str(payment.pk), message="دریافت صندوق",
                 metadata={"invoice_id": invoice.pk, "paid_amount_toman": amount})

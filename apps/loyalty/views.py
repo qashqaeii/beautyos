@@ -1,10 +1,13 @@
 from django.contrib import messages
+from django.db import transaction
+from django.views.decorators.http import require_http_methods
+from apps.audit.models import AuditLog
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from apps.loyalty.forms import LoyaltyAdjustForm
-from apps.loyalty.models import LoyaltyAccount, LoyaltyTransaction, ledger_adjust_points, transaction_signed_points
+from apps.loyalty.forms import LoyaltyAdjustForm, LoyaltyPolicyForm
+from apps.loyalty.models import LoyaltyAccount, LoyaltyPolicy, LoyaltyTransaction, ledger_adjust_points, transaction_signed_points
 from apps.loyalty.services import loyalty_overview_stats, sync_account_tier, tier_count_rows
 from apps.loyalty.tiers import LOYALTY_TIERS, next_tier_progress, tier_for_points
 from apps.salons.decorators import salon_required
@@ -13,7 +16,6 @@ from apps.salons.permissions_policy import P_LOYALTY_MANAGE, require_permission
 
 def _enrich_account(account: LoyaltyAccount) -> dict:
     tier = tier_for_points(account.points_balance)
-    sync_account_tier(account)
     nxt, into, span = next_tier_progress(account.points_balance)
     return {
         "account": account,
@@ -38,11 +40,14 @@ def overview(request):
             delta = form.cleaned_data["points_delta"]
             note = form.cleaned_data["note"]
             try:
-                ledger_adjust_points(salon=salon, customer=customer, points_delta=delta, note=note)
+                with transaction.atomic():
+                    tx = ledger_adjust_points(salon=salon, customer=customer, points_delta=delta, note=note)
+                    AuditLog.objects.create(salon=salon, actor=request.user, action=AuditLog.Action.CREATE, entity_type="loyalty_transaction", entity_id=str(tx.pk), message="اصلاح دستی امتیاز", metadata={"delta":delta})
                 messages.success(request, "امتیاز مشتری به‌روزرسانی شد.")
             except ValueError as exc:
                 messages.error(request, "امتیاز کافی نیست." if "insufficient" in str(exc) else "مقدار امتیاز نامعتبر است.")
-            return redirect(reverse("loyalty:overview") + (f"?q={q}" if q else ""))
+            from urllib.parse import urlencode
+            return redirect(reverse("loyalty:overview") + ("?"+urlencode({"q":q}) if q else ""))
     else:
         form = LoyaltyAdjustForm(salon=salon)
 
@@ -85,6 +90,7 @@ def overview(request):
         "loyalty/overview.html",
         {
             "stats": stats,
+            "policy": LoyaltyPolicy.scoped(salon).first(),
             "tier_rows": tier_count_rows(stats),
             "members": members,
             "member_count": len(members),
@@ -93,6 +99,7 @@ def overview(request):
             "rules": rules,
             "search_q": q,
             "adjust_form": form,
+            "adjust_open": form.is_bound,
         },
     )
 
@@ -106,7 +113,7 @@ def member_detail(request, pk: int):
         pk=pk,
     )
     ctx = _enrich_account(account)
-    transactions = account.transactions.order_by("-created_at")[:100]
+    transactions = account.transactions.filter(salon=salon).order_by("-created_at")[:100]
     tx_rows = [{"tx": tx, "signed_points": transaction_signed_points(tx)} for tx in transactions]
     return render(
         request,
@@ -116,3 +123,24 @@ def member_detail(request, pk: int):
             "tx_rows": tx_rows,
         },
     )
+
+
+@salon_required
+@require_permission(P_LOYALTY_MANAGE)
+@require_http_methods(["GET","POST"])
+def program_settings(request):
+    salon=request.salon
+    policy=LoyaltyPolicy.scoped(salon).first()
+    initial={key:getattr(policy or LoyaltyPolicy(),key) for key in ("enabled","spend_per_point_toman","visit_points")}
+    form=LoyaltyPolicyForm(request.POST if request.method=="POST" else None,initial=initial)
+    if request.method=="POST" and form.is_valid():
+        with transaction.atomic():
+            row,_=LoyaltyPolicy.objects.select_for_update().get_or_create(salon=salon)
+            for key,value in form.cleaned_data.items():
+                setattr(row,key,value)
+            row.save()
+            AuditLog.objects.create(salon=salon,actor=request.user,action=AuditLog.Action.UPDATE,
+                entity_type="loyalty_policy",entity_id=str(row.pk),message="تنظیم برنامه وفاداری",metadata=form.cleaned_data)
+        messages.success(request,"تنظیمات باشگاه ذخیره شد.")
+        return redirect("loyalty:overview")
+    return render(request,"loyalty/program_settings.html",{"form":form})

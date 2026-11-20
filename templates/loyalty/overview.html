@@ -9,17 +9,23 @@
 <script defer src="{% static 'js/loyalty-overview.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 {% endblock %}
 {% block content %}
-<div class="loyalty-page mx-auto w-full max-w-4xl pb-24 md:pb-8" x-data="{ adjustOpen: false }">
+<div class="loyalty-page mx-auto w-full max-w-5xl pb-24 md:pb-8" x-data="{ adjustOpen: {% if adjust_open %}true{% else %}false{% endif %} }">
   <header class="loyalty-page__hero dashboard-enter">
     <div class="loyalty-page__hero-copy">
       <h1 class="loyalty-page__title">باشگاه مشتریان</h1>
       <p class="loyalty-page__subtitle">امتیاز وفاداری، سطوح عضویت و فعالیت اخیر سالن</p>
     </div>
+    <div class="flex flex-wrap gap-2"><a class="btn-secondary text-sm" href="{% url 'loyalty:program' %}"><i data-lucide="settings-2" aria-hidden="true"></i>تنظیمات باشگاه</a>
     <button type="button" class="btn-secondary loyalty-page__adjust-toggle text-sm" @click="adjustOpen = !adjustOpen">
       <i data-lucide="plus-circle" class="h-4 w-4" aria-hidden="true"></i>
       ثبت تغییر امتیاز
-    </button>
+    </button></div>
   </header>
+
+  <section class="loyalty-adjust-panel dashboard-enter">
+    <div class="flex items-center justify-between gap-2 flex-wrap"><h2 class="loyalty-panel__heading">برنامه امتیازدهی</h2><span class="loyalty-tier-badge {% if policy.enabled %}loyalty-tier-badge--silver{% else %}loyalty-tier-badge--standard{% endif %}">{% if policy.enabled %}فعال{% else %}غیرفعال{% endif %}</span></div>
+    {% if policy.enabled %}<p class="text-sm text-ink-secondary">هر {{ policy.spend_per_point_toman|fa_money }} تومان دریافت = یک امتیاز · هر مراجعه انجام‌شده {{ policy.visit_points|fa_num }} امتیاز</p>{% else %}<p class="text-sm text-ink-secondary">با فعال‌سازی برنامه، امتیاز خرید و مراجعه به‌صورت خودکار ثبت می‌شود.</p>{% endif %}
+  </section>
 
   <div class="loyalty-stats-grid dashboard-enter">
     <article class="loyalty-stat">
@@ -71,6 +77,7 @@
     <form method="post" class="loyalty-adjust-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="adjust">
+      {% if adjust_form.errors %}<div role="alert" class="text-sm text-ink-secondary">{{ adjust_form.errors }}</div>{% endif %}
       <div class="loyalty-adjust-form__grid">
         <div class="loyalty-adjust-form__field">
           <label class="loyalty-adjust-form__label" for="id_customer">مشتری</label>
@@ -167,7 +174,7 @@
     {% endif %}
     {% else %}
     <p class="loyalty-panel__empty">
-      {% if search_q %}عضوی با این جستجو پیدا نشد.{% else %}هنوز امتیازی برای مشتریان ثبت نشده؛ پس از اولین رزرو یا ثبت دستی امتیاز، لیست پر می‌شود.{% endif %}
+      {% if search_q %}عضوی با این جستجو پیدا نشد.{% else %}هنوز امتیازی برای مشتریان ثبت نشده است. برنامه امتیازدهی را فعال کنید یا امتیاز دستی ثبت کنید.{% endif %}
     </p>
     {% endif %}
   </section>

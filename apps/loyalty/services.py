@@ -34,7 +34,7 @@ def loyalty_overview_stats(salon) -> LoyaltyOverviewStats:
     accounts = LoyaltyAccount.scoped(salon)
     agg = accounts.aggregate(
         member_count=Count("id"),
-        total_points=Sum("points_balance"),
+        total_points=Sum("points_balance", filter=Q(points_balance__gt=0)),
         active_with_balance=Count("id", filter=Q(points_balance__gt=0)),
     )
     member_count = agg["member_count"] or 0
@@ -42,8 +42,9 @@ def loyalty_overview_stats(salon) -> LoyaltyOverviewStats:
     active_with_balance = agg["active_with_balance"] or 0
     avg_points = int(total_points / member_count) if member_count else 0
 
-    month_start = timezone.localdate().replace(day=1)
-    txs = LoyaltyTransaction.scoped(salon).filter(created_at__date__gte=month_start)
+    from apps.core.utils.dates import jalali_month_bounds
+    month_start, month_end = jalali_month_bounds()
+    txs = LoyaltyTransaction.scoped(salon).filter(created_at__date__range=(month_start, month_end))
     points_earned_month = int(
         txs.filter(kind=LoyaltyTransaction.Kind.EARN).aggregate(s=Sum("points"))["s"] or 0
     )
