@@ -278,6 +278,15 @@ def staff_hours(request, pk):
     week_anchor = _resolve_week_anchor(request)
     week_start = week_start_saturday(week_anchor)
     week_end = week_start + timedelta(days=6)
+    hours = list(profile.work_hours.order_by("weekday"))
+    schedule = _staff_week_schedule(hours, week_start)
+    try:
+        selected = int(request.POST.get("weekday") if request.method == "POST" else request.GET.get("day", (week_anchor-week_start).days))
+    except (TypeError, ValueError):
+        selected = (week_anchor-week_start).days
+    if not 0 <= selected <= 6:
+        selected = (week_anchor-week_start).days
+    selected_row = schedule[selected]
     if request.method == "POST":
         form = WorkHoursForm(request.POST, week_anchor=week_anchor)
         if form.is_valid():
@@ -294,10 +303,15 @@ def staff_hours(request, pk):
             )
             messages.success(request, "برنامهٔ هفتگی ذخیره شد.")
             url = reverse("staff:hours", kwargs={"pk": pk})
-            return redirect(f"{url}?week={week_start.isoformat()}")
+            return redirect(f"{url}?week={week_start.isoformat()}&day={data['weekday']}")
     else:
-        form = WorkHoursForm(week_anchor=week_anchor)
-    hours = profile.work_hours.order_by("weekday")
+        record = selected_row["record"]
+        initial = {"weekday": selected, "reference_date": selected_row["gregorian"]}
+        if record:
+            initial.update(start_time=record.start_time if not record.is_closed else None,
+                           end_time=record.end_time if not record.is_closed else None,
+                           is_closed=record.is_closed)
+        form = WorkHoursForm(week_anchor=selected_row["gregorian"], initial=initial)
     return render(
         request,
         "staff/hours.html",
@@ -305,9 +319,16 @@ def staff_hours(request, pk):
             "form": form,
             "profile": profile,
             "hours": hours,
-            "week_schedule": _staff_week_schedule(hours, week_start),
+            "week_schedule": schedule,
+            "selected_day": selected,
+            "selected_row": selected_row,
+            "work_days": sum(not h.is_closed for h in hours),
+            "closed_days": sum(h.is_closed for h in hours),
+            "unconfigured_days": 7 - len(hours),
             "week_start": week_start,
             "week_end": week_end,
+            "previous_week": week_start - timedelta(days=7),
+            "next_week": week_start + timedelta(days=7),
             "week_anchor": week_anchor,
             "week_anchor_jalali": to_jalali(week_anchor),
             "week_range_jalali": f"{to_jalali(week_start)} – {to_jalali(week_end)}",

@@ -1,152 +1,74 @@
 {% extends "layouts/app_shell.html" %}
 {% load static format_tags %}
-{% block title %}ساعات کاری · {{ profile.display_name }}{% endblock %}
+{% block title %}ساعات کاری · {{ profile.full_display_name }}{% endblock %}
 {% block workspace_header %}{% endblock %}
-{% block page_title %}{% endblock %}
-{% block page_subtitle %}{% endblock %}
-
+{% block mobile_header %}{% endblock %}
+{% block extra_head %}<script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>{% endblock %}
 {% block content %}
-<div class="staff-hours-page staff-hours-page--minimal">
-  <header class="staff-hours-page__header staff-hours-page__header--minimal">
-    <a href="{% url 'staff:detail' pk=profile.pk %}" class="staff-hours-page__back-link">
-      <i data-lucide="chevron-right" class="staff-hours-page__lucide" aria-hidden="true"></i>
-      <span>بازگشت</span>
-    </a>
-    <h1 class="staff-hours-page__title">ساعات کاری · {{ profile.display_name }}</h1>
+<div class="staff-hours-page hours-workspace">
+  <header class="hours-head">
+    <div class="hours-head__identity"><span class="hours-emblem"><i data-lucide="clock" aria-hidden="true"></i></span><div><h1>ساعات کاری</h1><p>{{ profile.full_display_name }}{% if profile.title %} · {{ profile.title }}{% endif %}</p></div></div>
+    <a class="btn-secondary hours-back" href="{% url 'staff:detail' pk=profile.pk %}"><i data-lucide="arrow-right" aria-hidden="true"></i>پروفایل متخصص</a>
   </header>
-
-  <section class="staff-hours-surface" aria-label="برنامهٔ هفتگی">
-    <div class="staff-hours-surface__toolbar">
-      <p class="staff-hours-week-range tabular-nums">{{ week_range_jalali|persian_digits }}</p>
-      {% include "partials/jalali_week_picker.html" with week_anchor=week_anchor %}
-    </div>
-    <ol class="staff-hours-week-list">
-      {% for row in week_schedule %}
-      <li class="staff-hours-week-row{% if row.record and row.record.is_closed %} staff-hours-week-row--closed{% endif %}">
-        <span class="staff-hours-week-row__day">{{ row.label }}</span>
-        <span class="staff-hours-week-row__meta tabular-nums">{{ row.jalali|persian_digits }}</span>
-        <span class="staff-hours-week-row__hours" dir="ltr">
-          {% if row.record and not row.record.is_closed %}
-          {{ row.record.start_time|time:"H:i"|persian_digits }} – {{ row.record.end_time|time:"H:i"|persian_digits }}
-          {% elif row.record and row.record.is_closed %}
-          <span class="staff-hours-week-row__closed">تعطیل</span>
-          {% else %}
-          <span class="staff-hours-week-row__muted">—</span>
-          {% endif %}
-        </span>
-      </li>
-      {% endfor %}
-    </ol>
+  {% if messages %}<div class="hours-messages">{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+  <section class="hours-summary" aria-label="خلاصه برنامه هفتگی">
+    <div><span class="hours-summary-icon is-work"><i data-lucide="calendar-check" aria-hidden="true"></i></span><span>روز کاری</span><strong>{{ work_days|fa_num }}</strong></div>
+    <div><span class="hours-summary-icon"><i data-lucide="calendar-off" aria-hidden="true"></i></span><span>روز تعطیل</span><strong>{{ closed_days|fa_num }}</strong></div>
+    <div><span class="hours-summary-icon is-neutral"><i data-lucide="calendar-clock" aria-hidden="true"></i></span><span>تنظیم نشده</span><strong>{{ unconfigured_days|fa_num }}</strong></div>
   </section>
-
-  <section class="staff-hours-edit" aria-labelledby="staff-hours-form-title">
-    <h2 id="staff-hours-form-title" class="staff-hours-edit__title">ویرایش روز</h2>
-    <p class="staff-hours-edit__hint">ذخیره برای همان روز هفته (شنبه تا جمعه) اعمال می‌شود.</p>
-    <form
-      method="post"
-      class="staff-hours-form staff-hours-form--compact"
-      x-data="staffHoursWeekdaySync('{{ week_start|date:'Y-m-d' }}')"
-      data-staff-hours-form
-    >
-      {% csrf_token %}
-      <div class="staff-hours-form__reference-hidden" aria-hidden="true">
-        {{ form.reference_date }}
+  <div class="hours-layout">
+    <section class="staff-hours-surface" aria-labelledby="hours-schedule-title">
+      <div class="hours-panel-title"><span class="hours-small-icon"><i data-lucide="calendar-days" aria-hidden="true"></i></span><h2 id="hours-schedule-title">برنامهٔ هفتگی</h2><span class="hours-recurring">تکرار هر هفته</span></div>
+      <div class="staff-hours-surface__toolbar">
+        <div class="hours-week-nav"><a href="?week={{ previous_week|date:'Y-m-d' }}&amp;day={{ selected_day }}" aria-label="هفته قبل" title="هفته قبل"><i data-lucide="chevron-right" aria-hidden="true"></i></a><p class="staff-hours-week-range tabular-nums">{{ week_range_jalali|persian_digits }}</p><a href="?week={{ next_week|date:'Y-m-d' }}&amp;day={{ selected_day }}" aria-label="هفته بعد" title="هفته بعد"><i data-lucide="chevron-left" aria-hidden="true"></i></a></div>
+        {% include "partials/jalali_week_picker.html" with week_anchor=week_anchor %}
       </div>
-
-      <div class="staff-hours-form__grid">
-        <div class="staff-hours-field staff-hours-field--grow">
-          <label class="field-label" for="{{ form.weekday.id_for_label }}">{{ form.weekday.label }}</label>
-          {{ form.weekday }}
-          {% if form.weekday.errors %}<p class="staff-hours-field__error">{{ form.weekday.errors.0 }}</p>{% endif %}
+      <div class="hours-table-head" aria-hidden="true"><span>روز هفته</span><span>ساعت حضور</span><span>وضعیت</span><span></span></div>
+      <ol class="staff-hours-week-list">
+        {% for row in week_schedule %}
+        <li class="hours-day-item">
+          <a href="?week={{ week_start|date:'Y-m-d' }}&amp;day={{ row.weekday }}#hours-editor" data-hours-day="{{ row.weekday }}" class="hours-day{% if row.weekday == selected_day %} is-selected{% endif %}" {% if row.weekday == selected_day %}aria-current="true"{% endif %}>
+            <span class="hours-day__name"><strong>{{ row.label }}</strong><small>{{ row.jalali|persian_digits }}</small></span>
+            <span class="hours-day__time" dir="ltr">{% if row.record and not row.record.is_closed %}{{ row.record.start_time|time:"H:i"|persian_digits }} – {{ row.record.end_time|time:"H:i"|persian_digits }}{% else %}—{% endif %}</span>
+            {% if not row.record %}<span class="hours-status is-neutral">تنظیم نشده</span>{% elif row.record.is_closed %}<span class="hours-status is-closed">تعطیل</span>{% else %}<span class="hours-status is-work">کاری</span>{% endif %}
+            <i data-lucide="pencil" class="hours-day__edit" aria-hidden="true"></i>
+          </a>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    <section class="staff-hours-edit" id="hours-editor" aria-labelledby="staff-hours-form-title">
+      <div class="hours-panel-title"><span class="hours-small-icon"><i data-lucide="sliders-horizontal" aria-hidden="true"></i></span><h2 id="staff-hours-form-title">ویرایش ساعات</h2></div>
+      <div class="hours-selected"><div><strong>{{ selected_row.label }}</strong><small>{{ selected_row.jalali|persian_digits }}</small></div><span>روز انتخاب‌شده</span></div>
+      <form method="post" class="staff-hours-form staff-hours-form--compact" data-staff-hours-form>
+        {% csrf_token %}
+        {{ form.weekday.as_hidden }}
+        {{ form.reference_date.as_hidden }}
+        {% if form.non_field_errors %}<div role="alert" class="hours-errors">{{ form.non_field_errors }}</div>{% endif %}
+        {{ form.weekday.errors }}{{ form.reference_date.errors }}
+        <label class="hours-closed-switch"><span><strong>این روز تعطیل است</strong><small>عدم پذیرش نوبت در این روز هفته</small></span>{{ form.is_closed }}<i aria-hidden="true"></i></label>
+        {{ form.is_closed.errors }}
+        <div class="staff-hours-form__grid staff-hours-time-stack" data-time-stack>
+          <div class="staff-hours-field"><label class="field-label" for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>{{ form.start_time }}{{ form.start_time.errors }}</div>
+          <div class="staff-hours-field"><label class="field-label" for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>{{ form.end_time }}{{ form.end_time.errors }}</div>
         </div>
-        <div class="staff-hours-field staff-hours-field--closed">
-          <label class="staff-hours-checkbox">
-            {{ form.is_closed }}
-            <span>{{ form.is_closed.label }}</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="staff-hours-form__grid staff-hours-time-stack" data-time-stack>
-        <div class="staff-hours-field">
-          <label class="field-label" for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
-          {{ form.start_time }}
-          {% if form.start_time.errors %}<p class="staff-hours-field__error">{{ form.start_time.errors.0 }}</p>{% endif %}
-        </div>
-        <div class="staff-hours-field">
-          <label class="field-label" for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
-          {{ form.end_time }}
-          {% if form.end_time.errors %}<p class="staff-hours-field__error">{{ form.end_time.errors.0 }}</p>{% endif %}
-        </div>
-      </div>
-
-      <button type="submit" class="btn-primary staff-hours-form__submit">ذخیره</button>
-    </form>
-  </section>
+        <p class="hours-hint"><i data-lucide="info" aria-hidden="true"></i>تغییرات برای {{ selected_row.label }} هر هفته اعمال می‌شوند، نه فقط این تاریخ.</p>
+        <button type="submit" class="btn-primary staff-hours-form__submit"><i data-lucide="check" aria-hidden="true"></i>ذخیره برنامهٔ هفتگی</button>
+      </form>
+    </section>
+  </div>
 </div>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    if (window.lucide) window.lucide.createIcons();
-    const form = document.querySelector("[data-staff-hours-form]");
-    if (!form) return;
-
-    const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
-    const toAscii = (value) =>
-      String(value).replace(/[۰-۹]/g, (ch) => String(persianDigits.indexOf(ch)));
-
-    const extractDigits = (value) => toAscii(value).replace(/\D/g, "").slice(0, 4);
-
-    const formatTimeDigits = (digits, { autoColon }) => {
-      if (!digits) return "";
-      if (digits.length <= 2) {
-        return autoColon && digits.length === 2 ? digits + ":" : digits;
-      }
-      return digits.slice(0, 2) + ":" + digits.slice(2);
-    };
-
-    const caretAfterFormat = (formatted, digits, autoColon) => {
-      if (!formatted) return 0;
-      if (autoColon && digits.length === 2) return 3;
-      return formatted.length;
-    };
-
-    const handleTimeInput = (el, event) => {
-      const deleting = Boolean(event.inputType && event.inputType.startsWith("delete"));
-      const digits = extractDigits(el.value);
-      const autoColon = !deleting && digits.length === 2;
-      const formatted = formatTimeDigits(digits, { autoColon });
-
-      el.value = formatted;
-
-      const pos = caretAfterFormat(formatted, digits, autoColon);
-      requestAnimationFrame(() => {
-        try {
-          el.setSelectionRange(pos, pos);
-        } catch (_err) {
-          /* noop */
-        }
-      });
-    };
-
-    const syncDisabled = (closed) => {
-      form.querySelectorAll(".input-field--time24").forEach((el) => {
-        el.disabled = closed;
-      });
-      const stack = form.querySelector("[data-time-stack]");
-      if (stack) {
-        stack.classList.toggle("staff-hours-time-stack--disabled", closed);
-      }
-    };
-
-    form.querySelectorAll(".input-field--time24").forEach((el) => {
-      el.addEventListener("input", (event) => handleTimeInput(el, event));
-    });
-
-    const cb = form.querySelector('input[name="is_closed"]');
-    if (cb) {
-      syncDisabled(cb.checked);
-      cb.addEventListener("change", (e) => syncDisabled(e.target.checked));
-    }
-  });
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.querySelector("[data-staff-hours-form]");
+  if (!form) return;
+  const closed = form.querySelector('[name="is_closed"]');
+  function sync() {
+    form.querySelectorAll(".input-field--time24").forEach(el => { el.disabled = closed.checked; });
+    form.querySelector("[data-time-stack]").classList.toggle("staff-hours-time-stack--disabled", closed.checked);
+  }
+  closed.addEventListener("change", sync);
+  sync();
+});
 </script>
 {% endblock %}

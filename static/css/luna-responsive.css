@@ -158,3 +158,18 @@ body.beautyos-main-bg .maison-app .maison-unified-header:has(.maison-page-title:
   .maison-app .luna-mobile-account-sheet { z-index:61; inset:auto; inset-inline-start:24px; bottom:24px; width:min(360px,calc(100vw - 48px)); max-height:calc(100dvh - 48px); border-radius:18px; box-shadow:0 12px 42px rgba(68,43,39,.16); }
   .luna-mobile-account-sheet .maison-sheet__handle { display:none; }
 }
+
+/* Document is the scrolling surface. Keep focused controls above fixed mobile navigation.
+   Do not hide overflow or resize financial/report data to force a fit. */
+@media(max-width:1023px){
+ html:has(body.theme-app){scroll-padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+ .maison-app .maison-unified-header{position:relative;top:auto;min-width:0}
+ .maison-app .maison-page-actions{flex-wrap:wrap;min-width:0;max-width:100%}
+ .maison-app .maison-page-actions > :is(a,button){white-space:normal;min-width:0}
+}
+@media(max-width:639px){
+ .maison-app .maison-content :is(.public-auth-field,.fin-tools-form,.editorial-module-card,.finance-checkout-field,.club-form-field){min-width:0;max-width:100%}
+ .maison-app .maison-content :is(.public-auth-field,.fin-tools-form) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea){max-width:100%;min-width:0}
+ .maison-app .maison-content :is(.public-auth-field,.fin-tools-form) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea){font-size:16px}
+ .maison-app .maison-content :is(.editorial-module-actions,.customer-detail-header__actions,.staff-profile-header__actions){min-width:0;max-width:100%}
+}

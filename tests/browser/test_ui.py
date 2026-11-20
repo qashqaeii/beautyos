@@ -55,7 +55,7 @@ def browser_data(owner_membership):
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.parametrize("width,height", [(360,800),(768,1024),(1440,900)])
+@pytest.mark.parametrize("width,height", [(360,800),(768,1024),(1280,720),(1440,900)])
 def test_real_browser_layout_and_controls(live_server, client, owner_membership, browser_data, width, height):
     salon, staff, customer, appt, account = browser_data
     from apps.appointments.models import Appointment
@@ -482,5 +482,54 @@ def test_staff_board_populated_short_notebook(live_server, client, owner_members
         pw.expect(page.locator(".suite-staff-card")).to_have_count(1)
         page.goto(live_server.url+reverse("finance:overview"),wait_until="load")
         assert page.locator(".maison-app.management-suite").count()==0
+        context.close()
+        browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(360,800),(1366,640)])
+def test_staff_hours_weekly_editor(live_server, client, owner_membership, browser_data, width, height):
+    from datetime import time
+    from apps.staff.models import StaffWorkHours
+    salon,staff,_,_,_=browser_data
+    client.force_login(owner_membership.user)
+    session=client.session
+    session["active_salon_id"]=str(salon.pk)
+    session.save()
+    with pw.sync_playwright() as playwright:
+        browser=playwright.chromium.launch(headless=True)
+        context=browser.new_context(viewport={"width":width,"height":height},locale="fa-IR",reduced_motion="reduce")
+        context.add_cookies([{"name":settings.SESSION_COOKIE_NAME,"value":client.cookies[settings.SESSION_COOKIE_NAME].value,"url":live_server.url}])
+        page=context.new_page()
+        errors=[]
+        page.on("pageerror",lambda error:errors.append(str(error)))
+        page.goto(live_server.url+reverse("staff:hours",args=[staff.pk]),wait_until="load")
+        page.evaluate("document.fonts.ready")
+        pw.expect(page.locator("[data-hours-day]")).to_have_count(7)
+        if width>=1024:
+            pw.expect(page.locator(".staff-hours-surface")).to_be_in_viewport(ratio=1)
+            pw.expect(page.locator(".staff-hours-form__submit")).to_be_in_viewport(ratio=1)
+        page.locator('[data-hours-day="2"]').click()
+        pw.expect(page.locator('[data-hours-day="2"]')).to_have_attribute("aria-current","true")
+        start=page.locator('[name="start_time"]')
+        end=page.locator('[name="end_time"]')
+        pw.expect(start).to_have_value("09:00")
+        pw.expect(end).to_have_value("18:00")
+        start.fill("1030")
+        end.fill("1930")
+        pw.expect(start).to_have_value("10:30")
+        page.get_by_role("button",name="ذخیره برنامهٔ هفتگی").click()
+        pw.expect(start).to_have_value("10:30")
+        assert StaffWorkHours.objects.get(staff=staff,weekday=2).end_time==time(19,30)
+        page.locator('[name="is_closed"]').check()
+        pw.expect(start).to_be_disabled()
+        pw.expect(end).to_be_disabled()
+        page.get_by_role("button",name="ذخیره برنامهٔ هفتگی").click()
+        pw.expect(page.locator('[data-hours-day="2"]')).to_contain_text("تعطیل")
+        assert StaffWorkHours.objects.get(staff=staff,weekday=2).is_closed
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+2")
+        assert not errors
+        ARTIFACT.mkdir(exist_ok=True)
+        page.screenshot(path=str(ARTIFACT/f"{width}-staff-hours.png"),animations="disabled")
         context.close()
         browser.close()

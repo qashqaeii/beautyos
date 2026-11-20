@@ -1,0 +1,3 @@
+# Staff hours and responsive pass
+Staff hours retains the recurring weekday contract. Selecting a row opens the correct persisted weekday, with direct week navigation, Jalali picker, accurate counts, HH:mm formatting, and visible validation. No schema change or separate dated rota.
+Desktop uses adjacent panels; phone uses stacked responsive modules. Shared non-finance management cards now respond to actual workspace width, and mobile focus/headers/forms respect fixed navigation. Finance retains its design and gains only common responsive safeguards. Existing full-route Chromium suite adds 1280×720; dedicated tests cover 360×800 and 1366×640, save, close day, and overflow. Previous regression (removed weekly-save label) is fixed by restoring the meaningful label.
