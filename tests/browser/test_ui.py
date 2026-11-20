@@ -147,6 +147,15 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 pw.expect(dialog).to_be_visible(timeout=6000)
                 box=dialog.bounding_box()
                 assert box and box["x"]>=-2 and box["x"]+box["width"]<=width+2
+                assert box["height"] <= height * (0.92 if width < 640 else 0.84) + 2
+                if width >= 640:
+                    limit = dialog.evaluate("(el) => el.classList.contains('luna-modal--extended') ? 620 : el.classList.contains('luna-modal--compact') ? 420 : 520")
+                    assert box["width"] <= limit + 2, "oversized desktop dialog"
+                    assert box["height"] <= 562, "oversized desktop dialog height"
+                footer = dialog.locator(".inventory-create-modal__foot")
+                pw.expect(footer).to_be_visible()
+                footer_box = footer.bounding_box()
+                assert footer_box and footer_box["y"] + footer_box["height"] <= box["y"] + box["height"] + 2
                 assert dialog.evaluate("(el) => getComputedStyle(el, '::before').content === 'none' || getComputedStyle(el, '::before').display === 'none'"), "decorative modal panel still present"
                 page.screenshot(path=str(ARTIFACT/f"{width}-modal-{name}.png"),animations="disabled")
                 page.keyboard.press("Escape")
