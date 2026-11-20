@@ -12,7 +12,7 @@
   {% for row in by_staff %}
   <article class="editorial-module-card"><div class="editorial-module-card__head"><span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
     <div>
-      <p>مانده تسویه</p>
+      <h3>{{ row.staff__display_name|default:"متخصص" }}</h3><p>مانده تسویه</p>
       <p class="editorial-module-value">{{ row.total|fa_money }} <span class="text-base font-normal">تومان</span></p>
     </div>
     <a href="{% url 'commissions:settle' staff_id=row.staff_id %}" class="btn-secondary text-xs">تسویه</a>

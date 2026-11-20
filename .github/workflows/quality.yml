@@ -52,7 +52,21 @@ jobs:
       - name: Check JavaScript syntax
         run: find static/js -name '*.js' -not -path '*/vendor/*' -print0 | xargs -0 -n 1 node --check
       - name: PostgreSQL regression suite
-        run: pytest --create-db --junitxml=pytest-report.xml
+        run: pytest --create-db --ignore=tests/browser --junitxml=pytest-report.xml
+      - name: Install browser test dependencies
+        run: |
+          pip install playwright==1.51.0
+          python -m playwright install --with-deps chromium
+      - name: Real browser responsive and offline-CDN regression
+        run: pytest tests/browser --reuse-db --junitxml=browser-report.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-report
+          path: |
+            browser-report.xml
+            browser-artifacts/
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         if: always()
         with:

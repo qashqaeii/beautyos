@@ -144,8 +144,8 @@ def test_staff_profile_always_renders_booking_and_preserves_edit_form(client, st
     assert 'name="booking_staff_locked"' in source
     assert 'id="staff-edit-form"' in source
     assert 'name="display_name"' in source
-    assert source.index("appointment-customer-picker.js") < source.index("alpinejs@")
-    assert source.index("appointment-deposit-preview.js") < source.index("alpinejs@")
+    assert source.index("appointment-customer-picker.js") < source.index("alpine-3.14.8.min.js")
+    assert source.index("appointment-deposit-preview.js") < source.index("alpine-3.14.8.min.js")
     # A query parameter cannot select a different specialist on this profile.
     response = client.get(path, {"book": "1", "staff": staff.pk + 999, "edit": "1"})
     assert response.status_code == 200
