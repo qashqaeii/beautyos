@@ -245,6 +245,7 @@
   {% endif %}
 
   {% if tab == 'commissions' %}
+  <section class="fin-panel"><header class="fin-panel-head"><h2>مدل همکاری و حقوق</h2>{% if can_settle_commission %}<a class="btn-primary" href="{% url 'finance:staff_finance' %}">حقوق، مساعده و اجاره جایگاه</a>{% endif %}</header><p class="fin-muted">پورسانت خدمات در همین بخش و قراردادهای ماهانه در پرونده همکاری ثبت می‌شوند.</p></section>
   <section
     class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="تسویه متخصص‌ها"
     x-data="{ commPanel: '{% if commissions.pending_rows %}pending{% elif commissions.settled_rows %}settled{% else %}pending{% endif %}' }"

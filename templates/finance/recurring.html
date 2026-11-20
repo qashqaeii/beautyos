@@ -1,0 +1,8 @@
+{% extends "layouts/app_shell.html" %}{% load static format_tags %}
+{% block page_title %}هزینه‌های دوره‌ای{% endblock %}{% block page_subtitle %}مدیریت سررسیدهای ماهانه شمسی{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block content %}<div class="fin-tools-grid">
+<section class="fin-panel"><header class="fin-panel-head"><h2>هزینه تکرارشونده جدید</h2><a href="{% url 'expenses:overview' %}">هزینه‌ها</a></header><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="create">{% include "finance/partials/tool_form.html" %}<button class="btn-primary">ثبت یادآور ماهانه</button></form></section>
+<section class="fin-panel"><header class="fin-panel-head"><h2>سررسیدها</h2></header><p class="fin-muted">در زمان سررسید هزینه را تأیید کنید تا فقط یک بار به هزینه‌های سالن اضافه شود. تاریخ سررسید بعدی خودکار محاسبه می‌شود.</p>{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% for row in schedules %}<article class="fin-account-card"><strong>{{ row.title }}</strong><span>{{ row.amount_toman|fa_money }} تومان · {{ row.next_due|fa_jalali }}</span>{% if row.is_active %}<form method="post" class="flex flex-wrap gap-2">{% csrf_token %}<input type="hidden" name="schedule" value="{{ row.pk }}"><input type="hidden" name="due" value="{{ row.next_due|date:'Y-m-d' }}">{% if row.next_due <= today %}<button class="btn-primary" name="action" value="record">ثبت هزینه سررسید</button>{% endif %}<button class="btn-secondary" name="action" value="pause">توقف</button></form>{% else %}<small>متوقف‌شده</small>{% endif %}</article>{% empty %}<p class="fin-muted">یادآوری ثبت نشده است.</p>{% endfor %}</section>
+</div>{% endblock %}

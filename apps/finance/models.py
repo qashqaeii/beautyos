@@ -171,3 +171,53 @@ class AccountMovement(TenantModelMixin, TimeStampedModel):
             models.CheckConstraint(condition=models.Q(amount_toman__gt=0), name="finance_movement_positive"),
             models.CheckConstraint(condition=(models.Q(from_account__isnull=False)|models.Q(to_account__isnull=False)) & ~(models.Q(from_account=models.F("to_account")) & models.Q(from_account__isnull=False) & models.Q(to_account__isnull=False)), name="finance_movement_accounts"),
         ]
+
+
+class StaffAgreement(TenantModelMixin, TimeStampedModel):
+    staff = models.ForeignKey("staff.StaffProfile", on_delete=models.PROTECT, related_name="finance_agreements")
+    effective_month = models.DateField()
+    mode = models.CharField(max_length=12, choices=[("commission","درصدی"),("salary","حقوق ثابت"),("hybrid","ترکیبی"),("rent","اجاره جایگاه")])
+    monthly_toman = models.BigIntegerField(default=0)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","staff","effective_month"],name="finance_staff_agreement_month")]
+
+
+class StaffPeriod(TenantModelMixin, TimeStampedModel):
+    staff = models.ForeignKey("staff.StaffProfile", on_delete=models.PROTECT, related_name="finance_periods")
+    agreement = models.ForeignKey("finance.StaffAgreement", on_delete=models.PROTECT, related_name="periods")
+    month = models.DateField()
+    kind = models.CharField(max_length=10, choices=[("salary","حقوق"),("rent","اجاره جایگاه")])
+    amount_toman = models.BigIntegerField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","staff","month"],name="finance_staff_period_month")]
+
+
+class StaffPeriodPayment(TenantModelMixin, TimeStampedModel):
+    period = models.ForeignKey("finance.StaffPeriod", on_delete=models.PROTECT, related_name="payments")
+    kind = models.CharField(max_length=12, choices=[("advance","مساعده حقوق"),("settlement","تسویه حقوق"),("rent","دریافت اجاره")])
+    amount_toman = models.BigIntegerField()
+    request_key = models.UUIDField()
+    note = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","request_key"],name="finance_staff_payment_request"), models.CheckConstraint(condition=models.Q(amount_toman__gt=0),name="finance_staff_payment_positive")]
+
+
+class RecurringExpense(TenantModelMixin, TimeStampedModel):
+    title = models.CharField(max_length=120)
+    category = models.CharField(max_length=20)
+    amount_toman = models.BigIntegerField()
+    next_due = models.DateField()
+    day_of_month = models.PositiveSmallIntegerField()
+    is_active = models.BooleanField(default=True)
+
+
+class ExpenseOccurrence(TenantModelMixin, TimeStampedModel):
+    schedule = models.ForeignKey("finance.RecurringExpense", on_delete=models.PROTECT, related_name="occurrences")
+    due_day = models.DateField()
+    expense = models.OneToOneField("expenses.Expense", on_delete=models.PROTECT, related_name="recurring_occurrence")
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","schedule","due_day"],name="finance_expense_occurrence_day")]

@@ -60,6 +60,8 @@ class PostingForm(StyledForm):
           ("commission",CommissionSettlement.scoped(salon),"تسویه متخصص","amount_toman",False),
           ("debt",SalonDebtPayment.scoped(salon),"پرداخت بدهی","amount_toman",False),
           ("package",CustomerPackage.scoped(salon).filter(price_paid_toman__gt=0),"فروش پکیج","price_paid_toman",True)]
+        from apps.finance.models import StaffPeriodPayment
+        sources.extend([("staff_period",StaffPeriodPayment.scoped(salon).exclude(kind="rent"),"حقوق متخصص","amount_toman",False),("staff_period",StaffPeriodPayment.scoped(salon).filter(kind="rent"),"دریافت اجاره","amount_toman",True)])
         self.directions={}
         choices=[]
         for key,qs,label,field,inbound in sources:
@@ -76,7 +78,11 @@ class PostingForm(StyledForm):
                     kind,pk=event.split(":")
                     if kind in {s[0] for s in sources} and 0<int(pk)<=MAX_MONEY:
                         choices.append((event,event))
-                        self.directions[event]=kind in ("payment","package")
+                        from apps.finance.ledger import source_event
+                        try:
+                            self.directions[event]=source_event(salon,kind,int(pk))[2]
+                        except ValidationError:
+                            choices.pop()
                 except (ValueError,TypeError):
                     pass
         self.fields["event"].choices=choices
@@ -94,9 +100,9 @@ class RefundForm(StyledForm):
 def accounts_view(request):
     salon=request.salon
     action=request.POST.get("action")
-    account_form=AccountForm(request.POST if action=="account" else None)
-    movement=MovementForm(request.POST if action=="movement" else None,salon=salon,initial={"request_key":uuid4()})
-    posting=PostingForm(request.POST if action=="posting" else None,salon=salon,initial={"request_key":uuid4()})
+    account_form=AccountForm(request.POST if action=="account" else None,auto_id="account_%s")
+    movement=MovementForm(request.POST if action=="movement" else None,salon=salon,initial={"request_key":uuid4()},auto_id="movement_%s")
+    posting=PostingForm(request.POST if action=="posting" else None,salon=salon,initial={"request_key":uuid4()},auto_id="posting_%s")
     if request.method=="POST":
         if action=="account" and account_form.is_valid():
             d=account_form.cleaned_data

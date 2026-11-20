@@ -35,7 +35,12 @@ def recognize_commission_for_appointment(appointment: Appointment) -> Commission
 
     rule = _pick_rule(appointment.salon, appointment.staff, appointment.service)
     base = appointment.price_toman or appointment.service.price_toman
-    if rule:
+    from apps.finance.periods import agreement_for
+    agreement=agreement_for(appointment.salon,appointment.staff_id,timezone.localdate(appointment.completed_at or timezone.now()))
+    if agreement and agreement.mode in ("salary","rent"):
+        commission=0
+        snapshot={"agreement_id":agreement.pk,"mode":agreement.mode}
+    elif rule:
         commission = rule.resolve_amount(base)
         snapshot = {
             "rule_id": str(rule.pk),

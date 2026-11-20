@@ -22,3 +22,7 @@
 ## Refund and account reconciliation
 - Refunds are immutable partial/full receipt reversal events (manager only), capped by original payment and idempotent; active service balance is reopened. Original receipt and discount remain unchanged. Cash reconciliation uses net method amounts; dashboard shows gross, refunds and net separately. No external bank payment API.
 - Account balances are explicitly reconciled: opening-day balance + unique source postings + transfers + documented other cash movements. Source allocation is manual to avoid pretending which bank received a historical payment. Transfers never affect revenue. No bank synchronization.
+
+## Staff arrangements and recurring expenses
+- Effective Jalali month arrangements (commission, fixed salary, hybrid, chair rent), preserve historical commission snapshots; fixed/rent modes suppress automatic commission. Monthly obligation created explicitly, advances reduce the same salary obligation, and rent is an inbound event. Monthly obligations are not duplicated as expenses. Account posting supports staff events. No prospective advance against unearned commission, labor payroll/tax engine or automatic collection.
+- Monthly recurring expense schedules show due reminders in financial dashboard; user confirms occurrence once, next Jalali due date is computed. No automatic debit or external notification.

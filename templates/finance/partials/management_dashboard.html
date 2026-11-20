@@ -57,6 +57,9 @@
     <div class="fin-line"><span>مطالبات خدمات انجام‌شده</span><bdi>{{ dashboard.receivable_total|fa_money }} تومان</bdi></div>
     <div class="fin-line"><span>بدهی باز سالن</span><bdi>{{ dashboard.debt_total|fa_money }} تومان</bdi></div>
     <div class="fin-line"><span>مانده سهم متخصصان</span><bdi>{{ dashboard.staff_due_total|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>حقوق ثبت‌شده در بازه</span><bdi>{{ dashboard.salary_total|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>اجاره جایگاه ثبت‌شده</span><bdi>{{ dashboard.rent_total|fa_money }} تومان</bdi></div>
+    {% if can_manage_expenses %}<div class="fin-line"><a href="{% url 'finance:recurring' %}">هزینه‌های دوره‌ای سررسیدشده</a><bdi>{{ dashboard.recurring_due|fa_num }}</bdi></div>{% endif %}
     <div class="fin-line"><span>فروش پکیج ثبت‌شده در بازه</span><bdi>{{ dashboard.package_sales|fa_money }} تومان</bdi></div>
   </article>
 </section>

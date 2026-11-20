@@ -126,9 +126,15 @@ def finance_dashboard(salon, range_ctx):
         settled_at__gte=start, settled_at__lt=end), "amount_toman")
     paid_debt = _total(SalonDebtPayment.scoped(salon).filter(
         created_at__gte=start, created_at__lt=end), "amount_toman")
+    from apps.finance.models import StaffPeriod, StaffPeriodPayment, RecurringExpense
+    periods=StaffPeriod.scoped(salon).filter(month__range=(first,last))
+    salary_total=_total(periods.filter(kind="salary"),"amount_toman")
+    rent_total=_total(periods.filter(kind="rent"),"amount_toman")
     return {
+        "salary_total":salary_total,"rent_total":rent_total,
+        "recurring_due":RecurringExpense.scoped(salon).filter(is_active=True,next_due__lte=timezone.localdate()).count(),
         "received": received, "refunded": refunded, "net_received": received-refunded, "earned": earned, "expenses": expenses_total, "commission": commission,
-        "operating_estimate": earned - expenses_total - commission,
+        "operating_estimate": earned + rent_total - expenses_total - commission - salary_total,
         "receipt_count": receipts.count(), "methods": methods,
         "method_cut1": round(method_totals.get("cash", 0) * 100 / received, 2) if received else 0,
         "method_cut2": round((method_totals.get("cash", 0) + method_totals.get("card", 0)) * 100 / received, 2) if received else 0,

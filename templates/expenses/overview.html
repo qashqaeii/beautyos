@@ -10,6 +10,7 @@
 </div>
 <div class="editorial-module-toolbar">
   <p class="text-xs text-ink-muted">تعهد پورسانت جداگانه در بخش پورسانت محاسبه می‌شود.</p>
+  <a href="{% url 'finance:recurring' %}" class="btn-secondary">هزینه‌های دوره‌ای</a>
   <a href="{% url 'expenses:create' %}" class="btn-primary text-sm"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i> ثبت هزینه</a>
 </div>
 {% if expenses %}

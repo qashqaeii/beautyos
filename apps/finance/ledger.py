@@ -92,6 +92,11 @@ def source_event(salon, kind, pk):
     """Return amount, date, direction and receipt method, always from the actual source."""
     models = {"payment":Payment, "refund":Refund, "expense":Expense, "commission":CommissionSettlement,
         "debt":SalonDebtPayment, "package":CustomerPackage}
+    if kind=="staff_period":
+        from apps.finance.models import StaffPeriodPayment
+        row=StaffPeriodPayment.scoped(salon).filter(pk=pk).first()
+        if not row: raise ValidationError("گردش متخصص یافت نشد.")
+        return row.amount_toman,timezone.localdate(row.created_at),row.kind=="rent",None
     model=models.get(kind)
     if model is None:
         raise ValidationError("نوع گردش معتبر نیست.")
@@ -125,7 +130,7 @@ def post_movement(*, salon, kind, source_id=None, from_id=None, to_id=None, amou
         if not from_id or not to_id or from_id == to_id:
             raise ValidationError("دو حساب متفاوت انتخاب کنید.")
         source_id = None
-    elif kind in ("payment","refund","expense","commission","debt","package"):
+    elif kind in ("payment","refund","expense","commission","debt","package","staff_period"):
         amount, day, inbound, method = source_event(salon, kind, source_id)
         if (inbound and (from_id or not to_id)) or (not inbound and (to_id or not from_id)):
             raise ValidationError("جهت گردش با سند مطابقت ندارد.")
