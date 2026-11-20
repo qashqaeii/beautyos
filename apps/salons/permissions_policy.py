@@ -29,6 +29,7 @@ P_MEMBERS_MANAGE = "salon.members.manage"
 P_SALON_SETTINGS = "salon.settings"
 P_INVENTORY_MANAGE = "inventory.manage"
 P_LOYALTY_MANAGE = "loyalty.manage"
+P_MARKETING_MANAGE = "marketing.manage"
 P_WAITLIST_MANAGE = "waitlist.manage"
 P_PACKAGE_MANAGE = "package.manage"
 
@@ -53,6 +54,7 @@ ROLE_PERMISSIONS: dict[str, set[str]] = {
         P_SALON_SETTINGS,
         P_INVENTORY_MANAGE,
         P_LOYALTY_MANAGE,
+        P_MARKETING_MANAGE,
         P_WAITLIST_MANAGE,
         P_PACKAGE_MANAGE,
     },
@@ -74,6 +76,7 @@ ROLE_PERMISSIONS: dict[str, set[str]] = {
         P_STAFF_MANAGE,
         P_INVENTORY_MANAGE,
         P_LOYALTY_MANAGE,
+        P_MARKETING_MANAGE,
         P_WAITLIST_MANAGE,
         P_PACKAGE_MANAGE,
     },

@@ -1,0 +1,6 @@
+# Phase 4 — first increment
+
+- Internal retention queue uses actual completed appointments or new customer creation, one follow-up per lapse cycle. Completed follow-ups are not resurrected until a new completed visit establishes a new cycle. Priority is sorted explicitly. Seven-day snooze; future bookings suspend automatic reminders until next sync. Existing legacy decisions are adopted when relevant; history is preserved.
+- Run `python manage.py sync_retention` manually or via deployment scheduler, e.g. daily; no scheduler installed by this commit.
+- Marketing permission: owner/manager only. Six audience segments: active (30 days), risk (31–60 days), inactive (>60 days), no completed visit, VIP and current Jalali birthday month. No archived customers. Preparation requires salon marketing enabled and customer consent. Explicit preview/draft, idempotent snapshot preparation, cancellation and audit log. No phone numbers exposed in preview.
+- No SMS sending, external provider, automatic campaign scheduler, opt-out transport, delivery or conversion reports yet. Existing OTP provider intentionally not reused for marketing. Consent must be checked again at delivery and no message marked sent before a provider accepts it.

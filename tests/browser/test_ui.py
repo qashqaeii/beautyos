@@ -110,7 +110,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
         ("loyalty-vouchers",reverse("loyalty:vouchers")),
         ("loyalty-memberships",reverse("loyalty:memberships")),
         ("loyalty-insights",reverse("loyalty:insights")),
-        ("retention","/retention/"),("waitlist","/waitlist/"),
+        ("retention","/retention/"),("marketing-campaigns",reverse("retention:campaigns")),("waitlist","/waitlist/"),
         ("portfolio","/portfolio/"),("members","/members/"),("settings","/settings/"),
         ("appointment-detail",reverse("appointments:detail",args=[appt.pk])),
     ]

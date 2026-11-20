@@ -10,11 +10,12 @@
 {% endblock %}
 {% block content %}
 <div
-  class="retention-page mx-auto w-full max-w-2xl pb-24 md:pb-8"
+  class="retention-page mx-auto w-full max-w-4xl pb-24 md:pb-8"
   x-data="retentionQueue({ openId: {{ open_item_id|default:'null' }} })"
 >
   <header class="retention-page__hero dashboard-enter">
     <h1 class="retention-page__title">پیگیری مشتریان</h1>
+    <div class="flex gap-2 flex-wrap">{% if can_marketing %}<a href="{% url 'retention:campaigns' %}" class="btn-primary text-sm"><i data-lucide="megaphone" aria-hidden="true"></i>کمپین‌ها</a>{% endif %}
     <form method="post" class="retention-page__sync">
       {% csrf_token %}
       <input type="hidden" name="action" value="sync">
@@ -22,8 +23,9 @@
         <i data-lucide="refresh-cw" class="h-4 w-4" aria-hidden="true"></i>
         به‌روزرسانی صف
       </button>
-    </form>
+    </form></div>
   </header>
+  <p class="text-sm text-ink-secondary">صف پیگیری بر اساس آخرین مراجعه واقعی · {{ snoozed_count|fa_num }} مورد به تعویق افتاده</p>
 
   <section class="retention-queue-panel dashboard-enter">
   {% if messages %}
@@ -85,6 +87,7 @@
             >{% if open_item_id == item.pk %}{{ open_draft_note }}{% endif %}</textarea>
             <div class="retention-queue-form__actions">
               <button type="submit" class="btn-primary text-sm">ذخیره پیگیری</button>
+              <button type="submit" class="btn-secondary text-sm" name="action" value="snooze" formnovalidate>تعویق ۷ روزه</button>
               <button type="button" class="btn-secondary text-sm" @click="cancel()">انصراف</button>
             </div>
           </form>
