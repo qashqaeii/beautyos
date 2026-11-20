@@ -6,6 +6,7 @@ app_name = "finance"
 
 urlpatterns = [
     path("", views.finance_overview, name="overview"),
+    path("reports/export/", views.export_report, name="export_report"),
     path("accounts/", ledger_views.accounts_view, name="accounts"),
     path("product-sales/", stock_views.product_sales, name="product_sales"),
     path("product-sales/<int:sale_id>/return/", stock_views.product_return, name="product_return"),

@@ -58,7 +58,7 @@ def finance_dashboard(salon, range_ctx):
     completed = Appointment.scoped(salon).filter(status=Appointment.Status.COMPLETED).filter(
         Q(completed_at__gte=start, completed_at__lt=end) |
         Q(completed_at__isnull=True, start_at__gte=start, start_at__lt=end)
-    ).select_related("service", "customer").prefetch_related("payments")
+    ).select_related("service", "customer").prefetch_related("payments__refunds")
     package_uses = {u.appointment_id: u for u in PackageSessionUse.scoped(salon).filter(
         appointment__in=completed.values("pk"), customer_package__salon=salon
     ).select_related("customer_package")}
@@ -116,7 +116,7 @@ def finance_dashboard(salon, range_ctx):
     # Future bookings and unused prepaid sessions are not debts.
     receivables = []
     owing = Appointment.scoped(salon).filter(status=Appointment.Status.COMPLETED,
-        package_use__isnull=True).select_related("customer", "service").prefetch_related("payments")
+        package_use__isnull=True).select_related("customer", "service").prefetch_related("payments__refunds")
     for appt in owing:
         balance = appointment_payment_summary(appt)["owed_toman"]
         if balance:
@@ -140,12 +140,24 @@ def finance_dashboard(salon, range_ctx):
     periods=StaffPeriod.scoped(salon).filter(month__range=(first,last))
     salary_total=_total(periods.filter(kind="salary"),"amount_toman")
     rent_total=_total(periods.filter(kind="rent"),"amount_toman")
+    total_earned=earned+rent_total+product_revenue
+    general_expenses=expenses_total-inventory_purchases
+    specialist_cost=commission+salary_total
+    other_cost=general_expenses+material_total+product_cost
+    mix=[{"name":"خدمات سالن","amount":earned},{"name":"فروش محصولات","amount":product_revenue},{"name":"اجاره جایگاه","amount":rent_total}]
+    mix_valid=total_earned>0 and all(row["amount"]>=0 for row in mix)
+    for row in mix:
+        row["percent"]=round(row["amount"]*100/total_earned,1) if mix_valid else 0
     return {
+        "total_earned":total_earned,"general_expenses":general_expenses,"specialist_cost":specialist_cost,"other_cost":other_cost,
+        "revenue_mix":mix,"revenue_mix_valid":mix_valid,
+        "revenue_cut1":round(earned*100/total_earned,2) if mix_valid else 0,
+        "revenue_cut2":round((earned+product_revenue)*100/total_earned,2) if mix_valid else 0,
         "salary_total":salary_total,"rent_total":rent_total,
         "product_revenue":product_revenue,"product_cost":product_cost,"material_total":material_total,"inventory_purchases":inventory_purchases,
         "recurring_due":RecurringExpense.scoped(salon).filter(is_active=True,next_due__lte=timezone.localdate()).count(),
         "received": received, "refunded": refunded, "net_received": received-refunded, "earned": earned, "expenses": expenses_total, "commission": commission,
-        "operating_estimate": earned + rent_total + product_revenue - (expenses_total-inventory_purchases) - commission - salary_total - material_total - product_cost,
+        "operating_estimate":total_earned-other_cost-specialist_cost,
         "receipt_count": receipts.count(), "methods": methods,
         "method_cut1": round(method_totals.get("cash", 0) * 100 / received, 2) if received else 0,
         "method_cut2": round((method_totals.get("cash", 0) + method_totals.get("card", 0)) * 100 / received, 2) if received else 0,

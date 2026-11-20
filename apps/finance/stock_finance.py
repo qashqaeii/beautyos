@@ -1,7 +1,7 @@
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from apps.appointments.models import Appointment
 from apps.customers.models import Customer
@@ -66,10 +66,8 @@ def sell_product(*,salon,customer_id,item_id,quantity,unit_price,method,request_
         sale=ProductSale.objects.create(salon=salon,item=item,payment=payment,movement=movement,item_name=item.name,
             quantity=qty,unit_price_toman=unit_price,unit_cost_toman=item.purchase_price_toman,
             revenue_toman=revenue,cost_toman=cost,request_key=key)
-    except Exception as exc:
-        from django.db import IntegrityError
-        if isinstance(exc,IntegrityError): raise ValidationError("درخواست تکراری است.") from exc
-        raise
+    except IntegrityError as exc:
+        raise ValidationError("درخواست تکراری است.") from exc
     refresh_customer_stats(customer)
     _audit(salon,actor,sale,"product_sale","فروش محصول",{"revenue":revenue,"cost":cost,"payment_id":payment.pk})
     return sale
@@ -91,7 +89,10 @@ def return_product(*,salon,sale_id,reason,request_key,actor):
         raise ValidationError("سوابق استرداد نیازمند بررسی هستند.")
     if Refund.scoped(salon).filter(request_key=key).exists(): raise ValidationError("شناسه درخواست تکراری است.")
     movement=apply_movement(salon=salon,item=sale.item,kind=StockMovement.Kind.IN,quantity=sale.quantity,note="برگشت محصول")
-    refund=Refund.objects.create(salon=salon,payment=payment,request_key=key,amount_toman=sale.revenue_toman,reason=reason)
+    try:
+        refund=Refund.objects.create(salon=salon,payment=payment,request_key=key,amount_toman=sale.revenue_toman,reason=reason)
+    except IntegrityError as exc:
+        raise ValidationError("شناسه درخواست تکراری است.") from exc
     row=ProductReturn.objects.create(salon=salon,sale=sale,refund=refund,movement=movement)
     refresh_customer_stats(payment.customer)
     _audit(salon,actor,row,"product_return","برگشت محصول و وجه",{"sale_id":sale.pk,"refund_id":refund.pk})
@@ -118,9 +119,7 @@ def consume_material(*,salon,appointment_id,item_id,quantity,request_key,actor):
     try:
         row=MaterialCost.objects.create(salon=salon,appointment=appointment,movement=movement,
             item_name=item.name,unit_cost_toman=item.purchase_price_toman,cost_toman=cost,request_key=key)
-    except Exception as exc:
-        from django.db import IntegrityError
-        if isinstance(exc,IntegrityError): raise ValidationError("درخواست تکراری است.") from exc
-        raise
+    except IntegrityError as exc:
+        raise ValidationError("درخواست تکراری است.") from exc
     _audit(salon,actor,row,"material_cost","مصرف مواد خدمت",{"appointment_id":appointment.pk,"cost":cost})
     return row

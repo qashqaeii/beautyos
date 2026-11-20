@@ -22,7 +22,7 @@ def amount_sum(qs, field="amount_toman"):
 
 
 def payment_refunded(payment):
-    return amount_sum(payment.refunds.filter(salon_id=payment.salon_id))
+    return sum(int(row.amount_toman) for row in payment.refunds.all() if row.salon_id==payment.salon_id)
 
 
 def refund_total(salon, start, end):

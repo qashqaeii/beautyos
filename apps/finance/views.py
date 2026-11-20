@@ -331,3 +331,42 @@ def payment_receipt(request, payment_id):
         "refunds":payment.refunds.filter(salon=request.salon).order_by("-pk"),
         "refund_total":payment_refunded(payment),
         "can_refund":has_permission(getattr(request,"membership",None),P_FINANCE_REPORTS) and payment.status!=Payment.Status.REFUNDED})
+
+
+@salon_required
+@require_role(SalonMembership.Role.MANAGER)
+def export_report(request):
+    import csv
+    from django.http import HttpResponse
+    from django.views.decorators.http import require_safe
+
+    if not has_permission(getattr(request,"membership",None),P_FINANCE_REPORTS):
+        raise PermissionDenied
+    if request.method not in ("GET","HEAD"):
+        from django.http import HttpResponseNotAllowed
+        return HttpResponseNotAllowed(["GET","HEAD"])
+    span=parse_finance_range(request)
+    data=finance_dashboard(request.salon,span)
+    response=HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"]="attachment; filename=beautyos-finance.csv"
+    response["Cache-Control"]="private, no-store"
+    response.write("\ufeff")
+    writer=csv.writer(response)
+    writer.writerow(["بازه",span["range_display_jalali"]])
+    writer.writerow(["شاخص","تومان"])
+    for label,key in (("درآمد کل","total_earned"),("درآمد خدمات","earned"),("فروش خالص کالا","product_revenue"),
+        ("اجاره جایگاه","rent_total"),("هزینه عمومی","general_expenses"),("بهای مواد","material_total"),
+        ("بهای کالای فروش‌رفته","product_cost"),("حقوق","salary_total"),("پورسانت","commission"),
+        ("سود عملیاتی برآوردی","operating_estimate"),("دریافتی ناخالص","received"),("استرداد","refunded"),
+        ("خالص دریافتی","net_received"),("خرید موجودی","inventory_purchases"),
+        ("مطالبات باز فعلی خدمات","receivable_total"),("بدهی باز فعلی","debt_total")):
+        writer.writerow([label,data[key]])
+    writer.writerow([])
+    writer.writerow(["خدمت","تعداد","درآمد","سهم متخصص","مواد","مانده مستقیم"])
+    for row in data["service_rows"]:
+        # Guard spreadsheet formula injection from user-entered service names.
+        name=str(row["name"])
+        if name.lstrip().startswith(("=","+","-","@","\t","\r","\n")):
+            name="'"+name
+        writer.writerow([name,row["count"],row["revenue"],row["commission"],row["materials"],row["contribution"]])
+    return response

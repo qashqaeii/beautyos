@@ -50,6 +50,8 @@
     <div class="finance-page__range-pills" role="group" aria-label="بازه زمانی">
       <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=today" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}" {% if range_key == 'today' %}aria-current="true"{% endif %}>امروز</a>
       {% if tab != 'commissions' %}
+      <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=yesterday" class="finance-page__range-pill {% if range_key == 'yesterday' %}is-active{% endif %}">دیروز</a>
+      <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=week" class="finance-page__range-pill {% if range_key == 'week' %}is-active{% endif %}">این هفته</a>
       <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=month" class="finance-page__range-pill {% if range_key == 'month' %}is-active{% endif %}" {% if range_key == 'month' %}aria-current="true"{% endif %}>ماه جاری</a>
       <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=quarter" class="finance-page__range-pill {% if range_key == 'quarter' %}is-active{% endif %}" {% if range_key == 'quarter' %}aria-current="true"{% endif %}>سه ماه گذشته</a>
       {% endif %}
@@ -61,7 +63,7 @@
         <input type="hidden" name="range" value="day">
         {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
       </form>
-      {% if range_key == 'month' or range_key == 'quarter' %}
+      {% if range_key == 'month' or range_key == 'quarter' or range_key == 'week' %}
       <p class="finance-page__range-caption"><span class="tabular-nums">{{ range_display_jalali|persian_digits }}</span></p>
       {% endif %}
     </div>
@@ -100,9 +102,9 @@
       </article>
       <article class="finance-stat-card">
         <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="coins"></i></span>
-        <p class="finance-stat-card__label">بیعانه پرداخت کرده‌اند</p>
+        <p class="finance-stat-card__label">پرداخت بخشی</p>
         <p class="finance-stat-card__value tabular-nums"><bdi>{{ income.deposit_customer_count|fa_num }}</bdi> <span class="finance-stat-card__unit">نفر</span></p>
-        <p class="finance-stat-card__hint">مشتریان با پرداخت بیعانه</p>
+        <p class="finance-stat-card__hint">مشتریان با ثبت پرداخت بخشی</p>
         {% include "finance/partials/income_sparkline.html" with series=presentation.series.deposits variant="deposits" trend_label=presentation.trend_label only %}
       </article>
       <article class="finance-stat-card finance-stat-card--success">

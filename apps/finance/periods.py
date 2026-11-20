@@ -3,6 +3,7 @@ from datetime import date
 import jdatetime
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from apps.appointments.models import Appointment
@@ -34,7 +35,7 @@ def create_agreement(*,salon,staff_id,month,mode,amount,actor):
         if (existing.mode,existing.monthly_toman)==(mode,amount): return existing
         raise ValidationError("قرارداد این ماه ثبت شده است؛ تغییر برای ماه بعد مجاز است.")
     dt,_=day_bounds(start)
-    if Appointment.scoped(salon).filter(staff=staff,status=Appointment.Status.COMPLETED,completed_at__gte=dt).exists() or StaffPeriod.scoped(salon).filter(staff=staff,month__gte=start).exists():
+    if Appointment.scoped(salon).filter(staff=staff,status=Appointment.Status.COMPLETED).filter(Q(completed_at__gte=dt)|Q(completed_at__isnull=True,start_at__gte=dt)).exists() or StaffPeriod.scoped(salon).filter(staff=staff,month__gte=start).exists():
         raise ValidationError("برای این دوره سوابق مالی وجود دارد؛ قرارداد را از ماه بعد تنظیم کنید.")
     row=StaffAgreement.objects.create(salon=salon,staff=staff,effective_month=start,mode=mode,monthly_toman=amount)
     _audit(salon,actor,row,"staff_agreement","تعریف مدل همکاری",{"mode":mode,"monthly_toman":amount})

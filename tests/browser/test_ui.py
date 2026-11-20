@@ -59,7 +59,11 @@ def browser_data(owner_membership):
 def test_real_browser_layout_and_controls(live_server, client, owner_membership, browser_data, width, height):
     salon, staff, customer, appt, account = browser_data
     from apps.appointments.models import Appointment
-    from apps.finance.models import Invoice, Payment
+    from apps.finance.models import Invoice, Payment, ProductSale, Refund
+    from apps.inventory.models import InventoryItem
+    item=InventoryItem.scoped(salon).get(name="شامپو تخصصی")
+    item.purchase_price_toman=150000
+    item.save(update_fields=["purchase_price_toman"])
 
     prior = timezone.now() - timedelta(hours=2)
     completed = Appointment.objects.create(salon=salon, customer=customer, staff=staff, service=appt.service,
@@ -88,6 +92,11 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
         ("finance-checkout",reverse("finance:checkout",args=[customer.pk])),
         ("finance-invoices",reverse("finance:invoices")),
         ("finance-cash-close",reverse("finance:cash_close")),
+        ("finance-accounts",reverse("finance:accounts")),
+        ("finance-staff",reverse("finance:staff_finance")),
+        ("finance-recurring",reverse("finance:recurring")),
+        ("finance-product-sales",reverse("finance:product_sales")),
+        ("finance-materials",reverse("finance:materials")),
         ("expenses","/expenses/"),("commissions","/commissions/"),
         ("commission-rules","/commissions/rules/"),("packages","/packages/"),
         ("inventory","/inventory/"),("loyalty","/loyalty/"),
@@ -212,6 +221,25 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
             page.screenshot(path=str(ARTIFACT/f"{width}-finance-invoice.png"),animations="disabled")
         except Exception as exc:
             errors.append(f"{width}/checkout interaction: {exc}")
+        try:
+            external.clear(); js_errors.clear(); broken.clear()
+            page.goto(live_server.url+reverse("finance:product_sales"),wait_until="load")
+            page.locator("select[name='customer']").select_option(str(customer.pk))
+            page.locator("select[name='item']").select_option(str(item.pk))
+            page.locator("input[name='quantity']").fill("1")
+            page.locator("#id_unit_price").fill("250000")
+            page.locator("select[name='method']").select_option("card")
+            page.get_by_role("button",name="ثبت فروش و رسید").click()
+            pw.expect(page.get_by_role("heading",name="رسید پرداخت",exact=True).first).to_be_visible()
+            assert "/receipt/" in page.url
+            page.get_by_role("link",name="برگشت کالا و وجه").click()
+            page.locator("input[name='reason']").fill("تست برگشت کالا")
+            page.get_by_role("button",name="ثبت برگشت کالا و وجه").click()
+            assert "/receipt/" in page.url
+            assert not js_errors and not broken and not external
+            page.screenshot(path=str(ARTIFACT/f"{width}-finance-product-return.png"),animations="disabled")
+        except Exception as exc:
+            errors.append(f"{width}/product return interaction: {exc}")
         context.close()
         browser.close()
     assert not errors, "\n"+"\n".join(errors)
@@ -220,3 +248,8 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
     invoice=Invoice.scoped(salon).get()
     assert invoice.received_toman==1200000 and invoice.balance_at_issue_toman==0
     assert Payment.scoped(salon).filter(invoice=invoice).count()==1
+    sale=ProductSale.scoped(salon).get()
+    assert sale.revenue_toman==250000 and sale.cost_toman==150000
+    assert Refund.scoped(salon).filter(payment=sale.payment,amount_toman=250000).exists()
+    item.refresh_from_db()
+    assert item.quantity==4

@@ -2,6 +2,7 @@ from datetime import date
 from urllib.parse import urlencode
 
 from django import forms
+from apps.core.fields import TomanAmountField
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Sum
@@ -72,10 +73,10 @@ def close_cash_day(*, salon, day, opening, other_in, cash_out, counted, note, ac
 
 
 class CashCloseForm(forms.Form):
-    opening = forms.IntegerField(min_value=0, max_value=MAX_MONEY,label="موجودی نقدی ابتدای روز")
-    other_in = forms.IntegerField(min_value=0,max_value=MAX_MONEY,required=False,label="سایر ورود وجه نقد")
-    cash_out = forms.IntegerField(min_value=0,max_value=MAX_MONEY,required=False,label="خروج وجه نقد")
-    counted = forms.IntegerField(min_value=0,max_value=MAX_MONEY,label="وجه نقد شمارش‌شده")
+    opening = TomanAmountField(min_value=0, max_value=MAX_MONEY,label="موجودی نقدی ابتدای روز")
+    other_in = TomanAmountField(min_value=0,max_value=MAX_MONEY,required=False,label="سایر ورود وجه نقد")
+    cash_out = TomanAmountField(min_value=0,max_value=MAX_MONEY,required=False,label="خروج وجه نقد")
+    counted = TomanAmountField(min_value=0,max_value=MAX_MONEY,label="وجه نقد شمارش‌شده")
     note = forms.CharField(required=False,max_length=500,label="توضیح مغایرت یا گردش نقدی",widget=forms.Textarea(attrs={"rows":2}))
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)

@@ -35,6 +35,8 @@ def recognize_commission_for_appointment(appointment: Appointment) -> Commission
 
     rule = _pick_rule(appointment.salon, appointment.staff, appointment.service)
     base = appointment.price_toman or appointment.service.price_toman
+    from apps.staff.models import StaffProfile
+    StaffProfile.scoped(appointment.salon).select_for_update().get(pk=appointment.staff_id)
     from apps.finance.periods import agreement_for
     agreement=agreement_for(appointment.salon,appointment.staff_id,timezone.localdate(appointment.completed_at or timezone.now()))
     if agreement and agreement.mode in ("salary","rent"):

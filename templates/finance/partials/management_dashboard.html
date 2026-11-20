@@ -1,9 +1,9 @@
 {% load format_tags l10n %}
 {% if tab != 'cash' %}
 <section class="fin-summary-grid" aria-label="خلاصه مالی">
-  <article class="fin-kpi fin-kpi--primary"><div><span>درآمد خدمات</span><i data-lucide="trending-up" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.earned|fa_money }}</bdi></strong><small>تومان · خدمات انجام‌شده</small></article>
-  <article class="fin-kpi"><div><span>هزینه‌ها</span><i data-lucide="layers" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.expenses|fa_money }}</bdi></strong><small>تومان · هزینه ثبت‌شده</small></article>
-  <article class="fin-kpi"><div><span>سهم متخصصان</span><i data-lucide="users-round" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.commission|fa_money }}</bdi></strong><small>تومان · سهم شناسایی‌شده</small></article>
+  <article class="fin-kpi fin-kpi--primary"><div><span>درآمد کل</span><i data-lucide="trending-up" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.total_earned|fa_money }}</bdi></strong><small>تومان · خدمات، کالا و اجاره</small></article>
+  <article class="fin-kpi"><div><span>هزینه‌ها</span><i data-lucide="layers" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.other_cost|fa_money }}</bdi></strong><small>تومان · هزینه عمومی و بهای مستقیم</small></article>
+  <article class="fin-kpi"><div><span>سهم متخصصان</span><i data-lucide="users-round" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.specialist_cost|fa_money }}</bdi></strong><small>تومان · پورسانت و حقوق</small></article>
   <article class="fin-kpi"><div><span>سود عملیاتی برآوردی</span><i data-lucide="sprout" class="fin-success" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.operating_estimate|fa_money }}</bdi></strong><small>تومان · پس از هزینه، حقوق و بهای مستقیم</small></article>
 </section>
 {% endif %}
@@ -22,13 +22,24 @@
         <circle cx="{{ row.x|unlocalize }}" cy="{{ row.expense_y|unlocalize }}" r="3" fill="#d4a697"><title>{{ row.day|fa_jalali }}: {{ row.expense|fa_money }} تومان</title></circle>
         {% endfor %}
       </svg>
-      <div class="fin-trend-labels">{% for row in dashboard.chart.rows %}<small title="{{ row.day|fa_jalali }} تا {{ row.end|fa_jalali }}">{{ row.day|fa_jalali }}</small>{% endfor %}</div>
+      <div class="fin-trend-labels" dir="ltr">{% for row in dashboard.chart.rows %}<small title="{{ row.day|fa_jalali }} تا {{ row.end|fa_jalali }}">{{ row.day|fa_jalali }}</small>{% endfor %}</div>
     </div>
     <details class="fin-chart-details"><summary>مقادیر نمودار</summary>{% for row in dashboard.chart.rows %}<div class="fin-line"><span>{{ row.day|fa_jalali }} تا {{ row.end|fa_jalali }}</span><bdi>{{ row.received|fa_money }} / {{ row.expense|fa_money }}</bdi></div>{% endfor %}</details>
     {% else %}<div class="fin-empty"><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>هنوز گردش مالی ثبت نشده است.</span></div>{% endif %}
     <p class="fin-muted">مقایسه دریافتی‌های مشتریان با هزینه‌های ثبت‌شده؛ نه سود حسابداری.</p>
   </article>
   <article class="fin-panel">
+    {% if tab != 'cash' %}
+    <header class="fin-panel-head"><h2><i data-lucide="layers" aria-hidden="true"></i>ترکیب درآمد</h2><span class="fin-muted">{{ range_label }}</span></header>
+    <div class="fin-method-layout">
+      <div class="fin-method-ring {% if not dashboard.revenue_mix_valid %}fin-method-ring--empty{% endif %}" style="--cut1:{{ dashboard.revenue_cut1|unlocalize }}%;--cut2:{{ dashboard.revenue_cut2|unlocalize }}%">
+        <div><small>کل درآمد</small><strong>{{ dashboard.total_earned|fa_money }}</strong><small>تومان</small></div>
+      </div>
+      <div class="fin-method-list">{% for item in dashboard.revenue_mix %}<div class="fin-line"><span><i class="fin-dot fin-method-{{ forloop.counter }}"></i>{{ item.name }}</span><bdi>{{ item.amount|fa_money }}</bdi></div>{% endfor %}</div>
+    </div>
+    <div class="fin-line"><span>خالص دریافتی مشتریان</span><bdi>{{ dashboard.net_received|fa_money }} تومان</bdi></div>
+    <p class="fin-muted">درآمد تحقق‌یافته با دریافتی یکسان نیست. در صورت خالص درآمد منفی نمودار حلقه‌ای بدون سهم نمایش داده می‌شود.</p>
+    {% else %}
     <header class="fin-panel-head"><h2><i data-lucide="wallet" aria-hidden="true"></i>ترکیب دریافتی‌ها</h2><span class="fin-muted">{{ range_label }}</span></header>
     <div class="fin-method-layout">
       <div class="fin-method-ring {% if not dashboard.received %}fin-method-ring--empty{% endif %}" style="--cut1:{{ dashboard.method_cut1|unlocalize }}%;--cut2:{{ dashboard.method_cut2|unlocalize }}%">
@@ -39,6 +50,7 @@
     <div class="fin-line"><span>استرداد در بازه</span><bdi>{{ dashboard.refunded|fa_money }} تومان</bdi></div>
     <div class="fin-line"><span>خالص دریافتی</span><bdi>{{ dashboard.net_received|fa_money }} تومان</bdi></div>
     <p class="fin-muted">نمودار روش پرداخت ناخالص است؛ موجودی حساب بانکی نیست.</p>
+    {% endif %}
   </article>
 </section>
 {% if tab == 'income' or tab == 'cash' %}
@@ -48,7 +60,7 @@
     <div class="fin-actions">
       {% if can_payment_create %}<a class="fin-action fin-action--primary" href="{{ payment_return_url }}&amp;payment=1"><i data-lucide="credit-card" aria-hidden="true"></i>دریافت پرداخت</a>{% endif %}
       {% if can_payment_create %}<a class="fin-action" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i>صدور فاکتور</a>{% else %}<a class="fin-action" href="{% url 'finance:invoices' %}"><i data-lucide="receipt-text" aria-hidden="true"></i>فاکتورها</a>{% endif %}
-      {% if can_settle_commission %}<a class="fin-action" href="{% url 'commissions:overview' %}"><i data-lucide="users-round" aria-hidden="true"></i>تسویه متخصص</a>{% endif %}
+      {% if can_settle_commission %}<a class="fin-action" href="{% url 'finance:overview' %}?tab=commissions"><i data-lucide="users-round" aria-hidden="true"></i>تسویه متخصص</a>{% endif %}
       {% if can_manage_expenses %}<a class="fin-action" href="{% url 'expenses:create' %}"><i data-lucide="layers" aria-hidden="true"></i>ثبت هزینه</a>{% endif %}
     </div>
   </article>
@@ -67,7 +79,7 @@
 {% endif %}
 {% if tab == 'reports' %}
 <section class="fin-panel">
-  <header class="fin-panel-head"><h2><i data-lucide="scissors" aria-hidden="true"></i>عملکرد خدمات</h2></header>
+  <header class="fin-panel-head"><h2><i data-lucide="scissors" aria-hidden="true"></i>عملکرد خدمات</h2><a href="{% url 'finance:export_report' %}?range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}">خروجی اکسل (CSV)</a></header>
   <p class="fin-muted">سهم باقی‌مانده هر خدمت پس از پورسانت و مواد مصرف ثبت‌شده، پیش از هزینه عمومی. فروش پکیج در لحظه فروش درآمد خدمات محسوب نمی‌شود.</p>
   <div class="fin-report-table">
   {% for row in dashboard.service_rows %}
@@ -75,9 +87,13 @@
   {% empty %}<div class="fin-empty">خدمت انجام‌شده‌ای در این بازه ثبت نشده است.</div>{% endfor %}
   </div>
   <div class="fin-line"><span>خالص فروش محصولات</span><bdi>{{ dashboard.product_revenue|fa_money }} تومان</bdi></div>
+  <div class="fin-line"><span>حقوق ماهانه (در آغاز ماه)</span><bdi>{{ dashboard.salary_total|fa_money }} تومان</bdi></div>
+  <div class="fin-line"><span>اجاره جایگاه (در آغاز ماه)</span><bdi>{{ dashboard.rent_total|fa_money }} تومان</bdi></div>
+  <div class="fin-line"><span>هزینه عمومی</span><bdi>{{ dashboard.general_expenses|fa_money }} تومان</bdi></div>
   <div class="fin-line"><span>بهای خالص کالای فروش‌رفته</span><bdi>{{ dashboard.product_cost|fa_money }} تومان</bdi></div>
   <div class="fin-line"><span>بهای مواد مصرف‌شده در بازه</span><bdi>{{ dashboard.material_total|fa_money }} تومان</bdi></div>
   <div class="fin-line"><span>خرید موجودی (خارج از هزینه عملیاتی)</span><bdi>{{ dashboard.inventory_purchases|fa_money }} تومان</bdi></div>
+  {% if can_manage_expenses %}<div class="fin-line"><a href="{% url 'finance:materials' %}">ثبت بهای مواد و مصرف خدمات</a></div>{% endif %}
   <p class="fin-muted">خرید موجودی را در دسته خرید موجودی انبار ثبت کنید، نه مواد مصرفی؛ هزینه مواد هنگام مصرف محاسبه می‌شود. حقوق تعریف‌شده در قرارداد را دوباره در هزینه عمومی وارد نکنید. برآورد مالیات، استهلاک و مواد ثبت‌نشده را پوشش نمی‌دهد.</p>
 </section>
 {% endif %}

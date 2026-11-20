@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import jdatetime
 from django import forms
+from apps.core.fields import TomanAmountField
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
 from django.utils import timezone
@@ -27,12 +28,12 @@ class StaffForm(StyledForm):
 
 class AgreementForm(StaffForm):
     mode=forms.ChoiceField(choices=StaffAgreement._meta.get_field("mode").choices,label="نوع همکاری")
-    amount=forms.IntegerField(min_value=0,max_value=MAX_MONEY,label="حقوق یا اجاره ماهانه (تومان)",initial=0)
+    amount=TomanAmountField(min_value=0,max_value=MAX_MONEY,label="حقوق یا اجاره ماهانه (تومان)",initial=0)
 
 class PeriodPaymentForm(StyledForm):
     period=forms.ModelChoiceField(queryset=StaffPeriod.objects.none(),label="تعهد ماهانه")
     kind=forms.ChoiceField(choices=[("advance","مساعده حقوق"),("settlement","تسویه حقوق"),("rent","دریافت اجاره")],label="نوع عملیات")
-    amount=forms.IntegerField(min_value=1,max_value=MAX_MONEY,label="مبلغ (تومان)")
+    amount=TomanAmountField(min_value=1,max_value=MAX_MONEY,label="مبلغ (تومان)")
     note=forms.CharField(max_length=255,required=False,label="توضیح")
     request_key=forms.UUIDField(widget=forms.HiddenInput)
     def __init__(self,*args,salon,**kwargs):
@@ -72,7 +73,7 @@ def staff_finance(request):
 class RecurringForm(StyledForm):
     title=forms.CharField(max_length=120,label="عنوان هزینه")
     category=forms.ChoiceField(choices=Expense.Category.choices,label="دسته‌بندی")
-    amount_toman=forms.IntegerField(min_value=1,max_value=MAX_MONEY,label="مبلغ (تومان)")
+    amount_toman=TomanAmountField(min_value=1,max_value=MAX_MONEY,label="مبلغ (تومان)")
     next_due=forms.DateField(label="اولین سررسید",initial=timezone.localdate)
 
 @salon_required

@@ -10,6 +10,7 @@ from django.views.decorators.http import require_http_methods
 from apps.audit.models import AuditLog
 from apps.commissions.models import CommissionSettlement
 from apps.core.forms import PersianForm
+from apps.core.fields import TomanAmountField
 from apps.expenses.models import Expense
 from apps.finance.ledger import MAX_MONEY, account_balance, payment_refunded, post_movement, refund_payment
 from apps.finance.models import AccountMovement, FinancialAccount, Payment, Refund, SalonDebtPayment
@@ -28,7 +29,7 @@ class StyledForm(PersianForm):
 class AccountForm(StyledForm):
     name=forms.CharField(max_length=100,label="نام حساب")
     kind=forms.ChoiceField(choices=[("cash","صندوق نقدی"),("bank","حساب بانکی")],label="نوع حساب")
-    opening_toman=forms.IntegerField(min_value=0,max_value=MAX_MONEY,label="موجودی ابتدای دوره (تومان)")
+    opening_toman=TomanAmountField(min_value=0,max_value=MAX_MONEY,label="موجودی ابتدای دوره (تومان)")
     opening_day=forms.DateField(label="تاریخ شروع ثبت",initial=timezone.localdate)
 
 
@@ -37,7 +38,7 @@ class MovementForm(StyledForm):
     kind=forms.ChoiceField(label="نوع گردش",choices=[("transfer","انتقال بین حساب‌ها"),("other_in","سایر ورود وجه"),("other_out","سایر خروج وجه")])
     from_account=forms.ModelChoiceField(queryset=FinancialAccount.objects.none(),required=False,label="از حساب")
     to_account=forms.ModelChoiceField(queryset=FinancialAccount.objects.none(),required=False,label="به حساب")
-    amount=forms.IntegerField(min_value=1,max_value=MAX_MONEY,label="مبلغ (تومان)")
+    amount=TomanAmountField(min_value=1,max_value=MAX_MONEY,label="مبلغ (تومان)")
     note=forms.CharField(required=False,max_length=255,label="توضیح")
     def __init__(self,*args,salon,**kwargs):
         super().__init__(*args,**kwargs)
@@ -90,7 +91,7 @@ class PostingForm(StyledForm):
 
 class RefundForm(StyledForm):
     request_key=forms.UUIDField(widget=forms.HiddenInput)
-    amount=forms.IntegerField(min_value=1,max_value=MAX_MONEY,label="مبلغ استرداد (تومان)")
+    amount=TomanAmountField(min_value=1,max_value=MAX_MONEY,label="مبلغ استرداد (تومان)")
     reason=forms.CharField(max_length=255,label="علت استرداد")
 
 

@@ -21,7 +21,17 @@ def parse_finance_range(request) -> dict:
     if not date(1900, 1, 1) <= selected_day <= date(2200, 12, 31):
         selected_day = timezone.localdate()
 
-    if range_key == "month":
+    if range_key == "yesterday":
+        selected_day=timezone.localdate()-timedelta(days=1)
+        start_d=end_d=selected_day
+        label="دیروز"
+    elif range_key == "week":
+        from apps.core.utils.dates import week_start_saturday
+        selected_day=timezone.localdate()
+        start_d=week_start_saturday(selected_day)
+        end_d=selected_day
+        label="این هفته"
+    elif range_key == "month":
         start_d, end_d = jalali_month_bounds(selected_day)
         label = "ماه جاری"
     elif range_key == "quarter":
@@ -331,6 +341,10 @@ def record_customer_payment(*, salon, form, actor):
             raise ValidationError("این نوبت قبلاً تسویه شده است.")
         if payment.total_amount_toman != balance:
             raise ValidationError(f"مبلغ قابل پرداخت پیش از تخفیف باید برابر مانده نوبت باشد: {balance:,} تومان.")
+        from apps.finance.models import InvoiceLine
+        line=InvoiceLine.scoped(salon).filter(appointment=appointment).first()
+        if line:
+            payment.invoice_id=line.invoice_id
     payment.save()
     refresh_customer_stats(payment.customer)
     AuditLog.objects.create(salon=salon, actor=actor, action=AuditLog.Action.CREATE,

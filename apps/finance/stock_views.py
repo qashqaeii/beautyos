@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django import forms
+from apps.core.fields import TomanAmountField
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
@@ -24,12 +25,12 @@ class ItemForm(StyledForm):
         self.fields["item"].label_from_instance=lambda item:f"{item.name} · {item.unit} · موجودی {item.quantity}"
 
 class CostForm(ItemForm):
-    unit_cost=forms.IntegerField(min_value=1,max_value=MAX_MONEY,label="بهای خرید هر واحد (تومان)")
+    unit_cost=TomanAmountField(min_value=1,max_value=MAX_MONEY,label="بهای خرید هر واحد (تومان)")
 
 class SaleForm(ItemForm):
     customer=forms.ModelChoiceField(queryset=Customer.objects.none(),label="مشتری")
     quantity=forms.DecimalField(min_value=0.01,max_digits=12,decimal_places=2,label="تعداد / مقدار")
-    unit_price=forms.IntegerField(min_value=1,max_value=MAX_MONEY,label="قیمت فروش هر واحد (تومان)")
+    unit_price=TomanAmountField(min_value=1,max_value=MAX_MONEY,label="قیمت فروش هر واحد (تومان)")
     method=forms.ChoiceField(choices=Payment.Method.choices,label="روش دریافت")
     request_key=forms.UUIDField(widget=forms.HiddenInput)
     def __init__(self,*args,salon,**kwargs):
