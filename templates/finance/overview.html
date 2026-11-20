@@ -70,6 +70,9 @@
   {% if tab == 'income' or tab == 'reports' or tab == 'cash' %}
     {% include "finance/partials/management_dashboard.html" %}
   {% endif %}
+  {% if tab == 'cash' and can_payment_create %}
+  <section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="lock" aria-hidden="true"></i>کنترل صندوق روزانه</h2><a class="btn-primary" href="{% url 'finance:cash_close' %}?day={{ selected_day|date:'Y-m-d' }}">بستن صندوق</a></header><p class="fin-muted">ثبت موجودی نقدی پایان روز و مغایرت‌ها.</p></section>
+  {% endif %}
   {% if tab == 'receipts' or tab == 'cash' %}
   <section class="fin-panel">
     <header class="fin-panel-head"><h2><i data-lucide="receipt-text" aria-hidden="true"></i>فاکتور خدمات</h2><a href="{% url 'finance:invoices' %}">مشاهده فاکتورها</a></header>

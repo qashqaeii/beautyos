@@ -12,3 +12,9 @@
 - Payment rows remain authoritative; issue-time snapshot records gross, prior discounts/receipts, new discount, new payment and balance. Three payment methods can be allocated in one submission.
 - Request UUID + payload digest enforce idempotency, and one invoice line per appointment prevents accidental second invoicing. Later receipts still use the existing receipt flow. Access is tenant-scoped.
 - No automatic refunds, fiscal e-invoice integration, product lines, bank-account ledger or cash close yet. Package sessions must be redeemed through the existing package flow, not invoiced as new services.
+
+## Cash reconciliation and reporting increment
+- Daily immutable CashClose snapshots (one per salon/day) compare counted cash with opening + recorded cash receipts + manual other cash in - manual cash out. Nonzero differences require a note; duplicate submissions do not create multiple closures. Card and transfer receipts are disclosed separately; later receipt changes are flagged rather than rewriting the snapshot.
+- Cash reconciliation is not a bank-account ledger; the manual amounts do not create duplicate expense or payment rows.
+- Expense reports use Jalali month boundaries and include partial receipts, without labeling cash receipts minus expenses as net profit. Expense creation validates positive amounts and records an audit event.
+- Financial overview uses actual line chart and receipt-method donut inspired by the approved design.

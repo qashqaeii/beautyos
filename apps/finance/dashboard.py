@@ -36,10 +36,16 @@ def _chart(receipts, expenses, first, last):
             "received": sum(incoming.get(day + timedelta(days=i), 0) for i in range((end-day).days+1)),
             "expense": sum(outgoing.get(day + timedelta(days=i), 0) for i in range((end-day).days+1))})
     peak = max([1] + [max(r["received"], r["expense"]) for r in rows])
-    for row in rows:
-        row["received_percent"] = round(max(0, row["received"]) * 100 / peak, 2)
-        row["expense_percent"] = round(max(0, row["expense"]) * 100 / peak, 2)
-    return {"rows": rows, "peak": peak, "has_data": any(r["received"] or r["expense"] for r in rows)}
+    for index, row in enumerate(rows):
+        row["x"] = round(200 if len(rows) == 1 else 15 + index * 370 / (len(rows)-1), 2)
+        row["received_y"] = round(120 - max(0, row["received"]) * 102 / peak, 2)
+        row["expense_y"] = round(120 - max(0, row["expense"]) * 102 / peak, 2)
+    def points(key):
+        return " ".join(f"{row['x']},{row[key]}" for row in rows)
+    return {"rows": rows, "peak": peak, "received_points": points("received_y"),
+            "expense_points": points("expense_y"),
+            "received_area": f"{rows[0]['x']},120 {points('received_y')} {rows[-1]['x']},120",
+            "has_data": any(r["received"] or r["expense"] for r in rows)}
 
 
 def finance_dashboard(salon, range_ctx):
@@ -121,7 +127,10 @@ def finance_dashboard(salon, range_ctx):
     return {
         "received": received, "earned": earned, "expenses": expenses_total, "commission": commission,
         "operating_estimate": earned - expenses_total - commission,
-        "receipt_count": receipts.count(), "methods": methods, "package_sales": package_sales,
+        "receipt_count": receipts.count(), "methods": methods,
+        "method_cut1": round(method_totals.get("cash", 0) * 100 / received, 2) if received else 0,
+        "method_cut2": round((method_totals.get("cash", 0) + method_totals.get("card", 0)) * 100 / received, 2) if received else 0,
+        "package_sales": package_sales,
         "paid_commissions": paid_commissions, "paid_debt": paid_debt,
         "receivable_total": sum(row["amount"] for row in receivables),
         "receivables": receivables[:30], "receivable_count": len(receivables),

@@ -11,22 +11,31 @@
   <article class="fin-panel">
     <header class="fin-panel-head"><h2><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i>روند دریافتی و هزینه</h2><span class="fin-legend"><span><i></i>دریافتی</span><span><i></i>هزینه</span></span></header>
     {% if dashboard.chart.has_data %}
-    <div class="fin-chart" role="img" aria-label="نمودار دریافتی و هزینه ثبت‌شده در بازه انتخابی">
-      {% for row in dashboard.chart.rows %}
-      <div class="fin-chart-col">
-        <div class="fin-chart-bars"><span style="--bar:{{ row.received_percent|unlocalize }}%" title="دریافتی {{ row.received|fa_money }} تومان"></span><span style="--bar:{{ row.expense_percent|unlocalize }}%" title="هزینه {{ row.expense|fa_money }} تومان"></span></div>
-        <small>{{ row.day|fa_jalali }}</small>
-      </div>
-      {% endfor %}
+    <div class="fin-trend" role="img" aria-label="نمودار دریافتی و هزینه ثبت‌شده در بازه انتخابی">
+      <svg viewBox="0 0 400 132" aria-hidden="true" preserveAspectRatio="none">
+        <g stroke="#eadfd8" stroke-width="1" stroke-dasharray="3 3"><path d="M15 18H385 M15 52H385 M15 86H385 M15 120H385"/></g>
+        <polygon points="{{ dashboard.chart.received_area }}" fill="#9d726e" opacity=".11"/>
+        <polyline points="{{ dashboard.chart.expense_points }}" fill="none" stroke="#d4a697" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        <polyline points="{{ dashboard.chart.received_points }}" fill="none" stroke="#91615d" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        {% for row in dashboard.chart.rows %}
+        <circle cx="{{ row.x|unlocalize }}" cy="{{ row.received_y|unlocalize }}" r="3" fill="#91615d"><title>{{ row.day|fa_jalali }}: {{ row.received|fa_money }} تومان</title></circle>
+        <circle cx="{{ row.x|unlocalize }}" cy="{{ row.expense_y|unlocalize }}" r="3" fill="#d4a697"><title>{{ row.day|fa_jalali }}: {{ row.expense|fa_money }} تومان</title></circle>
+        {% endfor %}
+      </svg>
+      <div class="fin-trend-labels">{% for row in dashboard.chart.rows %}<small title="{{ row.day|fa_jalali }} تا {{ row.end|fa_jalali }}">{{ row.day|fa_jalali }}</small>{% endfor %}</div>
     </div>
+    <details class="fin-chart-details"><summary>مقادیر نمودار</summary>{% for row in dashboard.chart.rows %}<div class="fin-line"><span>{{ row.day|fa_jalali }} تا {{ row.end|fa_jalali }}</span><bdi>{{ row.received|fa_money }} / {{ row.expense|fa_money }}</bdi></div>{% endfor %}</details>
     {% else %}<div class="fin-empty"><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>هنوز گردش مالی ثبت نشده است.</span></div>{% endif %}
     <p class="fin-muted">مقایسه دریافتی‌های مشتریان با هزینه‌های ثبت‌شده؛ نه سود حسابداری.</p>
   </article>
   <article class="fin-panel">
     <header class="fin-panel-head"><h2><i data-lucide="wallet" aria-hidden="true"></i>ترکیب دریافتی‌ها</h2><span class="fin-muted">{{ range_label }}</span></header>
-    <div class="fin-received-total"><small>مجموع دریافتی مشتریان</small><strong>{{ dashboard.received|fa_money }} <small>تومان</small></strong></div>
-    <div class="fin-method-stack" aria-hidden="true">{% for method in dashboard.methods %}<span class="fin-method-{{ forloop.counter }}" style="width:{{ method.percent|unlocalize }}%"></span>{% endfor %}</div>
-    {% for method in dashboard.methods %}<div class="fin-line"><span><i class="fin-dot fin-method-{{ forloop.counter }}"></i>{{ method.name }}</span><bdi>{{ method.amount|fa_money }} تومان</bdi></div>{% endfor %}
+    <div class="fin-method-layout">
+      <div class="fin-method-ring {% if not dashboard.received %}fin-method-ring--empty{% endif %}" style="--cut1:{{ dashboard.method_cut1|unlocalize }}%;--cut2:{{ dashboard.method_cut2|unlocalize }}%">
+        <div><small>مجموع دریافتی</small><strong>{{ dashboard.received|fa_money }}</strong><small>تومان</small></div>
+      </div>
+      <div class="fin-method-list">{% for method in dashboard.methods %}<div class="fin-line"><span><i class="fin-dot fin-method-{{ forloop.counter }}"></i>{{ method.name }}</span><bdi>{{ method.amount|fa_money }}</bdi></div>{% endfor %}</div>
+    </div>
     <p class="fin-muted">روش ثبت پرداخت؛ موجودی واقعی حساب بانکی نیست.</p>
   </article>
 </section>

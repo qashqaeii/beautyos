@@ -4,9 +4,9 @@
 {% block page_subtitle %}گزارش ماه جاری{% endblock %}
 {% block content %}
 <div class="grid gap-4 sm:grid-cols-3 mb-6">
-  {% include "partials/stat_card.html" with label="درآمد ماه" value=revenue_total|fa_money suffix="تومان" icon="wallet" variant="primary" %}
+  {% include "partials/stat_card.html" with label="دریافتی ماه" value=revenue_total|fa_money suffix="تومان" icon="wallet" variant="primary" %}
   {% include "partials/stat_card.html" with label="هزینه ماه" value=expense_total|fa_money suffix="تومان" icon="receipt" %}
-  {% include "partials/stat_card.html" with label="سود عملیاتی تخمینی" value=operating_estimate|fa_money suffix="تومان" hint="درآمد منهای هزینه ثبت‌شده" icon="chart-no-axes-column-increasing" %}
+  {% include "partials/stat_card.html" with label="دریافتی منهای هزینه" value=operating_estimate|fa_money suffix="تومان" hint="جریان ثبت‌شده؛ نه سود خالص" icon="chart-no-axes-column-increasing" %}
 </div>
 <div class="editorial-module-toolbar">
   <p class="text-xs text-ink-muted">تعهد پورسانت جداگانه در بخش پورسانت محاسبه می‌شود.</p>

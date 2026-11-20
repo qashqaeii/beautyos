@@ -1,11 +1,12 @@
 from django.urls import path
 
-from apps.finance import views, checkout_views
+from apps.finance import views, checkout_views, cash_close
 
 app_name = "finance"
 
 urlpatterns = [
     path("", views.finance_overview, name="overview"),
+    path("cash-close/", cash_close.cash_close_view, name="cash_close"),
     path("checkout/", checkout_views.checkout_customers, name="checkout_customers"),
     path("checkout/<int:customer_id>/", checkout_views.checkout, name="checkout"),
     path("invoices/", checkout_views.invoice_list, name="invoices"),

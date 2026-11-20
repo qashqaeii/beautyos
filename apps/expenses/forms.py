@@ -14,3 +14,9 @@ class ExpenseForm(PersianModelForm):
             "expense_date": forms.DateInput(attrs={"class": "input-field"}),
             "description": forms.TextInput(attrs={"class": "input-field"}),
         }
+
+    def clean_amount_toman(self):
+        amount = self.cleaned_data["amount_toman"]
+        if amount <= 0:
+            raise forms.ValidationError("مبلغ هزینه باید بزرگ‌تر از صفر باشد.")
+        return amount

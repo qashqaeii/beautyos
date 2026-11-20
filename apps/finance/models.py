@@ -108,3 +108,22 @@ class InvoiceLine(TenantModelMixin, TimeStampedModel):
     discount_toman = models.BigIntegerField(default=0)
     received_toman = models.BigIntegerField(default=0)
     balance_at_issue_toman = models.BigIntegerField(default=0)
+
+
+class CashClose(TenantModelMixin, TimeStampedModel):
+    """Immutable reconciliation of recorded receipts and manually counted cash."""
+    day = models.DateField()
+    closed_by = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
+    opening_toman = models.BigIntegerField()
+    other_in_toman = models.BigIntegerField(default=0)
+    cash_out_toman = models.BigIntegerField(default=0)
+    cash_received_toman = models.BigIntegerField(default=0)
+    card_received_toman = models.BigIntegerField(default=0)
+    transfer_received_toman = models.BigIntegerField(default=0)
+    expected_toman = models.BigIntegerField()
+    counted_toman = models.BigIntegerField()
+    difference_toman = models.BigIntegerField()
+    note = models.CharField(max_length=500, blank=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon", "day"], name="finance_cashclose_day")]

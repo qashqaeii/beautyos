@@ -1,0 +1,40 @@
+{% extends "layouts/app_shell.html" %}
+{% load static format_tags l10n %}
+{% block page_title %}بستن صندوق روزانه{% endblock %}
+{% block page_subtitle %}کنترل وجه نقد پایان روز و ثبت مغایرت{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block content %}
+<div class="space-y-3 max-w-3xl mx-auto">
+  <section class="fin-panel">
+    <header class="fin-panel-head"><h2><i data-lucide="calendar-days" aria-hidden="true"></i>دریافتی‌های روز</h2><form method="get">{% include "partials/jalali_day_field.html" with iso_day=day|date:'Y-m-d' fallback_jalali=day_jalali %}</form></header>
+    <div class="fin-line"><span>دریافتی نقدی مشتری</span><bdi>{{ totals.cash|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>کارت‌خوان</span><bdi>{{ totals.card|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>انتقال بانکی</span><bdi>{{ totals.transfer|fa_money }} تومان</bdi></div>
+    <p class="fin-muted">فقط نقدی در شمارش صندوق وارد می‌شود. کارت و انتقال، دریافتی ثبت‌شده هستند نه موجودی حساب بانکی.</p>
+  </section>
+  {% if invalid_day %}<p role="alert" class="luna-modal-errors">تاریخ معتبر نیست.</p>{% endif %}
+  {% if form.errors %}<div class="luna-modal-errors" role="alert">{{ form.errors }}</div>{% endif %}
+  {% if close %}
+  <section class="fin-panel">
+    <header class="fin-panel-head"><h2><i data-lucide="lock" aria-hidden="true"></i>صندوق بسته شده</h2><span>{{ close.created_at|fa_jalali_datetime }}</span></header>
+    <div class="fin-line"><span>موجودی آغاز روز</span><bdi>{{ close.opening_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>دریافتی نقدی هنگام بستن</span><bdi>{{ close.cash_received_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>سایر ورود / خروج</span><bdi>{{ close.other_in_toman|fa_money }} / {{ close.cash_out_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>موجودی مورد انتظار</span><bdi>{{ close.expected_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>وجه شمارش‌شده</span><bdi>{{ close.counted_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-received-total"><small>مغایرت (شمارش منهای انتظار)</small><strong>{{ close.difference_toman|fa_money }} تومان</strong></div>
+    {% if close.note %}<p class="fin-muted">{{ close.note }}</p>{% endif %}
+    {% if late_cash_delta or late_card_delta or late_transfer_delta %}<p role="status" class="luna-modal-errors">بعد از بستن صندوق، گردش ثبت‌شده تغییر کرده است: نقد {{ late_cash_delta|fa_money }}، کارت {{ late_card_delta|fa_money }}، انتقال {{ late_transfer_delta|fa_money }} تومان. صورت‌وضعیت بسته‌شده تغییر نکرده است.</p>{% endif %}
+  </section>
+  {% else %}
+  <form method="post" class="fin-panel">{% csrf_token %}<input type="hidden" name="day" value="{{ day|date:'Y-m-d' }}">
+    <header class="fin-panel-head"><h2><i data-lucide="calculator" aria-hidden="true"></i>ثبت وضعیت پایان روز</h2></header>
+    <p class="fin-muted">ورود و خروج نقدی خارج از پرداخت‌های مشتری را دستی وارد کنید؛ هزینه یا تسویه‌ای را که نقدی نبوده وارد نکنید. این صورت‌وضعیت باعث ثبت دوباره درآمد یا هزینه نمی‌شود.</p>
+    {% for field in form %}<label class="finance-checkout-field" for="{{ field.id_for_label }}"><span>{{ field.label }}{% if field.name != 'note' %} (تومان){% endif %}</span>{{ field }}</label>{% endfor %}
+    <button type="submit" class="btn-primary">ثبت و بستن صندوق</button>
+    <p class="fin-muted">بعد از ثبت، صورت‌وضعیت ثابت است. تغییر دریافتی‌های بعدی جداگانه نشان داده می‌شود.</p>
+  </form>
+  {% endif %}
+  <section class="fin-panel"><header class="fin-panel-head"><h2>صندوق‌های بسته‌شده اخیر</h2></header>{% for record in history %}<div class="fin-line"><a href="?day={{ record.day|date:'Y-m-d' }}">{{ record.day|fa_jalali }}</a><bdi>{{ record.counted_toman|fa_money }} تومان</bdi></div>{% empty %}<p class="fin-muted">هنوز صندوقی بسته نشده است.</p>{% endfor %}</section>
+</div>
+{% endblock %}
