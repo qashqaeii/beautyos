@@ -32,21 +32,25 @@
     <div class="luna-finance-hero-art" aria-hidden="true"><img src="{% static 'images/photos/beautyos-finance-hero.webp' %}?v={{ BEAUTYOS_ASSET_VERSION }}" alt="" width="665" height="199" decoding="async"></div>
     <div class="finance-page__headline">
       <span class="finance-page__head-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
-      <div><h1 class="finance-page__title">مدیریت مالی</h1><p class="luna-finance-subtitle">درآمد، پرداخت‌ها و تسویه حساب‌های سالن زیبایی</p></div>
+      <div><h1 class="finance-page__title">مدیریت مالی</h1><p class="luna-finance-subtitle">درآمد، هزینه‌ها، تسویه متخصصان و سود سالن</p></div>
     </div>
   </header>
-  <nav class="finance-page__tabs" aria-label="بخش‌های مالی">
-    <a href="{% url 'finance:overview' %}?tab=income" class="finance-page__tab {% if tab == 'income' %}is-active{% endif %}" {% if tab == 'income' %}aria-current="page"{% endif %}><i data-lucide="coins" aria-hidden="true"></i><span>درآمد و دریافتی‌ها</span></a>
-    <a href="{% url 'finance:overview' %}?tab=debts" class="finance-page__tab {% if tab == 'debts' %}is-active{% endif %}" {% if tab == 'debts' %}aria-current="page"{% endif %}><i data-lucide="receipt-text" aria-hidden="true"></i><span>بدهی‌ها</span></a>
-    <a href="{% url 'finance:overview' %}?tab=commissions" class="finance-page__tab {% if tab == 'commissions' %}is-active{% endif %}" {% if tab == 'commissions' %}aria-current="page"{% endif %}><i data-lucide="users-round" aria-hidden="true"></i><span>تسویه متخصص‌ها</span></a>
+  <nav class="finance-page__tabs finance-phase2-tabs" aria-label="بخش‌های مالی">
+    <a href="{% url 'finance:overview' %}?tab=income" class="finance-page__tab {% if tab == 'income' %}is-active{% endif %}" {% if tab == 'income' %}aria-current="page"{% endif %}><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>نمای کلی</span></a>
+    <a href="{% url 'finance:overview' %}?tab=cash" class="finance-page__tab {% if tab == 'cash' %}is-active{% endif %}" {% if tab == 'cash' %}aria-current="page"{% endif %}><i data-lucide="wallet" aria-hidden="true"></i><span>صندوق</span></a>
+    <a href="{% url 'finance:overview' %}?tab=receipts" class="finance-page__tab {% if tab == 'receipts' %}is-active{% endif %}" {% if tab == 'receipts' %}aria-current="page"{% endif %}><i data-lucide="receipt-text" aria-hidden="true"></i><span>رسیدها</span></a>
+    <a href="{% url 'finance:overview' %}?tab=commissions" class="finance-page__tab {% if tab == 'commissions' %}is-active{% endif %}" {% if tab == 'commissions' %}aria-current="page"{% endif %}><i data-lucide="users-round" aria-hidden="true"></i><span>تسویه متخصصان</span></a>
+    {% if can_manage_expenses %}<a href="{% url 'expenses:overview' %}" class="finance-page__tab"><i data-lucide="layers" aria-hidden="true"></i><span>هزینه‌ها</span></a>{% endif %}
+    <a href="{% url 'finance:overview' %}?tab=debts" class="finance-page__tab {% if tab == 'debts' %}is-active{% endif %}" {% if tab == 'debts' %}aria-current="page"{% endif %}><i data-lucide="arrow-left-right" aria-hidden="true"></i><span>بدهی و مطالبات</span></a>
+    <a href="{% url 'finance:overview' %}?tab=reports" class="finance-page__tab {% if tab == 'reports' %}is-active{% endif %}" {% if tab == 'reports' %}aria-current="page"{% endif %}><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>گزارش‌ها</span></a>
   </nav>
   {% if tab != 'debts' %}
   <section class="finance-page__range-bar" aria-label="بازه گزارش">
     <div class="finance-page__range-pills" role="group" aria-label="بازه زمانی">
       <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=today" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}" {% if range_key == 'today' %}aria-current="true"{% endif %}>امروز</a>
-      {% if tab == 'income' %}
-      <a href="{% url 'finance:overview' %}?tab=income&amp;range=month" class="finance-page__range-pill {% if range_key == 'month' %}is-active{% endif %}" {% if range_key == 'month' %}aria-current="true"{% endif %}>ماه جاری</a>
-      <a href="{% url 'finance:overview' %}?tab=income&amp;range=quarter" class="finance-page__range-pill {% if range_key == 'quarter' %}is-active{% endif %}" {% if range_key == 'quarter' %}aria-current="true"{% endif %}>سه ماه گذشته</a>
+      {% if tab != 'commissions' %}
+      <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=month" class="finance-page__range-pill {% if range_key == 'month' %}is-active{% endif %}" {% if range_key == 'month' %}aria-current="true"{% endif %}>ماه جاری</a>
+      <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=quarter" class="finance-page__range-pill {% if range_key == 'quarter' %}is-active{% endif %}" {% if range_key == 'quarter' %}aria-current="true"{% endif %}>سه ماه گذشته</a>
       {% endif %}
       <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=day&amp;day={{ selected_day|date:'Y-m-d' }}" class="finance-page__range-pill {% if range_key == 'day' %}is-active{% endif %}" {% if range_key == 'day' %}aria-current="true"{% endif %}>انتخاب روز</a>
     </div>
@@ -63,8 +67,12 @@
   </section>
   {% endif %}
 
-  {% if tab == 'income' %}
-  <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="درآمد و دریافتی‌ها">
+  {% if tab == 'income' or tab == 'reports' or tab == 'cash' %}
+    {% include "finance/partials/management_dashboard.html" %}
+  {% endif %}
+  {% if tab == 'income' or tab == 'cash' or tab == 'receipts' %}
+  <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="دریافتی‌ها">
+    {% if tab == 'cash' %}
     <div class="finance-stat-grid luna-finance-income-grid">
       <article class="finance-stat-card luna-finance-featured">
         <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
@@ -93,6 +101,7 @@
         {% include "finance/partials/income_sparkline.html" with series=presentation.series.settled variant="settled" trend_label=presentation.trend_label only %}
       </article>
     </div>
+    {% endif %}
 
     <div class="luna-finance-panel">
     <div class="finance-section-head">
@@ -115,7 +124,7 @@
         <tbody>
           {% for p in payments %}
           <tr>
-            <td class="finance-table__name" data-label="نام"><span class="luna-finance-customer"><span class="luna-finance-customer-icon" aria-hidden="true"><i data-lucide="user-round"></i></span><bdi dir="auto">{{ p.customer.full_name }}</bdi></span></td>
+            <td class="finance-table__name" data-label="نام"><span class="luna-finance-customer"><span class="luna-finance-customer-icon" aria-hidden="true"><i data-lucide="user-round"></i></span><bdi dir="auto">{{ p.customer.full_name }}</bdi></span><a class="fin-receipt-link" href="{% url 'finance:receipt' p.pk %}">رسید <i data-lucide="chevron-left" aria-hidden="true"></i></a></td>
             <td class="finance-table__money" data-label="مبلغ"><bdi>{{ p.paid_amount_toman|fa_money }}</bdi> <span class="luna-finance-table-unit">تومان</span></td>
             <td class="finance-table__meta" data-label="نوع"><span class="luna-finance-status luna-finance-status--{{ p.status }}"><i data-lucide="{% if p.status == 'paid' %}circle-check{% elif p.status == 'partial' %}coins{% else %}clock{% endif %}" aria-hidden="true"></i>{% if p.status == 'paid' %}پرداخت کامل{% elif p.status == 'partial' %}پرداخت بخشی{% else %}{{ p.get_status_display }}{% endif %}</span><span class="luna-finance-method">{{ p.get_method_display }}</span></td>
             <td class="finance-table__date tabular-nums" data-label="تاریخ"><span class="luna-finance-table-date"><i data-lucide="calendar-days" aria-hidden="true"></i><bdi>{{ p.created_at|jalali_date|persian_digits }}</bdi></span></td>
@@ -129,10 +138,10 @@
     <div class="luna-finance-table-footer">
       <span><i data-lucide="list" aria-hidden="true"></i> {% if payment_page.paginator.count %}نمایش {{ payment_page.start_index|fa_num }} تا {{ payment_page.end_index|fa_num }} از {{ payment_page.paginator.count|fa_num }} پرداخت{% else %}۰ پرداخت در این بازه{% endif %}</span>
       <div class="luna-finance-pagination">
-        {% if payment_page.has_previous %}<a href="{% url 'finance:overview' %}?tab=income&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows={{ payment_page_size|unlocalize }}&amp;page={{ payment_page.previous_page_number|unlocalize }}" aria-label="صفحه قبل"><i data-lucide="chevron-right" aria-hidden="true"></i></a>{% endif %}
-        {% if payment_page.has_next %}<a href="{% url 'finance:overview' %}?tab=income&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows={{ payment_page_size|unlocalize }}&amp;page={{ payment_page.next_page_number|unlocalize }}" aria-label="صفحه بعد"><i data-lucide="chevron-left" aria-hidden="true"></i></a>{% endif %}
-        {% if payment_page_size == 5 and payment_page.paginator.count > 5 %}<a class="luna-finance-view-all" href="{% url 'finance:overview' %}?tab=income&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows=50">مشاهده همه پرداخت‌ها<i data-lucide="chevron-left" aria-hidden="true"></i></a>
-        {% elif payment_page_size == 50 %}<a class="luna-finance-view-all" href="{% url 'finance:overview' %}?tab=income&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows=5">نمایش خلاصه<i data-lucide="chevron-left" aria-hidden="true"></i></a>{% endif %}
+        {% if payment_page.has_previous %}<a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows={{ payment_page_size|unlocalize }}&amp;page={{ payment_page.previous_page_number|unlocalize }}" aria-label="صفحه قبل"><i data-lucide="chevron-right" aria-hidden="true"></i></a>{% endif %}
+        {% if payment_page.has_next %}<a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows={{ payment_page_size|unlocalize }}&amp;page={{ payment_page.next_page_number|unlocalize }}" aria-label="صفحه بعد"><i data-lucide="chevron-left" aria-hidden="true"></i></a>{% endif %}
+        {% if payment_page_size == 5 and payment_page.paginator.count > 5 %}<a class="luna-finance-view-all" href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows=50">مشاهده همه پرداخت‌ها<i data-lucide="chevron-left" aria-hidden="true"></i></a>
+        {% elif payment_page_size == 50 %}<a class="luna-finance-view-all" href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;rows=5">نمایش خلاصه<i data-lucide="chevron-left" aria-hidden="true"></i></a>{% endif %}
       </div>
     </div>
     </div>
@@ -140,6 +149,7 @@
   {% endif %}
 
   {% if tab == 'debts' %}
+    {% include "finance/partials/receivables.html" %}
   <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="بدهی‌های سالن">
     <article class="finance-stat-card finance-stat-card--wide finance-stat-card--warning">
       <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="receipt-text"></i></span>

@@ -1,0 +1,23 @@
+{% extends "layouts/app_shell.html" %}
+{% load format_tags %}
+{% block title %}رسید پرداخت{% endblock %}
+{% block page_title %}رسید پرداخت{% endblock %}
+{% block content %}
+<style>@media print { .maison-sidebar,.maison-mobile-bar,.maison-unified-header,.receipt-actions,.maison-sheet {display:none!important} body,.maison-app,.maison-main{background:white!important} .maison-content{padding:0!important} .receipt-paper{box-shadow:none!important;border:0!important} }</style>
+<div class="max-w-lg mx-auto">
+  <article class="receipt-paper premium-card space-y-4 p-6">
+    <header class="border-b border-line pb-4"><p class="text-sm text-ink-secondary">{{ active_salon.name }}</p><h2 class="text-xl font-bold text-ink">رسید پرداخت</h2><p class="text-xs text-ink-secondary">شماره {{ payment.pk|fa_num }} · {{ payment.created_at|fa_jalali_datetime }}</p></header>
+    <dl class="space-y-3 text-sm">
+      <div class="flex justify-between gap-3"><dt>مشتری</dt><dd>{{ payment.customer.full_name }}</dd></div>
+      {% if payment.appointment %}<div class="flex justify-between gap-3"><dt>خدمت</dt><dd>{{ payment.appointment.service.name }}</dd></div><div class="flex justify-between gap-3"><dt>متخصص</dt><dd>{{ payment.appointment.staff.full_display_name }}</dd></div>{% endif %}
+      <div class="flex justify-between gap-3"><dt>مبلغ قابل پرداخت این ثبت</dt><dd>{{ payment.total_amount_toman|fa_money }} تومان</dd></div>
+      <div class="flex justify-between gap-3"><dt>تخفیف این ثبت</dt><dd>{{ payment.discount_toman|fa_money }} تومان</dd></div>
+      <div class="flex justify-between gap-3"><dt>روش</dt><dd>{{ payment.get_method_display }}</dd></div>
+      <div class="flex justify-between gap-3"><dt>وضعیت ثبت</dt><dd>{{ payment.get_status_display }}</dd></div>
+      <div class="flex justify-between gap-3 border-t border-line pt-4 font-bold"><dt>مبلغ ثبت‌شده</dt><dd>{{ payment.paid_amount_toman|fa_money }} تومان</dd></div>
+    </dl>
+    <p class="text-xs text-ink-secondary">این سند رسید یک ثبت پرداخت است، نه فاکتور کامل مراجعه.</p>
+  </article>
+  <div class="receipt-actions flex gap-2 mt-4"><button type="button" class="btn-primary" onclick="window.print()">چاپ / ذخیره PDF</button><a href="{% url 'dashboard:home' %}" class="btn-secondary">بازگشت</a></div>
+</div>
+{% endblock %}

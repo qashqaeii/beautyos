@@ -1,0 +1,64 @@
+{% load format_tags l10n %}
+{% if tab != 'cash' %}
+<section class="fin-summary-grid" aria-label="خلاصه مالی">
+  <article class="fin-kpi fin-kpi--primary"><div><span>درآمد خدمات</span><i data-lucide="trending-up" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.earned|fa_money }}</bdi></strong><small>تومان · خدمات انجام‌شده</small></article>
+  <article class="fin-kpi"><div><span>هزینه‌ها</span><i data-lucide="layers" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.expenses|fa_money }}</bdi></strong><small>تومان · هزینه ثبت‌شده</small></article>
+  <article class="fin-kpi"><div><span>سهم متخصصان</span><i data-lucide="users-round" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.commission|fa_money }}</bdi></strong><small>تومان · سهم شناسایی‌شده</small></article>
+  <article class="fin-kpi"><div><span>سود عملیاتی برآوردی</span><i data-lucide="sprout" class="fin-success" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.operating_estimate|fa_money }}</bdi></strong><small>تومان · پس از هزینه و پورسانت</small></article>
+</section>
+{% endif %}
+<section class="fin-insights-grid" aria-label="روند و ترکیب دریافتی">
+  <article class="fin-panel">
+    <header class="fin-panel-head"><h2><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i>روند دریافتی و هزینه</h2><span class="fin-legend"><span><i></i>دریافتی</span><span><i></i>هزینه</span></span></header>
+    {% if dashboard.chart.has_data %}
+    <div class="fin-chart" role="img" aria-label="نمودار دریافتی و هزینه ثبت‌شده در بازه انتخابی">
+      {% for row in dashboard.chart.rows %}
+      <div class="fin-chart-col">
+        <div class="fin-chart-bars"><span style="--bar:{{ row.received_percent|unlocalize }}%" title="دریافتی {{ row.received|fa_money }} تومان"></span><span style="--bar:{{ row.expense_percent|unlocalize }}%" title="هزینه {{ row.expense|fa_money }} تومان"></span></div>
+        <small>{{ row.day|fa_jalali }}</small>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}<div class="fin-empty"><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>هنوز گردش مالی ثبت نشده است.</span></div>{% endif %}
+    <p class="fin-muted">مقایسه دریافتی‌های مشتریان با هزینه‌های ثبت‌شده؛ نه سود حسابداری.</p>
+  </article>
+  <article class="fin-panel">
+    <header class="fin-panel-head"><h2><i data-lucide="wallet" aria-hidden="true"></i>ترکیب دریافتی‌ها</h2><span class="fin-muted">{{ range_label }}</span></header>
+    <div class="fin-received-total"><small>مجموع دریافتی مشتریان</small><strong>{{ dashboard.received|fa_money }} <small>تومان</small></strong></div>
+    <div class="fin-method-stack" aria-hidden="true">{% for method in dashboard.methods %}<span class="fin-method-{{ forloop.counter }}" style="width:{{ method.percent|unlocalize }}%"></span>{% endfor %}</div>
+    {% for method in dashboard.methods %}<div class="fin-line"><span><i class="fin-dot fin-method-{{ forloop.counter }}"></i>{{ method.name }}</span><bdi>{{ method.amount|fa_money }} تومان</bdi></div>{% endfor %}
+    <p class="fin-muted">روش ثبت پرداخت؛ موجودی واقعی حساب بانکی نیست.</p>
+  </article>
+</section>
+{% if tab == 'income' or tab == 'cash' %}
+<section class="fin-quick-grid" aria-label="دسترسی سریع">
+  <article class="fin-panel">
+    <header class="fin-panel-head"><h2><i data-lucide="zap" aria-hidden="true"></i>دسترسی سریع</h2></header>
+    <div class="fin-actions">
+      {% if can_payment_create %}<a class="fin-action fin-action--primary" href="{{ payment_return_url }}&amp;payment=1"><i data-lucide="credit-card" aria-hidden="true"></i>دریافت پرداخت</a>{% endif %}
+      <a class="fin-action" href="{% url 'finance:overview' %}?tab=receipts"><i data-lucide="receipt-text" aria-hidden="true"></i>رسید پرداخت</a>
+      {% if can_settle_commission %}<a class="fin-action" href="{% url 'commissions:overview' %}"><i data-lucide="users-round" aria-hidden="true"></i>تسویه متخصص</a>{% endif %}
+      {% if can_manage_expenses %}<a class="fin-action" href="{% url 'expenses:create' %}"><i data-lucide="layers" aria-hidden="true"></i>ثبت هزینه</a>{% endif %}
+    </div>
+  </article>
+  <article class="fin-panel">
+    <header class="fin-panel-head"><h2><i data-lucide="arrow-left-right" aria-hidden="true"></i>مانده‌ها و گردش ثبت‌شده</h2><a href="{% url 'finance:overview' %}?tab=debts">جزئیات</a></header>
+    <div class="fin-line"><span>مطالبات خدمات انجام‌شده</span><bdi>{{ dashboard.receivable_total|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>بدهی باز سالن</span><bdi>{{ dashboard.debt_total|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>مانده سهم متخصصان</span><bdi>{{ dashboard.staff_due_total|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>فروش پکیج ثبت‌شده در بازه</span><bdi>{{ dashboard.package_sales|fa_money }} تومان</bdi></div>
+  </article>
+</section>
+{% endif %}
+{% if tab == 'reports' %}
+<section class="fin-panel">
+  <header class="fin-panel-head"><h2><i data-lucide="scissors" aria-hidden="true"></i>عملکرد خدمات</h2></header>
+  <p class="fin-muted">سهم باقی‌مانده هر خدمت پیش از هزینه مواد و هزینه عمومی. فروش پکیج در لحظه فروش درآمد خدمات محسوب نمی‌شود.</p>
+  <div class="fin-report-table">
+  {% for row in dashboard.service_rows %}
+    <div class="fin-report-row"><strong>{{ row.name }}</strong><span>{{ row.count|fa_num }} خدمت</span><span>درآمد <bdi>{{ row.revenue|fa_money }}</bdi></span><span>سهم متخصص <bdi>{{ row.commission|fa_money }}</bdi></span><span>مانده <bdi>{{ row.contribution|fa_money }}</bdi> تومان</span></div>
+  {% empty %}<div class="fin-empty">خدمت انجام‌شده‌ای در این بازه ثبت نشده است.</div>{% endfor %}
+  </div>
+  <p class="fin-muted">برآورد عملیاتی شامل هزینه‌های ثبت‌شده و سهم خدمات انجام‌شده است؛ مالیات، استهلاک و مواد ثبت‌نشده را پوشش نمی‌دهد.</p>
+</section>
+{% endif %}

@@ -1,0 +1,9 @@
+{% load format_tags %}
+<section class="fin-panel">
+  <header class="fin-panel-head"><h2><i data-lucide="hand-coins" aria-hidden="true"></i>مطالبات مشتریان</h2><span>{{ dashboard.receivable_count|fa_num }} نوبت</span></header>
+  <div class="fin-received-total"><small>مانده خدمات انجام‌شده</small><strong>{{ dashboard.receivable_total|fa_money }} <small>تومان</small></strong></div>
+  {% for row in dashboard.receivables %}
+  <div class="fin-line"><span><a href="{% url 'customers:detail' row.appointment.customer_id %}">{{ row.appointment.customer.full_name }}</a> · {{ row.appointment.service.name }}</span><bdi>{{ row.amount|fa_money }} تومان</bdi></div>
+  {% empty %}<p class="fin-muted">مطالبات باز خدمات انجام‌شده وجود ندارد.</p>{% endfor %}
+  {% if dashboard.receivable_count > 30 %}<p class="fin-muted">۳۰ مورد قدیمی‌تر نمایش داده شده است؛ مجموع شامل همه موارد است.</p>{% endif %}
+</section>

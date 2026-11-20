@@ -8,6 +8,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from apps.commissions.services import create_settlement
+from apps.finance.dashboard import finance_dashboard
 from apps.finance.forms import PaymentForm, SalonDebtForm, SalonDebtPaymentForm
 from apps.finance.models import Payment, SalonDebt
 from apps.finance.services import (
@@ -27,6 +28,8 @@ from apps.salons.permissions_policy import (
     P_COMMISSION_MANAGE,
     P_FINANCE_REPORTS,
     P_PAYMENT_CREATE,
+    P_PAYMENT_VIEW,
+    P_EXPENSE_MANAGE,
     has_permission,
 )
 from apps.staff.models import StaffProfile
@@ -101,7 +104,7 @@ def _finance_overview_context(
 ):
     get_query = (request.GET if get_query is None else get_query).copy()
     tab = get_query.get("tab", "income")
-    if tab not in ("income", "debts", "commissions"):
+    if tab not in ("income", "cash", "debts", "commissions", "reports", "receipts"):
         tab = "income"
     if tab == "commissions" and get_query.get("range", "today") not in ("today", "day"):
         get_query["range"] = "day"
@@ -120,12 +123,12 @@ def _finance_overview_context(
     if debt_form is None:
         debt_form = SalonDebtForm()
     # Only query the active tab. The other panels are not rendered.
-    income = income_metrics(request.salon, range_ctx["start_dt"], range_ctx["end_dt"]) if tab == "income" else None
+    income = income_metrics(request.salon, range_ctx["start_dt"], range_ctx["end_dt"]) if tab in ("income", "cash", "receipts", "reports") else None
     payments = ()
     payment_page = None
     payment_page_size = 50 if get_query.get("rows") == "50" else 5
     presentation = None
-    if tab == "income":
+    if tab in ("income", "cash", "receipts", "reports"):
         queryset = customer_payment_queryset(request.salon, range_ctx["start_dt"], range_ctx["end_dt"])
         payment_page = Paginator(queryset, payment_page_size).get_page(get_query.get("page", 1))
         payments = payment_page.object_list
@@ -135,7 +138,7 @@ def _finance_overview_context(
     get_query["tab"] = tab
     get_query["range"] = range_ctx["range_key"]
     get_query["day"] = range_ctx["selected_day"].isoformat()
-    if tab == "income":
+    if tab in ("income", "cash", "receipts", "reports"):
         get_query["rows"] = str(payment_page_size)
         get_query["page"] = str(payment_page.number)
     debts = open_debts_summary(request.salon) if tab == "debts" else {}
@@ -145,6 +148,7 @@ def _finance_overview_context(
         **range_ctx,
         "tab": tab,
         "income": income,
+        "dashboard": finance_dashboard(request.salon, range_ctx) if tab in ("income", "cash", "debts", "reports") else None,
         "payments": payments,
         "payment_page": payment_page,
         "payment_page_size": payment_page_size,
@@ -154,6 +158,7 @@ def _finance_overview_context(
         **debts,
         "commissions": commissions,
         "can_manage_debt": can_manage_debt,
+        "can_manage_expenses": has_permission(membership, P_EXPENSE_MANAGE),
         "can_settle_commission": can_settle_commission,
         "can_payment_create": can_payment_create,
         "payment_form": payment_form,
@@ -167,7 +172,7 @@ def _finance_overview_context(
 def finance_overview(request):
     range_ctx = parse_finance_range(request)
     tab = request.GET.get("tab", "income")
-    if tab not in ("income", "debts", "commissions"):
+    if tab not in ("income", "cash", "debts", "commissions", "reports", "receipts"):
         tab = "income"
 
     if request.method == "POST":
@@ -311,3 +316,14 @@ def payment_create(request):
             "payment_return_url": next_url,
         },
     )
+
+
+@salon_required
+@require_role(SalonMembership.Role.RECEPTIONIST)
+def payment_receipt(request, payment_id):
+    if not has_permission(getattr(request, "membership", None), P_PAYMENT_VIEW):
+        raise PermissionDenied
+    payment = get_object_or_404(Payment.scoped(request.salon).select_related(
+        "customer", "appointment__service", "appointment__staff"
+    ), pk=payment_id)
+    return render(request, "finance/receipt.html", {"payment": payment})

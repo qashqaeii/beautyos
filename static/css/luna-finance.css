@@ -247,3 +247,73 @@ body.beautyos-main-bg .maison-app.luna-finance-shell {
  .luna-finance-shell .finance-table th { padding-block:8px; }
  .luna-finance-empty { min-height:125px; }
 }
+
+/* Phase 2: compact financial management surfaces, same Editorial Rose tokens. */
+.luna-finance-shell .finance-page__tabs.finance-phase2-tabs {grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.luna-finance-shell .finance-phase2-tabs .finance-page__tab {min-height:43px;gap:5px;font-size:.72rem}
+.luna-finance-shell .finance-phase2-tabs .finance-page__tab::after {display:none}
+.fin-summary-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fin-kpi,.fin-panel {min-width:0;background:#fffaf8;border:1px solid #ecded8;border-radius:15px;box-shadow:0 4px 16px rgba(73,48,42,.045)}
+.fin-kpi {display:grid;gap:8px;align-content:start;padding:14px}
+.fin-kpi > div {display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:.77rem;font-weight:650}
+.fin-kpi > div svg {flex:none;width:30px;height:30px;padding:6px;background:#f1e4dd;border-radius:9px;color:#95675f}
+.fin-kpi > div svg.fin-success {background:#e4eee4;color:#42694e}
+.fin-kpi strong {font-size:clamp(1rem,2.05vw,1.65rem);line-height:1.5;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.fin-kpi small,.fin-muted {font-size:.72rem;line-height:1.8;color:#75635b;overflow-wrap:anywhere}
+.fin-kpi--primary {background:linear-gradient(135deg,#ae817a,#865c59);color:white;border-color:#9d726e}
+.fin-kpi--primary small {color:#f7e8e4}
+.fin-kpi--primary > div svg {background:rgba(255,255,255,.14);color:white}
+.fin-insights-grid,.fin-quick-grid {display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.fin-panel {padding:15px;display:grid;align-content:start;gap:12px}
+.fin-panel-head {display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.fin-panel-head h2 {display:flex;align-items:center;gap:8px;font-size:.94rem;font-weight:700;min-width:0}
+.fin-panel-head h2 svg {width:21px;height:21px;color:#95675f;stroke-width:1.7;flex:none}
+.fin-panel-head > a,.fin-panel-head > span {font-size:.73rem;color:#80574e}
+.fin-legend {display:flex;gap:9px;flex-wrap:wrap}
+.fin-legend > span {display:flex;align-items:center;gap:4px}
+.fin-legend i,.fin-dot {width:8px;height:8px;border-radius:50%;background:#9d726e;display:inline-block;flex:none}
+.fin-legend > span:nth-child(2) i {background:#e0b9aa}
+.fin-chart {display:flex;gap:8px;min-width:0;height:145px;align-items:stretch;padding-top:5px}
+.fin-chart-col {display:grid;grid-template-rows:minmax(0,1fr) auto;flex:1;min-width:0;text-align:center;gap:6px}
+.fin-chart-col small {font-size:clamp(.49rem,1vw,.67rem);overflow-wrap:anywhere;color:#75635b}
+.fin-chart-bars {display:flex;align-items:end;justify-content:center;gap:4px;background:repeating-linear-gradient(to top,transparent 0,transparent calc(25% - 1px),#efe4de calc(25% - 1px),#efe4de 25%);border-radius:5px}
+.fin-chart-bars span {height:var(--bar);width:clamp(5px,26%,24px);border-radius:4px 4px 0 0;background:#9d726e}
+.fin-chart-bars span:nth-child(2) {background:#e0b9aa}
+.fin-empty {display:grid;min-height:130px;place-content:center;justify-items:center;gap:9px;text-align:center;color:#75635b;font-size:.8rem}
+.fin-empty svg {width:31px;height:31px;stroke-width:1.3;color:#ac8379}
+.fin-received-total {display:grid;gap:4px;padding:11px 12px;border-radius:11px;background:#f4eae5}
+.fin-received-total small {font-size:.73rem;color:#75635b}
+.fin-received-total strong {font-size:1.35rem;overflow-wrap:anywhere}
+.fin-method-stack {display:flex;height:9px;border-radius:99px;overflow:hidden;background:#f0e4df}
+.fin-method-1 {background:#9d726e}.fin-method-2 {background:#c69a8b}.fin-method-3 {background:#dfc4b5}
+.fin-line {min-width:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1e6e0;font-size:.78rem}
+.fin-line:last-child {border:0}
+.fin-line > span {display:flex;align-items:center;gap:6px;min-width:0;overflow-wrap:anywhere;flex-wrap:wrap}
+.fin-line bdi {font-weight:650;text-align:end;overflow-wrap:anywhere;max-width:52%}
+.fin-line a,.fin-receipt-link {color:#87584f;font-weight:650}
+.fin-actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fin-action {display:grid;justify-items:center;align-content:center;gap:7px;min-height:82px;border:1px solid #eddfd8;border-radius:13px;background:#fffdfa;font-size:.78rem;font-weight:600;text-align:center;padding:9px}
+.fin-action svg {width:23px;height:23px;color:#96675d;stroke-width:1.6}
+.fin-action--primary {background:#9d726e;color:white;border-color:#9d726e}.fin-action--primary svg {color:white}
+.fin-action:hover {box-shadow:0 4px 12px rgba(81,68,63,.1)}
+.fin-receipt-link {display:inline-flex;align-items:center;gap:3px;font-size:.7rem;margin-inline-start:8px;min-height:26px}
+.fin-receipt-link svg {width:13px;height:13px}
+.fin-report-table {display:grid;gap:0}
+.fin-report-row {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px 0;border-bottom:1px solid #eaded8;font-size:.8rem;overflow-wrap:anywhere}
+.fin-report-row strong {font-weight:700}
+@media(min-width:640px) {
+ .luna-finance-shell .finance-page__tabs.finance-phase2-tabs {grid-template-columns:repeat(4,minmax(0,1fr))}
+ .fin-summary-grid {grid-template-columns:repeat(4,minmax(0,1fr))}
+ .fin-insights-grid {grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+ .fin-quick-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+ .fin-panel {padding:17px}
+ .fin-report-row {grid-template-columns:minmax(0,1.1fr) .6fr repeat(3,minmax(0,1fr))}
+}
+@media(min-width:1100px) {
+ .luna-finance-shell .finance-page__tabs.finance-phase2-tabs {grid-template-columns:repeat(7,minmax(0,1fr))}
+ .luna-finance-shell .finance-phase2-tabs .finance-page__tab {font-size:.76rem;min-height:44px;white-space:normal}
+ .luna-finance-shell .finance-page__header {border-radius:18px;min-height:118px}
+ .luna-finance-shell .maison-content {padding-block-start:16px}
+ .fin-actions {grid-template-columns:repeat(4,minmax(0,1fr))}
+ .fin-kpi {min-height:112px;padding:15px}
+}
