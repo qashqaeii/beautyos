@@ -3,7 +3,7 @@
   {% if analytics.revenue %}
   <section class="overview-panel overview-revenue" aria-labelledby="overview-revenue-title">
     <div class="overview-panel-head">
-      <div><h2 id="overview-revenue-title">روند دریافتی سالن</h2><p>پرداخت‌های ثبت‌شده تا روز انتخابی</p></div>
+      <div><h2 id="overview-revenue-title"><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i>روند دریافتی سالن</h2><p>پرداخت‌های ثبت‌شده تا روز انتخابی</p></div>
       <nav class="overview-range" aria-label="بازه روند دریافتی">
         <a href="?day={{ selected_day|date:'Y-m-d' }}&amp;range={{ range_key }}&amp;trend=7" {% if trend_days == 7 %}aria-current="true"{% endif %}>۷ روز</a>
         <a href="?day={{ selected_day|date:'Y-m-d' }}&amp;range={{ range_key }}&amp;trend=30" {% if trend_days == 30 %}aria-current="true"{% endif %}>۳۰ روز</a>
@@ -28,7 +28,7 @@
   </section>
   {% endif %}
   <section class="overview-panel overview-status" aria-labelledby="overview-status-title">
-    <div class="overview-panel-head"><div><h2 id="overview-status-title">وضعیت نوبت‌ها</h2><p>همه نوبت‌ها، شامل لغوشده</p></div></div>
+    <div class="overview-panel-head"><div><h2 id="overview-status-title"><i data-lucide="calendar-check" aria-hidden="true"></i>وضعیت نوبت‌ها</h2><p>همه نوبت‌ها، شامل لغوشده</p></div></div>
     <div class="overview-status-body">
       <div class="overview-donut" style="--status-stops:{{ analytics.status_gradient }}" role="img" aria-label="کل نوبت‌ها: {{ analytics.status_total|fa_num }}"><div><strong>{{ analytics.status_total|fa_num }}</strong><span>کل نوبت‌ها</span></div></div>
       <ul class="overview-status-legend">{% for item in analytics.statuses %}<li><span class="overview-dot" style="--dot:{{ item.color }}"></span><span>{{ item.label }}</span><strong>{{ item.count|fa_num }}</strong></li>{% endfor %}</ul>
@@ -36,7 +36,7 @@
   </section>
   {% if analytics.staff_visible %}
   <section class="overview-panel overview-staff" aria-labelledby="overview-staff-title">
-    <div class="overview-panel-head"><div><h2 id="overview-staff-title">عملکرد متخصصان</h2><p>۵ متخصص برتر بر اساس نوبت انجام‌شده</p></div><span class="overview-panel-icon"><i data-lucide="users-round" aria-hidden="true"></i></span></div>
+    <div class="overview-panel-head"><div><h2 id="overview-staff-title"><i data-lucide="users-round" aria-hidden="true"></i>عملکرد متخصصان</h2><p>۵ متخصص برتر بر اساس نوبت انجام‌شده</p></div></div>
     {% if analytics.staff %}
     <ul class="overview-staff-list">{% for item in analytics.staff %}<li><div><span>{{ item.name }}</span><strong>{{ item.count|fa_num }} نوبت</strong></div><div class="overview-progress"><span style="width:{{ item.percent|unlocalize }}%"></span></div></li>{% endfor %}</ul>
     {% else %}<div class="overview-empty"><i data-lucide="users-round" aria-hidden="true"></i><p>هنوز نوبت انجام‌شده‌ای ثبت نشده است.</p></div>{% endif %}
@@ -44,7 +44,7 @@
   {% endif %}
   {% if analytics.customers %}
   <section class="overview-panel overview-customers" aria-labelledby="overview-customer-title">
-    <div class="overview-panel-head"><div><h2 id="overview-customer-title">آمار مشتریان</h2><p>مشتریان ثبت‌شده و مراجعه‌کننده در این روز</p></div><span class="overview-panel-icon"><i data-lucide="heart-handshake" aria-hidden="true"></i></span></div>
+    <div class="overview-panel-head"><div><h2 id="overview-customer-title"><i data-lucide="heart-handshake" aria-hidden="true"></i>آمار مشتریان</h2><p>مشتریان ثبت‌شده و مراجعه‌کننده در این روز</p></div></div>
     <div class="overview-customer-grid">
       <div><span>مشتریان جدید</span><strong>{{ analytics.customers.new|fa_num }}</strong></div>
       <div><span>مراجعه‌کنندگان</span><strong>{{ analytics.customers.visited|fa_num }}</strong></div>

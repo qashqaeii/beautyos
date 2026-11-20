@@ -314,3 +314,63 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
     assert Refund.scoped(salon).filter(payment=sale.payment,amount_toman=250000).exists()
     item.refresh_from_db()
     assert item.quantity==4
+
+
+@pytest.mark.django_db(transaction=True)
+def test_overview_populated_notebook_first_fold(live_server, client, owner_membership):
+    """Exercise real data, including the maximum 5 staff rows and long currency labels."""
+    from apps.accounts.models import User
+    from apps.appointments.models import Appointment
+    from apps.customers.models import Customer
+    from apps.dashboard.role_services import day_bounds
+    from apps.finance.models import Payment
+    from apps.salons.models import SalonMembership
+    from apps.services.models import Service
+    from apps.staff.models import StaffProfile
+
+    salon=owner_membership.salon
+    day=timezone.localdate()
+    start,_=day_bounds(day)
+    service=Service.objects.create(salon=salon,name="مراقبت مو",price_toman=12345678)
+    for i in range(5):
+        membership=owner_membership
+        if i:
+            user=User.objects.create_user(phone=f"+98912123710{i}")
+            membership=SalonMembership.objects.create(salon=salon,user=user,role=SalonMembership.Role.SPECIALIST)
+        staff,_=StaffProfile.objects.get_or_create(salon=salon,membership=membership,
+            defaults={"display_name":f"متخصص زیبایی شماره {i+1}"})
+        customer=Customer.objects.create(salon=salon,full_name=f"مشتری آزمایشی {i+1}",phone=f"+98912123720{i}")
+        appointment=Appointment.objects.create(salon=salon,staff=staff,customer=customer,service=service,
+            start_at=start+timedelta(hours=8+i),end_at=start+timedelta(hours=8+i,minutes=30),
+            completed_at=start+timedelta(hours=8+i,minutes=30),status=Appointment.Status.COMPLETED,price_toman=12345678)
+        Payment.objects.create(salon=salon,customer=customer,appointment=appointment,
+            total_amount_toman=12345678,paid_amount_toman=12345678,status=Payment.Status.PAID,method=Payment.Method.CARD)
+
+    client.force_login(owner_membership.user)
+    session=client.session
+    session["active_salon_id"]=str(salon.pk)
+    session.save()
+    ARTIFACT.mkdir(exist_ok=True)
+    with pw.sync_playwright() as playwright:
+        browser=playwright.chromium.launch(headless=True)
+        context=browser.new_context(viewport={"width":1366,"height":640},locale="fa-IR",reduced_motion="reduce")
+        context.add_cookies([{"name":settings.SESSION_COOKIE_NAME,"value":client.cookies[settings.SESSION_COOKIE_NAME].value,"url":live_server.url}])
+        page=context.new_page()
+        for trend in (7,30):
+            response=page.goto(f"{live_server.url}/app/?day={day.isoformat()}&trend={trend}",wait_until="load")
+            assert response.status==200
+            page.evaluate("document.fonts.ready")
+            pw.expect(page.locator(".overview-staff-list li")).to_have_count(5)
+            pw.expect(page.locator(".dashboard-stat-mini")).to_have_count(6)
+            pw.expect(page.locator(".overview-chart svg")).to_be_visible()
+            for selector in (".overview-kpis",".overview-revenue",".overview-status",".overview-staff",".overview-customers"):
+                pw.expect(page.locator(selector)).to_be_in_viewport(ratio=1)
+            assert page.evaluate("window.scrollY")==0
+            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+2")
+            assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'")
+            page.screenshot(path=str(ARTIFACT/f"1366-overview-populated-{trend}.png"),animations="disabled")
+        page.locator(".overview-chart-details summary").click()
+        pw.expect(page.locator(".overview-chart-details dl")).to_be_visible()
+        assert page.locator(".overview-chart-details").evaluate("(el) => el.open")
+        context.close()
+        browser.close()
