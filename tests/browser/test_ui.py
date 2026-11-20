@@ -207,9 +207,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
             pw.expect(page.locator(".finance-checkout-wrap .fin-received-total strong")).to_have_text("۰ تومان")
             page.get_by_role("button",name="ثبت فاکتور و پرداخت").click()
             pw.expect(page.get_by_role("heading",name="فاکتور خدمات",exact=True)).to_be_visible()
-            invoice=Invoice.scoped(salon).get()
-            assert invoice.received_toman==1200000 and invoice.balance_at_issue_toman==0
-            assert Payment.scoped(salon).filter(invoice=invoice).count()==1
+            assert urlsplit(page.url).path.startswith("/finance/invoices/")
             assert not js_errors and not broken and not external
             page.screenshot(path=str(ARTIFACT/f"{width}-finance-invoice.png"),animations="disabled")
         except Exception as exc:
@@ -217,3 +215,8 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
         context.close()
         browser.close()
     assert not errors, "\n"+"\n".join(errors)
+    # The sync Playwright context runs an asyncio loop on the calling thread.
+    # Verify persisted state only after the browser context has exited.
+    invoice=Invoice.scoped(salon).get()
+    assert invoice.received_toman==1200000 and invoice.balance_at_issue_toman==0
+    assert Payment.scoped(salon).filter(invoice=invoice).count()==1
