@@ -70,3 +70,28 @@ class CampaignRecipient(TenantModelMixin, TimeStampedModel):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["campaign","customer"],name="retention_campaign_customer")]
+
+
+class AutomationPolicy(TenantModelMixin, TimeStampedModel):
+    reminder_enabled = models.BooleanField(default=False)
+    birthday_enabled = models.BooleanField(default=False)
+    winback_enabled = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon"],name="retention_one_automation_policy")]
+
+
+class AutomationMessage(TenantModelMixin, TimeStampedModel):
+    customer = models.ForeignKey("customers.Customer",on_delete=models.PROTECT,related_name="automation_messages")
+    appointment = models.ForeignKey("appointments.Appointment",on_delete=models.PROTECT,null=True,blank=True,related_name="automation_messages")
+    followup = models.ForeignKey("retention.FollowUp",on_delete=models.PROTECT,null=True,blank=True,related_name="automation_messages")
+    kind = models.CharField(max_length=16,choices=[("reminder","یادآوری نوبت"),("birthday","تبریک تولد"),("winback","دعوت به مراجعه")])
+    source_key = models.CharField(max_length=100)
+    text = models.CharField(max_length=480)
+    due_at = models.DateTimeField()
+    expires_at = models.DateTimeField()
+    status = models.CharField(max_length=12,choices=[("pending","آماده ارسال"),("skipped","صرف‌نظر شده")],default="pending")
+    reason = models.CharField(max_length=120,blank=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","kind","source_key"],name="retention_unique_automation_source")]

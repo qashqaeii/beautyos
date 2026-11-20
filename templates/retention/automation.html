@@ -1,0 +1,17 @@
+{% extends "layouts/app_shell.html" %}{% load static format_tags %}
+{% block page_title %}اتوماسیون هوشمند سالن{% endblock %}
+{% block page_subtitle %}یادآوری و ارتباط هدفمند بدون پیگیری تکراری{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block content %}<div class="space-y-3">
+<section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="bot" aria-hidden="true"></i>مرکز اتوماسیون</h2><a href="{% url 'retention:campaigns' %}">کمپین‌ها</a></header>
+<p class="fin-muted">در این نسخه صف پیام آماده می‌شود؛ درگاه ارسال پیامک متصل نیست.</p>
+<div class="fin-account-grid"><article class="fin-account-card"><span>آماده بررسی</span><strong>{{ pending|fa_num }}</strong></article><article class="fin-account-card"><span>صرف‌نظر شده</span><strong>{{ skipped|fa_num }}</strong></article></div>
+{% if messages %}{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}{% endif %}
+</section>
+<section class="fin-panel"><header class="fin-panel-head"><h2>سناریوهای خودکار</h2></header>
+<p class="fin-muted">پیام تبلیغاتی فقط با رضایت مشتری و فعال بودن تنظیمات تبلیغاتی آماده می‌شود. تنظیمات تبلیغاتی: {% if settings.sms_marketing_enabled %}فعال{% else %}غیرفعال{% endif %} · اطلاع‌رسانی نوبت: {% if settings.sms_transactional_enabled %}فعال{% else %}غیرفعال{% endif %}</p>
+<form method="post" class="fin-tools-form">{% csrf_token %}<input type="hidden" name="action" value="save">{% for field in form %}<label class="fin-line"><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>{% endfor %}<button class="btn-primary">ذخیره سناریوها</button></form>
+</section>
+<section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="list-checks" aria-hidden="true"></i>صف پیام‌ها</h2><form method="post">{% csrf_token %}<button class="btn-secondary" name="action" value="prepare">به‌روزرسانی صف</button></form></header>
+{% for row in rows %}<div class="fin-line"><span><strong>{{ row.customer.full_name }} · {{ row.get_kind_display }}</strong><small>{{ row.text }}</small>{% if row.reason %}<small>{{ row.reason }}</small>{% endif %}</span><span>{{ row.get_status_display }}</span></div>{% empty %}<p class="fin-muted">هنوز پیامی آماده نشده است. سناریوی مورد نظر را فعال کنید.</p>{% endfor %}
+</section></div>{% endblock %}
