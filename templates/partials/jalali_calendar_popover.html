@@ -1,5 +1,5 @@
 {# Shared Jalali popover — Alpine: open, popoverStyle, viewJy, viewJm, birthPicker, monthsFaList, cells, pick, closeCalendar #}
-<template x-teleport="body">
+<template x-teleport="{{ portal_target|default:'body' }}">
   <div
     x-ref="popover"
     class="jalali-date__popover jalali-date__popover--portal"

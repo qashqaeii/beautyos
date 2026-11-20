@@ -204,6 +204,12 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 bounds=dialog.bounding_box()
                 assert bounds and bounds["width"]<=min(width,520)+2 and bounds["height"]<=min(height*.92,650)+2
                 pw.expect(dialog.locator(".club-dialog__footer")).to_be_visible()
+                if dialog_id=="club-voucher":
+                    dialog.locator("[data-jalali-calendar-trigger]").click()
+                    popover=dialog.locator(".jalali-date__popover--portal")
+                    pw.expect(popover).to_be_visible()
+                    popover.locator("[role='gridcell']:not(:disabled)").first.click()
+                    pw.expect(popover).not_to_be_visible()
                 page.keyboard.press("Escape")
                 pw.expect(dialog).not_to_be_visible()
                 pw.expect(trigger).to_be_focused()

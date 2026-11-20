@@ -28,6 +28,9 @@
     document.querySelectorAll(".club-dialog").forEach(dialog => {
       dialog.addEventListener("close", () => {
         if (active!==dialog) return;
+        if (window.__beautyosJalaliCalendarOpen) {
+          dialog.querySelectorAll("[data-jalali-date]").forEach(el=>window.Alpine?.$data(el)?.closeCalendar?.());
+        }
         active=null;
         document.documentElement.classList.remove("club-dialog-open");
         if (opener?.isConnected) opener.focus({preventScroll:true});

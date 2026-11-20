@@ -36,6 +36,10 @@ class VoucherForm(BenefitForm):
     amount_toman=TomanAmountField(min_value=1,max_value=10**12,label="اعتبار تخفیف (تومان)")
     expires_on=forms.DateField(label="مهلت مصرف",initial=timezone.localdate)
 
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.fields["expires_on"].widget.attrs["portal_target"]="#club-voucher"
+
 
 @salon_required
 @require_permission(P_LOYALTY_MANAGE)
