@@ -5,12 +5,12 @@
 {% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
 {% block content %}
 <form method="post" class="finance-checkout-wrap" x-data="{
-  selected: [], discount: '', cash: '', card: '', transfer: '',
+  selected: [], discount: '', cash: '', card: '', transfer: '', voucherAmount: 0,
   number(v) { return Math.max(0, Number(v || 0)); },
   get owed() { return this.selected.reduce((total, key) => total + this.number(this.$refs.rows?.querySelector('[data-key=a'+key+']')?.dataset.owed), 0); },
-  get remaining() { return Math.max(0, this.owed - this.number(this.discount) - this.number(this.cash) - this.number(this.card) - this.number(this.transfer)); },
+  get remaining() { return Math.max(0, this.owed - this.number(this.discount) - this.voucherAmount - this.number(this.cash) - this.number(this.card) - this.number(this.transfer)); },
   format(v) { return Number(v).toLocaleString('fa-IR'); }
-}" x-init="$nextTick(() => { selected = Array.from($refs.rows.querySelectorAll('input:checked')).map(el => el.value); discount = $refs.discount.dataset.initial; cash = $refs.cash.dataset.initial; card = $refs.card.dataset.initial; transfer = $refs.transfer.dataset.initial; })">
+}" x-init="$nextTick(() => { selected = Array.from($refs.rows.querySelectorAll('input:checked')).map(el => el.value); discount = $refs.discount.dataset.initial; cash = $refs.cash.dataset.initial; card = $refs.card.dataset.initial; transfer = $refs.transfer.dataset.initial; voucherAmount = Number($refs.voucher?.selectedOptions[0]?.dataset.amount || 0); })">
   {% csrf_token %}{{ form.request_key }}
   <section class="fin-panel">
     <header class="fin-panel-head"><h2><i data-lucide="user-round" aria-hidden="true"></i>{{ customer.full_name }}</h2><a href="{% url 'finance:checkout_customers' %}">تغییر مشتری</a></header>
@@ -30,9 +30,10 @@
     <header class="fin-panel-head"><h2><i data-lucide="wallet" aria-hidden="true"></i>جزئیات تسویه</h2></header>
     {% if form.errors %}<div class="luna-modal-errors" role="alert">{{ form.errors }}</div>{% endif %}
     <div class="fin-line"><span>مانده انتخاب‌شده</span><bdi x-text="format(owed)+' تومان'"></bdi></div>
-    {% for field in form.visible_fields %}
+    {% if vouchers %}<label class="finance-checkout-field"><span>اعتبار اختصاصی باشگاه</span><select name="voucher" x-ref="voucher" class="input-field" @change="voucherAmount=Number($event.target.selectedOptions[0]?.dataset.amount || 0)"><option value="">بدون اعتبار</option>{% for voucher in vouchers %}<option value="{{ voucher.pk|unlocalize }}" data-amount="{{ voucher.amount_toman|unlocalize }}" {% if selected_voucher == voucher.pk|stringformat:"s" %}selected{% endif %}>{{ voucher.title }} · {{ voucher.amount_toman|fa_money }} تومان</option>{% endfor %}</select><small class="fin-muted">یک‌بار مصرف؛ مبلغ کامل اعتبار از مانده کسر می‌شود.</small></label>{% endif %}
+    {% for field in form.visible_fields %}{% if field.name != "voucher" %}
       <label class="finance-checkout-field"><span>{{ field.label }}</span><input type="number" min="0" step="1" name="{{ field.name }}" class="input-field" x-ref="{{ field.name }}" x-model="{{ field.name }}" value="{{ field.value|default_if_none:''|unlocalize }}" data-initial="{{ field.value|default_if_none:''|unlocalize }}" inputmode="numeric" placeholder="۰"></label>
-    {% endfor %}
+    {% endif %}{% endfor %}
     <div class="fin-received-total"><small>مانده پس از ثبت</small><strong x-text="format(remaining)+' تومان'"></strong></div>
     <button class="btn-primary" type="submit" {% if not rows %}disabled{% endif %}>ثبت فاکتور و پرداخت</button>
     <p class="fin-muted">اگر مبلغی دریافت نشود، مانده به عنوان مطالبه باقی می‌ماند.</p>

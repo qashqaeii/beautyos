@@ -17,6 +17,7 @@ from apps.salons.permissions_policy import P_PAYMENT_CREATE, P_PAYMENT_VIEW, has
 
 class CheckoutForm(forms.Form):
     request_key = forms.UUIDField(widget=forms.HiddenInput)
+    voucher = forms.IntegerField(required=False,min_value=1,max_value=MAX_MONEY,label="اعتبار اختصاصی")
     discount = forms.IntegerField(label="تخفیف (تومان)", min_value=0, max_value=MAX_MONEY, required=False)
     cash = forms.IntegerField(label="نقدی (تومان)", min_value=0, max_value=MAX_MONEY, required=False)
     card = forms.IntegerField(label="کارت‌خوان (تومان)", min_value=0, max_value=MAX_MONEY, required=False)
@@ -56,7 +57,7 @@ def checkout(request, customer_id):
             invoice = issue_invoice(salon=request.salon, customer_id=customer.pk,
                 appointment_ids=selected, request_key=form.cleaned_data["request_key"],
                 discount=form.cleaned_data["discount"] or 0,
-                amounts={method: form.cleaned_data[method] or 0 for method in Payment.Method.values}, actor=request.user)
+                amounts={method: form.cleaned_data[method] or 0 for method in Payment.Method.values}, actor=request.user,voucher_id=form.cleaned_data["voucher"])
         except ValidationError as exc:
             form.add_error(None, exc)
         else:
@@ -67,7 +68,8 @@ def checkout(request, customer_id):
     for appt in appointments[:100]:
         gross, paid, discount, owed=appointment_amounts(appt)
         rows.append({"appointment":appt,"gross":gross,"paid":paid,"discount":discount,"owed":owed,"selected":str(appt.pk) in selected})
-    return render(request, "finance/checkout.html", {"customer":customer,"form":form,"rows":rows})
+    from apps.loyalty.benefits import available_vouchers
+    return render(request, "finance/checkout.html", {"customer":customer,"form":form,"rows":rows,"vouchers":available_vouchers(request.salon,customer),"selected_voucher":str(form["voucher"].value() or "")})
 
 
 @salon_required

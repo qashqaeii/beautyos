@@ -183,3 +183,26 @@ class RewardRedemption(TenantModelMixin, TimeStampedModel):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["salon","request_key"],name="loyalty_redemption_request"), models.CheckConstraint(condition=models.Q(points_cost__gt=0),name="loyalty_redemption_cost_positive")]
+
+
+class Referral(TenantModelMixin, TimeStampedModel):
+    referrer = models.ForeignKey("customers.Customer", on_delete=models.PROTECT, related_name="loyalty_referrals")
+    referred = models.OneToOneField("customers.Customer", on_delete=models.PROTECT, related_name="loyalty_referral")
+    qualifying_visit = models.OneToOneField("appointments.Appointment", on_delete=models.PROTECT, null=True, blank=True, related_name="loyalty_referral")
+    points_snapshot = models.PositiveIntegerField()
+    status = models.CharField(max_length=10, choices=[("pending","در انتظار مراجعه"),("awarded","پاداش ثبت شد"),("reversed","برگشت پاداش")],default="pending")
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=~models.Q(referrer=models.F("referred")),name="loyalty_referral_not_self")]
+
+
+class LoyaltyVoucher(TenantModelMixin, TimeStampedModel):
+    customer = models.ForeignKey("customers.Customer", on_delete=models.PROTECT, related_name="loyalty_vouchers")
+    title = models.CharField(max_length=100)
+    amount_toman = models.BigIntegerField()
+    expires_on = models.DateField()
+    is_active = models.BooleanField(default=True)
+    invoice = models.OneToOneField("finance.Invoice", on_delete=models.PROTECT, null=True, blank=True, related_name="loyalty_voucher")
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=models.Q(amount_toman__gt=0),name="loyalty_voucher_positive")]

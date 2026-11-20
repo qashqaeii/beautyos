@@ -12,6 +12,7 @@
     <div class="fin-line"><span>تخفیف قبلی</span><bdi>{{ invoice.prior_discount_toman|fa_money }} تومان</bdi></div>
     <div class="fin-line"><span>پرداخت قبلی / بیعانه</span><bdi>{{ invoice.prior_paid_toman|fa_money }} تومان</bdi></div>
     <div class="fin-line"><span>تخفیف جدید</span><bdi>{{ invoice.discount_toman|fa_money }} تومان</bdi></div>
+    {% if invoice.loyalty_voucher %}<div class="fin-line"><span>از تخفیف بالا: {{ invoice.loyalty_voucher.title }}</span><bdi>{{ invoice.loyalty_voucher.amount_toman|fa_money }} تومان</bdi></div>{% endif %}
     <div class="fin-line"><span>دریافتی هنگام صدور</span><bdi>{{ invoice.received_toman|fa_money }} تومان</bdi></div>
     <div class="fin-received-total"><small>مانده هنگام صدور</small><strong>{{ invoice.balance_at_issue_toman|fa_money }} تومان</strong></div>
     <div class="fin-line"><span>مانده فعلی خدمات فعال</span><bdi>{{ current_balance|fa_money }} تومان</bdi></div>

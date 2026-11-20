@@ -28,13 +28,16 @@ def appointment_amounts(appointment):
 
 
 @transaction.atomic
-def issue_invoice(*, salon, customer_id, appointment_ids, request_key, discount, amounts, actor):
+def issue_invoice(*, salon, customer_id, appointment_ids, request_key, discount, amounts, actor, voucher_id=None):
     try:
         key = UUID(str(request_key))
         ids = sorted({int(pk) for pk in appointment_ids})
         customer_id = int(customer_id)
         if not 0 < customer_id <= MAX_MONEY or not 0 < len(ids) <= 50 or any(not 0 < pk <= MAX_MONEY for pk in ids):
             raise ValueError
+        if voucher_id is not None:
+            voucher_id=int(voucher_id)
+            if not 0<voucher_id<=MAX_MONEY:raise ValueError
         if not isinstance(discount, int) or not 0 <= discount <= MAX_MONEY:
             raise ValueError
         if set(amounts) != set(Payment.Method.values) or any(
@@ -43,7 +46,9 @@ def issue_invoice(*, salon, customer_id, appointment_ids, request_key, discount,
             raise ValueError
     except (ValueError, TypeError, AttributeError):
         raise ValidationError("اطلاعات فاکتور معتبر نیست.") from None
-    digest = hashlib.sha256(json.dumps([customer_id, ids, discount, amounts], sort_keys=True).encode()).hexdigest()
+    payload=[customer_id,ids,discount,amounts]
+    if voucher_id is not None:payload.append(voucher_id)
+    digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
     def existing():
         invoice = Invoice.scoped(salon).filter(request_key=key).first()
@@ -79,6 +84,11 @@ def issue_invoice(*, salon, customer_id, appointment_ids, request_key, discount,
     paid_before_total = sum(s[2] for s in snapshots)
     discount_before_total = sum(s[3] for s in snapshots)
     owed_total = sum(s[4] for s in snapshots)
+    voucher=None
+    if voucher_id is not None:
+        from apps.loyalty.benefits import lock_voucher
+        voucher=lock_voucher(salon=salon,customer=customer,voucher_id=voucher_id)
+        discount+=voucher.amount_toman
     received = sum(amounts.values())
     if gross_total > MAX_MONEY or discount + received > owed_total:
         raise ValidationError("تخفیف و دریافتی نمی‌تواند بیش از مانده خدمات باشد.")
@@ -92,6 +102,10 @@ def issue_invoice(*, salon, customer_id, appointment_ids, request_key, discount,
         if invoice.request_digest != digest:
             raise ValidationError("این درخواست قبلاً با اطلاعات متفاوت ثبت شده است.")
         return invoice
+    if voucher:
+        voucher.invoice=invoice
+        voucher.save(update_fields=["invoice","updated_at"])
+        AuditLog.objects.create(salon=salon,actor=actor,action=AuditLog.Action.UPDATE,entity_type="loyalty_voucher",entity_id=str(voucher.pk),message="مصرف اعتبار در صندوق",metadata={"invoice_id":invoice.pk,"amount_toman":voucher.amount_toman})
     discount_left = discount
     method_left = dict(amounts)
     for appointment, gross, paid_before, discount_before, owed in snapshots:

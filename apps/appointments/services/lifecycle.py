@@ -49,6 +49,9 @@ def complete_appointment(*, salon, appointment_id: int) -> Appointment:
     appt.save(update_fields=["status", "completed_at", "updated_at"])
     recognize_commission_for_appointment(appt)
     from apps.loyalty.automation import award_visit
+    # Serialize registration and first completion on the customer row.
+    from apps.loyalty.benefits import award_referral
+    award_referral(appt)
     award_visit(appt)
     refresh_customer_stats(appt.customer)
     return appt
@@ -64,6 +67,8 @@ def cancel_appointment(*, salon, appointment_id: int) -> Appointment:
     if had_completed:
         reverse_commission_for_appointment(appt)
         from apps.loyalty.automation import reverse_visit
+        from apps.loyalty.benefits import reverse_referral
+        reverse_referral(appt)
         reverse_visit(appt)
 
     appt.status = Appointment.Status.CANCELLED

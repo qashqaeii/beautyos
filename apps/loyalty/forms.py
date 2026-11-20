@@ -36,11 +36,15 @@ class LoyaltyPolicyForm(forms.Form):
     spend_per_point_toman = TomanAmountField(label="مبلغ لازم برای یک امتیاز", min_value=1000, max_value=1000000000)
     visit_points = forms.IntegerField(label="امتیاز هر مراجعه انجام‌شده", min_value=0, max_value=10000)
     birthday_points = forms.IntegerField(label="هدیه امتیاز تولد سالانه", min_value=0, max_value=10000, required=False)
+    referral_points = forms.IntegerField(label="پاداش معرفی مشتری جدید",min_value=0,max_value=10000,required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for key in ("visit_points","birthday_points"):
+        for key in ("visit_points","birthday_points","referral_points"):
             self.fields[key].widget.attrs["class"]="input-field"
 
     def clean_birthday_points(self):
         return self.cleaned_data["birthday_points"] or 0
+
+    def clean_referral_points(self):
+        return self.cleaned_data["referral_points"] or 0
