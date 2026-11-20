@@ -7,6 +7,7 @@
 {% block mobile_header %}{% endblock %}
 {% block extra_head %}
 <script defer src="{% static 'js/loyalty-overview.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+<link rel="stylesheet" href="{% static 'css/luna-loyalty-phase3.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 {% endblock %}
 {% block content %}
 <div class="loyalty-page mx-auto w-full max-w-5xl pb-24 md:pb-8" x-data="{ adjustOpen: {% if adjust_open %}true{% else %}false{% endif %} }">
@@ -27,6 +28,11 @@
     {% if policy.enabled %}<p class="text-sm text-ink-secondary">هر {{ policy.spend_per_point_toman|fa_money }} تومان دریافت = یک امتیاز · هر مراجعه انجام‌شده {{ policy.visit_points|fa_num }} امتیاز</p>{% else %}<p class="text-sm text-ink-secondary">با فعال‌سازی برنامه، امتیاز خرید و مراجعه به‌صورت خودکار ثبت می‌شود.</p>{% endif %}
   </section>
 
+  <nav class="loyalty-phase3-nav" aria-label="امکانات باشگاه">
+    <a href="{% url 'loyalty:rewards' %}"><i data-lucide="gift" aria-hidden="true"></i><span>جوایز و مصرف امتیاز</span></a>
+    <a href="{% url 'loyalty:birthdays' %}"><i data-lucide="cake" aria-hidden="true"></i><span>تولد مشتریان</span></a>
+    <a href="{% url 'loyalty:program' %}"><i data-lucide="settings-2" aria-hidden="true"></i><span>قوانین امتیازدهی</span></a>
+  </nav>
   <div class="loyalty-stats-grid dashboard-enter">
     <article class="loyalty-stat">
       <p class="loyalty-stat__label">اعضای باشگاه</p>

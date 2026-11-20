@@ -131,7 +131,7 @@ def member_detail(request, pk: int):
 def program_settings(request):
     salon=request.salon
     policy=LoyaltyPolicy.scoped(salon).first()
-    initial={key:getattr(policy or LoyaltyPolicy(),key) for key in ("enabled","spend_per_point_toman","visit_points")}
+    initial={key:getattr(policy or LoyaltyPolicy(),key) for key in ("enabled","spend_per_point_toman","visit_points","birthday_points")}
     form=LoyaltyPolicyForm(request.POST if request.method=="POST" else None,initial=initial)
     if request.method=="POST" and form.is_valid():
         with transaction.atomic():

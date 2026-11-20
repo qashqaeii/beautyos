@@ -4,3 +4,7 @@
 - Original entitlement and spend unit are immutable per source. Refund reduces entitlement based on cumulative refund and original unit even when the policy is disabled; cancellation reverses visit award; a spent award may yield a negative points balance, offset by future grants. Financial refunds are not blocked by loyalty.
 - Existing tiers remain based on spendable point balance. Manual adjustment is audited; cross-tenant customer inputs rejected; monthly stats follow Jalali dates.
 - Next: reward redemption catalog, birthday and referral bonuses, package/discount integration, member insights and responsive acceptance.
+
+## Rewards and birthday gifts
+- Salon-scoped reward catalog and immutable redemption price/name snapshot. Account lock + idempotency key prevent negative or double spending; pending gifts can be fulfilled or cancelled once and cancellation restores exact points as adjustment. Fulfilled gifts cannot be cancelled. Gift fulfillment is operational, not an automatic invoice discount or stock movement.
+- Birthday view shows registered birthdays in current Jalali month; manager confirms annual gift once per customer/year, amount configured per salon. No SMS or outbound marketing. Browser smoke coverage adds program, rewards and birthdays.

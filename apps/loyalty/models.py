@@ -161,3 +161,25 @@ class LoyaltyAward(TenantModelMixin, TimeStampedModel):
             models.UniqueConstraint(fields=["salon", "source_kind", "source_key"], name="loyalty_unique_source_award"),
             models.CheckConstraint(condition=models.Q(remaining_points__lte=models.F("original_points")), name="loyalty_award_remaining"),
         ]
+
+
+class LoyaltyReward(TenantModelMixin, TimeStampedModel):
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=255, blank=True)
+    points_cost = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=models.Q(points_cost__gt=0), name="loyalty_reward_cost_positive")]
+
+
+class RewardRedemption(TenantModelMixin, TimeStampedModel):
+    reward = models.ForeignKey("loyalty.LoyaltyReward", on_delete=models.PROTECT, related_name="redemptions")
+    account = models.ForeignKey("loyalty.LoyaltyAccount", on_delete=models.PROTECT, related_name="redemptions")
+    title_snapshot = models.CharField(max_length=100)
+    points_cost = models.PositiveIntegerField()
+    request_key = models.UUIDField()
+    status = models.CharField(max_length=12, choices=[("pending","در انتظار تحویل"),("fulfilled","تحویل‌شده"),("cancelled","لغوشده")], default="pending")
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon","request_key"],name="loyalty_redemption_request"), models.CheckConstraint(condition=models.Q(points_cost__gt=0),name="loyalty_redemption_cost_positive")]

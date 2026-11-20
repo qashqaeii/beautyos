@@ -23,7 +23,7 @@ def _write_delta(account, delta, reference, note):
 
 
 @transaction.atomic
-def grant_source(*, salon, customer, kind, key, points, unit=0, note):
+def grant_source(*, salon, customer, kind, key, points, unit=0, note, actor=None):
     if customer.salon_id != salon.pk or customer.is_deleted:
         return None
     points = min(MAX_EVENT_POINTS, max(0, int(points)))
@@ -34,6 +34,9 @@ def grant_source(*, salon, customer, kind, key, points, unit=0, note):
         defaults={"account":account,"original_points":points,"remaining_points":points,"spend_unit_toman":unit})
     if created:
         _write_delta(account, points, f"{kind}:{key}"[:64], note)
+        if actor is not None:
+            from apps.audit.models import AuditLog
+            AuditLog.objects.create(salon=salon,actor=actor,action=AuditLog.Action.CREATE,entity_type="loyalty_award",entity_id=str(award.pk),message=note,metadata={"points":points,"source_kind":kind})
     return award
 
 
