@@ -66,10 +66,28 @@ def test_home_fallback_when_hero_asset_is_missing(client, monkeypatch):
     response = client.get("/")
     assert response.status_code == 200
     assert response.context["hero_image_is_fallback"]
-    assert "lavender_glow_beauty_portrait.webp" in response.content.decode()
+    assert "Sunlit" in response.content.decode()
+    assert "lavender_glow_beauty_portrait.webp" not in response.content.decode()
 
 
 def test_beautyos_brand_asset_exists():
     from django.contrib.staticfiles import finders
 
     assert finders.find("images/logos/beautyos-logo-3d.webp")
+
+
+@pytest.mark.django_db
+def test_home_approved_hero_is_versioned_and_rendered(client):
+    from django.contrib.staticfiles import finders
+    from pathlib import Path
+
+    asset = finders.find("images/photos/luna-salon-hero.webp")
+    assert asset and Path(asset).read_bytes()[8:12] == b"WEBP"
+    response = client.get("/")
+    assert response.status_code == 200
+    assert not response.context["hero_image_is_fallback"]
+    html = response.content.decode()
+    assert "luna-hero__curves" in html
+    assert "راهکار تخصصی مدیریت سالن‌های زیبایی" in html
+    assert "lavender_glow_beauty_portrait.webp" not in html
+    assert reverse("accounts:register") in html
