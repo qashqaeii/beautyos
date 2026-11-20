@@ -7,10 +7,10 @@
 <form method="post" class="finance-checkout-wrap" x-data="{
   selected: [], discount: '', cash: '', card: '', transfer: '',
   number(v) { return Math.max(0, Number(v || 0)); },
-  get owed() { return this.selected.reduce((total, key) => total + this.number(this.$refs.rows.querySelector('[data-key=a'+key+']')?.dataset.owed), 0); },
+  get owed() { return this.selected.reduce((total, key) => total + this.number(this.$refs.rows?.querySelector('[data-key=a'+key+']')?.dataset.owed), 0); },
   get remaining() { return Math.max(0, this.owed - this.number(this.discount) - this.number(this.cash) - this.number(this.card) - this.number(this.transfer)); },
   format(v) { return Number(v).toLocaleString('fa-IR'); }
-}" x-init="selected = Array.from($refs.rows.querySelectorAll('input:checked')).map(el => el.value); discount = $refs.discount.dataset.initial; cash = $refs.cash.dataset.initial; card = $refs.card.dataset.initial; transfer = $refs.transfer.dataset.initial">
+}" x-init="$nextTick(() => { selected = Array.from($refs.rows.querySelectorAll('input:checked')).map(el => el.value); discount = $refs.discount.dataset.initial; cash = $refs.cash.dataset.initial; card = $refs.card.dataset.initial; transfer = $refs.transfer.dataset.initial; })">
   {% csrf_token %}{{ form.request_key }}
   <section class="fin-panel">
     <header class="fin-panel-head"><h2><i data-lucide="user-round" aria-hidden="true"></i>{{ customer.full_name }}</h2><a href="{% url 'finance:checkout_customers' %}">تغییر مشتری</a></header>

@@ -58,6 +58,13 @@ def browser_data(owner_membership):
 @pytest.mark.parametrize("width,height", [(360,800),(768,1024),(1440,900)])
 def test_real_browser_layout_and_controls(live_server, client, owner_membership, browser_data, width, height):
     salon, staff, customer, appt, account = browser_data
+    from apps.appointments.models import Appointment
+    from apps.finance.models import Invoice, Payment
+
+    prior = timezone.now() - timedelta(hours=2)
+    completed = Appointment.objects.create(salon=salon, customer=customer, staff=staff, service=appt.service,
+        start_at=prior, end_at=prior+timedelta(minutes=30), completed_at=prior+timedelta(minutes=30),
+        price_toman=1250000,status=Appointment.Status.COMPLETED)
     ARTIFACT.mkdir(exist_ok=True)
     client.force_login(owner_membership.user)
     session=client.session
@@ -77,6 +84,9 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
         ("staff","/staff/"),("staff-detail",reverse("staff:detail",args=[staff.pk])),
         ("staff-hours",reverse("staff:hours",args=[staff.pk])),("services","/services/"),
         ("finance","/finance/"),("finance-debts","/finance/?tab=debts"),("finance-cash","/finance/?tab=cash"),("finance-reports","/finance/?tab=reports"),("finance-receipts","/finance/?tab=receipts"),
+        ("finance-checkout-customers",reverse("finance:checkout_customers")),
+        ("finance-checkout",reverse("finance:checkout",args=[customer.pk])),
+        ("finance-invoices",reverse("finance:invoices")),
         ("expenses","/expenses/"),("commissions","/commissions/"),
         ("commission-rules","/commissions/rules/"),("packages","/packages/"),
         ("inventory","/inventory/"),("loyalty","/loyalty/"),
@@ -185,6 +195,24 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 pw.expect(page.locator(".luna-desktop-account")).to_be_focused()
         except Exception as exc:
             errors.append(f"{width}/navigation interaction: {exc}")
+        try:
+            external.clear(); js_errors.clear(); broken.clear()
+            url=reverse("finance:checkout",args=[customer.pk])+f"?appointment={completed.pk}"
+            page.goto(live_server.url+url,wait_until="load")
+            pw.expect(page.locator(f"input[name='appointment'][value='{completed.pk}']")).to_be_checked()
+            pw.expect(page.locator(".finance-checkout-wrap .fin-line bdi")).to_have_text("۱٬۲۵۰٬۰۰۰ تومان")
+            page.locator("input[name='discount']").fill("50000")
+            page.locator("input[name='card']").fill("1200000")
+            pw.expect(page.locator(".finance-checkout-wrap .fin-received-total strong")).to_have_text("۰ تومان")
+            page.get_by_role("button",name="ثبت فاکتور و پرداخت").click()
+            pw.expect(page.get_by_role("heading",name="فاکتور خدمات",exact=True)).to_be_visible()
+            invoice=Invoice.scoped(salon).get()
+            assert invoice.received_toman==1200000 and invoice.balance_at_issue_toman==0
+            assert Payment.scoped(salon).filter(invoice=invoice).count()==1
+            assert not js_errors and not broken and not external
+            page.screenshot(path=str(ARTIFACT/f"{width}-finance-invoice.png"),animations="disabled")
+        except Exception as exc:
+            errors.append(f"{width}/checkout interaction: {exc}")
         context.close()
         browser.close()
     assert not errors, "\n"+"\n".join(errors)
