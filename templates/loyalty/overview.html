@@ -16,7 +16,7 @@
   </header>
   <div class="club-workspace">
     <div class="club-toolbar">
-      <span class="club-toolbar__label"><i data-lucide="layout-dashboard" aria-hidden="true"></i>نمای کلی باشگاه</span>
+      
       <div class="club-toolbar__actions"><a href="{% url 'loyalty:program' %}" data-club-open="club-program" class="btn-secondary"><i data-lucide="settings-2" aria-hidden="true"></i>تنظیمات باشگاه</a><button type="button" class="btn-primary" data-club-open="club-adjust"><i data-lucide="plus-circle" aria-hidden="true"></i>ثبت تغییر امتیاز</button></div>
     </div>
     <section class="club-program" aria-label="وضعیت برنامه امتیازدهی">
@@ -35,9 +35,9 @@
       <a href="{% url 'loyalty:program' %}" data-club-open="club-program"><i data-lucide="sliders-horizontal" aria-hidden="true"></i><span>قوانین امتیازدهی</span></a>
     </nav>
     <section class="loyalty-stats-grid club-kpis" aria-label="شاخص‌های باشگاه">
-      <article class="loyalty-stat"><span class="club-kpi-icon club-kpi-icon--sage"><i data-lucide="users-round" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">اعضای باشگاه</p><p class="loyalty-stat__value tabular-nums">{{ stats.member_count|fa_num }}</p><small>نفر</small></div></article>
+      <article class="loyalty-stat"><span class="club-kpi-icon club-kpi-icon--sage"><i data-lucide="users-round" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">اعضای باشگاه</p><p class="loyalty-stat__value tabular-nums">{{ stats.member_count|fa_num }}</p></div></article>
       <article class="loyalty-stat"><span class="club-kpi-icon"><i data-lucide="coins" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">مجموع امتیاز فعال</p><p class="loyalty-stat__value tabular-nums">{{ stats.total_points|fa_num }}</p><small>{{ stats.active_with_balance|fa_num }} عضو دارای امتیاز</small></div></article>
-      <article class="loyalty-stat"><span class="club-kpi-icon"><i data-lucide="award" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">میانگین امتیاز</p><p class="loyalty-stat__value tabular-nums">{{ stats.avg_points|fa_num }}</p><small>امتیاز هر عضو</small></div></article>
+      <article class="loyalty-stat"><span class="club-kpi-icon"><i data-lucide="award" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">میانگین امتیاز</p><p class="loyalty-stat__value tabular-nums">{{ stats.avg_points|fa_num }}</p></div></article>
       <article class="loyalty-stat"><span class="club-kpi-icon"><i data-lucide="calendar-check" aria-hidden="true"></i></span><div><p class="loyalty-stat__label">امتیاز این ماه</p><p class="loyalty-stat__value tabular-nums">{{ stats.points_earned_month|fa_num }}</p><small>مصرف {{ stats.points_redeemed_month|fa_num }} امتیاز</small></div></article>
     </section>
     <section class="club-tiers" aria-label="توزیع سطوح عضویت">
@@ -74,7 +74,6 @@
       </form>
     </div>
 
-    {% if members %}
     <div class="loyalty-members-table" role="table" aria-label="لیست اعضای باشگاه">
       <div class="loyalty-members-table__head loyalty-members-table__row" role="row">
         <span class="loyalty-members-table__cell loyalty-members-table__cell--rank" role="columnheader">رتبه</span>
@@ -83,6 +82,7 @@
         <span class="loyalty-members-table__cell loyalty-members-table__cell--points" role="columnheader">امتیاز</span>
         <span class="loyalty-members-table__cell loyalty-members-table__cell--meta" role="columnheader">خلاصه</span>
       </div>
+      {% if members %}
       <ul class="loyalty-members-list m-0 list-none p-0">
         {% for row in members %}
         {% with acc=row.account member=row.account.customer %}
@@ -115,7 +115,9 @@
         {% endwith %}
         {% endfor %}
       </ul>
+    {% endif %}
     </div>
+    {% if members %}
     {% if total_members > member_count %}
     <p class="loyalty-members-panel__more text-xs">
       نمایش {{ member_count|fa_num }} از {{ total_members|fa_num }} عضو. برای بقیه از جستجو استفاده کنید.

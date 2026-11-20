@@ -168,6 +168,24 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
         for name,path in workspace_pages:
             visit(name,path,True)
 
+        if width>=1024:
+            try:
+                # Typical 1366x768 laptop with browser chrome leaves roughly 640 CSS px.
+                page.set_viewport_size({"width":1366,"height":640})
+                page.goto(live_server.url+reverse("loyalty:overview"),wait_until="load")
+                page.evaluate("document.fonts.ready")
+                page.evaluate("window.scrollTo(0,0)")
+                header=page.locator(".loyalty-members-table__head")
+                pw.expect(header).to_be_in_viewport(ratio=1)
+                first=page.locator(".loyalty-members-table__row--body").first
+                pw.expect(first).to_be_in_viewport(ratio=.25)
+                assert page.evaluate("window.scrollY")==0
+                page.screenshot(path=str(ARTIFACT/"1366-loyalty-compact.png"),animations="disabled")
+            except Exception as exc:
+                errors.append(f"1366/loyalty first viewport: {exc}")
+            finally:
+                page.set_viewport_size({"width":width,"height":height})
+
         def modal(path,trigger,name):
             try:
                 page.goto(live_server.url+path,wait_until="load")
