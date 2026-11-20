@@ -1,0 +1,12 @@
+{% extends "layouts/app_shell.html" %}
+{% block page_title %}صدور فاکتور{% endblock %}
+{% block page_subtitle %}ابتدا مشتری را انتخاب کنید{% endblock %}
+{% block content %}
+<section class="premium-card p-4 max-w-2xl mx-auto space-y-4">
+  <form method="get" class="flex gap-2"><label for="checkout-search" class="sr-only">نام یا شماره مشتری</label><input id="checkout-search" name="q" value="{{ q }}" class="input-field min-w-0 flex-1" placeholder="نام یا شماره مشتری"><button class="btn-primary" type="submit">جستجو</button></form>
+  {% for customer in customers %}
+  <a class="flex items-center justify-between gap-3 border-b border-line py-3" href="{% url 'finance:checkout' customer.pk %}"><span>{{ customer.full_name }}<small class="block text-xs text-ink-secondary" dir="ltr">{{ customer.phone }}</small></span><i data-lucide="chevron-left" aria-hidden="true"></i></a>
+  {% empty %}<p class="text-sm text-ink-secondary">مشتری یافت نشد.</p>{% endfor %}
+  <p class="text-xs text-ink-secondary">حداکثر ۵۰ نتیجه؛ برای مشتری‌های دیگر جستجو کنید.</p>
+</section>
+{% endblock %}

@@ -38,7 +38,7 @@
   <nav class="finance-page__tabs finance-phase2-tabs" aria-label="بخش‌های مالی">
     <a href="{% url 'finance:overview' %}?tab=income" class="finance-page__tab {% if tab == 'income' %}is-active{% endif %}" {% if tab == 'income' %}aria-current="page"{% endif %}><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>نمای کلی</span></a>
     <a href="{% url 'finance:overview' %}?tab=cash" class="finance-page__tab {% if tab == 'cash' %}is-active{% endif %}" {% if tab == 'cash' %}aria-current="page"{% endif %}><i data-lucide="wallet" aria-hidden="true"></i><span>صندوق</span></a>
-    <a href="{% url 'finance:overview' %}?tab=receipts" class="finance-page__tab {% if tab == 'receipts' %}is-active{% endif %}" {% if tab == 'receipts' %}aria-current="page"{% endif %}><i data-lucide="receipt-text" aria-hidden="true"></i><span>رسیدها</span></a>
+    <a href="{% url 'finance:overview' %}?tab=receipts" class="finance-page__tab {% if tab == 'receipts' %}is-active{% endif %}" {% if tab == 'receipts' %}aria-current="page"{% endif %}><i data-lucide="receipt-text" aria-hidden="true"></i><span>فاکتورها و رسیدها</span></a>
     <a href="{% url 'finance:overview' %}?tab=commissions" class="finance-page__tab {% if tab == 'commissions' %}is-active{% endif %}" {% if tab == 'commissions' %}aria-current="page"{% endif %}><i data-lucide="users-round" aria-hidden="true"></i><span>تسویه متخصصان</span></a>
     {% if can_manage_expenses %}<a href="{% url 'expenses:overview' %}" class="finance-page__tab"><i data-lucide="layers" aria-hidden="true"></i><span>هزینه‌ها</span></a>{% endif %}
     <a href="{% url 'finance:overview' %}?tab=debts" class="finance-page__tab {% if tab == 'debts' %}is-active{% endif %}" {% if tab == 'debts' %}aria-current="page"{% endif %}><i data-lucide="arrow-left-right" aria-hidden="true"></i><span>بدهی و مطالبات</span></a>
@@ -69,6 +69,13 @@
 
   {% if tab == 'income' or tab == 'reports' or tab == 'cash' %}
     {% include "finance/partials/management_dashboard.html" %}
+  {% endif %}
+  {% if tab == 'receipts' or tab == 'cash' %}
+  <section class="fin-panel">
+    <header class="fin-panel-head"><h2><i data-lucide="receipt-text" aria-hidden="true"></i>فاکتور خدمات</h2><a href="{% url 'finance:invoices' %}">مشاهده فاکتورها</a></header>
+    <p class="fin-muted">خدمات انجام‌شده یک مشتری را یکجا انتخاب و با احتساب پرداخت‌های قبلی تسویه کنید.</p>
+    {% if can_payment_create %}<div><a href="{% url 'finance:checkout_customers' %}" class="btn-primary">صدور فاکتور جدید</a></div>{% endif %}
+  </section>
   {% endif %}
   {% if tab == 'income' or tab == 'cash' or tab == 'receipts' %}
   <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="دریافتی‌ها">

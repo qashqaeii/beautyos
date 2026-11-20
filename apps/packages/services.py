@@ -19,6 +19,9 @@ def consume_package_session(customer_package: CustomerPackage, appointment) -> P
         raise ValidationError("جلسات پکیج تمام شده است.")
     if customer_package.expires_at <= timezone.now():
         raise ValidationError("اعتبار پکیج منقضی شده است.")
+    from apps.finance.models import InvoiceLine
+    if InvoiceLine.objects.filter(appointment=appointment).exists():
+        raise ValidationError("برای این نوبت فاکتور صادر شده است.")
     if PackageSessionUse.objects.filter(appointment=appointment).exists():
         raise ValidationError("برای این نوبت قبلاً جلسه پکیج ثبت شده است.")
 

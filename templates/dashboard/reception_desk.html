@@ -1,4 +1,5 @@
 {% extends "layouts/app_shell.html" %}
+{% load l10n %}
 {% load humanize appointment_tags format_tags staff_tags static %}
 {% block shell_modifier %}luna-reception-shell{% endblock %}
 {% block extra_head %}
@@ -81,6 +82,7 @@
           </div>
         </div>
         <a href="{% url 'appointments:detail' pk=next_appt.pk %}" class="reception-desk-next__detail">جزئیات نوبت</a>
+        {% if can_payment_create %}<a href="{% url 'finance:checkout' next_appt.customer_id %}?appointment={{ next_appt.pk|unlocalize }}" class="reception-desk-next__detail">صندوق مشتری</a>{% endif %}
         {% else %}
         <p class="reception-desk-empty reception-desk-empty--inline">نوبت فعالی در صف نیست.</p>
         <img class="luna-reception-empty-art" src="{% static 'images/photos/beautyos-reception-next.webp' %}" width="228" height="140" alt="" decoding="async">

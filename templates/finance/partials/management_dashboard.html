@@ -36,7 +36,7 @@
     <header class="fin-panel-head"><h2><i data-lucide="zap" aria-hidden="true"></i>دسترسی سریع</h2></header>
     <div class="fin-actions">
       {% if can_payment_create %}<a class="fin-action fin-action--primary" href="{{ payment_return_url }}&amp;payment=1"><i data-lucide="credit-card" aria-hidden="true"></i>دریافت پرداخت</a>{% endif %}
-      <a class="fin-action" href="{% url 'finance:overview' %}?tab=receipts"><i data-lucide="receipt-text" aria-hidden="true"></i>رسید پرداخت</a>
+      {% if can_payment_create %}<a class="fin-action" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i>صدور فاکتور</a>{% else %}<a class="fin-action" href="{% url 'finance:invoices' %}"><i data-lucide="receipt-text" aria-hidden="true"></i>فاکتورها</a>{% endif %}
       {% if can_settle_commission %}<a class="fin-action" href="{% url 'commissions:overview' %}"><i data-lucide="users-round" aria-hidden="true"></i>تسویه متخصص</a>{% endif %}
       {% if can_manage_expenses %}<a class="fin-action" href="{% url 'expenses:create' %}"><i data-lucide="layers" aria-hidden="true"></i>ثبت هزینه</a>{% endif %}
     </div>

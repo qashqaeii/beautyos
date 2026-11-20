@@ -1,0 +1,23 @@
+{% extends "layouts/app_shell.html" %}
+{% load format_tags static %}
+{% block page_title %}فاکتور خدمات{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block content %}
+<style>@media print { .maison-sidebar,.maison-mobile-bar,.maison-unified-header,.receipt-actions,.maison-sheet {display:none!important} body,.maison-app,.maison-main{background:white!important} .maison-content{padding:0!important} .fin-panel{box-shadow:none!important;border:0!important} }</style>
+<div class="max-w-2xl mx-auto space-y-3">
+  <article class="fin-panel">
+    <header class="fin-panel-head"><div><h2>{{ active_salon.name }} · فاکتور {{ invoice.pk|fa_num }}</h2><p class="fin-muted">{{ invoice.customer_name }} · {{ invoice.created_at|fa_jalali_datetime }}</p></div></header>
+    {% for line in lines %}<div class="fin-line"><span><strong>{{ line.service_name }}</strong> · {{ line.staff_name }}{% if line.appointment.status == 'cancelled' %} · لغوشده{% endif %}</span><bdi>{{ line.gross_toman|fa_money }} تومان</bdi></div>{% endfor %}
+    <div class="fin-line"><span>کل خدمات</span><bdi>{{ invoice.gross_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>تخفیف قبلی</span><bdi>{{ invoice.prior_discount_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>پرداخت قبلی / بیعانه</span><bdi>{{ invoice.prior_paid_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>تخفیف جدید</span><bdi>{{ invoice.discount_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-line"><span>دریافتی هنگام صدور</span><bdi>{{ invoice.received_toman|fa_money }} تومان</bdi></div>
+    <div class="fin-received-total"><small>مانده هنگام صدور</small><strong>{{ invoice.balance_at_issue_toman|fa_money }} تومان</strong></div>
+    <div class="fin-line"><span>مانده فعلی خدمات فعال</span><bdi>{{ current_balance|fa_money }} تومان</bdi></div>
+    {% for receipt in receipts %}<div class="fin-line"><span>{{ receipt.get_method_display }}</span><a href="{% url 'finance:receipt' receipt.pk %}">{{ receipt.paid_amount_toman|fa_money }} تومان · رسید</a></div>{% endfor %}
+    <p class="fin-muted">مبالغ هنگام صدور ثابت هستند. پرداخت‌های بعدی در مانده فعلی خدمات منعکس می‌شوند. این فاکتور داخلی سالن است.</p>
+  </article>
+  <div class="receipt-actions flex gap-2 flex-wrap"><button type="button" class="btn-primary" onclick="window.print()">چاپ / ذخیره PDF</button><a href="{% url 'finance:invoices' %}" class="btn-secondary">فهرست فاکتورها</a></div>
+</div>
+{% endblock %}

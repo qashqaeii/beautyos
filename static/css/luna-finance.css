@@ -317,3 +317,13 @@ body.beautyos-main-bg .maison-app.luna-finance-shell {
  .fin-actions {grid-template-columns:repeat(4,minmax(0,1fr))}
  .fin-kpi {min-height:112px;padding:15px}
 }
+
+.finance-checkout-wrap {display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start;max-width:1040px;margin-inline:auto}
+.finance-checkout-row {display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,.7fr);align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid #efe3dd;cursor:pointer;font-size:.83rem}
+.finance-checkout-row input {width:20px;height:20px;accent-color:#95675f}
+.finance-checkout-row span,.finance-checkout-row bdi {min-width:0;overflow-wrap:anywhere}
+.finance-checkout-row small {display:block;color:#75635b;font-size:.7rem;line-height:1.7;margin-top:3px}
+.finance-checkout-row bdi {font-weight:650;text-align:end}
+.finance-checkout-field {display:grid;gap:5px;font-size:.8rem}
+.finance-checkout-field input {max-width:100%;min-width:0}
+@media(min-width:950px) {.finance-checkout-wrap {grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}}

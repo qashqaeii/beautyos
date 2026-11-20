@@ -16,6 +16,7 @@ class Payment(TenantModelMixin, TimeStampedModel):
         PAID = "paid", "تسویه"
         REFUNDED = "refunded", "استرداد"
 
+    invoice = models.ForeignKey("finance.Invoice", on_delete=models.PROTECT, null=True, blank=True, related_name="payments")
     customer = models.ForeignKey(
         "customers.Customer",
         on_delete=models.PROTECT,
@@ -77,3 +78,33 @@ class SalonDebtPayment(TenantModelMixin, TimeStampedModel):
 
     class Meta:
         indexes = [models.Index(fields=["salon", "debt", "-created_at"])]
+
+
+class Invoice(TenantModelMixin, TimeStampedModel):
+    """Immutable issue-time snapshot; Payment remains the receipt ledger."""
+    customer = models.ForeignKey("customers.Customer", on_delete=models.PROTECT, related_name="invoices")
+    customer_name = models.CharField(max_length=200)
+    request_key = models.UUIDField()
+    request_digest = models.CharField(max_length=64)
+    gross_toman = models.BigIntegerField()
+    prior_discount_toman = models.BigIntegerField(default=0)
+    prior_paid_toman = models.BigIntegerField(default=0)
+    discount_toman = models.BigIntegerField(default=0)
+    received_toman = models.BigIntegerField(default=0)
+    balance_at_issue_toman = models.BigIntegerField(default=0)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["salon", "request_key"], name="finance_invoice_request_key")]
+
+
+class InvoiceLine(TenantModelMixin, TimeStampedModel):
+    invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT, related_name="lines")
+    appointment = models.OneToOneField("appointments.Appointment", on_delete=models.PROTECT, related_name="invoice_line")
+    service_name = models.CharField(max_length=120)
+    staff_name = models.CharField(max_length=200)
+    gross_toman = models.BigIntegerField()
+    prior_discount_toman = models.BigIntegerField(default=0)
+    prior_paid_toman = models.BigIntegerField(default=0)
+    discount_toman = models.BigIntegerField(default=0)
+    received_toman = models.BigIntegerField(default=0)
+    balance_at_issue_toman = models.BigIntegerField(default=0)
