@@ -1,5 +1,5 @@
 <aside
-  class="theme-sidebar maison-sidebar maison-sidebar--layout maison-sidebar--premium hidden shrink-0 flex-col overflow-hidden lg:flex"
+  class="theme-sidebar maison-sidebar maison-sidebar--layout maison-sidebar--premium hidden shrink-0 flex-col lg:flex"
   style="background: var(--color-sidebar);"
   :class="{ 'is-collapsed': sidebarCollapsed }"
 >
@@ -23,17 +23,13 @@
       <i data-lucide="panel-right" aria-hidden="true"></i><span x-show="!sidebarCollapsed" x-cloak>جمع کردن منو</span>
     </button>
   </div>
-  {% if user_memberships|length > 1 %}
-  <div class="luna-salon-switch-list" x-show="!sidebarCollapsed" x-cloak>
-    <p>سالن فعال</p>
-    {% for m in user_memberships %}
-    <form method="post" action="{% url 'salons_onboarding:switch' salon_id=m.salon_id %}">{% csrf_token %}
-      <button type="submit"{% if m.salon_id == active_salon.id %} aria-current="true" disabled{% endif %}><i data-lucide="store" aria-hidden="true"></i><span>{{ m.salon.name }}</span></button>
-    </form>
-    {% endfor %}
+  {% if active_salon %}
+  <div class="luna-active-salon" x-show="!sidebarCollapsed" x-cloak title="{{ active_salon.name }}">
+    <i data-lucide="store" aria-hidden="true"></i>
+    <span>{{ active_salon.name }}</span>
   </div>
   {% endif %}
-  <nav id="workspace-sidebar-nav" class="maison-sidebar__nav theme-sidebar-nav maison-scroll-minimal min-h-0 flex-1 space-y-1 overflow-x-hidden overflow-y-auto overscroll-contain p-2.5" aria-label="منوی اصلی">
+  <nav id="workspace-sidebar-nav" class="maison-sidebar__nav theme-sidebar-nav min-h-0 flex-1 space-y-1 p-2.5" aria-label="منوی اصلی">
     {% include "partials/dashboard_nav_core.html" %}
   </nav>
   {% if nav_salon_settings %}
@@ -46,10 +42,10 @@
   {% endif %}
   <div class="maison-sidebar__footer theme-sidebar-footer shrink-0 border-t p-3 text-xs">
     {% if user.is_authenticated %}
-    <div class="maison-sidebar-footer__user">
+    <button type="button" class="maison-sidebar-footer__user luna-desktop-account" x-ref="desktopAccountTrigger" aria-label="حساب کاربری" aria-haspopup="dialog" aria-controls="mobile-account-sheet" :aria-expanded="accountSheetOpen" @click="accountSheetOpen = true; $nextTick(() => $refs.mobileAccountClose.focus())">
       <span class="maison-sidebar-footer__avatar" aria-hidden="true"><i data-lucide="user-round" class="beautyos-lucide beautyos-lucide--md"></i></span>
-      <p class="maison-sidebar-footer__meta truncate text-ink">{{ user.full_name|default:user.display_phone }}</p>
-    </div>
+      <span class="maison-sidebar-footer__meta truncate text-ink">{{ user.full_name|default:user.display_phone }}</span>
+    </button>
     <form method="post" action="{% url 'accounts:logout' %}" class="mt-2">
       {% csrf_token %}
       <button type="submit" class="nav-link w-full !px-2 text-ink-secondary hover:text-ink" title="خروج"><i data-lucide="log-out" class="beautyos-lucide beautyos-lucide--nav"></i><span class="nav-label">خروج</span></button>

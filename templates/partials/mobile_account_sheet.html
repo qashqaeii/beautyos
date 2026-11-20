@@ -1,6 +1,6 @@
 {% if user.is_authenticated %}
 <div class="maison-sheet-backdrop luna-mobile-account-backdrop" x-show="accountSheetOpen" x-transition.opacity @click="closeAccountSheet()" x-cloak aria-hidden="true"></div>
-<section id="mobile-account-sheet" class="maison-sheet luna-mobile-account-sheet lg:hidden" x-show="accountSheetOpen" x-cloak role="dialog" aria-modal="true" aria-labelledby="mobile-account-title"
+<section id="mobile-account-sheet" class="maison-sheet luna-mobile-account-sheet" x-show="accountSheetOpen" x-cloak role="dialog" aria-modal="true" aria-labelledby="mobile-account-title"
   @keydown.escape.window="if (accountSheetOpen) closeAccountSheet()"
   @keydown.tab="
     const items = Array.from($el.querySelectorAll('a[href],button:not([disabled])'));

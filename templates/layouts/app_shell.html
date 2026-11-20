@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <div
-  class="maison-app beautyos-main-bg__shell {% block shell_modifier %}{% endblock %} flex h-[100dvh] max-h-[100dvh] overflow-hidden"
+  class="maison-app beautyos-main-bg__shell {% block shell_modifier %}{% endblock %} flex min-h-screen"
   x-data="{
     sidebarCollapsed: false,
     quickSheetOpen: false,
@@ -9,7 +9,7 @@
     accountSheetOpen: false,
     closeAccountSheet() {
       this.accountSheetOpen = false;
-      this.$nextTick(() => this.$refs.mobileAccountTrigger?.focus());
+      this.$nextTick(() => { const desktop = this.$refs.desktopAccountTrigger; (desktop?.getClientRects().length ? desktop : this.$refs.mobileAccountTrigger)?.focus({preventScroll:true}); });
     },
     navGroups: { business: false, finance: false, growth: true, digital: false },
     toggleSidebar() {
@@ -18,21 +18,21 @@
     },
     toggleNavGroup(key) {
       this.navGroups[key] = !this.navGroups[key];
-      localStorage.setItem('maisonNavGroups', JSON.stringify(this.navGroups));
+      try { localStorage.setItem('maisonNavGroups', JSON.stringify(this.navGroups)); } catch (e) {}
     }
   }"
-  x-init="
+  x-init="(() => {
     try {
       sidebarCollapsed = localStorage.getItem('maisonSidebarCollapsed') === '1';
       const saved = JSON.parse(localStorage.getItem('maisonNavGroups') || '{}');
       Object.keys(saved).forEach((k) => { if (k in navGroups) navGroups[k] = saved[k]; });
     } catch (e) {}
-  "
+  })()"
   :class="{ 'maison-app--sheet-open': quickSheetOpen || moreSheetOpen || accountSheetOpen }"
 >
   <a href="#workspace-content" class="editorial-skip-link">رفتن به محتوای اصلی</a>
   {% include "partials/sidebar.html" %}
-  <div class="maison-main maison-scroll-minimal min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+  <div class="maison-main min-w-0 flex-1">
     <div class="maison-htmx-progress htmx-indicator" aria-hidden="true"></div>
     {% block workspace_header %}
     <header class="maison-unified-header maison-reveal {% block header_modifier %}{% endblock %}">

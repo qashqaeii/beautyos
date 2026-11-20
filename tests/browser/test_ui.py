@@ -116,6 +116,11 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 if workspace:
                     assert page.locator("#workspace-content").is_visible()
                     assert page.locator("h1:visible").count()==1, "missing/duplicate page heading"
+                    assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"
+                    if width >= 1024:
+                        pw.expect(page.locator(".luna-active-salon")).to_have_text(salon.name)
+                        assert page.locator(".maison-sidebar .luna-salon-switch-list").count() == 0
+                        assert page.evaluate("getComputedStyle(document.querySelector('#workspace-sidebar-nav')).overflowY === 'visible'"), "nested sidebar scroll"
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 2"), "horizontal page overflow"
                 assert not external, f"external runtime requests {external}"
                 assert not broken, f"broken static assets {broken}"
@@ -142,6 +147,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 pw.expect(dialog).to_be_visible(timeout=6000)
                 box=dialog.bounding_box()
                 assert box and box["x"]>=-2 and box["x"]+box["width"]<=width+2
+                assert dialog.evaluate("(el) => getComputedStyle(el, '::before').content === 'none' || getComputedStyle(el, '::before').display === 'none'"), "decorative modal panel still present"
                 page.screenshot(path=str(ARTIFACT/f"{width}-modal-{name}.png"),animations="disabled")
                 page.keyboard.press("Escape")
                 pw.expect(dialog).not_to_be_visible(timeout=6000)
@@ -163,6 +169,11 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 pw.expect(toggle).to_have_attribute("aria-expanded","false")
                 toggle.click()
                 pw.expect(toggle).to_have_attribute("aria-expanded","true")
+                page.locator(".luna-desktop-account").click()
+                pw.expect(page.locator("#mobile-account-sheet")).to_be_visible()
+                page.keyboard.press("Escape")
+                pw.expect(page.locator("#mobile-account-sheet")).not_to_be_visible()
+                pw.expect(page.locator(".luna-desktop-account")).to_be_focused()
         except Exception as exc:
             errors.append(f"{width}/navigation interaction: {exc}")
         context.close()

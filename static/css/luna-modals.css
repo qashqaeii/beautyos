@@ -5,53 +5,47 @@ body.theme-app .luna-modal-root {
   padding:0; align-items:flex-end; justify-content:center;
 }
 .luna-modal-root .inventory-create-modal__backdrop {
-  background:rgba(65,43,40,.43);
-  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  background:rgba(53,40,37,.36);
+  -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
 }
 body.theme-app .luna-modal-root .luna-modal {
   --modal-ink:#51443f; --modal-heading:#50372f; --modal-muted:#75625b;
   --modal-rose:#9d726e; --modal-line:#e6d3ca; --modal-paper:#fffaf7;
-  --modal-art-width:0px; --modal-max-width:820px;
+  --modal-max-width:640px;
   box-sizing:border-box; position:relative; isolation:isolate; direction:rtl;
   display:flex; flex-direction:column; align-items:stretch;
   width:100%; max-width:var(--modal-max-width); min-width:0; min-height:0;
   max-height:calc(100dvh - max(8px,env(safe-area-inset-top,0px)));
-  padding:0; padding-inline-end:var(--modal-art-width);
-  margin:0; border:1px solid #f1e2da; border-radius:23px 23px 0 0;
-  background:linear-gradient(145deg,#fffdfb,#fcf5f1);
+  padding:0;
+  margin:0; border:1px solid #e8dbd4; border-radius:18px 18px 0 0;
+  background:#fffdfa;
   color:var(--modal-ink); overflow:hidden;
-  box-shadow:0 18px 58px rgba(68,43,39,.23);
+  box-shadow:0 14px 42px rgba(68,43,39,.15);
 }
-.luna-modal--compact { --modal-max-width:700px!important; }
-.luna-modal--extended { --modal-max-width:930px!important; }
-.luna-modal::before {
-  content:""; display:none; position:absolute; inset-block:0; inset-inline-end:0;
-  width:var(--modal-art-width); z-index:0; pointer-events:none;
-  border-start-start-radius:30px; border-end-start-radius:30px;
-  background:#e8c8bb url("../images/photos/beautyos-modal-salon.webp") center center / cover no-repeat;
-}
+.luna-modal--compact { --modal-max-width:520px!important; }
+.luna-modal--extended { --modal-max-width:800px!important; }
 body.theme-app .luna-modal .inventory-create-modal__head {
   position:static; display:flex; align-items:center; justify-content:space-between; gap:12px;
-  flex:none; min-width:0; padding:18px 16px 8px; border:0; background:transparent;
+  flex:none; min-width:0; padding:16px 16px 13px; border:0; border-bottom:1px solid #f0e6e1; background:transparent;
   z-index:1;
 }
 .luna-modal-heading { display:flex; align-items:center; gap:12px; min-width:0; flex:1; }
 .luna-modal-heading__copy { min-width:0; }
 .luna-modal-emblem {
-  display:grid; place-items:center; flex:none; width:46px; height:46px;
-  border:1px solid #b88a80; border-radius:13px;
-  background:linear-gradient(145deg,#b88a80,#93655d); color:#fff;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 9px rgba(104,62,52,.10);
+  display:grid; place-items:center; flex:none; width:38px; height:38px;
+  border:0; border-radius:10px;
+  background:#f1e3de; color:#875f57;
+  box-shadow:none;
 }
-.luna-modal-emblem svg { width:24px; height:24px; stroke-width:1.65; }
+.luna-modal-emblem svg { width:20px; height:20px; stroke-width:1.65; }
 .luna-modal .inventory-create-modal__title {
-  font-size:clamp(1.1rem,2vw,1.4rem); font-weight:700; line-height:1.5;
+  font-size:clamp(1.05rem,2vw,1.23rem); font-weight:700; line-height:1.5;
   color:var(--modal-heading); margin:0; overflow-wrap:anywhere;
 }
 .luna-modal-subtitle { margin:3px 0 0; color:var(--modal-muted); font-size:.78rem; line-height:1.75; overflow-wrap:anywhere; }
 .luna-modal .inventory-create-modal__close {
   display:grid; place-items:center; flex:none; order:0; width:42px; height:42px;
-  color:#80574e; border:1px solid #ead8cf; background:#fffaf7; border-radius:50%;
+  color:#80574e; border:1px solid transparent; background:transparent; border-radius:10px;
 }
 .luna-modal .inventory-create-modal__close svg { width:19px; height:19px; stroke-width:1.8; }
 .luna-modal .inventory-create-modal__close:hover { background:#f1e1d9; color:#50372f; }
@@ -66,7 +60,7 @@ body.theme-app .luna-modal .inventory-create-modal__scroll {
 }
 body.theme-app .luna-modal :is(input,select,textarea).input-field {
   max-width:100%; min-width:0; width:100%; min-height:46px; border:1px solid #dcc8be;
-  border-radius:11px; background:#fffaf7; color:var(--modal-ink);
+  border-radius:9px; background:#fffdfa; color:var(--modal-ink);
   font-size:16px; box-shadow:none;
   transition:border-color .18s ease,box-shadow .18s ease;
 }
@@ -86,7 +80,7 @@ body.theme-app .luna-modal .luna-modal-field-icon .input-field[dir="ltr"] { padd
 body.theme-app .luna-modal .inventory-create-modal__foot {
   display:flex; flex-flow:row-reverse wrap; align-items:center; justify-content:flex-start;
   flex:none; gap:9px; padding:12px 16px max(15px,env(safe-area-inset-bottom,0px));
-  border:0; border-top:1px solid #f0e2da; background:#fff9f5;
+  border:0; border-top:1px solid #f0e6e1; background:#fffdfa;
 }
 body.theme-app .luna-modal .inventory-create-modal__foot :is(.btn-primary,.btn-secondary) {
   display:inline-flex; justify-content:center; align-items:center; gap:8px;
@@ -96,8 +90,8 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(.btn-primary,.btn-s
 }
 body.theme-app .luna-modal .inventory-create-modal__foot .btn-primary {
   flex:1 1 130px; color:#fff; border:1px solid #94645b;
-  background:linear-gradient(135deg,#a7776c,#8d6059);
-  box-shadow:0 3px 8px rgba(107,66,56,.12);
+  background:#95675f;
+  box-shadow:none;
 }
 body.theme-app .luna-modal .inventory-create-modal__foot .btn-secondary { flex:0 1 auto; color:#784d42; border:1px solid #dbc7bc; background:#fffaf7; }
 .luna-modal .inventory-create-modal__foot .btn-primary:not(:disabled):hover { background:#865b53; }
@@ -109,25 +103,17 @@ body.theme-app .luna-modal .inventory-create-modal__foot .btn-secondary { flex:0
 html.app-modal-open .maison-toast-stack { z-index:240; pointer-events:none; }
 @media(min-width:640px) {
   body.theme-app .luna-modal-root { align-items:center; padding:20px; }
-  body.theme-app .luna-modal-root .luna-modal { max-height:calc(100dvh - 40px); border-radius:24px; }
-  body.theme-app .luna-modal .inventory-create-modal__head { padding:22px 24px 8px; }
-  .luna-modal-emblem { width:52px; height:52px; border-radius:14px; }
-  .luna-modal-emblem svg { width:27px;height:27px; }
-  body.theme-app .luna-modal .inventory-create-modal__scroll { padding:20px 24px; }
+  body.theme-app .luna-modal-root .luna-modal { max-height:calc(100dvh - 40px); border-radius:18px; }
+  body.theme-app .luna-modal .inventory-create-modal__head { padding:18px 22px 14px; }
+   .luna-modal-emblem { width:40px; height:40px; border-radius:10px; }
+  .luna-modal-emblem svg { width:21px;height:21px; }
+  body.theme-app .luna-modal .inventory-create-modal__scroll { padding:18px 22px; }
   body.theme-app .luna-modal :is(input,select,textarea).input-field { font-size:.9rem; min-height:48px; }
-  body.theme-app .luna-modal .inventory-create-modal__foot { padding:13px 24px 22px; }
+  body.theme-app .luna-modal .inventory-create-modal__foot { padding:12px 22px 16px; }
   body.theme-app .luna-modal .inventory-create-modal__foot .btn-primary { flex:0 1 auto; min-width:145px; }
   body.theme-app .luna-modal .inventory-create-modal__foot .btn-secondary { min-width:94px; }
   .luna-modal .staff-invite-form__grid--modal { grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px 18px; }
   .luna-modal .staff-invite-form__grid--modal .staff-invite-field--phone { grid-column:auto; }
-}
-@media(min-width:900px) and (min-height:480px) {
-  body.theme-app .luna-modal-root .luna-modal { --modal-art-width:clamp(145px,12vw,176px); }
-  body.theme-app .luna-modal-root .luna-modal--compact { --modal-art-width:135px; }
-  .luna-modal::before { display:block; }
-  .luna-modal .inventory-create-modal__close { position:absolute; inset-block-start:17px; inset-inline-end:17px; z-index:2; background:#fffaf7; }
-  .luna-modal .inventory-create-modal__head { min-height:85px; }
-  body.theme-app .luna-modal-root .luna-modal--staff-invite { --modal-max-width:860px; min-height:360px; }
 }
 @media(max-width:639px) {
   .luna-modal .staff-invite-form__grid--modal { grid-template-columns:minmax(0,1fr); gap:13px; }
@@ -143,8 +129,8 @@ html.app-modal-open .maison-toast-stack { z-index:240; pointer-events:none; }
 }
 
 /* Keep short confirmations and mobile action sheets lightweight. */
-.luna-confirm-root { background:rgba(65,43,40,.43); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
-.luna-confirm-panel { border:1px solid #e6d3ca; border-radius:22px; background:linear-gradient(145deg,#fffdfb,#fcf5f1); box-shadow:0 16px 44px rgba(68,43,39,.2); color:#51443f; }
+.luna-confirm-root { background:rgba(53,40,37,.36); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); }
+.luna-confirm-panel { border:1px solid #e6d3ca; border-radius:16px; background:#fffdfa; box-shadow:0 12px 32px rgba(68,43,39,.13); color:#51443f; }
 .luna-confirm-panel h2 { color:#50372f; }
 .luna-confirm-panel .btn-primary { background:#94645b; color:#fff; border-radius:11px; }
 .luna-confirm-panel .btn-public-ghost { color:#784d42; border:1px solid #dbc7bc; background:#fffaf7; border-radius:11px; }

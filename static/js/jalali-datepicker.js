@@ -204,6 +204,7 @@
 
   function jalaliPopoverMixin() {
     return {
+      birthPicker: false,
       popoverStyle: {},
       popoverPlacement: "below",
       jalaliDismissPointer(event) {
