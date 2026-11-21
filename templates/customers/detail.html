@@ -65,11 +65,12 @@
       </div>
       <div class="customer-detail-header__actions">
         {% if can_book_appointment %}
-        <button type="button" class="customer-detail-header__btn customer-detail-header__btn--primary"
-          @click="bookOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))">
+        <a href="{% url 'customers:detail' pk=customer.pk %}?book=1"
+          class="customer-detail-header__btn customer-detail-header__btn--primary"
+          aria-haspopup="dialog">
           <i data-lucide="calendar-plus" class="customer-detail-header__icon" aria-hidden="true"></i>
           <span>ثبت نوبت</span>
-        </button>
+        </a>
         {% endif %}
         <button type="button" class="customer-detail-header__btn customer-detail-header__btn--ghost"
           @click="editOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))">
@@ -147,7 +148,7 @@
       {% endif %}
       {% else %}
       <div class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="calendar-x-2" aria-hidden="true"></i><p>هنوز نوبتی برای روزهای آینده ثبت نشده است.</p>
-        {% if can_book_appointment %}<button type="button" @click="bookOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))">ثبت اولین نوبت</button>{% endif %}
+        {% if can_book_appointment %}<a href="{% url 'customers:detail' pk=customer.pk %}?book=1" aria-haspopup="dialog">ثبت اولین نوبت</a>{% endif %}
       </div>
       {% endif %}
     </section>
