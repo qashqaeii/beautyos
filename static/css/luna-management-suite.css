@@ -247,3 +247,16 @@
  .maison-app.management-suite .suite-card-actions a,.maison-app.management-suite .customers-list-card__cta{min-height:44px}
  .maison-app.management-suite .staff-team-page__toolbar .list-view-switch__btn,.maison-app.management-suite .customers-list-page__controls .list-view-switch__btn{min-height:44px;min-width:44px}
 }
+
+/* Keep the weekly editor visible on short desktop viewports without introducing nested scroll. */
+@media (min-width:1024px) and (max-height:760px){
+ .maison-app.management-suite .hours-workspace{gap:6px}
+ .maison-app.management-suite .hours-head{min-height:52px;padding:7px 12px}
+ .maison-app.management-suite .hours-summary>div{min-height:43px;padding:5px 9px}
+ .maison-app.management-suite .hours-summary-icon{width:30px;height:30px}
+ .maison-app.management-suite .hours-layout :is(.staff-hours-surface,.staff-hours-edit){padding:9px}
+ .maison-app.management-suite .hours-panel-title{margin-bottom:5px}
+ .maison-app.management-suite .hours-layout .staff-hours-surface__toolbar{padding-bottom:5px;margin-bottom:2px}
+ .maison-app.management-suite .hours-layout .hours-day{min-height:39px;padding-block:4px}
+ .maison-app.management-suite .hours-layout .staff-hours-week-list{gap:2px}
+}

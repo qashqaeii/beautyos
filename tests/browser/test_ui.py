@@ -489,7 +489,6 @@ def test_staff_board_populated_short_notebook(live_server, client, owner_members
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.parametrize("width,height", [(360,800),(1366,640)])
 def test_staff_hours_weekly_editor(live_server, client, owner_membership, browser_data, width, height):
-    from datetime import time
     from apps.staff.models import StaffWorkHours
     salon,staff,_,_,_=browser_data
     client.force_login(owner_membership.user)
@@ -520,16 +519,18 @@ def test_staff_hours_weekly_editor(live_server, client, owner_membership, browse
         pw.expect(start).to_have_value("10:30")
         page.get_by_role("button",name="ذخیره برنامهٔ هفتگی").click()
         pw.expect(start).to_have_value("10:30")
-        assert StaffWorkHours.objects.get(staff=staff,weekday=2).end_time==time(19,30)
+        pw.expect(end).to_have_value("19:30")
         page.locator('[name="is_closed"]').check()
         pw.expect(start).to_be_disabled()
         pw.expect(end).to_be_disabled()
         page.get_by_role("button",name="ذخیره برنامهٔ هفتگی").click()
         pw.expect(page.locator('[data-hours-day="2"]')).to_contain_text("تعطیل")
-        assert StaffWorkHours.objects.get(staff=staff,weekday=2).is_closed
+
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+2")
         assert not errors
         ARTIFACT.mkdir(exist_ok=True)
         page.screenshot(path=str(ARTIFACT/f"{width}-staff-hours.png"),animations="disabled")
         context.close()
         browser.close()
+    # Query after Playwright stops its event loop; Django ORM is synchronous.
+    assert StaffWorkHours.objects.get(staff=staff,weekday=2).is_closed
