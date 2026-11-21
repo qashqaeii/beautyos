@@ -31,6 +31,7 @@ from apps.services.models import Service, ServiceCategory
 from apps.staff.models import StaffProfile, StaffWorkHours
 from apps.waitlist.models import WaitlistEntry
 
+from apps.core.demo_seed.finance_timeline import backdate_salon_payment_timestamps, seed_expense_timeline
 from apps.core.demo_seed.labels import DEMO_LEGACY_PREFIX, scrub_salon_demo_labels
 from apps.core.demo_seed.personas import (
     BARBER_CUSTOMERS,
@@ -286,9 +287,10 @@ class DemoSeedEngine:
         primary = staff_profiles[0] if staff_profiles else self._ensure_primary_staff(salon, owner, services)
         customers = [self._upsert_customer(salon, i) for i in range(1, 13)]
 
-        for i, c in enumerate(customers[:6], start=1):
-            past = timezone.localtime() - timedelta(days=10 + i)
-            past = past.replace(hour=10 + i, minute=0, second=0, microsecond=0)
+        for i, c in enumerate(customers[:8]):
+            spread = (3, 7, 12, 18, 25, 32, 40, 48)[i]
+            past = timezone.localtime() - timedelta(days=spread)
+            past = past.replace(hour=9 + (i % 5), minute=15 * (i % 2), second=0, microsecond=0)
             self._ensure_past_completed(salon, owner, c, primary, services[i % len(services)], past)
 
         today_base = timezone.localtime().replace(hour=9, minute=0, second=0, microsecond=0)
@@ -326,6 +328,8 @@ class DemoSeedEngine:
                 amount_toman=amount,
                 defaults={"description": expense_blurbs[cat]},
             )
+        seed_expense_timeline(salon, marker=DEMO_MARKER, days=60)
+        backdate_salon_payment_timestamps(salon)
 
         pkg, _ = ServicePackage.objects.get_or_create(
             salon=salon,
@@ -581,7 +585,7 @@ class DemoSeedEngine:
             },
         )
         if created or not Payment.scoped(salon).filter(appointment=appt).exists():
-            Payment.objects.get_or_create(
+            payment, pay_created = Payment.objects.get_or_create(
                 salon=salon,
                 customer=customer,
                 appointment=appt,
@@ -591,4 +595,7 @@ class DemoSeedEngine:
                     "status": Payment.Status.PAID,
                 },
             )
+            when = appt.completed_at or appt.start_at
+            if when and (pay_created or payment.created_at.date() != when.date()):
+                Payment.objects.filter(pk=payment.pk).update(created_at=when, updated_at=when)
             refresh_customer_stats(customer)

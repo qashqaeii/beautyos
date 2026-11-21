@@ -19,6 +19,11 @@ from apps.appointments.services.scheduling import SchedulingError, create_appoin
 from apps.commissions.models import CommissionRule
 from apps.commissions.services import create_settlement
 from apps.core.demo_seed.engine import DemoSeedEngine, SALON_A_SLUG, demo_customer_phone
+from apps.core.demo_seed.finance_timeline import (
+    backdate_salon_payment_timestamps,
+    complete_recent_demo_checkouts,
+    seed_expense_timeline,
+)
 from apps.core.demo_seed.salon_avatars import solid_avatar_file
 from apps.core.demo_seed.salon_dataset import (
     CAMPAIGNS,
@@ -119,6 +124,7 @@ class DemoSalonSeedEngine:
             self._seed_loyalty_catalog(salon)
             appts = self._seed_appointments(salon, owner, customers, staff_by_spec, services)
             self._seed_finance_flows(salon, owner, customers, appts, items)
+            self._seed_finance_timeline(salon, owner, staff_by_spec)
             self._seed_loyalty_members(salon, customers, packages, owner)
             self._seed_marketing(salon, owner, customers)
             self._seed_staff_payroll(salon, staff_by_spec, owner)
@@ -621,7 +627,7 @@ class DemoSalonSeedEngine:
                 continue
             methods = [Payment.Method.CASH, Payment.Method.CARD, Payment.Method.TRANSFER]
             method = methods[i % 3]
-            Payment.objects.create(
+            payment = Payment.objects.create(
                 salon=salon,
                 customer=customer,
                 appointment=appt,
@@ -631,6 +637,9 @@ class DemoSalonSeedEngine:
                 method=method,
                 status=Payment.Status.PAID,
             )
+            when = appt.completed_at or appt.start_at
+            if when:
+                Payment.objects.filter(pk=payment.pk).update(created_at=when, updated_at=when)
             refresh_customer_stats(customer)
 
         # multi-service checkout
@@ -714,6 +723,27 @@ class DemoSalonSeedEngine:
             )
         except Exception:
             pass
+
+    def _seed_finance_timeline(self, salon: Salon, actor: User, staff_map: dict[str, StaffProfile]):
+        expense_rows = seed_expense_timeline(salon, marker=DEMO_SALON_MARKER)
+        stamped = backdate_salon_payment_timestamps(salon)
+        same_day = complete_recent_demo_checkouts(salon, actor, count=5)
+        month_start, _ = jalali_month_bounds(timezone.localdate())
+        rent_opened = 0
+        for spec in SPECIALISTS:
+            if spec["agreement"][0] != "rent":
+                continue
+            staff = staff_map.get(spec["specialty"])
+            if not staff:
+                continue
+            try:
+                open_staff_period(salon=salon, staff_id=staff.pk, month=month_start, actor=actor)
+                rent_opened += 1
+            except Exception:
+                pass
+        self._say(
+            f"finance timeline: expenses+{expense_rows}, payments realigned={stamped}, today receipts={same_day}, rent periods={rent_opened}"
+        )
 
     def _seed_loyalty_members(self, salon: Salon, customers: list[Customer], packages: list[ServicePackage], actor: User):
         tier_points = [(0, 50), (1, 280), (2, 550), (3, 1100), (7, 220), (14, 480)]
