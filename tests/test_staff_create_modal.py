@@ -103,7 +103,7 @@ def test_staff_directory_balanced_grid_and_paginated_table(
     assert table.status_code == 200
     table_html = table.content.decode()
     assert "staff-board-v2--table-balanced" in table_html
-    assert table_html.count('href="/staff/') >= 8
+    assert table_html.count('href="/staff/') >= 6
     assert table_html.count('class="staff-team-card suite-staff-card staff-board-card"') == 0
     assert 'aria-label="جدول متخصصان"' in table_html
     second = client.get(reverse("staff:list"), {"view": "table", "page": 2})

@@ -791,6 +791,7 @@ def test_staff_directory_viewport_fit_and_pagination(live_server, client, owner_
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
         if width >= 1200:
             assert page.locator(".staff-board-v2--table-balanced").count() == 1
+            pw.expect(page.locator(".staff-team-table .maison-table tbody tr")).to_have_count(6)
             pager = page.locator(".staff-board-pagination").bounding_box()
             assert pager and pager["y"] + pager["height"] <= height + 2
         context.close()
