@@ -59,37 +59,38 @@
   </header>
 
   <section class="customers-list-page__workspace" aria-label="فهرست مشتریان">
-    <div class="customers-list-page__controls suite-customer-filters suite-filter-bar">
-      <div class="customers-list-page__controls-top">
-        <p class="customers-list-page__summary">
-          <span class="customers-list-page__count-num">{{ result_count|fa_num }}</span>
-          <span>مشتری</span>
-          {% if q %}
-          <span class="customers-list-page__summary-tag">جست‌وجو فعال</span>
-          {% endif %}
-        </p>
-        {% include "partials/list_view_toggle.html" %}
+    <div class="customers-list-page__controls suite-customer-filters suite-filter-bar customers-filter-bar">
+      <div class="customers-filter-bar__primary">
+        <form method="get" class="customers-list-page__search-form suite-filter-form" role="search">
+          <input type="hidden" name="view" value="{{ view_mode }}">
+          {% if segment %}<input type="hidden" name="segment" value="{{ segment }}">{% endif %}
+          <label class="sr-only" for="customers-search-input">جست‌وجوی نام یا موبایل</label>
+          <div class="customers-list-page__search-wrap">
+            <i data-lucide="search" class="customers-list-page__search-icon" aria-hidden="true"></i>
+            <input
+              id="customers-search-input"
+              type="search"
+              name="q"
+              value="{{ q }}"
+              class="input-field customers-list-page__search"
+              placeholder="جست‌وجوی نام یا موبایل"
+              autocomplete="off"
+            />
+          </div>
+        </form>
+        <div class="suite-filter-bar__meta customers-list-page__controls-top">
+          <p class="customers-list-page__summary suite-filter-bar__count">
+            <span class="customers-list-page__count-num">{{ result_count|fa_num }}</span>
+            <span>مشتری</span>
+            {% if q %}
+            <span class="customers-list-page__summary-tag">جست‌وجو فعال</span>
+            {% endif %}
+          </p>
+          {% include "partials/list_view_toggle.html" %}
+        </div>
       </div>
 
-      <form method="get" class="customers-list-page__search-form" role="search">
-        <input type="hidden" name="view" value="{{ view_mode }}">
-        {% if segment %}<input type="hidden" name="segment" value="{{ segment }}">{% endif %}
-        <label class="sr-only" for="customers-search-input">جست‌وجوی نام یا موبایل</label>
-        <div class="customers-list-page__search-wrap">
-          <i data-lucide="search" class="customers-list-page__search-icon" aria-hidden="true"></i>
-          <input
-            id="customers-search-input"
-            type="search"
-            name="q"
-            value="{{ q }}"
-            class="input-field customers-list-page__search"
-            placeholder="جست‌وجوی نام یا موبایل"
-            autocomplete="off"
-          />
-        </div>
-      </form>
-
-      <nav class="customers-list-page__segments" aria-label="فیلتر وضعیت مشتری">
+      <nav class="customers-list-page__segments customers-filter-bar__segments" aria-label="فیلتر وضعیت مشتری">
         <a
           href="{% querystring segment=None page=None %}"
           class="customers-list-page__segment {% if not segment %}is-active{% endif %}"

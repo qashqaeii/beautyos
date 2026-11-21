@@ -57,88 +57,32 @@
   gap: 8px;
   padding: 0;
 }
-.maison-app.management-suite .customers-list-page .customers-list-page__controls.suite-filter-bar {
-  display: grid;
-  flex: 0 0 auto;
-  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
-  grid-template-areas: "meta search" "segments segments";
-  align-items: center;
-  gap: 7px 12px;
-  padding: 8px 11px;
-  margin: 0;
-  border-radius: 12px;
-  min-width: 0;
+.maison-app.management-suite .customers-list-page .customers-filter-bar{
+  display:flex;flex-direction:column;align-items:stretch;gap:9px;
+  flex:0 0 auto;margin:0;min-width:0;padding:8px 10px
 }
-.maison-app.management-suite .customers-list-page .customers-list-page__controls-top {
-  grid-area: meta;
-  min-width: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: nowrap;
-  gap: 8px;
-  margin: 0;
+.maison-app.management-suite .customers-list-page .customers-filter-bar__primary{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:0
 }
-.maison-app.management-suite .customers-list-page .customers-list-page__summary {
-  font-size: 11px;
-  line-height: 1.6;
-  white-space: nowrap;
-  gap: 4px;
+.maison-app.management-suite .customers-list-page .customers-list-page__search-form{
+  flex:1 1 220px;min-width:0;width:auto;margin:0
 }
-.maison-app.management-suite .customers-list-page .customers-list-page__search-form {
-  grid-area: search;
-  width: 100%;
-  min-width: 0;
-  flex: none;
-  margin: 0;
+.maison-app.management-suite .customers-list-page .customers-list-page__search-wrap{min-width:0;width:100%}
+.maison-app.management-suite .customers-list-page .customers-list-page__controls-top{
+  flex:0 0 auto;display:flex;align-items:center;gap:8px;margin:0;width:auto
 }
-.maison-app.management-suite .customers-list-page .customers-list-page__search-wrap {
-  min-width: 0;
+.maison-app.management-suite .customers-list-page .customers-list-page__summary{
+  display:flex;align-items:center;gap:5px;margin:0;font-size:.8rem;line-height:1.5;white-space:nowrap;color:var(--suite-muted,#75635c)
 }
-.maison-app.management-suite .customers-list-page .customers-list-page__controls.suite-filter-bar .customers-list-page__search {
-  height: 36px;
-  min-height: 36px;
-  font-size: 11px;
-  line-height: 34px;
-  border-radius: 9px;
-  padding-inline: 11px 36px;
+.maison-app.management-suite .customers-list-page .customers-list-page__count-num{color:var(--suite-ink,#503e37);font-weight:750}
+.maison-app.management-suite .customers-list-page .customers-filter-bar__segments{
+  width:100%;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0;padding:0
 }
-.maison-app.management-suite .customers-list-page .customers-list-page__segments {
-  grid-area: segments;
-  width: 100%;
-  min-width: 0;
-  flex: none;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  overflow-x: auto;
-  padding: 0 0 1px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+.maison-app.management-suite .customers-list-page .list-view-switch{
+  flex:none;padding:3px;border-radius:10px;border:1px solid #e5d3ca;background:#fffaf7
 }
-.maison-app.management-suite .customers-list-page .customers-list-page__segments::-webkit-scrollbar { display: none; }
-.maison-app.management-suite .customers-list-page .customers-list-page__segment {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  min-height: 30px;
-  padding: 4px 9px;
-  font-size: 10px;
-  border-radius: 8px;
-  line-height: 1.5;
-  white-space: nowrap;
-}
-.maison-app.management-suite .customers-list-page .list-view-switch {
-  padding: 2px;
-  border-radius: 8px;
-}
-.maison-app.management-suite .customers-list-page .list-view-switch__btn {
-  min-width: 31px;
-  min-height: 31px;
-  padding: 4px;
+.maison-app.management-suite .customers-list-page .list-view-switch__btn{
+  min-width:36px;min-height:36px;width:36px;height:36px;padding:5px;border-radius:8px
 }
 .maison-app.management-suite .customers-list-page .customers-list-page__results {
   display: flex;
@@ -291,6 +235,50 @@
     overflow-x: hidden;
   }
 }
+@media (min-width: 600px) {
+  .maison-app.management-suite .customers-list-page {
+    gap: 10px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__header {
+    min-height: 118px;
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__headline {
+    max-width: min(52%, 420px);
+    gap: 10px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__head-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+  .maison-app.management-suite .customers-list-page .editorial-directory-copy > h1 {
+    font-size: 1.22rem;
+  }
+  .maison-app.management-suite .customers-list-page .editorial-directory-copy > p {
+    display: block;
+    font-size: 0.74rem;
+    line-height: 1.65;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card {
+    padding: 10px 11px;
+    gap: 7px;
+    border-radius: 13px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__name {
+    font-size: 0.91rem;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__phone {
+    font-size: 0.72rem;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__cta {
+    min-height: 34px;
+    font-size: 0.76rem;
+    padding: 5px 9px;
+    border-radius: 9px;
+  }
+}
 @media (min-width: 768px) {
   .maison-app.management-suite .customers-list-page .customers-list-grid {
     grid-template-columns: repeat(3, minmax(0,1fr));
@@ -301,27 +289,17 @@
     grid-template-columns: repeat(4, minmax(0,1fr));
   }
 }
-@media (max-width: 767px) {
-  .maison-app.management-suite .customers-list-page .customers-list-page__controls.suite-filter-bar {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "meta" "search" "segments";
-    gap: 6px;
-    padding: 7px 9px;
+@media (max-width: 479px) {
+  .maison-app.management-suite .customers-list-page .customers-filter-bar{padding:7px 9px;gap:7px}
+  .maison-app.management-suite .customers-list-page .customers-filter-bar__primary{flex-direction:column;align-items:stretch}
+  .maison-app.management-suite .customers-list-page .customers-list-page__controls-top{
+    width:100%;justify-content:space-between
   }
-  .maison-app.management-suite .customers-list-page .customers-list-page__search-wrap {
-    flex-basis: auto;
+  .maison-app.management-suite .customers-list-page .customers-filter-bar__segments{
+    flex-wrap:nowrap;overflow-x:auto;padding-bottom:1px;scrollbar-width:none
   }
-  .maison-app.management-suite .customers-list-page .customers-list-page__summary {
-    font-size: 10px;
-  }
-  .maison-app.management-suite .customers-list-page .customers-list-page__segments {
-    padding-block: 0;
-  }
-  .maison-app.management-suite .customers-list-page .customers-list-page__segment {
-    min-height: 30px;
-    padding-inline: 8px;
-    font-size: 10px;
-  }
+  .maison-app.management-suite .customers-list-page .customers-filter-bar__segments::-webkit-scrollbar{display:none}
+  .maison-app.management-suite .customers-list-page .customers-list-page__segment{flex:0 0 auto}
   .maison-app.management-suite .customers-list-page .customers-list-grid {
     grid-template-columns: minmax(0,1fr);
     gap: 6px;

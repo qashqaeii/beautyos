@@ -110,6 +110,9 @@
   margin-block:0 10px;padding:10px 12px;border:1px solid var(--suite-line);border-radius:var(--suite-filter-shell-radius);background:linear-gradient(180deg,#fbf3ee 0%,#fffaf7 58%)
 }
 .maison-app.management-suite .customers-list-page__workspace .suite-filter-bar{box-shadow:0 2px 8px #7254470a}
+.maison-app.management-suite .customers-filter-bar .customers-list-page__search-form{flex:1 1 280px;min-width:min(100%,200px)}
+.maison-app.management-suite .customers-filter-bar .customers-filter-bar__primary{align-items:center}
+.maison-app.management-suite .customers-filter-bar .list-view-switch__btn.is-active{background:#ab8178;color:#fff}
 .maison-app.management-suite .loyalty-members-panel .suite-filter-bar--loyalty{
   margin:0 0 10px;padding:0 0 10px;border:0;border-radius:0;background:none;box-shadow:none
 }
