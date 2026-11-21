@@ -555,7 +555,7 @@
 }
 .maison-app.management-suite .customer-detail-page .customer-detail-header__btn svg { width: 15px; height: 15px; }
 .maison-app.management-suite .customer-detail-page .customer-detail-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
   gap: 9px;
 }
 .maison-app.management-suite .customer-detail-page .customer-detail-summary__item {
