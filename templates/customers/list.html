@@ -8,6 +8,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/customers-hero.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/customers-compact.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 {% endblock %}
 
 {% block content %}
@@ -119,7 +120,7 @@
     <div class="customers-list-page__results">
       {% if page.object_list %}
         {% if view_mode == 'table' %}
-        <div class="customers-list-table-wrap dashboard-enter">
+        <div class="customers-list-table-wrap dashboard-enter" tabindex="0" role="region" aria-label="جدول مشتریان">
           <table class="customers-list-table">
             <thead>
               <tr>
@@ -154,7 +155,7 @@
           </table>
         </div>
         {% else %}
-        <div class="customers-list-grid dashboard-enter">
+        <div class="customers-list-grid dashboard-enter" tabindex="0" role="region" aria-label="کارت‌های مشتریان">
           {% for c in page %}
           <a href="{% url 'customers:detail' pk=c.pk %}" class="customers-list-card">
             <div class="customers-list-card__identity">
