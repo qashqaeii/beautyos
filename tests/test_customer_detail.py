@@ -220,3 +220,34 @@ def test_customer_detail_compact_notes_keep_all_records_accessible(client, salon
     assert 'x-show="showAllNotes" x-cloak' in body
     assert 'showAllNotes = !showAllNotes' in body
     assert 'مشاهده همه یادداشت‌ها' in body
+
+
+@pytest.mark.django_db
+def test_customer_detail_booking_cta_loads_modal_with_customer_locked(client, salon, owner_membership):
+    """The initial profile is lightweight, but its booking link must render a real modal."""
+    customer = Customer.objects.create(
+        salon=salon, full_name="مشتری جهت رزرو", phone="+989121555563"
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+
+    path = reverse("customers:detail", kwargs={"pk": customer.pk})
+    initial = client.get(path)
+    assert initial.status_code == 200
+    initial_html = initial.content.decode()
+    assert f'href="{path}?book=1"' in initial_html
+    assert "appointments/partials/appointment_booking_modal.html" not in initial_html
+    assert 'data-appt-booking-form' not in initial_html
+
+    opened = client.get(path + "?book=1")
+    assert opened.status_code == 200
+    body = opened.content.decode()
+    assert "bookOpen: true" in body
+    assert 'x-show="bookOpen"' in body
+    assert 'data-appt-booking-form' in body
+    assert "مشتری جهت رزرو" in body
+    assert 'name="from_customer_detail"' in body
+    assert f'value="{customer.pk}"' in body
+    assert 'customer-detail-booking-lock' in body
