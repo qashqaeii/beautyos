@@ -97,3 +97,34 @@ def cancel_campaign(*,salon,campaign_id,actor):
         row.save(update_fields=["status","updated_at"])
         AuditLog.objects.create(salon=salon,actor=actor,action=AuditLog.Action.UPDATE,entity_type="marketing_campaign",entity_id=str(row.pk),message="لغو کمپین")
     return row
+
+
+
+@transaction.atomic
+def schedule_campaign(*, salon, campaign_id, scheduled_at, actor):
+    """Explicit manager action; idempotent scheduling of a prepared snapshot."""
+    if timezone.is_naive(scheduled_at):
+        raise ValidationError("زمان ارسال باید دارای منطقه زمانی باشد.")
+    now = timezone.now()
+    if scheduled_at < now - timedelta(minutes=5) or scheduled_at > now + timedelta(days=90):
+        raise ValidationError("زمان ارسال باید از اکنون تا ۹۰ روز آینده باشد.")
+    row = Campaign.scoped(salon).select_for_update().filter(pk=campaign_id).first()
+    if not row:
+        raise ValidationError("کمپین یافت نشد.")
+    if row.status == Campaign.Status.SCHEDULED and row.scheduled_at == scheduled_at:
+        return row
+    if row.status != Campaign.Status.PREPARED:
+        raise ValidationError("کمپین باید ابتدا آماده‌سازی شده باشد.")
+    if not marketing_enabled(salon):
+        raise ValidationError("ارسال تبلیغاتی در تنظیمات سالن غیرفعال است.")
+    if not row.recipients.filter(salon=salon).exists():
+        raise ValidationError("کمپین مخاطب آماده ندارد.")
+    row.status = Campaign.Status.SCHEDULED
+    row.scheduled_at = scheduled_at
+    row.save(update_fields=["status", "scheduled_at", "updated_at"])
+    AuditLog.objects.create(
+        salon=salon, actor=actor, action=AuditLog.Action.UPDATE,
+        entity_type="marketing_campaign", entity_id=str(row.pk),
+        message="زمان‌بندی کمپین", metadata={"scheduled_at": scheduled_at.isoformat()},
+    )
+    return row

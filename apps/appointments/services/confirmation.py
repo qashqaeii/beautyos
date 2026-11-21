@@ -32,6 +32,8 @@ def confirm_pending_appointment(*, salon, appointment_id: int) -> tuple[Appointm
 
     appt.status = Appointment.Status.CONFIRMED
     appt.save(update_fields=["status", "updated_at"])
+    from apps.retention.automation import queue_appointment_event
+    queue_appointment_event(appt, "confirmation")
     return appt, True
 
 
