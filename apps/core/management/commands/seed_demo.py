@@ -1,5 +1,3 @@
-import os
-
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
@@ -26,10 +24,13 @@ class Command(BaseCommand):
         parser.add_argument("--dry-run", action="store_true", help="Print plan without writing")
 
     def handle(self, *args, **options):
+        # Demo data must be impossible to create against a non-debug deployment,
+        # even if an old ALLOW_DEMO_SEED environment variable is accidentally set.
+        # The local settings module enables the explicit opt-in for development.
         allowed = (
-            settings.DEBUG
-            or getattr(settings, "ALLOW_DEMO_SEED", False)
-            or os.environ.get("ALLOW_DEMO_SEED") == "1"
+            settings.DEBUG is True
+            and getattr(settings, "ALLOW_DEMO_SEED", False) is True
+            and not getattr(settings, "SETTINGS_MODULE", "").endswith(".production")
         )
         if not allowed:
             raise CommandError(
