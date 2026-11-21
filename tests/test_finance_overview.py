@@ -238,3 +238,25 @@ def test_finance_quick_actions_and_balances_compact_layout(client, owner_members
     assert "fin-quick-grid--compact" in css
     assert "grid-template-columns:repeat(4,minmax(0,1fr))" in css
     assert "@media(max-width:480px)" in css
+
+
+@pytest.mark.django_db
+def test_finance_insights_keep_values_but_collapses_explanatory_text(client, owner_membership):
+    """Insights use a compact presentation without hiding financial figures or source notes."""
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    for tab in ("income", "cash"):
+        response = client.get(reverse("finance:overview"), {"tab": tab})
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "fin-insights-grid--minimal" in html
+        assert "fin-insight-panel--trend" in html
+        assert "fin-insight-panel--mix" in html
+        assert "fin-method-ring" in html
+        assert "fin-method-list" in html
+        assert "درباره نمودار" in html
+        assert "توضیح محاسبه" in html
+        assert html.count('class="fin-insight-caveat"') == 2
+        assert "خالص دریافتی" in html

@@ -172,6 +172,17 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     assert action_box["y"] + action_box["height"] <= balances_box["y"] + 3, "finance quick actions should be a separate compact strip"
                     assert action_box["height"] < (148 if width >= 1024 else 270), "unnecessary empty space inside finance quick actions"
                     assert page.evaluate("getComputedStyle(document.querySelector('.fin-quick-grid--compact')).gridTemplateColumns.split(' ').length === 1"), "finance balance layout must be stacked"
+                    insight_panels = page.locator(".fin-insights-grid--minimal > .fin-panel")
+                    pw.expect(insight_panels).to_have_count(2)
+                    assert page.evaluate("() => { const panels = [...document.querySelectorAll('.fin-insights-grid--minimal > .fin-panel')]; return panels.every((el) => el.scrollHeight <= el.clientHeight + 2); }"), "finance insight content clipped"
+                    assert page.locator(".fin-insight-panel--mix .fin-method-ring").is_visible()
+                    if width >= 1024:
+                        assert insight_panels.nth(0).bounding_box()["height"] < 180, "finance trend too tall"
+                        assert insight_panels.nth(1).bounding_box()["height"] < 270, "finance income breakdown too tall"
+                    caveat = page.locator(".fin-insight-panel--mix .fin-insight-caveat")
+                    pw.expect(caveat).to_be_visible()
+                    caveat.locator("summary").click()
+                    assert caveat.evaluate("(el) => el.open"), "finance explanatory note must stay accessible"
                 if name == "customers":
                     # Directory must never nest a vertical scroller or clip customer cards.
                     assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"

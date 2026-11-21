@@ -7,8 +7,8 @@
   <article class="fin-kpi"><div><span>سود عملیاتی برآوردی</span><i data-lucide="sprout" class="fin-success" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.operating_estimate|fa_money }}</bdi></strong><small>تومان · پس از هزینه، حقوق و بهای مستقیم</small></article>
 </section>
 {% endif %}
-<section class="fin-insights-grid" aria-label="روند و ترکیب دریافتی">
-  <article class="fin-panel">
+<section class="fin-insights-grid fin-insights-grid--minimal" aria-label="روند و ترکیب دریافتی">
+  <article class="fin-panel fin-insight-panel--trend">
     <header class="fin-panel-head"><h2><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i>روند دریافتی و هزینه</h2><span class="fin-legend"><span><i></i>دریافتی</span><span><i></i>هزینه</span></span></header>
     {% if dashboard.chart.has_data %}
     <div class="fin-trend" role="img" aria-label="نمودار دریافتی و هزینه ثبت‌شده در بازه انتخابی">
@@ -26,9 +26,9 @@
     </div>
     <details class="fin-chart-details"><summary>مقادیر نمودار</summary>{% for row in dashboard.chart.rows %}<div class="fin-line"><span>{{ row.day|fa_jalali }} تا {{ row.end|fa_jalali }}</span><bdi>{{ row.received|fa_money }} / {{ row.expense|fa_money }}</bdi></div>{% endfor %}</details>
     {% else %}<div class="fin-empty"><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>هنوز گردش مالی ثبت نشده است.</span></div>{% endif %}
-    <p class="fin-muted">مقایسه دریافتی‌های مشتریان با هزینه‌های ثبت‌شده؛ نه سود حسابداری.</p>
+    <details class="fin-insight-caveat"><summary>درباره نمودار</summary><p class="fin-muted">مقایسه دریافتی‌های مشتریان با هزینه‌های ثبت‌شده؛ نه سود حسابداری.</p></details>
   </article>
-  <article class="fin-panel">
+  <article class="fin-panel fin-insight-panel--mix">
     {% if tab != 'cash' %}
     <header class="fin-panel-head"><h2><i data-lucide="layers" aria-hidden="true"></i>ترکیب درآمد</h2><span class="fin-muted">{{ range_label }}</span></header>
     <div class="fin-method-layout">
@@ -38,7 +38,7 @@
       <div class="fin-method-list">{% for item in dashboard.revenue_mix %}<div class="fin-line"><span><i class="fin-dot fin-method-{{ forloop.counter }}"></i>{{ item.name }}</span><bdi>{{ item.amount|fa_money }}</bdi></div>{% endfor %}</div>
     </div>
     <div class="fin-line"><span>خالص دریافتی مشتریان</span><bdi>{{ dashboard.net_received|fa_money }} تومان</bdi></div>
-    <p class="fin-muted">درآمد تحقق‌یافته با دریافتی یکسان نیست. در صورت خالص درآمد منفی نمودار حلقه‌ای بدون سهم نمایش داده می‌شود.</p>
+    <details class="fin-insight-caveat"><summary>توضیح محاسبه</summary><p class="fin-muted">درآمد تحقق‌یافته با دریافتی یکسان نیست. در صورت خالص درآمد منفی نمودار حلقه‌ای بدون سهم نمایش داده می‌شود.</p></details>
     {% else %}
     <header class="fin-panel-head"><h2><i data-lucide="wallet" aria-hidden="true"></i>ترکیب دریافتی‌ها</h2><span class="fin-muted">{{ range_label }}</span></header>
     <div class="fin-method-layout">
@@ -49,7 +49,7 @@
     </div>
     <div class="fin-line"><span>استرداد در بازه</span><bdi>{{ dashboard.refunded|fa_money }} تومان</bdi></div>
     <div class="fin-line"><span>خالص دریافتی</span><bdi>{{ dashboard.net_received|fa_money }} تومان</bdi></div>
-    <p class="fin-muted">نمودار روش پرداخت ناخالص است؛ موجودی حساب بانکی نیست.</p>
+    <details class="fin-insight-caveat"><summary>توضیح محاسبه</summary><p class="fin-muted">نمودار روش پرداخت ناخالص است؛ موجودی حساب بانکی نیست.</p></details>
     {% endif %}
   </article>
 </section>
