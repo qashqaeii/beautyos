@@ -247,16 +247,23 @@ def test_finance_insights_keep_values_but_collapses_explanatory_text(client, own
     session = client.session
     session["active_salon_id"] = str(owner_membership.salon_id)
     session.save()
-    for tab in ("income", "cash"):
-        response = client.get(reverse("finance:overview"), {"tab": tab})
-        assert response.status_code == 200
-        html = response.content.decode()
-        assert "fin-insights-grid--minimal" in html
-        assert "fin-insight-panel--trend" in html
-        assert "fin-insight-panel--mix" in html
-        assert "fin-method-ring" in html
-        assert "fin-method-list" in html
-        assert "درباره نمودار" in html
-        assert "توضیح محاسبه" in html
-        assert html.count('class="fin-insight-caveat"') == 2
-        assert "خالص دریافتی" in html
+    response = client.get(reverse("finance:overview"), {"tab": "income"})
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert "fin-insights-grid--minimal" in html
+    assert "fin-insight-panel--trend" in html
+    assert "fin-insight-panel--mix" in html
+    assert "fin-method-ring" in html
+    assert "fin-method-list" in html
+    assert "درباره نمودار" in html
+    assert "توضیح محاسبه" in html
+    assert html.count('class="fin-insight-caveat"') == 2
+    assert "خالص دریافتی" in html
+
+    cash = client.get(reverse("finance:overview"), {"tab": "cash"})
+    assert cash.status_code == 200
+    cash_html = cash.content.decode()
+    assert "fin-insights-grid--minimal" not in cash_html
+    assert "fin-insight-panel--mix" not in cash_html
+    assert "ترکیب دریافتی‌ها" not in cash_html
+    assert "fin-quick-grid--compact" in cash_html

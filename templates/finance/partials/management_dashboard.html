@@ -7,6 +7,7 @@
   <article class="fin-kpi"><div><span>سود عملیاتی برآوردی</span><i data-lucide="sprout" class="fin-success" aria-hidden="true"></i></div><strong><bdi>{{ dashboard.operating_estimate|fa_money }}</bdi></strong><small>تومان · پس از هزینه، حقوق و بهای مستقیم</small></article>
 </section>
 {% endif %}
+{% if tab != 'cash' %}
 <section class="fin-insights-grid fin-insights-grid--minimal" aria-label="روند و ترکیب دریافتی">
   <article class="fin-panel fin-insight-panel--trend">
     <header class="fin-panel-head"><h2><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i>روند دریافتی و هزینه</h2><span class="fin-legend"><span><i></i>دریافتی</span><span><i></i>هزینه</span></span></header>
@@ -53,6 +54,7 @@
     {% endif %}
   </article>
 </section>
+{% endif %}
 {% if tab == 'income' or tab == 'cash' %}
 <section class="fin-quick-grid fin-quick-grid--compact" aria-label="دسترسی‌های مالی و مانده‌ها">
   <article class="fin-panel fin-quick-actions-panel">
