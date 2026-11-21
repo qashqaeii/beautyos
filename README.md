@@ -64,3 +64,9 @@ pytest
 | PHASE 2 CRM | تکمیل (لیست، پروفایل، یادداشت، تگ، آرشیو) |
 | PHASE 3–6 | MVP هسته (خدمات، کارکنان، نوبت، مالی، عمومی/رزرو، پیگیری) — نسخه اولیه |
 | Demo | `seed_demo` — slugs: `demo-salon-a`, `demo-barber-b` · `--scenario full\|minimal\|busy-day\|empty` · `--reset-demo` · `--dry-run` |
+
+## فاز ۶ — آماده‌سازی انتشار
+
+راهنمای پیش‌انتشار، سلامت دیتابیس و تنظیمات محیط پروداکشن در [docs/QA_RELEASE_PHASE_6.md](docs/QA_RELEASE_PHASE_6.md) قرار دارد.
+برای بررسی بدون تغییر دیتابیس یا ارسال پیامک، پس از اجرای Migration و collectstatic و تنظیم محیط Production، از `python manage.py release_check` استفاده کنید.
+فایل `docker-compose.yml` فقط مخصوص توسعه محلی است، نه استقرار Production.
