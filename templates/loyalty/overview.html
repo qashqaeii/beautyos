@@ -50,7 +50,7 @@
     </section>
     {% if messages %}<div class="loyalty-panel__messages space-y-2">{% for message in messages %}<p role="status" class="loyalty-panel__flash text-sm{% if message.tags %} loyalty-panel__flash--{{ message.tags }}{% endif %}">{{ message }}</p>{% endfor %}</div>{% endif %}
   <section class="loyalty-members-panel dashboard-enter">
-    <div class="loyalty-members-panel__head">
+    <div class="loyalty-members-panel__head suite-filter-bar suite-filter-bar--row suite-filter-bar--loyalty">
       <h2 class="loyalty-panel__heading">
         <i data-lucide="trophy" aria-hidden="true"></i> رتبه‌بندی اعضا
         {% if search_q %}

@@ -39,9 +39,18 @@
   @beautyos-close-edit-modal.window="closeEdit()"
   @keydown.escape.window="editOpen ? closeEdit() : (createOpen && closeCreate())"
 >
-  <div class="page-toolbar editorial-module-toolbar">
-    <form method="get" class="suite-filter-form" role="search"><label class="suite-search"><i data-lucide="search" aria-hidden="true"></i><input type="search" name="q" class="input-field" value="{{ q }}" aria-label="جست‌وجوی خدمت" placeholder="نام خدمت یا دسته‌بندی"></label><button class="btn-secondary">جست‌وجو</button>{% if q %}<a class="suite-clear" href="{% url 'services:list' %}">پاک کردن</a>{% endif %}</form><p>{{ service_page.paginator.count|fa_num }} خدمت</p>
-    <button type="button" class="btn-primary" @click="createOpen = true"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>خدمت جدید</button>
+  <div class="page-toolbar editorial-module-toolbar suite-filter-bar suite-filter-bar--row suite-filter-bar--split">
+    <form method="get" class="suite-filter-form" role="search">
+      <label class="suite-search"><i data-lucide="search" aria-hidden="true"></i><input type="search" name="q" class="input-field" value="{{ q }}" aria-label="جست‌وجوی خدمت" placeholder="نام خدمت یا دسته‌بندی"></label>
+      <button type="submit" class="btn-secondary">جست‌وجو</button>
+      {% if q %}<a class="suite-clear" href="{% url 'services:list' %}">پاک کردن</a>{% endif %}
+    </form>
+    <div class="suite-filter-bar__meta">
+      <p class="suite-filter-bar__count">{{ service_page.paginator.count|fa_num }} خدمت</p>
+      <div class="suite-filter-bar__actions">
+        <button type="button" class="btn-primary" @click="createOpen = true"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>خدمت جدید</button>
+      </div>
+    </div>
   </div>
 
   {% if messages %}

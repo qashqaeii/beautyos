@@ -35,9 +35,12 @@
   </header>
 
   <section class="suite-kpis suite-kpis--two"><article class="suite-kpi"><span class="suite-icon"><i data-lucide="boxes" aria-hidden="true"></i></span><div><small>اقلام در فهرست فعلی</small><strong>{{ inventory_page.paginator.count|fa_num }}</strong></div></article><article class="suite-kpi"><span class="suite-icon"><i data-lucide="alert-circle" aria-hidden="true"></i></span><div><small>نیازمند تأمین در فهرست فعلی</small><strong>{{ low_count|fa_num }}</strong></div></article></section>
-  <form method="get" class="inventory-page__filters" role="search">
+  <form method="get" class="inventory-page__filters suite-filter-bar" role="search">
+    <label class="sr-only" for="inventory-search-input">جست‌وجوی محصول</label>
     <div class="inventory-page__search">
+      <i data-lucide="search" class="inventory-page__search-icon" aria-hidden="true"></i>
       <input
+        id="inventory-search-input"
         type="search"
         name="q"
         value="{{ query }}"
