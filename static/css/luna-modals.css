@@ -263,3 +263,70 @@ body.theme-app .luna-profile-form textarea.input-field{min-height:52px;height:52
  .luna-service-choices{grid-template-columns:minmax(0,1fr)}
 }
 @media(prefers-reduced-motion:reduce){.luna-switch>i,.luna-section-chevron{transition:none}}
+
+/* Staff time-off modal — unified toolbar fields and footer actions (staff profile only). */
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot{
+  display:flex;flex-flow:row-reverse wrap;align-items:center;justify-content:flex-start;gap:10px;
+  padding:12px 16px max(12px,env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--dialog-line,#eadbd3);background:var(--dialog-cream,#fffdfa);
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot :is(.staff-timeoff-form__submit,.staff-timeoff-form__cancel){
+  box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;height:42px;min-height:42px;margin:0;padding:0 18px;border-radius:10px;
+  font-size:.875rem;font-weight:650;line-height:1;white-space:nowrap;
+  transition:background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,opacity .18s ease,transform .15s ease;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__submit{
+  flex:1 1 8.5rem;min-width:0;color:#fff;background:var(--dialog-accent,#95675f);border:1px solid var(--dialog-accent,#95675f);box-shadow:none;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__submit:hover:not(:disabled){
+  background:#82584f;border-color:#82584f;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__submit:active:not(:disabled){
+  transform:scale(.99);background:#7a5049;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__submit:focus-visible{
+  outline:2px solid #98675d;outline-offset:2px;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__submit:disabled,
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__submit[aria-busy="true"]{
+  cursor:not-allowed;opacity:.62;transform:none;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__cancel{
+  flex:0 1 auto;min-width:6.75rem;color:#79534b;background:#fffdfa;border:1px solid #e3cec4;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__cancel:hover:not(:disabled){
+  background:#f3e5de;border-color:#d9c4b9;color:#6f463f;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__cancel:active:not(:disabled){
+  transform:scale(.99);background:#ecddd5;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__cancel:focus-visible{
+  outline:2px solid #98675d;outline-offset:2px;
+}
+body.theme-app .luna-modal.staff-timeoff-modal :is(.staff-timeoff-field .jalali-date--minimal .jalali-date__display,.staff-timeoff-reason-input){
+  min-height:42px;border-radius:10px;border-color:#e3d2c9;background:#fffdfa;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-field .jalali-date--minimal .jalali-date__display{
+  display:flex;align-items:center;justify-content:center;height:42px;padding-block:0;
+}
+body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__range-fields{
+  gap:12px;align-items:start;
+}
+@media(min-width:640px){
+ body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot :is(.staff-timeoff-form__submit,.staff-timeoff-form__cancel){
+  flex:0 1 auto;min-width:7.75rem;width:auto;
+ }
+ body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot .staff-timeoff-form__submit{min-width:8.5rem;}
+}
+@media(max-width:639px){
+ body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot{padding:11px 13px max(11px,env(safe-area-inset-bottom,0px));gap:8px;}
+ body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot :is(.staff-timeoff-form__submit,.staff-timeoff-form__cancel){
+  flex:1 1 calc(50% - 4px);min-width:0;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.theme-app .luna-modal.staff-timeoff-modal .staff-timeoff-form__foot :is(.staff-timeoff-form__submit,.staff-timeoff-form__cancel){
+  transition:none!important;transform:none!important;
+ }
+}

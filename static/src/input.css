@@ -1683,7 +1683,7 @@
     @apply pt-1;
   }
   .staff-timeoff-form--modal .staff-timeoff-reason-input {
-    @apply min-h-[5.5rem] w-full resize-y rounded-xl border px-3 py-2.5 text-sm leading-relaxed shadow-none;
+    @apply min-h-[5.5rem] w-full resize-y rounded-[10px] border px-3 py-2.5 text-sm leading-relaxed shadow-none;
     border-color: color-mix(in srgb, var(--color-primary) 16%, var(--color-border));
     background: color-mix(in srgb, var(--color-surface-lavender) 10%, #fff);
   }
@@ -1693,17 +1693,24 @@
     background: #fff;
   }
   .staff-timeoff-form__foot {
-    @apply flex flex-row items-stretch gap-4 border-t px-4 py-3 sm:px-5;
+    @apply flex flex-row-reverse flex-wrap items-center justify-start gap-2.5 border-t px-4 py-3.5 sm:px-5;
     border-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-divider));
+    background: color-mix(in srgb, var(--color-surface-elevated) 92%, #fff);
   }
   .staff-timeoff-form__foot .staff-timeoff-form__submit,
   .staff-timeoff-form__foot .staff-timeoff-form__cancel {
-    @apply min-h-11 min-w-0 flex-1 justify-center rounded-[10px] text-sm font-medium sm:min-w-[7.5rem] sm:flex-initial;
+    @apply inline-flex h-[42px] min-h-[42px] w-full min-w-0 flex-none items-center justify-center rounded-[10px] px-4 text-sm font-semibold leading-none shadow-none transition active:scale-[0.99] sm:w-auto sm:min-w-[7.75rem];
+    --tw-ring-color: color-mix(in srgb, var(--color-focus, var(--color-accent)) 42%, transparent);
+  }
+  .staff-timeoff-form__foot .staff-timeoff-form__submit {
+    @apply border border-transparent;
+  }
+  .staff-timeoff-form__foot .staff-timeoff-form__submit:disabled {
+    @apply cursor-not-allowed opacity-60 active:scale-100;
   }
   .staff-timeoff-form__foot .staff-timeoff-form__cancel {
-    @apply border;
+    @apply border bg-white;
     border-color: color-mix(in srgb, var(--color-primary) 22%, var(--color-border));
-    background: #fff;
   }
   .staff-timeoff-field__error--block {
     @apply rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs;
@@ -1713,7 +1720,7 @@
     @apply w-full;
   }
   .inventory-create-modal .staff-timeoff-field .jalali-date--minimal .jalali-date__display {
-    @apply min-h-11 w-full cursor-pointer rounded-xl border text-center text-sm tabular-nums;
+    @apply flex h-[42px] min-h-[42px] w-full cursor-pointer items-center justify-center rounded-[10px] border text-center text-sm tabular-nums;
     border-color: color-mix(in srgb, var(--color-border) 90%, transparent);
     background: color-mix(in srgb, var(--color-surface-muted) 18%, #fff);
   }
