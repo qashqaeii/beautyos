@@ -1,0 +1,163 @@
+/* Services directory — scoped editorial-rose treatment, after shared suite styles. */
+.maison-app.management-suite .services-page{
+  --sv-line:#e9d7cf;--sv-ink:#563e38;--sv-sub:#846960;--sv-rose:#a9766e;
+  display:flex;flex-direction:column;gap:9px;width:100%;min-width:0;
+  margin:0;padding:0 0 10px
+}
+.maison-app.management-suite .services-page .services-hero{
+  position:relative;isolation:isolate;display:flex;justify-content:space-between;align-items:center;
+  width:100%;min-width:0;flex:0 0 auto;min-height:101px;gap:12px;
+  padding:16px 17px;overflow:hidden;border:1px solid #e4c8c1;border-radius:17px;
+  background:radial-gradient(ellipse 47% 105% at 23% 65%,rgba(255,252,247,.72),transparent 95%),
+  linear-gradient(108deg,#eac9c4 0%,#f6ded8 44%,#fff7f2 100%);
+  box-shadow:0 4px 17px rgba(109,73,65,.06)
+}
+.maison-app.management-suite .services-page .services-hero::after{
+  content:"";position:absolute;pointer-events:none;z-index:-1;
+  inset-inline:-7%;bottom:-83px;height:110px;transform:rotate(-2deg);
+  border:1px solid rgba(255,255,255,.65);border-radius:50% 50% 0 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.22),transparent)
+}
+.maison-app.management-suite .services-page .services-hero__identity{
+  display:flex;align-items:center;gap:11px;min-width:0;position:relative;z-index:2;flex:0 1 43%
+}
+.maison-app.management-suite .services-page .services-hero__icon{
+  display:grid;place-items:center;flex:0 0 auto;width:41px;height:41px;
+  color:#925f56;background:rgba(255,250,246,.65);border:1px solid #e8c9bf;border-radius:12px
+}
+.maison-app.management-suite .services-page .services-hero__icon svg{width:21px;height:21px;stroke-width:1.75}
+.maison-app.management-suite .services-page .services-hero__text{min-width:0;text-align:right}
+.maison-app.management-suite .services-page .services-hero__text h1{
+  margin:0;color:var(--sv-ink);font-size:clamp(18px,1.6vw,23px);font-weight:790;line-height:1.5
+}
+.maison-app.management-suite .services-page .services-hero__text p{
+  margin:4px 0 0;color:#85675e;font-size:12px;line-height:1.6
+}
+.maison-app.management-suite .services-page .services-hero__art{
+  position:absolute;inset-inline-end:clamp(106px,18%,225px);top:50%;
+  width:min(52%,500px);height:178px;transform:translateY(-49%);
+  display:flex;justify-content:center;align-items:center;z-index:1;pointer-events:none;
+  mask-image:linear-gradient(90deg,transparent 0%,#000 13%,#000 87%,transparent 100%)
+}
+.maison-app.management-suite .services-page .services-hero__art img{
+  display:block;width:100%;height:100%;object-fit:contain
+}
+.maison-app.management-suite .services-page .services-hero__add{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:0 0 auto;
+  position:relative;z-index:3;padding:10px 14px;min-height:42px;border-radius:10px;
+  color:#fff;background:#996d65;border:1px solid #906158;font-weight:720;font-size:12px;
+  box-shadow:0 5px 12px rgba(112,67,59,.12);
+  transition:background-color .18s ease,transform .18s ease
+}
+.maison-app.management-suite .services-page .services-hero__add:hover{background:#82564e;transform:translateY(-1px)}
+.maison-app.management-suite .services-page .services-hero__add svg{width:16px;height:16px;stroke-width:2}
+.maison-app.management-suite .services-page :is(button,a):focus-visible{outline:3px solid rgba(149,96,87,.45);outline-offset:2px}
+.maison-app.management-suite .services-page .services-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  width:100%;min-width:0;min-height:49px;margin:0;padding:7px 10px;
+  border:1px solid var(--sv-line);border-radius:12px;background:#fffaf7;box-shadow:none
+}
+.maison-app.management-suite .services-page .services-toolbar .suite-filter-form{
+  flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:7px;margin:0
+}
+.maison-app.management-suite .services-page .services-toolbar .suite-search{
+  display:flex;flex:1 1 180px;min-width:0;max-width:none;
+}
+.maison-app.management-suite .services-page .services-toolbar .suite-search input{
+  height:36px;min-height:36px;line-height:34px;font-size:12px
+}
+.maison-app.management-suite .services-page .services-toolbar .btn-secondary{min-height:36px;padding:6px 12px;font-size:11px}
+.maison-app.management-suite .services-page .services-toolbar .suite-filter-bar__meta{
+  flex:0 0 auto;display:flex;align-items:center;gap:5px
+}
+.maison-app.management-suite .services-page .services-toolbar .suite-filter-bar__count{font-size:11px;white-space:nowrap}
+.maison-app.management-suite .services-page .services-catalog{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
+  grid-auto-rows:max-content;align-content:start;min-height:0;width:100%;overflow:visible
+}
+.maison-app.management-suite .services-page .services-card{
+  display:flex;flex-direction:row;align-items:flex-start;min-width:0;min-height:90px;
+  gap:9px;padding:12px 12px;background:#fffaf8;border:1px solid var(--sv-line);
+  border-radius:13px;box-shadow:none
+}
+.maison-app.management-suite .services-page .services-card__icon{
+  display:grid;place-items:center;flex:0 0 auto;width:24px;height:24px;
+  color:#ae7d70;background:transparent;border:0;border-radius:0
+}
+.maison-app.management-suite .services-page .services-card__icon svg{width:20px;height:20px;stroke-width:1.65}
+.maison-app.management-suite .services-page .services-card__body{
+  display:flex;flex:1 1 auto;min-width:0;flex-direction:column;align-items:flex-start;gap:4px
+}
+.maison-app.management-suite .services-page .services-card__name{
+  font-size:13px;line-height:1.5;font-weight:750;color:var(--sv-ink);margin:0;overflow-wrap:anywhere
+}
+.maison-app.management-suite .services-page .services-card__description{
+  display:flex;align-items:center;flex-wrap:wrap;gap:4px;max-width:100%;margin:0;
+  color:var(--sv-sub);font-size:11px;line-height:1.7;overflow-wrap:anywhere
+}
+.maison-app.management-suite .services-page .services-card .staff-team-badge{
+  margin-top:3px;min-height:20px;padding:3px 8px;border-radius:7px;font-size:10px;line-height:1.4
+}
+.maison-app.management-suite .services-page .services-card__edit{
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+  min-height:32px;padding:5px 10px;margin:0;border-radius:9px;font-size:11px;white-space:nowrap
+}
+.maison-app.management-suite .services-page .services-pagination{
+  flex:0 0 auto;min-height:0;display:flex;justify-content:center;align-items:center;width:100%
+}
+.maison-app.management-suite .services-page .services-pagination .suite-pagination{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  margin:0;padding:5px 0 0;min-height:32px;font-size:11px
+}
+.maison-app.management-suite .services-page .services-pagination .btn-secondary{min-height:32px;padding:5px 11px}
+@media (min-width:1024px) and (min-height:600px){
+  .maison-app.management-suite .services-page--full-grid{
+    min-height:calc(100dvh - 46px);
+  }
+  .maison-app.management-suite .services-page--full-grid .services-catalog{
+    flex:1 1 auto;
+    grid-template-rows:repeat(3,minmax(90px,1fr));
+    grid-auto-rows:minmax(90px,auto);
+    align-content:stretch;
+  }
+  .maison-app.management-suite .services-page--full-grid .services-card{
+    height:100%;min-height:90px;justify-content:flex-start
+  }
+  .maison-app.management-suite .services-page--full-grid .services-card__body{
+    height:100%;
+  }
+}
+@media (max-width:1023px){
+  .maison-app.management-suite .services-page .services-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:720px){
+  .maison-app.management-suite .services-page .services-hero{min-height:92px;padding:12px;gap:8px}
+  .maison-app.management-suite .services-page .services-hero__identity{flex:1 1 auto;gap:7px}
+  .maison-app.management-suite .services-page .services-hero__icon{width:35px;height:35px;border-radius:9px}
+  .maison-app.management-suite .services-page .services-hero__icon svg{width:18px;height:18px}
+  .maison-app.management-suite .services-page .services-hero__text h1{font-size:17px}
+  .maison-app.management-suite .services-page .services-hero__text p{font-size:10px}
+  .maison-app.management-suite .services-page .services-hero__art{inset-inline-end:20%;width:47%;height:134px;opacity:.32}
+  .maison-app.management-suite .services-page .services-hero__add{min-height:42px;padding:9px 10px;font-size:11px}
+  .maison-app.management-suite .services-page .services-toolbar{flex-wrap:wrap;gap:6px}
+  .maison-app.management-suite .services-page .services-toolbar .suite-filter-form{flex:1 1 100%}
+  .maison-app.management-suite .services-page .services-toolbar .suite-filter-bar__meta{width:100%;justify-content:flex-end}
+}
+@media (max-width:560px){
+  .maison-app.management-suite .services-page .services-hero{min-height:85px;border-radius:13px}
+  .maison-app.management-suite .services-page .services-hero__text p{max-width:190px;line-height:1.5}
+  .maison-app.management-suite .services-page .services-hero__art{opacity:.22;inset-inline-end:5%;width:61%;height:125px}
+  .maison-app.management-suite .services-page .services-catalog{grid-template-columns:minmax(0,1fr);gap:8px}
+  .maison-app.management-suite .services-page .services-card{min-height:93px;padding:11px}
+  .maison-app.management-suite .services-page .services-card__edit{min-height:40px}
+  .maison-app.management-suite .services-page .services-toolbar .suite-search input{min-height:42px;height:42px;line-height:40px}
+  .maison-app.management-suite .services-page .services-toolbar .btn-secondary{min-height:42px}
+  .maison-app.management-suite .services-page .services-pagination .btn-secondary{min-height:42px}
+}
+@media (max-height:599px){
+  .maison-app.management-suite .services-page{min-height:0}
+  .maison-app.management-suite .services-page .services-catalog{grid-auto-rows:max-content}
+}
+@media (prefers-reduced-motion:reduce){
+  .maison-app.management-suite .services-page .services-hero__add{transition:none}
+}

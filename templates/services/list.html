@@ -1,11 +1,13 @@
 {% extends "layouts/app_shell.html" %}
-{% load format_tags %}
+{% load format_tags static %}
 {% block title %}خدمات{% endblock %}
-{% block page_title %}خدمات سالن{% endblock %}
-{% block page_subtitle %}مدت، قیمت و وضعیت خدمات{% endblock %}
+{% block workspace_header %}{% endblock %}
+{% block page_styles_after_suite %}
+<link rel="stylesheet" href="{% static 'css/services-premium.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
 {% block content %}
 <div
-  class="services-page"
+  class="services-page{% if services|length >= 7 %} services-page--full-grid{% endif %}"
   x-data="{
     createOpen: {{ create_modal_open|yesno:'true,false' }},
     editOpen: {{ edit_modal_open|default:False|yesno:'true,false' }},
@@ -39,7 +41,24 @@
   @beautyos-close-edit-modal.window="closeEdit()"
   @keydown.escape.window="editOpen ? closeEdit() : (createOpen && closeCreate())"
 >
-  <div class="page-toolbar editorial-module-toolbar suite-filter-bar suite-filter-bar--row suite-filter-bar--split">
+  <header class="services-hero" aria-labelledby="services-hero-title">
+    <div class="services-hero__identity">
+      <span class="services-hero__icon" aria-hidden="true"><i data-lucide="scissors"></i></span>
+      <div class="services-hero__text">
+        <h1 id="services-hero-title">خدمات سالن</h1>
+        <p>مدیریت خدمات، مدت، تعرفه و وضعیت رزرو</p>
+      </div>
+    </div>
+    <div class="services-hero__art" aria-hidden="true">
+      <img src="{% static 'images/services-catalog-hero.svg' %}?v={{ BEAUTYOS_ASSET_VERSION }}" alt="" width="820" height="300" decoding="async" fetchpriority="high">
+    </div>
+    <button type="button" class="services-hero__add" @click="createOpen = true" aria-haspopup="dialog" aria-controls="service-create-modal-title">
+      <i data-lucide="plus" aria-hidden="true"></i>
+      <span>خدمت جدید</span>
+    </button>
+  </header>
+
+  <div class="page-toolbar editorial-module-toolbar suite-filter-bar suite-filter-bar--row suite-filter-bar--split services-toolbar">
     <form method="get" class="suite-filter-form" role="search">
       <label class="suite-search"><i data-lucide="search" aria-hidden="true"></i><input type="search" name="q" class="input-field" value="{{ q }}" aria-label="جست‌وجوی خدمت" placeholder="نام خدمت یا دسته‌بندی"></label>
       <button type="submit" class="btn-secondary">جست‌وجو</button>
@@ -47,9 +66,7 @@
     </form>
     <div class="suite-filter-bar__meta">
       <p class="suite-filter-bar__count">{{ service_page.paginator.count|fa_num }} خدمت</p>
-      <div class="suite-filter-bar__actions">
-        <button type="button" class="btn-primary" @click="createOpen = true"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>خدمت جدید</button>
-      </div>
+
     </div>
   </div>
 
@@ -62,21 +79,21 @@
   {% endif %}
 
   {% if services %}
-  <div class="suite-catalog-grid">
+  <div class="suite-catalog-grid services-catalog">
     {% for s in services %}
-    <article class="maison-service-card suite-service-card !flex-row !items-start">
-      <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-soft to-surface-muted text-accent">
-        <i data-lucide="sparkles" class="h-6 w-6"></i>
-      </div>
-      <div class="min-w-0 flex-1">
-        <h3 class="font-semibold text-espresso">{{ s.name }}</h3>
-        <p class="mt-1 text-sm text-ink-secondary">
-          {% if s.category %}{{ s.category.name }} · {% endif %}
-          {{ s.duration_minutes|fa_num }} دقیقه · {{ s.price_toman|fa_money }} تومان
+    <article class="maison-service-card suite-service-card services-card">
+      <span class="services-card__icon" aria-hidden="true"><i data-lucide="sparkles"></i></span>
+      <div class="services-card__body">
+        <h3 class="services-card__name">{{ s.name }}</h3>
+        <p class="services-card__description">
+          {% if s.category %}<span>{{ s.category.name }}</span><span aria-hidden="true">·</span>{% endif %}
+          <span>{{ s.duration_minutes|fa_num }} دقیقه</span>
+          <span aria-hidden="true">·</span>
+          <span>{{ s.price_toman|fa_money }} تومان</span>
         </p>
         {% if s.is_active %}<span class="staff-team-badge staff-team-badge--ok">فعال</span>{% else %}<span class="staff-team-badge staff-team-badge--muted">غیرفعال</span>{% endif %}
       </div>
-      <a href="{% url 'services:list' %}?edit={{ s.pk }}" class="btn-secondary self-start text-xs">ویرایش</a>
+      <a href="{% url 'services:list' %}?edit={{ s.pk }}" class="btn-secondary services-card__edit">ویرایش</a>
     </article>
     {% endfor %}
   </div>
@@ -86,7 +103,7 @@
   {% include "partials/empty_state.html" with icon="scissors" title="خدمات سالن هنوز تعریف نشده‌اند" description="خدمات را اضافه کنید تا در رزرو و صفحه عمومی نمایش داده شوند." cta_url=list_url|add:"?create=1" cta_label="افزودن خدمت" %}
   {% endif %}
   {% endif %}
-  {% include "partials/suite_pagination.html" with pager=service_page %}
+  <div class="services-pagination">{% include "partials/suite_pagination.html" with pager=service_page %}</div>
 
   {% include "services/partials/service_create_modal.html" %}
   {% include "services/partials/service_edit_modal.html" %}

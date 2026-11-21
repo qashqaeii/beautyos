@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" fill="none" role="img" aria-label="Illustration of salon services">
+<defs>
+ <linearGradient id="paper" x1="260" y1="21" x2="520" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#fffdfb"/><stop offset="1" stop-color="#f4d9d0"/></linearGradient>
+ <linearGradient id="pedestal" x1="250" y1="251" x2="615" y2="297" gradientUnits="userSpaceOnUse"><stop stop-color="#f6ded2"/><stop offset="1" stop-color="#c88b7c"/></linearGradient>
+ <linearGradient id="rose" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#dbafa4"/><stop offset="1" stop-color="#98635c"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#fffdf9" stop-opacity=".95"/><stop offset="1" stop-color="#fffdf9" stop-opacity="0"/></radialGradient>
+ <filter id="shadow" x="-35%" y="-35%" width="170%" height="190%"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#8f6b60" flood-opacity=".18"/></filter>
+</defs>
+<ellipse cx="423" cy="156" rx="310" ry="144" fill="url(#glow)"/>
+<path d="M23 169c107-133 205-145 293-82 95 67 166 18 232-35 72-57 159-32 250 16" stroke="#fffaf8" stroke-width="2.4" opacity=".75"/>
+<path d="M14 235c100-94 197-94 277-27 76 62 153 34 228-20 95-68 174-54 293 3" stroke="#fffdf9" stroke-width="1.7" opacity=".65"/>
+<g opacity=".75" stroke="#b77b70" stroke-width="1.8"><path d="M640 70l4 13 14 4-14 4-4 13-4-13-14-4 14-4z"/><path d="M176 32l3 10 10 3-10 3-3 10-3-10-10-3 10-3z"/></g>
+<ellipse cx="427" cy="274" rx="252" ry="20" fill="#cfab9e" opacity=".22"/>
+<g filter="url(#shadow)">
+ <path d="M196 253c0-12 102-24 229-24s230 12 230 24v15c0 14-103 25-230 25s-229-11-229-25z" fill="url(#pedestal)"/>
+ <ellipse cx="425" cy="250" rx="229" ry="23" fill="#f9e8e1" stroke="#fff9f5" stroke-width="2"/>
+</g>
+<!-- salon instruments on left -->
+<g filter="url(#shadow)" stroke="#ad796f" stroke-width="3">
+ <rect x="109" y="165" width="78" height="107" rx="12" fill="#e8bdb0" stroke="#fff5ed"/>
+ <path d="M125 181v77M135 181v77M146 181v77M157 181v77M170 181v77" stroke="#fff5ec" stroke-width="2" opacity=".55"/>
+ <path d="M131 162l-7-88M159 162l16-80" stroke="#a9796b" stroke-width="9" stroke-linecap="round"/>
+ <path d="M106 89l31-8M112 96l28-8M119 104l26-8" stroke="#e1b3a4" stroke-width="5" stroke-linecap="round"/>
+ <circle cx="220" cy="113" r="15" stroke="#ad806e" stroke-width="4"/><circle cx="254" cy="113" r="15" stroke="#ad806e" stroke-width="4"/>
+ <path d="m230 127 22 45m-8-45-17 45" stroke="#a87465" stroke-width="4" stroke-linecap="round"/>
+</g>
+<!-- four service rows with service-themed pictograms -->
+<g filter="url(#shadow)" transform="rotate(-6 443 153)">
+ <rect x="275" y="15" width="303" height="248" rx="25" fill="url(#paper)" stroke="#fffbf7" stroke-width="3"/>
+ <rect x="288" y="29" width="277" height="220" rx="19" stroke="#e9cfc6"/>
+ <rect x="302" y="41" width="249" height="43" rx="14" fill="#fff9f5" stroke="#ecd5cc"/>
+ <rect x="302" y="93" width="249" height="43" rx="14" fill="#fff9f5" stroke="#ecd5cc"/>
+ <rect x="302" y="145" width="249" height="43" rx="14" fill="#fff9f5" stroke="#ecd5cc"/>
+ <rect x="302" y="197" width="249" height="43" rx="14" fill="#fff9f5" stroke="#ecd5cc"/>
+ <g stroke="#d6afa4" stroke-width="5" stroke-linecap="round"><path d="M332 62h45"/><path d="M332 114h45"/><path d="M332 166h45"/><path d="M332 218h45"/></g>
+ <g stroke="#e5ccc2" stroke-width="3" stroke-linecap="round"><path d="M332 73h70"/><path d="M332 125h70"/><path d="M332 177h70"/><path d="M332 229h70"/></g>
+ <g fill="#f6e5de" stroke="#be8a7e" stroke-width="2">
+  <rect x="479" y="48" width="40" height="30" rx="9"/><rect x="479" y="100" width="40" height="30" rx="9"/><rect x="479" y="152" width="40" height="30" rx="9"/><rect x="479" y="204" width="40" height="30" rx="9"/>
+ </g>
+ <g stroke="#b07970" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M492 66l-6-8M492 66l-6 8M492 66l13-8M492 66l13 8"/><circle cx="490" cy="62" r="3" fill="#c28f83"/><circle cx="490" cy="70" r="3" fill="#c28f83"/>
+  <path d="M492 110h14v13h-14zM496 105h6v5"/><path d="M487 175l14-13 6 6-14 13z"/><path d="M496 159l6-6"/>
+  <circle cx="500" cy="217" r="7"/><path d="M487 231c1-11 25-11 26 0M493 215c0-12 16-13 16 0"/>
+ </g>
+</g>
+<!-- cosmetics jar and towel -->
+<g filter="url(#shadow)">
+ <rect x="569" y="180" width="79" height="91" rx="15" fill="#e5b9ab" stroke="#fff4ec" stroke-width="3"/>
+ <path d="M579 194h59v49h-59z" fill="#f8e8e1" opacity=".45"/>
+ <rect x="584" y="153" width="50" height="26" rx="5" fill="#be8477"/>
+ <path d="M609 155v-16h22" stroke="#a36f62" stroke-width="6" stroke-linecap="round"/>
+ <path d="M641 252c6 7 41 13 56 17s-40 8-74 8" stroke="#eac2b8" stroke-width="20" stroke-linecap="round"/>
+ <rect x="75" y="257" width="83" height="30" rx="13" fill="#fbeee8" stroke="#dfb2a6" stroke-width="3"/>
+ <rect x="89" y="245" width="56" height="15" rx="7" fill="#d59e90"/>
+</g>
+<g fill="#fbeee7" stroke="#d1a095" stroke-width="1.6" opacity=".88">
+ <path d="M208 243c-34-34-50-13-35 13 20 13 38 6 35-13z"/>
+ <path d="M205 243c22-35 43-25 36 1-12 18-29 18-36-1z"/>
+ <path d="M205 242c-7-39 12-42 21-18 6 15-1 27-21 18z"/>
+</g>
+</svg>
