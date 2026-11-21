@@ -1,0 +1,191 @@
+/* Customer directory hero: local CRM illustration, not the shared salon photo.
+   All rules are scoped so staff/inventory headers remain untouched. */
+.maison-app.management-suite .customers-list-page .customers-list-page__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 156px;
+  margin: 0 0 12px;
+  padding: 20px 21px;
+  gap: 16px;
+  border: 1px solid #e6cbc5;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(113,73,67,.075), inset 0 1px rgba(255,255,255,.75);
+  background:
+    radial-gradient(ellipse 55% 50% at 7% 123%, rgba(176,109,110,.22), transparent 96%),
+    radial-gradient(ellipse 65% 90% at 107% 116%, rgba(255,255,255,.73), transparent 92%),
+    linear-gradient(102deg, #e8c5c3 0%, #f3dbd6 46%, #fff7f2 100%);
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__header::before {
+  display: none;
+  content: none;
+  background: none;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__header::after {
+  content: "";
+  position: absolute;
+  inset-inline: -12%;
+  bottom: -110px;
+  height: 153px;
+  z-index: -1;
+  border: 1px solid rgba(255,250,244,.62);
+  border-radius: 52% 48% 0 0 / 62% 75% 0 0;
+  transform: rotate(-2deg);
+  background: linear-gradient(180deg, rgba(246,219,211,.32),rgba(193,139,132,.1));
+  pointer-events: none;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__headline {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 12px;
+  max-width: 48%;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__head-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  color: #875b54;
+  background: #eed8d0;
+  border: 1px solid #e8cbc0;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.8);
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__head-icon :is(svg,i) {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.7;
+}
+.maison-app.management-suite .customers-list-page .editorial-directory-copy {
+  min-width: 0;
+  text-align: right;
+}
+.maison-app.management-suite .customers-list-page .editorial-directory-copy > h1,
+.maison-app.management-suite .customers-list-page .customers-list-page__title {
+  margin: 0;
+  color: #583d37;
+  font-size: clamp(19px, 2vw, 25px);
+  line-height: 1.5;
+  font-weight: 790;
+  letter-spacing: -.4px;
+}
+.maison-app.management-suite .customers-list-page .editorial-directory-copy > p {
+  margin: 3px 0 0;
+  color: #85645e;
+  font-size: 12px;
+  line-height: 1.75;
+  font-weight: 450;
+}
+.maison-app.management-suite .customers-list-page .customers-hero__art {
+  position: absolute;
+  z-index: 1;
+  inset-inline-end: clamp(142px, 18%, 240px);
+  top: 50%;
+  width: min(50%, 535px);
+  height: 178px;
+  transform: translateY(-49%);
+  pointer-events: none;
+  user-select: none;
+}
+.maison-app.management-suite .customers-list-page .customers-hero__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  filter: saturate(.96);
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__add {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 10px 15px;
+  gap: 8px;
+  border: 1px solid #9b6e67;
+  border-radius: 11px;
+  background: linear-gradient(125deg,#b4827b,#926761);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 730;
+  line-height: 1.5;
+  box-shadow: 0 5px 14px rgba(120,77,72,.13);
+  text-shadow: none;
+  transition: background-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__add:hover {
+  background: #865a53;
+  box-shadow: 0 7px 17px rgba(120,77,72,.18);
+  transform: translateY(-1px);
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__add:focus-visible {
+  outline: 3px solid rgba(130,83,76,.38);
+  outline-offset: 3px;
+}
+@media (max-width: 1023px) {
+  .maison-app.management-suite .customers-list-page .customers-list-page__header {
+    min-height: 132px;
+    padding: 16px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-hero__art {
+    inset-inline-end: 18%;
+    width: 47%;
+    height: 155px;
+    opacity: .86;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__headline { max-width: 57%; }
+}
+@media (max-width: 639px) {
+  .maison-app.management-suite .customers-list-page .customers-list-page__header {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    justify-items: stretch;
+    min-height: 144px;
+    gap: 13px;
+    padding: 13px;
+    border-radius: 14px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__headline {
+    max-width: 100%;
+    gap: 9px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__head-icon {
+    width: 39px;
+    height: 39px;
+    border-radius: 11px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__head-icon :is(svg,i) { width: 19px; height: 19px; }
+  .maison-app.management-suite .customers-list-page .editorial-directory-copy > h1 { font-size: 18px; }
+  .maison-app.management-suite .customers-list-page .editorial-directory-copy > p { font-size: 10px; max-width: 235px; }
+  .maison-app.management-suite .customers-list-page .customers-hero__art {
+    inset-inline-end: 0;
+    top: 42%;
+    width: 48%;
+    height: 120px;
+    opacity: .37;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__add {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    margin: 0;
+    font-size: 12px;
+    background: #966a62;
+  }
+}
+@media (max-width: 360px) {
+  .maison-app.management-suite .customers-list-page .customers-hero__art { opacity: .2; width: 41%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .maison-app.management-suite .customers-list-page .customers-list-page__add { transition: none; }
+}

@@ -1,10 +1,14 @@
 {% extends "layouts/app_shell.html" %}
-{% load humanize %}
+{% load humanize static %}
 {% block title %}مشتریان{% endblock %}
 {% block workspace_header %}{% endblock %}
 {% block page_title %}{% endblock %}
 {% block page_subtitle %}{% endblock %}
 {% block page_actions %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/customers-hero.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
 
 {% block content %}
 <div
@@ -33,12 +37,15 @@
   </div>
   {% endif %}
 
-  <header class="customers-list-page__header">
+  <header class="customers-list-page__header customers-hero">
     <div class="customers-list-page__headline">
       <span class="customers-list-page__head-icon" aria-hidden="true">
         <i data-lucide="users" class="h-5 w-5"></i>
       </span>
       <div class="editorial-directory-copy"><h1 class="customers-list-page__title">مدیریت مشتریان</h1><p>پرونده مشتریان، سوابق و ارتباطات سالن</p></div>
+    </div>
+    <div class="customers-hero__art" aria-hidden="true">
+      <img src="{% static 'images/customers-network-hero.svg' %}?v={{ BEAUTYOS_ASSET_VERSION }}" alt="" width="850" height="320" decoding="async">
     </div>
     <button
       type="button"

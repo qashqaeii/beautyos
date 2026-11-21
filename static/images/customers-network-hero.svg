@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 320" width="850" height="320" fill="none" aria-hidden="true">
+<defs>
+ <linearGradient id="orbit" x1="142" y1="62" x2="712" y2="233" gradientUnits="userSpaceOnUse"><stop stop-color="#fff9ee" stop-opacity=".25"/><stop offset=".25" stop-color="#fffdf7"/><stop offset=".6" stop-color="#e8b08b"/><stop offset="1" stop-color="#fff9ea" stop-opacity=".24"/></linearGradient>
+ <linearGradient id="card" x1="341" y1="40" x2="514" y2="256" gradientUnits="userSpaceOnUse"><stop stop-color="#fffdfa"/><stop offset=".57" stop-color="#fff5f0"/><stop offset="1" stop-color="#efd3c9"/></linearGradient>
+ <linearGradient id="rear" x1="258" y1="109" x2="350" y2="257" gradientUnits="userSpaceOnUse"><stop stop-color="#fffaf7"/><stop offset="1" stop-color="#e8c7c0"/></linearGradient>
+ <linearGradient id="pedestal" x1="420" y1="255" x2="420" y2="303" gradientUnits="userSpaceOnUse"><stop stop-color="#fbe7dd"/><stop offset=".55" stop-color="#dcaea0"/><stop offset="1" stop-color="#a9786d"/></linearGradient>
+ <linearGradient id="avatar" x1="383" y1="85" x2="480" y2="169" gradientUnits="userSpaceOnUse"><stop stop-color="#f3d1c9"/><stop offset="1" stop-color="#d7aba8"/></linearGradient>
+ <radialGradient id="halo"><stop stop-color="#fffaf2" stop-opacity=".94"/><stop offset=".6" stop-color="#f7dfd3" stop-opacity=".36"/><stop offset="1" stop-color="#f7dfd3" stop-opacity="0"/></radialGradient>
+ <filter id="shadow" x="-35%" y="-45%" width="170%" height="200%" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="12" stdDeviation="13" flood-color="#8e544d" flood-opacity=".22"/></filter>
+ <filter id="subtle" x="-35%" y="-45%" width="170%" height="200%" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#87534d" flood-opacity=".2"/></filter>
+ <filter id="glow" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+<ellipse cx="422" cy="164" rx="330" ry="145" fill="url(#halo)" opacity=".95"/>
+<!-- Connected CRM network in soft champagne light -->
+<g stroke="url(#orbit)" stroke-width="2" stroke-linecap="round">
+ <path d="M153 180C182 91 276 73 354 111"/>
+ <path d="M221 75C289 -10 387 2 441 66"/>
+ <path d="M505 104C560 48 626 47 682 110"/>
+ <path d="M521 194C586 207 638 180 685 142"/>
+ <path d="M167 190C219 252 282 249 341 218"/>
+</g>
+<g fill="#fffaf1"><circle cx="153" cy="180" r="5"/><circle cx="221" cy="75" r="5"/><circle cx="682" cy="110" r="5"/><circle cx="685" cy="142" r="5"/></g>
+<g fill="#ffd8b4" filter="url(#glow)" opacity=".83"><circle cx="221" cy="75" r="7"/><circle cx="684" cy="111" r="7"/><circle cx="153" cy="180" r="7"/></g>
+<!-- Floating user nodes -->
+<g filter="url(#subtle)">
+ <circle cx="219" cy="68" r="24" fill="#f4d4c7" stroke="#fff9f3" stroke-width="3"/>
+ <circle cx="219" cy="60" r="7" fill="#ae786e"/>
+ <path d="M205 82c1-17 27-17 28 0" fill="#ae786e"/>
+ <circle cx="155" cy="180" r="22" fill="#f2d4c7" stroke="#fff8f1" stroke-width="3"/>
+ <circle cx="155" cy="173" r="6.5" fill="#a8776c"/>
+ <path d="M142 193c0-14 26-14 26 0" fill="#a8776c"/>
+ <circle cx="652" cy="73" r="24" fill="#f2d1c4" stroke="#fff9f2" stroke-width="3"/>
+ <circle cx="652" cy="65" r="7" fill="#ae786e"/>
+ <path d="M638 88c1-17 27-17 28 0" fill="#ae786e"/>
+ <circle cx="704" cy="152" r="22" fill="#f2d6ca" stroke="#fff9f3" stroke-width="3"/>
+ <circle cx="704" cy="145" r="6.5" fill="#a8776c"/>
+ <path d="M691 165c0-14 26-14 26 0" fill="#a8776c"/>
+</g>
+<!-- Pedestal and low-depth reflective platform -->
+<g filter="url(#shadow)">
+ <ellipse cx="429" cy="275" rx="231" ry="24" fill="#d6aaa1" opacity=".55"/>
+ <path d="M197 273c0-18 103-32 232-32s232 14 232 32v12c0 18-103 31-232 31s-232-13-232-31z" fill="url(#pedestal)"/>
+ <ellipse cx="429" cy="269" rx="231" ry="26" fill="#f8e5dd" stroke="#fff9f2" stroke-width="2.5"/>
+ <ellipse cx="429" cy="268" rx="206" ry="19" fill="#fff4ea" opacity=".65"/>
+</g>
+<!-- Peripheral profiles, softly recessed -->
+<g filter="url(#subtle)" opacity=".82">
+ <rect x="268" y="115" width="109" height="135" rx="17" fill="url(#rear)" stroke="#fff9f4" stroke-width="2"/>
+ <circle cx="323" cy="156" r="25" fill="#ead0c9"/>
+ <circle cx="323" cy="149" r="9" fill="#b89893"/>
+ <path d="M303 175c1-19 39-19 40 0" fill="#b89893"/>
+ <rect x="292" y="197" width="60" height="6" rx="3" fill="#d6b4ac"/>
+ <rect x="299" y="212" width="47" height="5" rx="2.5" fill="#dec2bb"/>
+ <rect x="292" y="224" width="54" height="5" rx="2.5" fill="#dec2bb"/>
+ <rect x="496" y="116" width="108" height="134" rx="17" fill="url(#rear)" stroke="#fff8f3" stroke-width="2"/>
+ <circle cx="550" cy="156" r="25" fill="#ead0c9"/>
+ <circle cx="550" cy="149" r="9" fill="#b89893"/>
+ <path d="M530 175c1-19 39-19 40 0" fill="#b89893"/>
+ <rect x="520" y="197" width="60" height="6" rx="3" fill="#d6b4ac"/>
+ <rect x="528" y="212" width="47" height="5" rx="2.5" fill="#dec2bb"/>
+ <rect x="519" y="224" width="54" height="5" rx="2.5" fill="#dec2bb"/>
+</g>
+<!-- Primary verified customer card -->
+<g filter="url(#shadow)">
+ <rect x="358" y="63" width="149" height="199" rx="22" fill="url(#card)" stroke="#fffdf9" stroke-width="3"/>
+ <rect x="367" y="73" width="131" height="179" rx="16" stroke="#eacfc6" stroke-opacity=".65"/>
+ <circle cx="432" cy="129" r="50" fill="#fbebe3" stroke="#eac7bd" stroke-width="2"/>
+ <circle cx="432" cy="129" r="41" fill="url(#avatar)"/>
+ <circle cx="432" cy="113" r="16" fill="#a96c68"/>
+ <path d="M393 158c0-23 19-35 39-35s39 12 39 35v6h-78z" fill="#a96c68"/>
+ <path d="M422 109c0-14 6-21 18-21 17 2 23 16 17 29l-8 6c-1-12-12-21-27-14z" fill="#87514f" opacity=".73"/>
+ <rect x="386" y="190" width="91" height="8" rx="4" fill="#cca89f"/>
+ <rect x="399" y="207" width="66" height="6" rx="3" fill="#e1c6bd"/>
+ <rect x="399" y="221" width="52" height="6" rx="3" fill="#e6cdc5"/>
+ <circle cx="491" cy="227" r="18" fill="#c99380" stroke="#fffaf5" stroke-width="3"/>
+ <path d="m484 227 5 5 10-11" stroke="#fffaf4" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<path d="M229 283c138 22 279 29 400 0" stroke="#fffdf2" stroke-width="2" stroke-linecap="round" opacity=".84"/>
+</svg>
