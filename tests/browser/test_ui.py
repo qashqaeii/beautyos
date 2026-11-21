@@ -155,10 +155,11 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 assert not broken, f"broken static assets {broken}"
                 assert not js_errors, f"JavaScript exceptions {js_errors}"
                 if name == "customers":
-                    # Page chrome stays in the first viewport; only the customer list scrolls.
-                    if height >= 600:
-                        assert page.evaluate("document.scrollingElement.scrollHeight <= innerHeight + 3"), "customer directory causes page scroll"
-                        assert page.evaluate("getComputedStyle(document.querySelector('.customers-list-page__results')).minHeight === '0px'"), "customer list must shrink within viewport"
+                    # Directory must never nest a vertical scroller or clip customer cards.
+                    assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"
+                    assert page.evaluate("getComputedStyle(document.querySelector('.customers-list-grid')).overflowY === 'visible'"), "customer cards should not be clipped"
+                    if page.locator(".customers-list-page__pagination").count():
+                        assert page.evaluate("() => { const cards = document.querySelectorAll('.customers-list-card'); const pager = document.querySelector('.customers-list-page__pagination'); return !cards.length || pager.getBoundingClientRect().top >= cards[cards.length-1].getBoundingClientRect().bottom - 2; }"), "pagination overlaps last customer row"
                     hero = page.locator(".customers-list-page__header")
                     art = hero.locator(".customers-hero__art img")
                     pw.expect(art).to_be_visible()
@@ -555,3 +556,38 @@ def test_staff_hours_weekly_editor(live_server, client, owner_membership, browse
         browser.close()
     # Query after Playwright stops its event loop; Django ORM is synchronous.
     assert StaffWorkHours.objects.get(staff=staff,weekday=2).is_closed
+
+
+@pytest.mark.django_db(transaction=True)
+def test_customer_directory_all_eight_cards_visible_at_laptop_height(live_server, client, owner_membership):
+    """On 1366px laptops, two rows of customers and pagination fit without internal scrolling."""
+    from apps.customers.models import Customer
+    salon = owner_membership.salon
+    for i in range(9):
+        Customer.objects.create(
+            salon=salon, full_name=f"مشتری نمایشی شماره {i}", phone=f"+98912800{i:05d}"
+        )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(viewport={"width": 1366, "height": 640}, locale="fa-IR")
+        context.add_cookies([{"name": settings.SESSION_COOKIE_NAME, "value": cookie, "url": live_server.url}])
+        page = context.new_page()
+        page.goto(live_server.url + reverse("customers:list") + "?view=card", wait_until="load")
+        page.evaluate("document.fonts.ready")
+        cards = page.locator(".customers-list-card")
+        pw.expect(cards).to_have_count(8)
+        last = cards.last.bounding_box()
+        pager = page.locator(".customers-list-page__pagination").bounding_box()
+        assert last is not None and pager is not None
+        assert last["y"] + last["height"] <= pager["y"] + 2, "pagination covers last row"
+        assert pager["y"] + pager["height"] <= 640, "desktop content exceeds laptop viewport"
+        assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY") == "visible"
+        assert page.evaluate("getComputedStyle(document.querySelector('.customers-list-grid')).overflowY") == "visible"
+        assert page.evaluate("document.scrollingElement.scrollHeight <= innerHeight + 3")
+        context.close()
+        browser.close()

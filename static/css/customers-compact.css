@@ -195,53 +195,15 @@
   min-height: 0;
   overflow: auto;
 }
-/* At normal browser heights, keep the customer directory inside the app viewport.
-   The list is the ONLY vertical scroller; pagination stays discoverable. */
-@media (min-height: 600px) {
-  html:has(.maison-app.management-suite .customers-list-page) {
-    height: 100%;
-    overflow: hidden;
-  }
-  .maison-app.management-suite:has(.customers-list-page) {
-    height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .maison-app.management-suite:has(.customers-list-page) > .maison-main {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .maison-app.management-suite:has(.customers-list-page) > .maison-main > .maison-content {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .maison-app.management-suite .customers-list-page {
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-  .maison-app.management-suite .customers-list-page :is(.customers-list-grid,.customers-list-table-wrap) {
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-    scrollbar-gutter: stable;
-    -webkit-overflow-scrolling: touch;
-  }
-  .maison-app.management-suite .customers-list-page .customers-list-grid {
-    overflow-x: hidden;
-  }
-}
+/* Natural document flow prevents the last row from being clipped behind pagination.
+   Short screens may scroll vertically: never hide customer records or trap keyboard users. */
 @media (min-width: 600px) {
   .maison-app.management-suite .customers-list-page {
     gap: 10px;
   }
   .maison-app.management-suite .customers-list-page .customers-list-page__header {
-    min-height: 118px;
-    padding: 14px 16px;
+    min-height: 72px;
+    padding: 10px 13px;
     border-radius: 16px;
   }
   .maison-app.management-suite .customers-list-page .customers-list-page__headline {
@@ -262,9 +224,9 @@
     line-height: 1.65;
   }
   .maison-app.management-suite .customers-list-page .customers-list-card {
-    padding: 10px 11px;
-    gap: 7px;
-    border-radius: 13px;
+    padding: 7px 9px;
+    gap: 5px;
+    border-radius: 11px;
   }
   .maison-app.management-suite .customers-list-page .customers-list-card__name {
     font-size: 0.91rem;
@@ -273,10 +235,10 @@
     font-size: 0.72rem;
   }
   .maison-app.management-suite .customers-list-page .customers-list-card__cta {
-    min-height: 34px;
-    font-size: 0.76rem;
-    padding: 5px 9px;
-    border-radius: 9px;
+    min-height: 28px;
+    font-size: 0.7rem;
+    padding: 3px 7px;
+    border-radius: 8px;
   }
 }
 @media (min-width: 768px) {
@@ -430,4 +392,142 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .maison-app.management-suite .customers-list-page .customers-list-card { transition: none; }
+}
+/* First-fold desktop layout, after shared management-suite styles. */
+.maison-app.management-suite .customers-list-page,
+.maison-app.management-suite .customers-list-page .customers-list-page__workspace,
+.maison-app.management-suite .customers-list-page .customers-list-page__results {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+.maison-app.management-suite .customers-list-page .customers-list-grid {
+  flex: 0 0 auto;
+  grid-auto-rows: max-content;
+  align-content: start;
+  overflow: visible;
+  scrollbar-gutter: auto;
+}
+.maison-app.management-suite .customers-list-page .customers-list-table-wrap {
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-gutter: auto;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__pagination {
+  position: static;
+  flex: 0 0 auto;
+  min-height: 32px;
+  margin-top: 1px;
+  padding-top: 4px;
+  clear: both;
+}
+.maison-app.management-suite .customers-list-page .customers-filter-bar {
+  gap: 5px;
+  padding: 7px 9px;
+  flex: 0 0 auto;
+}
+.maison-app.management-suite .customers-list-page .customers-filter-bar__primary {
+  min-width: 0;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__search-form {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 130px;
+  max-width: 100%;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__controls-top {
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+.maison-app.management-suite .customers-list-page .customers-filter-bar__segments {
+  gap: 5px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 0;
+  scrollbar-width: none;
+}
+.maison-app.management-suite .customers-list-page .customers-filter-bar__segments::-webkit-scrollbar { display:none; }
+.maison-app.management-suite .customers-list-page .customers-list-page__segment {
+  min-height: 30px;
+  padding: 4px 8px;
+  flex: 0 0 auto;
+  font-size: 10px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__search-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__search {
+  box-sizing: border-box;
+  min-height: 36px;
+  height: 36px;
+  line-height: 34px;
+  font-size: 12px;
+}
+.maison-app.management-suite .customers-list-page .list-view-switch__btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 4px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card {
+  min-height: 0;
+  height: auto;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__identity { min-height: 36px; }
+.maison-app.management-suite .customers-list-page .customers-list-card__stats {
+  min-height: 0;
+  padding: 4px 0 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__cta {
+  min-height: 27px;
+  padding: 3px 6px;
+}
+/* Standard desktop: compact filter chips alongside the search and count (one row). */
+@media (min-width: 1200px) {
+  .maison-app.management-suite .customers-list-page .customers-list-page__header {
+    min-height: 72px;
+    padding-block: 9px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-hero__art { height: 90px; }
+  .maison-app.management-suite .customers-list-page .customers-filter-bar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 49px;
+    padding: 5px 9px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-filter-bar__primary {
+    flex: 1 1 40%;
+  }
+  .maison-app.management-suite .customers-list-page .customers-filter-bar__segments {
+    width: auto;
+    flex: 0 1 auto;
+    max-width: 58%;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+  }
+}
+@media (min-width: 600px) and (max-width: 1199px) {
+  .maison-app.management-suite .customers-list-page .customers-list-page__header { min-height: 76px; padding-block: 9px; }
+  .maison-app.management-suite .customers-list-page .customers-hero__art { height: 90px; }
+  .maison-app.management-suite .customers-list-page .customers-filter-bar { gap: 6px; }
+}
+/* Mobile keeps natural page scrolling and touch-size controls. */
+@media (max-width: 599px) {
+  .maison-app.management-suite .customers-list-page .customers-filter-bar__primary { flex-wrap: wrap; }
+  .maison-app.management-suite .customers-list-page .customers-list-page__search-form { width: 100%; flex-basis: 100%; }
+  .maison-app.management-suite .customers-list-page .customers-filter-bar__segments { flex-wrap: nowrap; }
+  .maison-app.management-suite .customers-list-page .customers-list-card__cta { min-height: 36px; }
 }

@@ -98,6 +98,7 @@ def test_customer_directory_compact_layout_preserves_pagination_and_filters(
     css_path = finders.find("css/customers-compact.css")
     assert css_path is not None
     css = Path(css_path).read_text(encoding="utf-8")
-    assert "100dvh" in css
-    assert "overflow-y: auto" in css
+    assert "height: 100dvh" not in css
+    assert "overflow: hidden;" not in css
+    assert "overflow: visible;" in css
     assert "@media (max-width: 639px)" in css
