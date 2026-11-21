@@ -13,7 +13,7 @@
 
 {% block content %}
 <div
-  class="customers-list-page"
+  class="customers-list-page{% if view_mode == 'card' and page.object_list|length >= 5 %} customers-list-page--balanced{% endif %}"
   x-data="{
     createOpen: {{ create_modal_open|yesno:'true,false' }},
     closeCreate() {

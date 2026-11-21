@@ -586,6 +586,9 @@ def test_customer_directory_all_eight_cards_visible_at_laptop_height(live_server
         assert last is not None and pager is not None
         assert last["y"] + last["height"] <= pager["y"] + 2, "pagination covers last row"
         assert pager["y"] + pager["height"] <= 640, "desktop content exceeds laptop viewport"
+        assert page.locator(".customers-list-page--balanced").count() == 1
+        assert cards.first.bounding_box()["height"] >= 160, "cards failed to use available desktop height"
+        assert 0 <= 640 - (pager["y"] + pager["height"]) <= 52, "excessive empty space remains below pagination"
         assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY") == "visible"
         assert page.evaluate("getComputedStyle(document.querySelector('.customers-list-grid')).overflowY") == "visible"
         # A few extra pixels from the shared app shell may scroll; customer cards must not.
