@@ -25,11 +25,17 @@ def test_seed_denied_in_production_even_if_opted_in(monkeypatch, command, debug)
             call_command(command, "--dry-run", verbosity=0)
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize("command", ["seed_demo", "seed_demo_salon"])
 def test_demo_seed_can_dry_run_with_explicit_nonproduction_opt_in(monkeypatch, command):
     monkeypatch.setenv("DJANGO_SETTINGS_MODULE", "config.settings.local")
     monkeypatch.delenv("ALLOW_DEMO_SEED", raising=False)
     # pytest-django forces DEBUG=False during normal tests; explicit local
     # ALLOW_DEMO_SEED still permits the existing seeded test data.
+    from apps.accounts.models import User
+    from apps.salons.models import Salon
+    users_before, salons_before = User.objects.count(), Salon.objects.count()
     with override_settings(DEBUG=False, ALLOW_DEMO_SEED=True):
         call_command(command, "--dry-run", verbosity=0)
+    assert User.objects.count() == users_before
+    assert Salon.objects.count() == salons_before

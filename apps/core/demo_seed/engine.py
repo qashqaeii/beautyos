@@ -198,13 +198,18 @@ class DemoSeedEngine:
             },
         }
         cfg = configs[slug]
+        if self.dry_run:
+            # Dry-run must never create or rename a real User. The calling
+            # scenario exits before using these unsaved placeholder objects.
+            self._say(f"salon ready (dry): {slug}")
+            return (
+                User(phone=cfg["owner_phone"], full_name=cfg["owner_name"]),
+                Salon(slug=slug, name=cfg["name"], business_type=cfg["business_type"]),
+            )
         owner, _ = User.objects.get_or_create(phone=cfg["owner_phone"], defaults={"full_name": cfg["owner_name"]})
         if owner.full_name != cfg["owner_name"]:
             owner.full_name = cfg["owner_name"]
             owner.save(update_fields=["full_name", "updated_at"])
-        if self.dry_run:
-            self._say(f"salon ready (dry): {slug}")
-            return owner, Salon(slug=slug, name=cfg["name"])
         salon, _ = Salon.objects.get_or_create(
             slug=slug,
             defaults={

@@ -10,3 +10,5 @@
 - Production dispatch remains opt-in; check sender credentials, suppression, and any scheduled jobs in the deployment host before enabling.
 - Review responsive browser screenshots and real mobile devices; CI samples Chromium breakpoints but does not certify every view or device.
 - **No production deploy** from this change.
+
+- Dry-run regression: `DemoSeedEngine._ensure_salon` no longer calls `User.objects.get_or_create` or renames an owner before returning. Dry-run leaves User and Salon row counts untouched.
