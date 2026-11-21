@@ -595,3 +595,47 @@ def test_customer_directory_all_eight_cards_visible_at_laptop_height(live_server
         assert page.evaluate("document.querySelector('.customers-list-grid').scrollHeight <= document.querySelector('.customers-list-grid').clientHeight + 2"), "grid clips its last row"
         context.close()
         browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("viewport", [{"width": 1366, "height": 660}, {"width": 360, "height": 800}])
+def test_services_premium_catalog_layout_and_create_modal(
+    live_server, client, owner_membership, viewport
+):
+    """Nine real service cards, local hero artwork, readable pagination and working create CTA."""
+    from apps.services.models import Service
+    salon = owner_membership.salon
+    for index in range(10):
+        Service.objects.create(
+            salon=salon, name=f"خدمت زیبایی {index}", price_toman=250_000 + index * 10_000,
+        )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(viewport=viewport, locale="fa-IR", reduced_motion="reduce")
+        context.add_cookies([{"name": settings.SESSION_COOKIE_NAME, "value": cookie, "url": live_server.url}])
+        page = context.new_page()
+        page.goto(live_server.url + reverse("services:list"), wait_until="load")
+        page.evaluate("document.fonts.ready")
+        art = page.locator(".services-hero__art img")
+        pw.expect(art).to_be_visible()
+        assert art.evaluate("(img) => img.complete && img.naturalWidth > 0"), "services hero artwork failed to load"
+        cards = page.locator(".services-catalog .services-card")
+        pw.expect(cards).to_have_count(9)
+        assert page.evaluate("document.scrollingElement.scrollWidth <= innerWidth + 3"), "services have horizontal page overflow"
+        if viewport["width"] >= 1024:
+            assert page.locator(".services-page--full-grid").count() == 1
+            last_card = cards.last.bounding_box()
+            pager = page.locator(".services-pagination .suite-pagination").bounding_box()
+            assert last_card and pager
+            assert last_card["y"] + last_card["height"] <= pager["y"] + 2, "pagination overlaps services"
+            assert pager["y"] + pager["height"] <= viewport["height"] + 2, "pagination below desktop viewport"
+            assert cards.first.bounding_box()["height"] >= 90
+        page.locator(".services-hero__add").click()
+        pw.expect(page.get_by_role("dialog", name="افزودن خدمت")).to_be_visible()
+        context.close()
+        browser.close()
