@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.db.models import Count
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -207,6 +208,15 @@ def _customer_detail_context(
     activities = customer.activities.select_related("actor").order_by("-created_at")[:50]
     recent_notes = customer.notes.select_related("author").order_by("-created_at")[:20]
 
+    # Display only services actually completed for this customer in the current salon.
+    frequent_services = (
+        Appointment.scoped(request.salon)
+        .filter(customer=customer, status=Appointment.Status.COMPLETED)
+        .values("service__name")
+        .annotate(total=Count("pk"))
+        .order_by("-total", "service__name")[:5]
+    )
+
     appt_extra = {}
     if has_permission(request.membership, P_APPOINTMENT_CREATE):
         if appointment_form is None and (book_modal_open or request.GET.get("book") == "1"):
@@ -238,6 +248,7 @@ def _customer_detail_context(
         "payments": payments,
         "activities": activities,
         "recent_notes": recent_notes,
+        "frequent_services": frequent_services,
         "edit_form": edit_form,
         "edit_modal_open": edit_modal_open,
         "book_modal_open": book_modal_open,
