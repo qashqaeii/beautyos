@@ -114,7 +114,7 @@
   </section>
 
   <div class="customer-detail-columns">
-    <section class="customer-detail-card customer-detail-card--main" aria-labelledby="customer-upcoming-heading">
+    <section class="customer-detail-card customer-detail-card--main" aria-labelledby="customer-upcoming-heading" x-data="{ showAllUpcoming: false }">
       <div class="customer-detail-card__head">
         <h2 id="customer-upcoming-heading" class="customer-detail-card__title"><i data-lucide="calendar-clock" aria-hidden="true"></i> نوبت‌های پیش‌رو</h2>
         <span class="customer-detail-card__count">{{ upcoming|length|fa_num }} نوبت</span>
@@ -122,7 +122,7 @@
       {% if upcoming %}
       <ul class="customer-detail-appt-list">
         {% for a in upcoming %}
-        <li>
+        <li {% if forloop.counter > 2 %}x-show="showAllUpcoming" x-cloak{% endif %}>
           <a href="{% url 'appointments:detail' pk=a.pk %}" class="customer-detail-appt-row">
             <span class="customer-detail-appt-row__icon" aria-hidden="true"><i data-lucide="calendar-days"></i></span>
             <div class="customer-detail-appt-row__main">
@@ -139,6 +139,12 @@
         </li>
         {% endfor %}
       </ul>
+      {% if upcoming|length > 2 %}
+      <button type="button" class="customer-detail-expand" @click="showAllUpcoming = !showAllUpcoming" :aria-expanded="showAllUpcoming.toString()">
+        <span x-text="showAllUpcoming ? 'نمایش نوبت‌های کمتر' : 'مشاهده همه نوبت‌ها'">مشاهده همه نوبت‌ها</span>
+        <i data-lucide="chevron-down" aria-hidden="true" :class="{ 'customer-detail-expand__chevron--up': showAllUpcoming }"></i>
+      </button>
+      {% endif %}
       {% else %}
       <div class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="calendar-x-2" aria-hidden="true"></i><p>هنوز نوبتی برای روزهای آینده ثبت نشده است.</p>
         {% if can_book_appointment %}<button type="button" @click="bookOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))">ثبت اولین نوبت</button>{% endif %}
@@ -146,7 +152,7 @@
       {% endif %}
     </section>
 
-    <section class="customer-detail-card customer-detail-card--notes" aria-labelledby="customer-notes-heading" x-data="{ noteOpen: false }">
+    <section class="customer-detail-card customer-detail-card--notes" aria-labelledby="customer-notes-heading" x-data="{ noteOpen: false, showAllNotes: false }">
       <div class="customer-detail-card__head">
         <h2 id="customer-notes-heading" class="customer-detail-card__title"><i data-lucide="notebook-pen" aria-hidden="true"></i> یادداشت‌های داخلی</h2>
         <button type="button" class="customer-detail-card__action" @click="noteOpen = !noteOpen" :aria-expanded="noteOpen.toString()" aria-controls="customer-new-note-form">
@@ -155,7 +161,7 @@
       </div>
       <ul class="customer-detail-notes-list">
         {% for note in recent_notes %}
-        <li class="customer-detail-note">
+        <li class="customer-detail-note" {% if forloop.counter > 2 %}x-show="showAllNotes" x-cloak{% endif %}>
           <p class="customer-detail-note__body">{{ note.body }}</p>
           <p class="customer-detail-note__meta">{{ note.created_at|fa_jalali_datetime }}{% if note.author %} · {{ note.author }}{% endif %}</p>
         </li>
@@ -163,6 +169,12 @@
         <li class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="notebook-tabs" aria-hidden="true"></i><p>یادداشتی ثبت نشده است.</p></li>
         {% endfor %}
       </ul>
+      {% if recent_notes|length > 2 %}
+      <button type="button" class="customer-detail-expand" @click="showAllNotes = !showAllNotes" :aria-expanded="showAllNotes.toString()">
+        <span x-text="showAllNotes ? 'نمایش یادداشت‌های کمتر' : 'مشاهده همه یادداشت‌ها'">مشاهده همه یادداشت‌ها</span>
+        <i data-lucide="chevron-down" aria-hidden="true" :class="{ 'customer-detail-expand__chevron--up': showAllNotes }"></i>
+      </button>
+      {% endif %}
       <form id="customer-new-note-form" method="post" action="{% url 'customers:add_note' pk=customer.pk %}"
         class="customer-detail-note-form" x-show="noteOpen" x-cloak x-transition.opacity>
         {% csrf_token %}
@@ -175,26 +187,32 @@
 
   <div class="customer-detail-lower">
     {% if 'finance.reports' in membership_permissions %}
-    <section class="customer-detail-card customer-detail-payments" aria-labelledby="customer-payments-heading">
+    <section class="customer-detail-card customer-detail-payments" aria-labelledby="customer-payments-heading" x-data="{ showAllPayments: false }">
       <div class="customer-detail-card__head">
         <h2 id="customer-payments-heading" class="customer-detail-card__title"><i data-lucide="credit-card" aria-hidden="true"></i> سوابق پرداخت‌ها</h2>
       </div>
       {% if payments %}
       <ul class="customer-detail-pay-list">
         {% for p in payments %}
-        <li class="customer-detail-pay-row">
+        <li class="customer-detail-pay-row" {% if forloop.counter > 2 %}x-show="showAllPayments" x-cloak{% endif %}>
           <div class="customer-detail-pay-row__top"><span class="customer-detail-pay-row__amount">{{ p.paid_amount_toman|fa_money }} <small>تومان</small></span><span class="customer-detail-pay-row__status">{{ p.get_status_display }}</span></div>
           <span class="customer-detail-pay-row__date"><i data-lucide="calendar" aria-hidden="true"></i> {{ p.created_at|fa_jalali }}</span>
         </li>
         {% endfor %}
       </ul>
+      {% if payments|length > 2 %}
+      <button type="button" class="customer-detail-expand" @click="showAllPayments = !showAllPayments" :aria-expanded="showAllPayments.toString()">
+        <span x-text="showAllPayments ? 'نمایش پرداخت‌های کمتر' : 'مشاهده همه پرداخت‌ها'">مشاهده همه پرداخت‌ها</span>
+        <i data-lucide="chevron-down" aria-hidden="true" :class="{ 'customer-detail-expand__chevron--up': showAllPayments }"></i>
+      </button>
+      {% endif %}
       {% else %}
       <div class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="wallet" aria-hidden="true"></i><p>پرداختی ثبت نشده است.</p></div>
       {% endif %}
     </section>
     {% endif %}
 
-    <section class="customer-detail-card customer-detail-card--activity" aria-labelledby="customer-activity-heading">
+    <section class="customer-detail-card customer-detail-card--activity" aria-labelledby="customer-activity-heading" x-data="{ showAllActivities: false }">
       <details class="customer-detail-timeline" open>
         <summary class="customer-detail-timeline__summary" id="customer-activity-heading">
           <span class="customer-detail-card__title"><i data-lucide="activity" aria-hidden="true"></i> سابقهٔ فعالیت</span>
@@ -203,7 +221,7 @@
         <div class="customer-detail-timeline__body">
           <ol class="customer-detail-timeline__list">
             {% for act in activities %}
-            <li class="customer-detail-timeline__item">
+            <li class="customer-detail-timeline__item" {% if forloop.counter > 2 %}x-show="showAllActivities" x-cloak{% endif %}>
               <span class="customer-detail-timeline__dot" aria-hidden="true"></span>
               <p class="customer-detail-timeline__event">{{ act.title }}</p>
               <time class="customer-detail-timeline__date">{{ act.created_at|fa_jalali_datetime }}</time>
@@ -213,6 +231,12 @@
             <li class="customer-detail-empty">فعالیتی ثبت نشده است.</li>
             {% endfor %}
           </ol>
+          {% if activities|length > 2 %}
+          <button type="button" class="customer-detail-expand" @click="showAllActivities = !showAllActivities" :aria-expanded="showAllActivities.toString()">
+            <span x-text="showAllActivities ? 'نمایش فعالیت‌های کمتر' : 'مشاهده همه فعالیت‌ها'">مشاهده همه فعالیت‌ها</span>
+            <i data-lucide="chevron-down" aria-hidden="true" :class="{ 'customer-detail-expand__chevron--up': showAllActivities }"></i>
+          </button>
+          {% endif %}
         </div>
       </details>
     </section>
