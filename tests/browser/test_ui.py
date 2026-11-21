@@ -720,3 +720,78 @@ def test_customer_table_column_alignment_and_mobile_rows(live_server, client, ow
             assert first.evaluate("(el) => getComputedStyle(el).display") == "grid"
         context.close()
         browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(1366,640),(390,800)])
+def test_staff_directory_viewport_fit_and_pagination(live_server, client, owner_membership, width, height):
+    """Full desktop staff page balances both rows; small screens keep natural scrolling."""
+    from django.contrib.auth import get_user_model
+    from apps.salons.models import SalonMembership
+    from apps.staff.models import StaffProfile
+
+    salon = owner_membership.salon
+    for index in range(9):
+        user = get_user_model().objects.create_user(
+            phone=f"+98912567{index:04d}", full_name=f"متخصص نمایشی {index}"
+        )
+        membership = SalonMembership.objects.create(
+            salon=salon, user=user, role=SalonMembership.Role.SPECIALIST
+        )
+        StaffProfile.objects.create(
+            salon=salon, membership=membership,
+            display_name=f"متخصص زیبایی {index}", title="میکاپ و آرایش"
+        )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": width, "height": height}, locale="fa-IR",
+            reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name": settings.SESSION_COOKIE_NAME,
+            "value": cookie, "url": live_server.url,
+        }])
+        page = context.new_page()
+        page.goto(live_server.url + reverse("staff:list") + "?view=card", wait_until="load")
+        page.evaluate("document.fonts.ready")
+        board = page.locator(".staff-board-v2")
+        cards = board.locator(".staff-board-card")
+        pw.expect(cards).to_have_count(6)
+        pw.expect(board.locator(".staff-board-kpis .suite-kpi")).to_have_count(4)
+        pw.expect(board.locator(".staff-team-page__add")).to_be_visible()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3"), "staff directory horizontal overflow"
+        assert page.evaluate("getComputedStyle(document.querySelector('.staff-board-grid')).overflowY === 'visible'"), "staff grid nested scrollbar"
+        if width >= 1200:
+            assert board.evaluate("(el) => el.classList.contains('staff-board-v2--balanced')")
+            cols = cards.first.evaluate("(el) => getComputedStyle(el.parentElement).gridTemplateColumns.split(' ').length")
+            assert cols == 3
+            first = cards.first.bounding_box()
+            last = cards.last.bounding_box()
+            pager = board.locator(".staff-board-pagination").bounding_box()
+            assert first and last and pager
+            assert last["y"] + last["height"] <= pager["y"] + 3, "last staff row overlaps pagination"
+            assert pager["y"] + pager["height"] <= height + 2, "staff pagination off viewport"
+            assert 0 <= height - pager["y"] - pager["height"] <= 52, "excessive blank space below staff pagination"
+            assert cards.first.bounding_box()["height"] >= 150, "staff rows too short"
+        else:
+            assert cards.first.bounding_box()["height"] >= 150
+            assert board.locator(".staff-board-kpis").is_visible()
+        table_response = page.goto(
+            live_server.url + reverse("staff:list") + "?view=table",
+            wait_until="load",
+        )
+        assert table_response and table_response.status == 200
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+        if width >= 1200:
+            assert page.locator(".staff-board-v2--table-balanced").count() == 1
+            pager = page.locator(".staff-board-pagination").bounding_box()
+            assert pager and pager["y"] + pager["height"] <= height + 2
+        context.close()
+        browser.close()
