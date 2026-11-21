@@ -389,9 +389,17 @@
 }
 .staff-board-v2 .staff-board-card .staff-team-card__profile-link svg{width:17px;height:17px;stroke-width:1.6}
 .staff-board-v2 .staff-board-card .staff-team-card__profile-link:hover{background:#a47a70;color:#fff}
-.maison-app.management-suite .staff-board-v2 .suite-icon-action{width:36px;height:36px;border-radius:10px;background:#fffaf7;border-color:#e4d2c9;color:#97675e}
-.staff-board-v2 .suite-icon-action--label{width:auto;padding-inline:9px;gap:5px;font-size:.76rem;font-weight:650;display:flex;justify-content:center;align-items:center}
-.staff-board-v2 .suite-icon-action--label span{display:inline}
+.maison-app.management-suite .staff-board-v2 .suite-icon-action:not(.suite-icon-action--label){
+  width:36px;height:36px;min-width:36px;border-radius:10px;background:#fffaf7;border-color:#e4d2c9;color:#97675e
+}
+.maison-app.management-suite .staff-board-v2 .suite-icon-action.suite-icon-action--label{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  width:auto;min-width:max(36px,7.25rem);height:36px;min-height:36px;padding-inline:10px;
+  border-radius:10px;background:#fffaf7;border:1px solid #e4d2c9;color:#97675e;
+  font-size:.76rem;font-weight:650;line-height:1.2;white-space:nowrap;flex:none;text-decoration:none
+}
+.staff-board-v2 .suite-icon-action--label svg{width:16px;height:16px;stroke-width:1.65;flex:none}
+.staff-board-v2 .suite-icon-action--label span{display:inline;white-space:nowrap;line-height:1.2}
 .staff-board-v2 .suite-icon-action:hover{background:#f0e1db}
 .staff-board-v2 .suite-clear{white-space:nowrap;font-size:.72rem}
 .staff-board-v2 .suite-pagination{margin:0;padding:5px 0;color:var(--staff-muted)}
@@ -447,9 +455,11 @@
  .staff-board-v2 .staff-board-filters .staff-board-search input.input-field,
  .maison-app.management-suite .staff-board-v2 .staff-board-filters select.input-field{font-size:16px}
  .staff-board-v2 .staff-board-search__submit{height:36px;width:36px}
- .staff-board-v2 .suite-icon-action--label span{display:none}
- .staff-board-v2 .suite-icon-action--label{width:44px}
- .maison-app.management-suite .staff-board-v2 .suite-icon-action{height:44px;min-width:44px}
+ .maison-app.management-suite .staff-board-v2 .suite-icon-action:not(.suite-icon-action--label){height:44px;width:44px;min-width:44px}
+ .maison-app.management-suite .staff-board-v2 .suite-icon-action.suite-icon-action--label span{display:none}
+ .maison-app.management-suite .staff-board-v2 .suite-icon-action.suite-icon-action--label{
+  width:44px;min-width:44px;height:44px;min-height:44px;padding-inline:0;gap:0
+ }
  .maison-app.management-suite .staff-board-v2 .staff-board-card .staff-team-card__profile-link{min-height:44px}
 }
 @media(prefers-reduced-motion:reduce){
