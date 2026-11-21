@@ -417,14 +417,16 @@
    All notes remain available via native details; all chart series and figures remain visible. */
 .luna-finance-shell .finance-page .fin-insights-grid--minimal{
   grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);
-  align-items:start;
+  align-items:stretch;
   gap:9px;
 }
 .luna-finance-shell .finance-page .fin-insights-grid--minimal > .fin-panel{
-  align-self:start;
+  display:flex;
+  flex-direction:column;
+  align-self:stretch;
   min-width:0;
   min-height:0;
-  height:auto;
+  height:100%;
   padding:10px 12px;
   gap:6px;
   border-radius:12px;
@@ -442,6 +444,7 @@
 }
 .luna-finance-shell .finance-page .fin-insight-panel--trend .fin-empty{
   display:flex;
+  flex:1 1 auto;
   flex-direction:row;
   align-items:center;
   justify-content:center;
@@ -458,7 +461,11 @@
   flex:0 0 auto;
 }
 .luna-finance-shell .finance-page .fin-insight-panel--trend .fin-trend{
+  flex:1 1 auto;
   min-height:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
 }
 .luna-finance-shell .finance-page .fin-insight-panel--trend .fin-trend svg{
   height:75px;
@@ -469,6 +476,7 @@
 }
 .luna-finance-shell .finance-page .fin-insight-panel--mix .fin-method-layout{
   display:grid;
+  flex:1 1 auto;
   grid-template-columns:92px minmax(0,1fr);
   align-items:center;
   gap:12px;
@@ -511,6 +519,10 @@
 .luna-finance-shell .finance-page .fin-insight-panel--mix .fin-line :is(span,bdi){
   min-width:0;
   overflow-wrap:anywhere;
+}
+.luna-finance-shell .finance-page .fin-insights-grid--minimal > .fin-panel .fin-insight-caveat,
+.luna-finance-shell .finance-page .fin-insights-grid--minimal > .fin-panel .fin-chart-details{
+  margin-top:auto;
 }
 .luna-finance-shell .finance-page .fin-insight-caveat{
   min-width:0;
