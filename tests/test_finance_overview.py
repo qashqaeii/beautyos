@@ -148,7 +148,7 @@ def test_finance_dashboard_paginates_and_uses_real_scoped_trends(client, owner_m
     assert response.context["payment_page"].paginator.count == 6
     assert len(response.context["payments"]) == 5
     assert "خارج از سالن" not in response.content.decode()
-    assert "beautyos-finance-hero.webp" in response.content.decode()
+    assert "finance-hero-approved.webp" in response.content.decode()
     assert finders.find("images/photos/beautyos-finance-hero.webp")
     response = client.get(reverse("finance:overview"), {"page": 2})
     assert len(response.context["payments"]) == 1
@@ -181,7 +181,7 @@ def test_finance_premium_hero_uses_local_art_and_preserves_all_financial_tabs(cl
         html = response.content.decode()
         assert html.count("<h1") == 1
         assert "finance-page__header--premium" in html
-        assert "finance-rose-dashboard.svg" in html
+        assert "finance-hero-approved.webp" in html
         assert "finance-premium-header.css" in html
         assert "beautyos-finance-hero.webp" not in html
         assert "درآمد، هزینه‌ها، تسویه متخصصان و سود سالن" in html
@@ -190,11 +190,11 @@ def test_finance_premium_hero_uses_local_art_and_preserves_all_financial_tabs(cl
         if tab != "debts":
             assert 'finance-page__range-bar' in html
 
-    art_path = finders.find("images/finance-rose-dashboard.svg")
+    art_path = finders.find("images/finance-hero-approved.webp")
     style_path = finders.find("css/finance-premium-header.css")
     assert art_path is not None and style_path is not None
-    svg_content = Path(art_path).read_text(encoding="utf-8")
-    assert "<svg " in svg_content and "</svg>" in svg_content
+    art_content = Path(art_path).read_bytes()
+    assert art_content[:4] == b"RIFF" and art_content[8:12] == b"WEBP"
     styles = Path(style_path).read_text(encoding="utf-8")
     assert "finance-page--dashboard" in styles
     assert "@media(max-width:720px)" in styles

@@ -154,6 +154,13 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 assert not external, f"external runtime requests {external}"
                 assert not broken, f"broken static assets {broken}"
                 assert not js_errors, f"JavaScript exceptions {js_errors}"
+                if name == "finance":
+                    header = page.locator(".finance-page__header--premium")
+                    pw.expect(header).to_be_visible()
+                    pw.expect(header.get_by_role("heading", name="مدیریت مالی")).to_be_visible()
+                    art = header.locator(".luna-finance-hero-art img")
+                    assert art.evaluate("(img) => img.complete && img.naturalWidth > 0"), "approved finance illustration missing"
+                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3"), "finance horizontal viewport overflow"
                 if name == "customers":
                     # Directory must never nest a vertical scroller or clip customer cards.
                     assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"
