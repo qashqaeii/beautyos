@@ -61,7 +61,11 @@ def test_staff_card_pagination_and_real_appointment_counts(client,salon,owner_me
     assert result.context["directory_stats"]["today"]==1
     assert result.context["staff_list"][0].month_count==1
     assert len(client.get(reverse("staff:list"),{"page":2}).context["staff_list"])==1
-    assert len(client.get(reverse("staff:list"),{"view":"table"}).context["staff_list"])==7
+    table_first = client.get(reverse("staff:list"), {"view": "table"})
+    table_second = client.get(reverse("staff:list"), {"view": "table", "page": 2})
+    assert len(table_first.context["staff_list"]) == 6
+    assert len(table_second.context["staff_list"]) == 1
+    assert table_first.context["staff_page"].paginator.count == 7
 
 
 @pytest.mark.django_db
