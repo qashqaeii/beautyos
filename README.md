@@ -21,7 +21,7 @@ npm run build:css
 $env:DJANGO_SETTINGS_MODULE="config.settings.local"
 python manage.py migrate
 python manage.py seed_demo --scenario full
-python manage.py seed_demo_salon --reset   # women's demo salon (demo-salon-a only)
+python manage.py seed_realistic_salon --reset   # professional sample data (slug: atiye-noor)
 python manage.py runserver
 ```
 
@@ -63,7 +63,8 @@ pytest
 | PHASE 1 Foundation | تکمیل |
 | PHASE 2 CRM | تکمیل (لیست، پروفایل، یادداشت، تگ، آرشیو) |
 | PHASE 3–6 | MVP هسته (خدمات، کارکنان، نوبت، مالی، عمومی/رزرو، پیگیری) — نسخه اولیه |
-| Demo | `seed_demo` — slugs: `demo-salon-a`, `demo-barber-b` · `--scenario full\|minimal\|busy-day\|empty` · `--reset-demo` · `--dry-run` |
+| Sample data | `seed_realistic_salon --reset` — slug `atiye-noor` (بدون برچسب دمو) |
+| Demo (legacy) | `seed_demo` — slugs: `demo-salon-a`, `demo-barber-b` · فقط با `ALLOW_DEMO_SEED` |
 
 ## فاز ۶ — آماده‌سازی انتشار
 

@@ -1,0 +1,1 @@
+"""Production-style sample data for local showcases (no demo markers)."""

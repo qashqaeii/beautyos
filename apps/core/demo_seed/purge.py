@@ -37,6 +37,11 @@ def _iter_salon_scoped_models():
             yield model
 
 
+def flush_salon_tenant_data(salon: Salon) -> dict[str, int]:
+    """Delete all tenant rows for one salon; keep the salon record."""
+    return _flush_salon_scoped_data(salon)
+
+
 def _flush_salon_scoped_data(salon: Salon) -> dict[str, int]:
     deleted: dict[str, int] = {}
     models = list(_iter_salon_scoped_models())

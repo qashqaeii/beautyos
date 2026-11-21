@@ -2,6 +2,7 @@ from .base import *  # noqa: F403
 
 DEBUG = True
 ALLOW_DEMO_SEED = True
+ALLOW_SAMPLE_SEED = True
 BEAUTYOS_DEMO_GRANT_PHONE = "09357930033"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
