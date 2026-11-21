@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
@@ -24,17 +26,21 @@ class Command(BaseCommand):
         parser.add_argument("--dry-run", action="store_true", help="Print plan without writing")
 
     def handle(self, *args, **options):
-        # Demo data must be impossible to create against a non-debug deployment,
-        # even if an old ALLOW_DEMO_SEED environment variable is accidentally set.
-        # The local settings module enables the explicit opt-in for development.
+        # Require an explicit settings opt-in outside production. pytest-django
+        # turns DEBUG off, so DEBUG alone is not a reliable environment guard.
+        # The legacy raw ALLOW_DEMO_SEED environment variable grants no access.
+        module = (
+            os.environ.get("DJANGO_SETTINGS_MODULE")
+            or getattr(settings, "SETTINGS_MODULE", None)
+            or ""
+        )
         allowed = (
-            settings.DEBUG is True
-            and getattr(settings, "ALLOW_DEMO_SEED", False) is True
-            and not getattr(settings, "SETTINGS_MODULE", "").endswith(".production")
+            getattr(settings, "ALLOW_DEMO_SEED", False) is True
+            and not module.endswith(".production")
         )
         if not allowed:
             raise CommandError(
-                "seed_demo is disabled in production. Use DEBUG/ALLOW_DEMO_SEED only on isolated demo hosts."
+                "seed_demo is disabled in production. Use ALLOW_DEMO_SEED=True in non-production settings only."
             )
 
         scenario = options["scenario"]
