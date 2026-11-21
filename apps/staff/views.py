@@ -90,7 +90,8 @@ def _staff_list_context(
         and (not status or (status == "bookable" and s.directory_bookable)
             or (status == "unbookable" and s.directory_active and not s.directory_bookable)
             or (status == "inactive" and not s.directory_active))]
-    page = Paginator(filtered, 6 if view_mode == "card" else 12).get_page(request.GET.get("page"))
+    # Keep the default desktop table inside the first viewport; remaining rows use pagination.
+    page = Paginator(filtered, 6 if view_mode == "card" else 8).get_page(request.GET.get("page"))
     if form is None:
         form = StaffInviteForm()
     return {

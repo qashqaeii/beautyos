@@ -5,10 +5,13 @@
 {% block page_title %}{% endblock %}
 {% block page_subtitle %}{% endblock %}
 {% block page_actions %}{% endblock %}
+{% block page_styles_after_suite %}
+<link rel="stylesheet" href="{% static 'css/staff-viewport.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
 
 {% block content %}
 <div
-  class="staff-team-page staff-board-v2"
+  class="staff-team-page staff-board-v2{% if view_mode == 'card' and staff_list|length >= 4 %} staff-board-v2--balanced{% elif view_mode == 'table' and staff_list|length >= 6 %} staff-board-v2--table-balanced{% endif %}"
   {% if can_add_staff %}
   x-data="{
     createOpen: {{ create_modal_open|yesno:'true,false' }},
@@ -76,7 +79,7 @@
   {% if staff_list %}
     {% if view_mode == 'table' %}
     <div class="staff-team-page__content staff-team-page__content--table">
-      <div class="maison-table-wrap staff-team-table dashboard-enter">
+      <div class="maison-table-wrap staff-team-table dashboard-enter" tabindex="0" role="region" aria-label="جدول متخصصان">
         <table class="maison-table">
           <thead>
             <tr>
@@ -124,7 +127,7 @@
       </div>
     </div>
     {% else %}
-    <div class="staff-team-page__content staff-team-grid staff-board-grid dashboard-enter">
+    <div class="staff-team-page__content staff-team-grid staff-board-grid dashboard-enter" tabindex="0" role="region" aria-label="کارت‌های متخصصان">
       {% for s in staff_list %}
       <article class="staff-team-card suite-staff-card staff-board-card" style="--staff-card-index: {{ forloop.counter0 }};">
         <header class="staff-team-card__identity">
@@ -157,7 +160,7 @@
   </div>
   {% endif %}
 
-  {% include "partials/suite_pagination.html" with pager=staff_page %}
+  <div class="staff-board-pagination">{% include "partials/suite_pagination.html" with pager=staff_page %}</div>
   {% if can_add_staff %}
   {% include "staff/partials/staff_create_modal.html" %}
   {% endif %}
