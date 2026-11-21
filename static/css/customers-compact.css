@@ -1,0 +1,455 @@
+/* BeautyOS customer directory: compact, mobile-first, independently scrollable list.
+   Scoped only to /customers/. No global sidebar, form, or modal changes. */
+.maison-app.management-suite .customers-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+  padding-block: 0 4px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__header {
+  flex: 0 0 auto;
+  min-height: 75px;
+  padding: 10px 13px;
+  gap: 9px;
+  margin: 0;
+  border-radius: 13px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__headline {
+  max-width: min(70%, 400px);
+  gap: 9px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__head-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__head-icon :is(svg,i) {
+  width: 18px;
+  height: 18px;
+}
+.maison-app.management-suite .customers-list-page .editorial-directory-copy > h1 {
+  font-size: 17px;
+  line-height: 1.45;
+}
+.maison-app.management-suite .customers-list-page .editorial-directory-copy > p {
+  font-size: 10px;
+  line-height: 1.55;
+}
+.maison-app.management-suite .customers-list-page .customers-hero__art {
+  height: 104px;
+  width: min(37%, 330px);
+  inset-inline-end: 19%;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__add {
+  min-width: 102px;
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 11px;
+  border-radius: 9px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__workspace {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  gap: 8px;
+  padding: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__controls.suite-filter-bar {
+  display: grid;
+  flex: 0 0 auto;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  grid-template-areas: "meta search" "segments segments";
+  align-items: center;
+  gap: 7px 12px;
+  padding: 8px 11px;
+  margin: 0;
+  border-radius: 12px;
+  min-width: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__controls-top {
+  grid-area: meta;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__summary {
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: nowrap;
+  gap: 4px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__search-form {
+  grid-area: search;
+  width: 100%;
+  min-width: 0;
+  flex: none;
+  margin: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__search-wrap {
+  min-width: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__controls.suite-filter-bar .customers-list-page__search {
+  height: 36px;
+  min-height: 36px;
+  font-size: 11px;
+  line-height: 34px;
+  border-radius: 9px;
+  padding-inline: 11px 36px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__segments {
+  grid-area: segments;
+  width: 100%;
+  min-width: 0;
+  flex: none;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  overflow-x: auto;
+  padding: 0 0 1px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__segments::-webkit-scrollbar { display: none; }
+.maison-app.management-suite .customers-list-page .customers-list-page__segment {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 4px 9px;
+  font-size: 10px;
+  border-radius: 8px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.maison-app.management-suite .customers-list-page .list-view-switch {
+  padding: 2px;
+  border-radius: 8px;
+}
+.maison-app.management-suite .customers-list-page .list-view-switch__btn {
+  min-width: 31px;
+  min-height: 31px;
+  padding: 4px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__results {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  gap: 7px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  grid-auto-rows: max-content;
+  align-content: start;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  gap: 7px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  gap: 5px;
+  padding: 8px 9px;
+  border-radius: 11px;
+  transition: border-color .18s ease, background .18s ease;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card:hover {
+  border-color: #cfa89f;
+  background: #fffdfb;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card:focus-visible {
+  outline: 3px solid #b6857b;
+  outline-offset: -3px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__identity { gap: 8px; }
+.maison-app.management-suite .customers-list-page .customers-list-card__avatar {
+  height: 35px;
+  width: 35px;
+  border-width: 1px;
+  border-radius: 50%;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__copy {
+  min-width: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__name {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__phone {
+  font-size: 10px;
+  line-height: 1.45;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__stats {
+  padding: 4px 0 0;
+  gap: 0;
+  margin: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__stat dt {
+  font-size: 10px;
+  line-height: 1.45;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__stat dd {
+  margin-top: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__unit {
+  font-size: 9px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-card__cta {
+  flex: 0 0 auto;
+  min-height: 28px;
+  margin: 0;
+  padding: 3px 7px;
+  border-radius: 7px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.maison-app.management-suite .customers-list-page .customers-list-table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: 100%;
+  margin: 0;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__pagination {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0;
+  padding: 6px 0 0;
+  min-height: 38px;
+  border-top: 1px solid #eaddd6;
+  font-size: 11px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__pagination :is(a,button) {
+  min-height: 29px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+.maison-app.management-suite .customers-list-page .customers-list-page__empty,
+.maison-app.management-suite .customers-list-page .customers-list-page__empty-filter {
+  min-height: 0;
+  overflow: auto;
+}
+/* At normal browser heights, keep the customer directory inside the app viewport.
+   The list is the ONLY vertical scroller; pagination stays discoverable. */
+@media (min-height: 600px) {
+  html:has(.maison-app.management-suite .customers-list-page) {
+    height: 100%;
+    overflow: hidden;
+  }
+  .maison-app.management-suite:has(.customers-list-page) {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .maison-app.management-suite:has(.customers-list-page) > .maison-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .maison-app.management-suite:has(.customers-list-page) > .maison-main > .maison-content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .maison-app.management-suite .customers-list-page {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .maison-app.management-suite .customers-list-page :is(.customers-list-grid,.customers-list-table-wrap) {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-grid {
+    overflow-x: hidden;
+  }
+}
+@media (min-width: 768px) {
+  .maison-app.management-suite .customers-list-page .customers-list-grid {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .maison-app.management-suite .customers-list-page .customers-list-grid {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+  }
+}
+@media (max-width: 767px) {
+  .maison-app.management-suite .customers-list-page .customers-list-page__controls.suite-filter-bar {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "meta" "search" "segments";
+    gap: 6px;
+    padding: 7px 9px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__search-wrap {
+    flex-basis: auto;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__summary {
+    font-size: 10px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__segments {
+    padding-block: 0;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__segment {
+    min-height: 30px;
+    padding-inline: 8px;
+    font-size: 10px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-grid {
+    grid-template-columns: minmax(0,1fr);
+    gap: 6px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    grid-template-areas: "identity action" "stats stats";
+    align-items: center;
+    gap: 5px 8px;
+    padding: 7px 10px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__identity {
+    grid-area: identity;
+    min-width: 0;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__stats {
+    grid-area: stats;
+    display: grid;
+    padding-top: 3px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__cta {
+    grid-area: action;
+    min-width: 90px;
+    width: auto;
+    padding: 6px 8px;
+    min-height: 34px;
+    font-size: 10px;
+    margin: 0;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__stat {
+    text-align: right;
+    padding-inline: 6px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__stat dt,
+  .maison-app.management-suite .customers-list-page .customers-list-card__stat dd {
+    display: inline;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__stat dd {
+    font-weight: 720;
+    margin-inline-start: 3px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__stat + .customers-list-card__stat {
+    border-inline-start: 1px solid #ecddd5;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__pagination {
+    min-height: 35px;
+  }
+}
+@media (max-width: 639px) {
+  .maison-app.management-suite .customers-list-page { gap: 6px; }
+  .maison-app.management-suite .customers-list-page .customers-list-page__header {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    min-height: 68px;
+    padding: 9px 10px;
+    gap: 7px;
+    border-radius: 11px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__headline {
+    flex: 1 1 auto;
+    max-width: none;
+    gap: 7px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__head-icon {
+    width: 32px;
+    height: 32px;
+  }
+  .maison-app.management-suite .customers-list-page .editorial-directory-copy > h1 {
+    font-size: 15px;
+  }
+  .maison-app.management-suite .customers-list-page .editorial-directory-copy > p {
+    display: none;
+  }
+  .maison-app.management-suite .customers-list-page .customers-hero__art {
+    inset-inline-end: 20%;
+    top: 50%;
+    width: 44%;
+    height: 84px;
+    opacity: .26;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__add {
+    width: auto;
+    min-width: 102px;
+    min-height: 40px;
+    padding: 8px 9px;
+    justify-content: center;
+    font-size: 11px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__name {
+    font-size: 12px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__phone {
+    font-size: 10px;
+  }
+  .maison-app.management-suite .customers-list-page .list-view-switch__btn {
+    min-width: 34px;
+    min-height: 34px;
+  }
+}
+@media (max-width: 350px) {
+  .maison-app.management-suite .customers-list-page .customers-list-page__header {
+    min-height: 65px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__add {
+    min-width: 92px;
+    padding-inline: 5px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-card__cta {
+    min-width: 72px;
+  }
+}
+@media (max-height: 599px) {
+  /* Landscape phones and accessibility zoom must never trap content. */
+  .maison-app.management-suite .customers-list-page {
+    padding-bottom: 12px;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-grid {
+    overflow: visible;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .maison-app.management-suite .customers-list-page .customers-list-card { transition: none; }
+}
