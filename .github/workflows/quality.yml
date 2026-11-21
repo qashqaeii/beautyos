@@ -48,6 +48,19 @@ jobs:
       - run: python manage.py check
       - run: python manage.py makemigrations --check --dry-run
       - run: python manage.py migrate --noinput
+      - name: Production configuration and release preflight
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.production
+          SECRET_KEY: ci-release-placeholder-Xj4q9Lf3D8ty6Nb2Kr7Y0p5ZW1d3V8a9Me7Q2s4A
+          ALLOWED_HOSTS: beautyos.example.invalid
+          CSRF_TRUSTED_ORIGINS: https://beautyos.example.invalid
+          BEAUTYOS_SMS_PROVIDER: apps.accounts.sms.KavenegarOTPProvider
+          BEAUTYOS_KAVENEGAR_API_KEY: ci-only-no-messages-sent
+          BEAUTYOS_KAVENEGAR_SENDER: ci-only
+          BEAUTYOS_AUTOMATION_SEND_ENABLED: "False"
+        run: |
+          python manage.py collectstatic --noinput
+          python manage.py release_check
       - run: python -m compileall -q apps config tests
       - name: Check JavaScript syntax
         run: find static/js -name '*.js' -not -path '*/vendor/*' -print0 | xargs -0 -n 1 node --check
