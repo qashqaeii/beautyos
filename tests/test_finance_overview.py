@@ -164,3 +164,38 @@ def test_finance_empty_does_not_invent_change_or_sparklines(client, owner_member
     assert response.context["presentation"]["comparison"] is None
     assert not any(response.context["presentation"]["series"].values())
     assert response.context["payment_page"].paginator.count == 0
+
+
+@pytest.mark.django_db
+def test_finance_premium_hero_uses_local_art_and_preserves_all_financial_tabs(client, owner_membership):
+    from pathlib import Path
+    from django.contrib.staticfiles import finders
+
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    for tab in ("income", "cash", "commissions", "debts", "reports"):
+        response = client.get(reverse("finance:overview"), {"tab": tab})
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert html.count("<h1") == 1
+        assert "finance-page__header--premium" in html
+        assert "finance-rose-dashboard.svg" in html
+        assert "finance-premium-header.css" in html
+        assert "beautyos-finance-hero.webp" not in html
+        assert "درآمد، هزینه‌ها، تسویه متخصصان و سود سالن" in html
+        assert 'class="finance-page__tabs finance-phase2-tabs"' in html
+        assert ("finance-page--dashboard" in html) == (tab == "income")
+        if tab != "debts":
+            assert 'finance-page__range-bar' in html
+
+    art_path = finders.find("images/finance-rose-dashboard.svg")
+    style_path = finders.find("css/finance-premium-header.css")
+    assert art_path is not None and style_path is not None
+    svg_content = Path(art_path).read_text(encoding="utf-8")
+    assert "<svg " in svg_content and "</svg>" in svg_content
+    styles = Path(style_path).read_text(encoding="utf-8")
+    assert "finance-page--dashboard" in styles
+    assert "@media(max-width:720px)" in styles
+    assert "overflow:visible" in styles
