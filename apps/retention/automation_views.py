@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 from apps.audit.models import AuditLog
 from apps.retention.automation import prepare_automation
 from apps.retention.models import AutomationMessage,AutomationPolicy
+from apps.retention.transport import ready
 from apps.salons.decorators import salon_required
 from apps.salons.models import Salon,SalonSettings
 from apps.salons.permissions_policy import P_MARKETING_MANAGE,require_permission
@@ -17,6 +18,9 @@ class AutomationForm(forms.Form):
     reminder_enabled=forms.BooleanField(label="یادآوری نوبت تأییدشده (۲۴ ساعت قبل)",required=False)
     birthday_enabled=forms.BooleanField(label="تبریک روز تولد شمسی",required=False)
     winback_enabled=forms.BooleanField(label="دعوت به مراجعه پس از ۶۰ روز",required=False)
+    confirmation_enabled=forms.BooleanField(label="پیام تأیید نوبت",required=False)
+    cancellation_enabled=forms.BooleanField(label="پیام لغو نوبت",required=False)
+    daily_marketing_cap=forms.IntegerField(label="سقف پیام‌های تبلیغاتی در ۲۴ ساعت",min_value=1,max_value=500,initial=30,required=False)
 
 
 @salon_required
@@ -25,7 +29,7 @@ class AutomationForm(forms.Form):
 def automation(request):
     salon=request.salon
     policy=AutomationPolicy.scoped(salon).first()
-    values={key:getattr(policy,key,False) for key in AutomationForm.base_fields}
+    values={key:getattr(policy,key,30 if key=="daily_marketing_cap" else False) for key in AutomationForm.base_fields}
     action=request.POST.get("action")
     form=AutomationForm(request.POST if action=="save" else None,initial=values)
     if request.method=="POST":
@@ -33,7 +37,10 @@ def automation(request):
             with transaction.atomic():
                 Salon.objects.select_for_update(no_key=True).get(pk=salon.pk)
                 row,_=AutomationPolicy.objects.get_or_create(salon=salon)
-                for key,value in form.cleaned_data.items():setattr(row,key,value)
+                for key,value in form.cleaned_data.items():
+                    if key=="daily_marketing_cap" and value is None:
+                        continue
+                    setattr(row,key,value)
                 row.save()
                 AuditLog.objects.create(salon=salon,actor=request.user,action=AuditLog.Action.UPDATE,
                     entity_type="automation_policy",entity_id=str(row.pk),message="تنظیم اتوماسیون سالن",metadata=form.cleaned_data)
@@ -46,4 +53,7 @@ def automation(request):
     qs=AutomationMessage.scoped(salon)
     counts={row["status"]:row["count"] for row in qs.values("status").annotate(count=Count("pk"))}
     return render(request,"retention/automation.html",{"form":form,"settings":SalonSettings.objects.filter(salon=salon).first(),
-        "pending":counts.get("pending",0),"skipped":counts.get("skipped",0),"rows":qs.select_related("customer").order_by("-pk")[:60]})
+        "pending":counts.get("pending",0),"skipped":counts.get("skipped",0),
+        "accepted":counts.get("accepted",0),"delivered":counts.get("delivered",0),
+        "failed":counts.get("failed",0),"unknown":counts.get("unknown",0)+counts.get("claimed",0),
+        "transport_ready":ready(),"rows":qs.select_related("customer").order_by("-pk")[:60]})

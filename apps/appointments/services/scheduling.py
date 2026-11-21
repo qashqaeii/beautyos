@@ -101,6 +101,10 @@ def create_appointment(
         status=status or Appointment.Status.CONFIRMED,
     )
 
+    if appt.status == Appointment.Status.CONFIRMED:
+        from apps.retention.automation import queue_appointment_event
+        queue_appointment_event(appt, "confirmation")
+
     from apps.customers.models import CustomerActivity
     from apps.customers.services import log_activity
 

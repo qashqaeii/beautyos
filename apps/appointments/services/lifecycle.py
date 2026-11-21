@@ -78,5 +78,7 @@ def cancel_appointment(*, salon, appointment_id: int) -> Appointment:
     if had_completed:
         appt.completed_at = None
     appt.save(update_fields=["status", "cancelled_at", "completed_at", "updated_at"])
+    from apps.retention.automation import queue_appointment_event
+    queue_appointment_event(appt, "cancellation")
     refresh_customer_stats(appt.customer)
     return appt

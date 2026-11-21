@@ -158,6 +158,11 @@ BEAUTYOS_SMS_PROVIDER = env(
     "BEAUTYOS_SMS_PROVIDER",
     default="apps.accounts.sms.DevSMSProvider",
 )
+# A separate, fail-closed gateway for customer communications (never OTP).
+BEAUTYOS_AUTOMATION_SEND_ENABLED = env.bool("BEAUTYOS_AUTOMATION_SEND_ENABLED", default=False)
+BEAUTYOS_KAVENEGAR_API_KEY = env("BEAUTYOS_KAVENEGAR_API_KEY", default="")
+BEAUTYOS_KAVENEGAR_SENDER = env("BEAUTYOS_KAVENEGAR_SENDER", default="")
+
 
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)

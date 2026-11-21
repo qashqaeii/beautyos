@@ -51,6 +51,7 @@ class Campaign(TenantModelMixin, TimeStampedModel):
     class Status(models.TextChoices):
         DRAFT = "draft", "پیش‌نویس"
         PREPARED = "prepared", "مخاطبان آماده"
+        SCHEDULED = "scheduled", "زمان‌بندی‌شده"
         CANCELLED = "cancelled", "لغوشده"
     title = models.CharField(max_length=100)
     segment = models.CharField(max_length=16,choices=Segment.choices)
@@ -58,6 +59,7 @@ class Campaign(TenantModelMixin, TimeStampedModel):
     status = models.CharField(max_length=16,choices=Status.choices,default=Status.DRAFT)
     request_key = models.UUIDField()
     prepared_at = models.DateTimeField(null=True,blank=True)
+    scheduled_at = models.DateTimeField(null=True,blank=True)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["salon","request_key"],name="retention_campaign_request")]
@@ -76,6 +78,9 @@ class AutomationPolicy(TenantModelMixin, TimeStampedModel):
     reminder_enabled = models.BooleanField(default=False)
     birthday_enabled = models.BooleanField(default=False)
     winback_enabled = models.BooleanField(default=False)
+    confirmation_enabled = models.BooleanField(default=False)
+    cancellation_enabled = models.BooleanField(default=False)
+    daily_marketing_cap = models.PositiveSmallIntegerField(default=30)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["salon"],name="retention_one_automation_policy")]
@@ -85,13 +90,18 @@ class AutomationMessage(TenantModelMixin, TimeStampedModel):
     customer = models.ForeignKey("customers.Customer",on_delete=models.PROTECT,related_name="automation_messages")
     appointment = models.ForeignKey("appointments.Appointment",on_delete=models.PROTECT,null=True,blank=True,related_name="automation_messages")
     followup = models.ForeignKey("retention.FollowUp",on_delete=models.PROTECT,null=True,blank=True,related_name="automation_messages")
-    kind = models.CharField(max_length=16,choices=[("reminder","یادآوری نوبت"),("birthday","تبریک تولد"),("winback","دعوت به مراجعه")])
+    campaign_recipient = models.ForeignKey("retention.CampaignRecipient",on_delete=models.PROTECT,null=True,blank=True,related_name="automation_messages")
+    kind = models.CharField(max_length=16,choices=[("reminder","یادآوری نوبت"),("birthday","تبریک تولد"),("winback","دعوت به مراجعه"),("confirmation","تأیید نوبت"),("cancellation","لغو نوبت"),("campaign","کمپین")])
     source_key = models.CharField(max_length=100)
     text = models.CharField(max_length=480)
     due_at = models.DateTimeField()
     expires_at = models.DateTimeField()
-    status = models.CharField(max_length=12,choices=[("pending","آماده ارسال"),("skipped","صرف‌نظر شده")],default="pending")
+    status = models.CharField(max_length=12,choices=[("pending","آماده ارسال"),("claimed","در حال ارسال"),("accepted","پذیرفته‌شده"),("delivered","تحویل‌شده"),("failed","ناموفق"),("unknown","نامشخص"),("skipped","صرف‌نظر شده")],default="pending")
     reason = models.CharField(max_length=120,blank=True)
+    attempted_at = models.DateTimeField(null=True,blank=True)
+    last_checked_at = models.DateTimeField(null=True,blank=True)
+    provider_message_id = models.CharField(max_length=64,blank=True)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["salon","kind","source_key"],name="retention_unique_automation_source")]
+        indexes = [models.Index(fields=["status","due_at"],name="retention_send_due_idx")]
