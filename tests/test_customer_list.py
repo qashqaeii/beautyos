@@ -117,7 +117,7 @@ def test_customer_table_column_partitions_rtl_and_phone_isolation(client, owner_
     session["active_salon_id"] = str(salon.id)
     session.save()
 
-    response = client.get(reverse("customers:list"), {"segment": "active", "view": "table"})
+    response = client.get(reverse("customers:list"), {"view": "table"})
     assert response.status_code == 200
     body = response.content.decode()
     assert '<table class="customers-list-table" dir="rtl">' in body
