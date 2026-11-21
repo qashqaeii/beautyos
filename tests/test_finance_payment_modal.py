@@ -114,3 +114,37 @@ def test_payment_rejects_inconsistent_amount_or_status(salon, discount, paid, st
     form = PaymentForm({"customer":customer.pk, "total_amount_toman":100,
         "discount_toman":discount, "paid_amount_toman":paid,"method":"cash","status":status}, salon=salon)
     assert not form.is_valid()
+
+
+@pytest.mark.django_db
+def test_payment_modal_amounts_have_no_deposit_hint_and_stable_grid_styles(
+    client, owner_membership, salon
+):
+    from pathlib import Path
+    from django.contrib.staticfiles import finders
+
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+
+    response = client.get(reverse("finance:overview"), {
+        "tab": "cash", "range": "today", "payment": "1",
+    })
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert 'id="finance-payment-create-form"' in html
+    assert "finance-payment-form__fields--amounts" in html
+    assert "برای نوبت دارای بیعانه" not in html
+    for name in ("total_amount_toman", "discount_toman", "paid_amount_toman"):
+        assert f'name="{name}"' in html
+    assert "finance-payment-form__fields--meta" in html
+    assert "finance-payment-modal-title" in html
+
+    css_path = finders.find("css/luna-modals.css")
+    assert css_path
+    css = Path(css_path).read_text(encoding="utf-8")
+    assert "Customer payment modal — isolated grid system" in css
+    assert "finance-payment-form__fields > .finance-payment-form__field" in css
+    assert "grid-template-columns:repeat(3,minmax(0,1fr))" in css
+    assert "@media(max-width:639px)" in css

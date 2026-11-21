@@ -796,3 +796,46 @@ def test_staff_directory_viewport_fit_and_pagination(live_server, client, owner_
             assert pager and pager["y"] + pager["height"] <= height + 2
         context.close()
         browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(1366,768),(390,800)])
+def test_finance_payment_modal_amount_partition_alignment(
+    live_server, client, owner_membership, width, height,
+):
+    """Payment amount inputs share a baseline on desktop and stack cleanly on phones."""
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": width, "height": height}, locale="fa-IR",
+            reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name": settings.SESSION_COOKIE_NAME, "value": cookie,
+            "url": live_server.url,
+        }])
+        page = context.new_page()
+        page.goto(live_server.url + reverse("finance:overview")
+                  + "?tab=cash&range=today&payment=1", wait_until="load")
+        dialog = page.get_by_role("dialog", name="ثبت پرداخت مشتری")
+        pw.expect(dialog).to_be_visible()
+        amounts = dialog.locator(".finance-payment-form__fields--amounts")
+        fields = amounts.locator(":scope > .finance-payment-form__field")
+        pw.expect(fields).to_have_count(3)
+        assert "برای نوبت دارای بیعانه" not in dialog.inner_text()
+        boxes = [field.locator("input").bounding_box() for field in fields.all()]
+        assert all(boxes)
+        if width >= 640:
+            assert max(b["y"] for b in boxes) - min(b["y"] for b in boxes) <= 3, "amount fields do not align"
+            assert max(b["width"] for b in boxes) - min(b["width"] for b in boxes) <= 3, "unequal amount widths"
+        else:
+            assert boxes[0]["y"] < boxes[1]["y"] < boxes[2]["y"], "mobile amounts not stacked"
+        assert dialog.evaluate("(el) => el.scrollWidth <= el.clientWidth + 2"), "payment modal overflows horizontally"
+        context.close()
+        browser.close()
