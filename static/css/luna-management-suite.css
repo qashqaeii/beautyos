@@ -304,18 +304,46 @@
   margin:0;padding:8px;border:1px solid var(--staff-line);border-radius:14px;
   background:#f8ece6aa;box-shadow:0 2px 9px #7254470c
 }
-.staff-board-v2 .staff-board-filters{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:nowrap;min-width:0}
-.maison-app.management-suite .staff-board-v2 .staff-board-filters :is(input[type=search],select){
-  min-height:39px;height:39px;border:1px solid #e4d0c7;border-radius:10px;background:#fffaf7;
-  color:var(--staff-ink);font-size:.82rem;box-shadow:0 1px 3px #57423709;transition:border-color .18s ease,box-shadow .18s ease
+.staff-board-v2 .staff-board-filters{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:nowrap;min-width:0;--staff-filter-h:42px}
+.staff-board-v2 .staff-board-filters .staff-board-search input.input-field,
+.maison-app.management-suite .staff-board-v2 .staff-board-filters select.input-field{
+  box-sizing:border-box;min-height:var(--staff-filter-h);height:var(--staff-filter-h);margin:0;
+  border:1px solid #e4d0c7;border-radius:10px;background-color:#fffaf7;color:var(--staff-ink);
+  font-size:.82rem;line-height:calc(var(--staff-filter-h) - 2px);box-shadow:0 1px 3px #57423709;
+  transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease
 }
-.staff-board-v2 .staff-board-filters :is(input[type=search],select):focus{border-color:#b48a7e;outline:none;box-shadow:0 0 0 3px #a67e7330}
-.staff-board-v2 .staff-board-filters select{flex:0 1 172px;max-width:185px;min-width:115px;padding-inline:12px 24px}
+.staff-board-v2 .staff-board-filters .staff-board-search input.input-field{
+  width:100%;min-width:0;padding-block:0;padding-inline:12px 44px;text-align:right;direction:rtl
+}
+.maison-app.management-suite .staff-board-v2 .staff-board-filters select.input-field{
+  flex:0 1 178px;width:auto;max-width:200px;min-width:128px;padding-block:0;
+  padding-inline:12px 2.5rem;text-align:right;direction:rtl;cursor:pointer;
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2392675f' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:left 10px center;background-size:16px 16px;
+  white-space:nowrap;text-overflow:ellipsis;overflow:hidden
+}
+.staff-board-v2 .staff-board-filters .staff-board-search input.input-field:focus,
+.maison-app.management-suite .staff-board-v2 .staff-board-filters select.input-field:focus{
+  border-color:#b48a7e;outline:none;box-shadow:0 0 0 3px #a67e7330
+}
+@media(hover:hover) and (pointer:fine){
+ .staff-board-v2 .staff-board-filters .staff-board-search input.input-field:hover,
+ .maison-app.management-suite .staff-board-v2 .staff-board-filters select.input-field:hover{
+  border-color:#d4b8ad;background-color:#fffdfb
+ }
+ .maison-app.management-suite .staff-board-v2 .staff-board-filters select.input-field:hover{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2384564a' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+ }
+}
+.staff-board-v2 .staff-board-filters select.input-field:active{background-color:#fff6f1}
+.staff-board-v2 .staff-board-filters select.input-field option{
+  direction:rtl;text-align:right;color:var(--staff-ink);background:#fffaf7
+}
 .staff-board-v2 .staff-board-filters .staff-board-search{position:relative;min-width:0;flex:1 1 250px}
-.maison-app.management-suite .staff-board-v2 .staff-board-search input{width:100%;padding-inline-start:12px;padding-inline-end:44px;min-width:0}
 .staff-board-v2 .staff-board-search__submit{
-  position:absolute;inset-inline-end:4px;inset-block:4px;display:grid;place-items:center;
-  width:32px;height:31px;border-radius:8px;color:#92675f;transition:background .16s ease,color .16s ease
+  position:absolute;inset-inline-end:3px;top:50%;transform:translateY(-50%);display:grid;place-items:center;
+  width:36px;height:36px;border-radius:8px;color:#92675f;transition:background .16s ease,color .16s ease
 }
 .staff-board-v2 .staff-board-search__submit svg{width:19px;height:19px;stroke-width:1.8}
 .staff-board-v2 .staff-board-search__submit:hover{background:#f1e0d8;color:#68463d}
@@ -367,15 +395,15 @@
 .staff-board-v2 .suite-icon-action:hover{background:#f0e1db}
 .staff-board-v2 .suite-clear{white-space:nowrap;font-size:.72rem}
 .staff-board-v2 .suite-pagination{margin:0;padding:5px 0;color:var(--staff-muted)}
-/* Apply a single quiet input language to management searches, not finance. */
-.maison-app.management-suite :is(.suite-filter-form .input-field,.customers-list-page__search,.inventory-page__filters .input-field,.loyalty-search-form__input){
+/* Apply a single quiet input language to management searches, not finance. Staff board toolbar is styled separately. */
+.maison-app.management-suite :is(.suite-filter-form:not(.staff-board-filters) .input-field,.customers-list-page__search,.inventory-page__filters .input-field,.loyalty-search-form__input){
   border:1px solid #e4d0c7;border-radius:10px;background:#fffaf7;color:#514139;box-shadow:none;
   transition:border-color .18s ease,box-shadow .18s ease
 }
-.maison-app.management-suite :is(.suite-filter-form .input-field,.customers-list-page__search,.inventory-page__filters .input-field,.loyalty-search-form__input):focus{
+.maison-app.management-suite :is(.suite-filter-form:not(.staff-board-filters) .input-field,.customers-list-page__search,.inventory-page__filters .input-field,.loyalty-search-form__input):focus{
   border-color:#b38b7e;outline:0;box-shadow:0 0 0 3px #ad82792a
 }
-.maison-app.management-suite :is(.suite-filter-form select,.inventory-page__filters select){border-radius:10px}
+.maison-app.management-suite :is(.suite-filter-form:not(.staff-board-filters) select,.inventory-page__filters select){border-radius:10px}
 /* Motion is deliberately understated; keyboard and reduced-motion remain first-class. */
 @keyframes staff-board-fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 .maison-app.management-suite .staff-board-v2 .staff-team-page__header,
@@ -392,7 +420,7 @@
  .maison-app.management-suite .staff-board-v2 .staff-board-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
  .staff-board-v2 .staff-board-filters{flex-wrap:wrap}
  .staff-board-v2 .staff-board-filters .staff-board-search{flex:1 1 100%}
- .staff-board-v2 .staff-board-filters select{flex:1 1 160px;max-width:none}
+ .staff-board-v2 .staff-board-filters select.input-field{flex:1 1 160px;max-width:none;min-width:0}
 }
 @container management-content (max-width:570px){
  .maison-app.management-suite .staff-board-v2{gap:8px}
@@ -406,7 +434,7 @@
  .staff-board-v2 .staff-board-kpis .suite-kpi strong{font-size:1.2rem}
  .maison-app.management-suite .staff-board-v2 .staff-board-toolbar{flex-wrap:wrap;align-items:stretch;padding:7px}
  .staff-board-v2 .staff-board-filters{flex:1 1 100%}
- .staff-board-v2 .staff-board-filters select{min-width:0;flex:1 1 125px}
+ .staff-board-v2 .staff-board-filters select.input-field{min-width:0;flex:1 1 calc(50% - 4px);max-width:none}
  .maison-app.management-suite .staff-board-v2 .list-view-switch{margin-inline-start:auto}
  .staff-board-v2 .staff-board-card{padding:10px;min-height:145px}
  .staff-board-v2 .staff-board-card .staff-team-card__stat dt{font-size:.69rem}
@@ -415,7 +443,9 @@
  .maison-app.management-suite .staff-board-v2 .staff-board-card .staff-team-avatar{width:43px;height:43px}
  .staff-board-v2 .staff-board-card .staff-team-card__name{font-size:.87rem}
  .staff-board-v2 .staff-board-card .staff-team-badge{font-size:.61rem;padding:4px 5px}
- .staff-board-v2 .staff-board-filters :is(input[type=search],select){min-height:44px;height:44px;font-size:16px}
+ .staff-board-v2 .staff-board-filters{--staff-filter-h:44px}
+ .staff-board-v2 .staff-board-filters .staff-board-search input.input-field,
+ .maison-app.management-suite .staff-board-v2 .staff-board-filters select.input-field{font-size:16px}
  .staff-board-v2 .staff-board-search__submit{height:36px;width:36px}
  .staff-board-v2 .suite-icon-action--label span{display:none}
  .staff-board-v2 .suite-icon-action--label{width:44px}
