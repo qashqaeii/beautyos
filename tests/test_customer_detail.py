@@ -239,7 +239,8 @@ def test_customer_detail_booking_cta_loads_modal_with_customer_locked(client, sa
     initial_html = initial.content.decode()
     assert f'href="{path}?book=1"' in initial_html
     assert "appointments/partials/appointment_booking_modal.html" not in initial_html
-    assert 'data-appt-booking-form' not in initial_html
+    # Match the rendered form attribute, not the JavaScript selector string.
+    assert '\n  data-appt-booking-form\n' not in initial_html
 
     opened = client.get(path + "?book=1")
     assert opened.status_code == 200
