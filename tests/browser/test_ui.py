@@ -245,6 +245,8 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
             except Exception as exc:
                 errors.append(f"{width}/{dialog_id}: {exc}")
         modal(reverse("staff:detail",args=[staff.pk]),"a.staff-profile-header__btn[href*='book=1']","رزرو نوبت")
+        # Booking from a customer profile loads the form on demand, then opens a real modal.
+        modal(reverse("customers:detail",args=[customer.pk]),"a.customer-detail-header__btn[href*='book=1']","رزرو نوبت")
         try:
             page.goto(live_server.url+"/app/",wait_until="load")
             if width<1024:
