@@ -18,10 +18,12 @@ def release_findings():
         findings.append("DEBUG must be disabled.")
     if settings.SETTINGS_MODULE != "config.settings.production":
         findings.append("DJANGO_SETTINGS_MODULE must be config.settings.production.")
+    # Browser HSTS preloading is an optional, domain-level commitment.
+    # Do not silently force preload for every tenant/subdomain.
     findings += [
         str(item)
         for item in run_checks(include_deployment_checks=True)
-        if item.level >= WARNING
+        if item.level >= WARNING and item.id != "security.W021"
     ]
     try:
         connection = connections["default"]
