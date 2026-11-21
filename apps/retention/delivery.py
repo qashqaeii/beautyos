@@ -23,7 +23,7 @@ def _claim(message_id, now):
     with transaction.atomic():
         salon = Salon.objects.select_for_update().get(pk=salon_id)
         row = (AutomationMessage.scoped(salon).select_for_update()
-               .select_related("salon", "customer", "appointment", "followup", "campaign_recipient__campaign")
+               .select_related("salon", "customer")
                .filter(pk=message_id).first())
         if not row or row.status != "pending" or row.due_at > now:
             return None
