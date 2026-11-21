@@ -38,3 +38,23 @@ def test_customer_list_filter_empty_state(client, owner_membership, salon):
     response = client.get(reverse("customers:list"), {"q": "ناموجود"})
     assert response.status_code == 200
     assert "نتیجه‌ای یافت نشد" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_customer_list_uses_local_customer_network_hero_without_changing_create_flow(
+    client, owner_membership, salon
+):
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+
+    response = client.get(reverse("customers:list"))
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert 'customers-list-page__header customers-hero' in html
+    assert "customers-network-hero.svg" in html
+    assert "customers-hero.css" in html
+    assert 'class="customers-hero__art" aria-hidden="true"' in html
+    assert 'customers-list-page__add btn-primary' in html
+    assert "customer-create-modal-title" in html

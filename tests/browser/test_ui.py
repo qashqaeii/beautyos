@@ -154,7 +154,14 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 assert not external, f"external runtime requests {external}"
                 assert not broken, f"broken static assets {broken}"
                 assert not js_errors, f"JavaScript exceptions {js_errors}"
-                if name in {"home","login","overview","management","reception","calendar","customer-detail","staff-detail","services","finance","packages","inventory","loyalty","storefront"}:
+                if name == "customers":
+                    hero = page.locator(".customers-list-page__header")
+                    art = hero.locator(".customers-hero__art img")
+                    pw.expect(art).to_be_visible()
+                    assert art.evaluate("(img) => img.complete && img.naturalWidth > 0"), "customer hero illustration not loaded"
+                    assert hero.evaluate("(el) => getComputedStyle(el, '::before').display === 'none'"), "shared flower hero still visible"
+                    pw.expect(hero.locator(".customers-list-page__add")).to_be_visible()
+                if name in {"home","login","overview","management","reception","calendar","customers","customer-detail","staff-detail","services","finance","packages","inventory","loyalty","storefront"}:
                     page.screenshot(path=str(ARTIFACT/f"{width}-{name}.png"),animations="disabled")
             except Exception as exc:
                 errors.append(f"{width}/{name}: {exc}")
