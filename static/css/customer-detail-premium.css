@@ -580,7 +580,50 @@
 .maison-app.management-suite .customer-detail-page .customer-detail-columns { grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); }
 .maison-app.management-suite .customer-detail-page .customer-detail-lower {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: start;
+  align-items: stretch;
+}
+/* Equal desktop panels, with no sideways scrolling inside RTL activity history. */
+.maison-app.management-suite .customer-detail-page .customer-detail-lower > .customer-detail-card {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 190px;
+  height: 100%;
+  align-self: stretch;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity,
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-timeline,
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-timeline__body {
+  min-width: 0;
+  max-width: 100%;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-timeline__body {
+  overflow-x: clip;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-timeline__list {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  direction: rtl;
+  text-align: right;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-timeline__item,
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-timeline__item :is(p, time) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  text-align: right;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-timeline__description {
+  line-height: 1.75;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-pay-list {
+  min-width: 0;
+  max-width: 100%;
 }
 .maison-app.management-suite .customer-detail-page .customer-detail-card {
   min-width: 0;
@@ -693,12 +736,19 @@
   .maison-app.management-suite .customer-detail-page .customer-detail-lower {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .maison-app.management-suite .customer-detail-page .customer-detail-card--preferences { grid-column: 1 / -1; }
+  .maison-app.management-suite .customer-detail-page .customer-detail-card--preferences {
+    grid-column: 1 / -1;
+    min-height: 0;
+  }
   .maison-app.management-suite .customer-detail-page .customer-detail-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 850px) {
   .maison-app.management-suite .customer-detail-page .customer-detail-columns { grid-template-columns: minmax(0, 1fr); }
   .maison-app.management-suite .customer-detail-page .customer-detail-lower { grid-template-columns: minmax(0, 1fr); }
+  .maison-app.management-suite .customer-detail-page .customer-detail-lower > .customer-detail-card {
+    min-height: 0;
+    height: auto;
+  }
   .maison-app.management-suite .customer-detail-page .customer-detail-card--preferences { grid-column: auto; }
   .maison-app.management-suite .customer-detail-page .customer-detail-header__actions { width: auto; }
 }
