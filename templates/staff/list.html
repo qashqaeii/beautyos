@@ -66,9 +66,9 @@
         <button type="submit" class="staff-board-search__submit" aria-label="جست‌وجو" title="جست‌وجو"><i data-lucide="search" aria-hidden="true"></i></button>
       </div>
       <label class="sr-only" for="staff-status">وضعیت متخصص</label>
-      <select id="staff-status" class="input-field" name="status" onchange="this.form.submit()"><option value="">همه وضعیت‌ها</option><option value="bookable" {% if status == 'bookable' %}selected{% endif %}>قابل رزرو</option><option value="unbookable" {% if status == 'unbookable' %}selected{% endif %}>غیرقابل رزرو</option><option value="inactive" {% if status == 'inactive' %}selected{% endif %}>غیرفعال</option></select>
+      <select id="staff-status" class="input-field" name="status" aria-label="وضعیت متخصص" onchange="this.form.submit()"><option value="">همه وضعیت‌ها</option><option value="bookable" {% if status == 'bookable' %}selected{% endif %}>قابل رزرو</option><option value="unbookable" {% if status == 'unbookable' %}selected{% endif %}>غیرقابل رزرو</option><option value="inactive" {% if status == 'inactive' %}selected{% endif %}>غیرفعال</option></select>
       <label class="sr-only" for="staff-specialty">تخصص</label>
-      <select id="staff-specialty" class="input-field" name="specialty" onchange="this.form.submit()"><option value="">همه تخصص‌ها</option>{% for title in specialties %}<option value="{{ title }}" {% if specialty == title %}selected{% endif %}>{{ title }}</option>{% endfor %}</select>
+      <select id="staff-specialty" class="input-field" name="specialty" aria-label="تخصص" onchange="this.form.submit()"><option value="">همه تخصص‌ها</option>{% for title in specialties %}<option value="{{ title }}" {% if specialty == title %}selected{% endif %}>{{ title }}</option>{% endfor %}</select>
       {% if q or status or specialty %}<a class="suite-clear" href="{% url 'staff:list' %}?view={{ view_mode }}">پاک کردن فیلتر</a>{% endif %}
     </form>
     {% include "partials/list_view_toggle.html" %}
