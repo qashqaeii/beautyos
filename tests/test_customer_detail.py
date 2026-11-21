@@ -193,3 +193,30 @@ def test_customer_detail_frequent_services_excludes_other_customers(client, salo
     body = response.content.decode()
     assert "خدمت مخصوص مشتری دیگر" not in body
     assert "پس از ثبت خدمات انجام‌شده نمایش داده می‌شود." in body
+
+
+@pytest.mark.django_db
+def test_customer_detail_compact_notes_keep_all_records_accessible(client, salon, owner_membership):
+    customer = Customer.objects.create(
+        salon=salon, full_name="مشتری با یادداشت‌های متعدد", phone="+989121555562"
+    )
+    for index in range(3):
+        CustomerNote.objects.create(
+            salon=salon,
+            customer=customer,
+            author=owner_membership.user,
+            body=f"یادداشت شماره {index + 1}",
+        )
+
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+    response = client.get(reverse("customers:detail", kwargs={"pk": customer.pk}))
+    assert response.status_code == 200
+    body = response.content.decode()
+    for index in range(3):
+        assert f"یادداشت شماره {index + 1}" in body
+    assert 'x-show="showAllNotes" x-cloak' in body
+    assert 'showAllNotes = !showAllNotes' in body
+    assert 'مشاهده همه یادداشت‌ها' in body
