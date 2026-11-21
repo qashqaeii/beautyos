@@ -122,13 +122,19 @@
       {% if page.object_list %}
         {% if view_mode == 'table' %}
         <div class="customers-list-table-wrap dashboard-enter" tabindex="0" role="region" aria-label="جدول مشتریان">
-          <table class="customers-list-table">
+          <table class="customers-list-table" dir="rtl">
+            <colgroup>
+              <col class="customers-list-table__col--name">
+              <col class="customers-list-table__col--phone">
+              <col class="customers-list-table__col--visits">
+              <col class="customers-list-table__col--action">
+            </colgroup>
             <thead>
               <tr>
                 <th scope="col">نام مشتری</th>
                 <th scope="col" class="customers-list-table__hide-sm">شماره موبایل</th>
                 <th scope="col">مراجعات</th>
-                <th scope="col"><span class="sr-only">پروفایل</span></th>
+                <th scope="col" class="customers-list-table__action-head">عملیات</th>
               </tr>
             </thead>
             <tbody>
@@ -140,11 +146,11 @@
                     {% if c.is_vip %}<span class="customers-list-card__vip">VIP</span>{% endif %}
                   </div>
                 </td>
-                <td class="customers-list-table__phone customers-list-table__hide-sm" data-label="شماره موبایل" dir="ltr">{{ c.phone }}</td>
+                <td class="customers-list-table__phone customers-list-table__hide-sm" data-label="شماره موبایل"><bdi class="customers-list-table__phone-value" dir="ltr">{{ c.phone }}</bdi></td>
                 <td class="customers-list-table__visits" data-label="مراجعات">
                   <span class="customers-list-table__visits-num">{{ c.total_visits|fa_num }}</span>
                 </td>
-                <td class="customers-list-table__action">
+                <td class="customers-list-table__action" data-label="عملیات">
                   <a href="{% url 'customers:detail' pk=c.pk %}" class="customers-list-table__profile-link">
                     <span>پروفایل</span>
                     <i data-lucide="chevron-left" class="customers-list-table__profile-icon" aria-hidden="true"></i>

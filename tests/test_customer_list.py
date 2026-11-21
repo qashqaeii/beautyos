@@ -102,3 +102,36 @@ def test_customer_directory_compact_layout_preserves_pagination_and_filters(
     assert "overflow: hidden;" not in css
     assert "overflow: visible;" in css
     assert "@media (max-width: 639px)" in css
+
+
+@pytest.mark.django_db
+def test_customer_table_column_partitions_rtl_and_phone_isolation(client, owner_membership, salon):
+    from pathlib import Path
+    from django.contrib.staticfiles import finders
+
+    customer = Customer.objects.create(
+        salon=salon, full_name="مشتری ویژه با نام طولانی", phone="+989121234567"
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+
+    response = client.get(reverse("customers:list"), {"segment": "active", "view": "table"})
+    assert response.status_code == 200
+    body = response.content.decode()
+    assert '<table class="customers-list-table" dir="rtl">' in body
+    assert '<colgroup>' in body
+    for col in ("name", "phone", "visits", "action"):
+        assert f'customers-list-table__col--{col}' in body
+    assert 'class="customers-list-table__action-head">عملیات</th>' in body
+    assert 'class="customers-list-table__phone-value" dir="ltr"' in body
+    assert "مشتری ویژه با نام طولانی" in body
+    assert f'/customers/{customer.pk}/' in body
+
+    css_path = finders.find("css/customers-compact.css")
+    assert css_path is not None
+    css = Path(css_path).read_text(encoding="utf-8")
+    assert "table-layout: fixed" in css
+    assert "justify-content: flex-start" in css
+    assert "@media (max-width: 900px)" in css

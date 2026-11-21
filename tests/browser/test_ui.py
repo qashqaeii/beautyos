@@ -668,3 +668,54 @@ def test_services_premium_catalog_layout_and_create_modal(
         pw.expect(page.get_by_role("dialog", name="افزودن خدمت")).to_be_visible()
         context.close()
         browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width", [1366, 820, 390])
+def test_customer_table_column_alignment_and_mobile_rows(live_server, client, owner_membership, width):
+    """Headers, phone numbers, visits, and actions stay in their own RTL tracks."""
+    from apps.customers.models import Customer
+
+    salon = owner_membership.salon
+    Customer.objects.create(salon=salon, full_name="مشتری ویژه برای بررسی جدول", phone="+989121222333")
+    Customer.objects.create(salon=salon, full_name="نام کوتاه", phone="+989121222334")
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(viewport={"width": width, "height": 790}, locale="fa-IR")
+        context.add_cookies([{"name": settings.SESSION_COOKIE_NAME, "value": cookie, "url": live_server.url}])
+        page = context.new_page()
+        page.goto(live_server.url + reverse("customers:list") + "?view=table", wait_until="load")
+        page.evaluate("document.fonts.ready")
+        table = page.locator(".customers-list-table")
+        rows = table.locator("tbody tr")
+        assert rows.count() >= 2
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3"), "customer table overflows viewport"
+        first = rows.first
+        assert first.locator(".customers-list-table__phone-value").get_attribute("dir") == "ltr"
+        pw.expect(first.locator(".customers-list-table__profile-link")).to_be_visible()
+        if width > 900:
+            assert table.evaluate("(el) => getComputedStyle(el).tableLayout") == "fixed"
+            for col in range(4):
+                th = table.locator("thead th").nth(col).bounding_box()
+                td = first.locator("td").nth(col).bounding_box()
+                assert th and td
+                assert abs(th["x"] - td["x"]) <= 2, f"column {col} header/body left edges diverged"
+                assert abs(th["width"] - td["width"]) <= 2, f"column {col} header/body widths diverged"
+            name = first.locator(".customers-list-table__name").bounding_box()
+            phone = first.locator(".customers-list-table__phone").bounding_box()
+            visits = first.locator(".customers-list-table__visits").bounding_box()
+            action = first.locator(".customers-list-table__action").bounding_box()
+            assert name["x"] > phone["x"] > visits["x"] > action["x"], "RTL column order incorrect"
+        else:
+            assert table.evaluate("(el) => getComputedStyle(el).display") == "block"
+            assert table.locator("thead").evaluate("(el) => getComputedStyle(el).display") == "none"
+            assert first.locator(".customers-list-table__phone").is_visible()
+            assert first.evaluate("(el) => getComputedStyle(el).display") == "grid"
+        context.close()
+        browser.close()
