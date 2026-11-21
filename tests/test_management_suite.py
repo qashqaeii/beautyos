@@ -62,3 +62,23 @@ def test_staff_card_pagination_and_real_appointment_counts(client,salon,owner_me
     assert result.context["staff_list"][0].month_count==1
     assert len(client.get(reverse("staff:list"),{"page":2}).context["staff_list"])==1
     assert len(client.get(reverse("staff:list"),{"view":"table"}).context["staff_list"])==7
+
+
+@pytest.mark.django_db
+def test_staff_reference_board_is_data_driven_and_accessible(client,salon,owner_membership):
+    from apps.staff.models import StaffProfile
+    from apps.services.models import Service
+    profile,_=StaffProfile.objects.get_or_create(salon=salon,membership=owner_membership)
+    service=Service.objects.create(salon=salon,name="کراتین",price_toman=1200000)
+    profile.services.add(service)
+    client.force_login(owner_membership.user)
+    response=client.get(reverse("staff:list"))
+    assert response.status_code==200
+    markup=response.content.decode()
+    assert 'staff-board-v2' in markup
+    assert 'aria-label="جست‌وجوی متخصص"' in markup
+    assert 'aria-label="وضعیت متخصص"' in markup
+    assert 'aria-label="تخصص"' in markup
+    assert markup.count('class="suite-kpi"')==4
+    assert 'خدمت' in markup and 'نوبت امروز' in markup
+    assert 'ساعات کاری' in markup and 'ویرایش' in markup

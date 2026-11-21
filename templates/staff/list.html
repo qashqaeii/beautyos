@@ -8,7 +8,7 @@
 
 {% block content %}
 <div
-  class="staff-team-page"
+  class="staff-team-page staff-board-v2"
   {% if can_add_staff %}
   x-data="{
     createOpen: {{ create_modal_open|yesno:'true,false' }},
@@ -38,9 +38,9 @@
   <header class="staff-team-page__header">
     <div class="staff-team-page__headline">
       <span class="staff-team-page__head-icon" aria-hidden="true">
-        <i data-lucide="users" class="staff-team-page__lucide"></i>
+        <i data-lucide="users-round" class="staff-team-page__lucide"></i>
       </span>
-      <div class="editorial-directory-copy"><h1 class="staff-team-page__title">تیم سالن</h1><p>متخصصان، خدمات و وضعیت رزروپذیری</p></div>
+      <div class="editorial-directory-copy"><h1 class="staff-team-page__title">تیم سالن</h1><p>مدیریت متخصصان، خدمات و وضعیت رزروها</p></div>
     </div>
     {% if can_add_staff %}
     <button type="button" class="staff-team-page__add btn-primary" @click="createOpen = true">
@@ -50,20 +50,26 @@
     {% endif %}
   </header>
 
-  <section class="suite-kpis" aria-label="خلاصه تیم سالن">
+
+  <section class="suite-kpis staff-board-kpis" aria-label="خلاصه تیم سالن">
     <article class="suite-kpi"><span class="suite-icon"><i data-lucide="users-round" aria-hidden="true"></i></span><div><small>کل متخصصان</small><strong>{{ directory_stats.total|fa_num }}</strong></div></article>
-    <article class="suite-kpi"><span class="suite-icon suite-icon--sage"><i data-lucide="user-round-check" aria-hidden="true"></i></span><div><small>متخصص فعال</small><strong>{{ directory_stats.active|fa_num }}</strong></div></article>
-    <article class="suite-kpi"><span class="suite-icon"><i data-lucide="calendar-check" aria-hidden="true"></i></span><div><small>نوبت امروز</small><strong>{{ directory_stats.today|fa_num }}</strong></div></article>
-    <article class="suite-kpi"><span class="suite-icon"><i data-lucide="scissors" aria-hidden="true"></i></span><div><small>خدمت فعال تیم</small><strong>{{ directory_stats.services|fa_num }}</strong></div></article>
-    <article class="suite-kpi"><span class="suite-icon suite-icon--sage"><i data-lucide="calendar-clock" aria-hidden="true"></i></span><div><small>قابل رزرو</small><strong>{{ directory_stats.bookable|fa_num }}</strong></div></article>
+    <article class="suite-kpi"><span class="suite-icon suite-icon--sage"><i data-lucide="user-round-check" aria-hidden="true"></i></span><div><small>متخصصان فعال</small><strong>{{ directory_stats.active|fa_num }}</strong></div></article>
+    <article class="suite-kpi"><span class="suite-icon"><i data-lucide="calendar-check" aria-hidden="true"></i></span><div><small>رزروهای امروز</small><strong>{{ directory_stats.today|fa_num }}</strong></div></article>
+    <article class="suite-kpi"><span class="suite-icon suite-icon--sage"><i data-lucide="calendar-clock" aria-hidden="true"></i></span><div><small>متخصصان قابل رزرو</small><strong>{{ directory_stats.bookable|fa_num }}</strong></div></article>
   </section>
-  <div class="staff-team-page__toolbar suite-toolbar">
-    <form method="get" class="suite-filter-form" role="search">
+
+  <div class="staff-team-page__toolbar suite-toolbar staff-board-toolbar">
+    <form method="get" class="suite-filter-form staff-board-filters" role="search">
       <input type="hidden" name="view" value="{{ view_mode }}">
-      <label class="suite-search"><i data-lucide="search" aria-hidden="true"></i><input class="input-field" type="search" name="q" value="{{ q }}" placeholder="جست‌وجوی متخصص یا خدمت" aria-label="جست‌وجوی متخصص"></label>
-      <select class="input-field" name="status" aria-label="وضعیت متخصص" onchange="this.form.submit()"><option value="">همه وضعیت‌ها</option><option value="bookable" {% if status == 'bookable' %}selected{% endif %}>قابل رزرو</option><option value="unbookable" {% if status == 'unbookable' %}selected{% endif %}>غیرقابل رزرو</option><option value="inactive" {% if status == 'inactive' %}selected{% endif %}>غیرفعال</option></select>
-      <select class="input-field" name="specialty" aria-label="تخصص" onchange="this.form.submit()"><option value="">همه تخصص‌ها</option>{% for title in specialties %}<option {% if specialty == title %}selected{% endif %}>{{ title }}</option>{% endfor %}</select>
-      <button class="btn-secondary" type="submit">جست‌وجو</button>{% if q or status or specialty %}<a class="suite-clear" href="{% url 'staff:list' %}?view={{ view_mode }}">پاک کردن</a>{% endif %}
+      <div class="suite-search staff-board-search">
+        <input class="input-field" type="search" name="q" value="{{ q }}" placeholder="جست‌وجوی متخصص، تخصص یا خدمت..." aria-label="جست‌وجوی متخصص" autocomplete="off">
+        <button type="submit" class="staff-board-search__submit" aria-label="جست‌وجو" title="جست‌وجو"><i data-lucide="search" aria-hidden="true"></i></button>
+      </div>
+      <label class="sr-only" for="staff-status">وضعیت متخصص</label>
+      <select id="staff-status" class="input-field" name="status" onchange="this.form.submit()"><option value="">همه وضعیت‌ها</option><option value="bookable" {% if status == 'bookable' %}selected{% endif %}>قابل رزرو</option><option value="unbookable" {% if status == 'unbookable' %}selected{% endif %}>غیرقابل رزرو</option><option value="inactive" {% if status == 'inactive' %}selected{% endif %}>غیرفعال</option></select>
+      <label class="sr-only" for="staff-specialty">تخصص</label>
+      <select id="staff-specialty" class="input-field" name="specialty" onchange="this.form.submit()"><option value="">همه تخصص‌ها</option>{% for title in specialties %}<option value="{{ title }}" {% if specialty == title %}selected{% endif %}>{{ title }}</option>{% endfor %}</select>
+      {% if q or status or specialty %}<a class="suite-clear" href="{% url 'staff:list' %}?view={{ view_mode }}">پاک کردن فیلتر</a>{% endif %}
     </form>
     {% include "partials/list_view_toggle.html" %}
   </div>
@@ -118,16 +124,23 @@
       </div>
     </div>
     {% else %}
-    <div class="staff-team-page__content staff-team-grid dashboard-enter">
+    <div class="staff-team-page__content staff-team-grid staff-board-grid dashboard-enter">
       {% for s in staff_list %}
-      <article class="staff-team-card suite-staff-card">
-        <div class="staff-team-card__identity">
-          {% if s.avatar %}<img src="{{ s.avatar.url }}" alt="" class="staff-team-avatar" width="52" height="52" loading="lazy">{% else %}<span class="staff-team-avatar staff-team-avatar--placeholder" aria-hidden="true">{{ s.initials }}</span>{% endif %}
+      <article class="staff-team-card suite-staff-card staff-board-card" style="--staff-card-index: {{ forloop.counter0 }};">
+        <header class="staff-team-card__identity">
+          {% if s.avatar %}<img src="{{ s.avatar.url }}" alt="" class="staff-team-avatar" width="54" height="54" loading="lazy">{% else %}<span class="staff-team-avatar staff-team-avatar--placeholder" aria-hidden="true">{{ s.initials }}</span>{% endif %}
           <div class="staff-team-card__copy"><h2 class="staff-team-card__name">{{ s.full_display_name }}</h2><p class="staff-team-card__role">{{ s.title|default:s.membership.get_role_display }}</p></div>
           {% if s.directory_bookable %}<span class="staff-team-badge staff-team-badge--ok">قابل رزرو</span>{% elif not s.directory_active %}<span class="staff-team-badge staff-team-badge--muted">غیرفعال</span>{% else %}<span class="staff-team-badge staff-team-badge--muted">غیرقابل رزرو</span>{% endif %}
+        </header>
+        <dl class="staff-team-card__stats">
+          <div class="staff-team-card__stat"><dt><i data-lucide="calendar-days" aria-hidden="true"></i>نوبت امروز</dt><dd>{{ s.today_count|fa_num }}</dd></div>
+          <div class="staff-team-card__stat"><dt><i data-lucide="layers-2" aria-hidden="true"></i>خدمت</dt><dd>{{ s.service_count|fa_num }}</dd></div>
+        </dl>
+        <div class="suite-card-actions">
+          <a href="{% url 'staff:detail' pk=s.pk %}" class="staff-team-card__profile-link"><i data-lucide="user-round" aria-hidden="true"></i>مشاهده پروفایل</a>
+          <a class="suite-icon-action suite-icon-action--label" href="{% url 'staff:detail' pk=s.pk %}?edit=1" aria-label="ویرایش {{ s.full_display_name }}"><i data-lucide="pencil" aria-hidden="true"></i><span>ویرایش</span></a>
+          <a class="suite-icon-action" href="{% url 'staff:hours' pk=s.pk %}" title="ساعات کاری" aria-label="ساعات کاری {{ s.full_display_name }}"><i data-lucide="clock" aria-hidden="true"></i></a>
         </div>
-        <dl class="staff-team-card__stats"><div class="staff-team-card__stat"><dt>نوبت امروز</dt><dd><i data-lucide="calendar-days" aria-hidden="true"></i>{{ s.today_count|fa_num }}</dd></div></dl>
-        <div class="suite-card-actions"><a href="{% url 'staff:detail' pk=s.pk %}" class="staff-team-card__profile-link">مشاهده پروفایل<i data-lucide="chevron-left" class="staff-team-card__profile-icon" aria-hidden="true"></i></a><a class="suite-icon-action" href="{% url 'staff:detail' pk=s.pk %}?edit=1" aria-label="ویرایش {{ s.full_display_name }}" title="ویرایش پروفایل"><i data-lucide="pencil" aria-hidden="true"></i></a><a class="suite-icon-action" href="{% url 'staff:hours' pk=s.pk %}" title="ساعات کاری" aria-label="ساعات کاری {{ s.full_display_name }}"><i data-lucide="clock" aria-hidden="true"></i></a></div>
       </article>
       {% endfor %}
     </div>

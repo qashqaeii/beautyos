@@ -260,3 +260,169 @@
  .maison-app.management-suite .hours-layout .hours-day{min-height:39px;padding-block:4px}
  .maison-app.management-suite .hours-layout .staff-hours-week-list{gap:2px}
 }
+
+
+/* Staff board V3 — approved BeautyOS Editorial Rose reference; scoped to this page. */
+.maison-app.management-suite .staff-board-v2{
+  --staff-paper:#fffaf7;--staff-ink:#4f3a33;--staff-muted:#806b63;--staff-line:#e9d9d1;--staff-accent:#a67c73;
+  display:grid;align-content:start;gap:10px;padding-bottom:16px
+}
+.maison-app.management-suite .staff-board-v2 .staff-team-page__header{
+  min-height:98px;margin:0;padding:15px 18px;border-radius:18px;
+  border-color:#ead6cd;background:linear-gradient(105deg,#eed9ce 0%,#fbf1ec 63%,#fff8f4 100%);
+  box-shadow:0 3px 13px #6b4b3c09
+}
+.maison-app.management-suite .staff-board-v2 .staff-team-page__header::before{
+  width:54%;opacity:.97;background-image:url("../images/photos/beautyos-finance-hero.webp");
+  background-position:left center;background-size:cover;
+  mask-image:linear-gradient(to right,#000 2%,#000 26%,transparent 100%);
+  -webkit-mask-image:linear-gradient(to right,#000 2%,#000 26%,transparent 100%)
+}
+.maison-app.management-suite .staff-board-v2 .staff-team-page__title{
+  font-size:1.45rem;font-weight:800;letter-spacing:-.02em;line-height:1.5;color:var(--staff-ink)
+}
+.maison-app.management-suite .staff-board-v2 .editorial-directory-copy p{color:#836b63;font-size:.77rem;margin-top:1px}
+.maison-app.management-suite .staff-board-v2 .staff-team-page__head-icon{width:42px;height:42px;border-radius:12px;background:#f0ded7;color:#976b63}
+.maison-app.management-suite .staff-board-v2 .staff-team-page__head-icon svg{width:23px;height:23px;stroke-width:1.6}
+.maison-app.management-suite .staff-board-v2 .staff-team-page__add{
+  min-height:40px;padding:8px 14px;border:1px solid #9e766e;background:#a77e75;
+  border-radius:11px;color:white;box-shadow:0 3px 12px #99716716;font-size:.8rem;font-weight:700;gap:7px
+}
+.staff-board-v2 .staff-team-page__add:hover{background:#956c62;transform:translateY(-1px)}
+.maison-app.management-suite .staff-board-v2 .staff-board-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:0}
+.maison-app.management-suite .staff-board-v2 .staff-board-kpis .suite-kpi{
+  min-height:72px;padding:11px 13px;gap:10px;background:linear-gradient(135deg,#fffdfa,#fbf1ec);
+  border:1px solid var(--staff-line);border-radius:15px;box-shadow:0 2px 9px #7b534311
+}
+.staff-board-v2 .staff-board-kpis .suite-icon{width:39px;height:39px;background:#f0e0da;color:#956a61;border-radius:11px}
+.staff-board-v2 .staff-board-kpis .suite-icon--sage{background:#e9f0e3;color:#577b5e}
+.staff-board-v2 .staff-board-kpis .suite-icon svg{width:21px;height:21px;stroke-width:1.7}
+.staff-board-v2 .staff-board-kpis .suite-kpi small{color:var(--staff-muted);font-size:.75rem;line-height:1.45}
+.staff-board-v2 .staff-board-kpis .suite-kpi strong{font-size:1.45rem;font-weight:750;line-height:1.2;margin-top:3px}
+.maison-app.management-suite .staff-board-v2 .staff-board-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin:0;padding:8px;border:1px solid var(--staff-line);border-radius:14px;
+  background:#f8ece6aa;box-shadow:0 2px 9px #7254470c
+}
+.staff-board-v2 .staff-board-filters{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:nowrap;min-width:0}
+.maison-app.management-suite .staff-board-v2 .staff-board-filters :is(input[type=search],select){
+  min-height:39px;height:39px;border:1px solid #e4d0c7;border-radius:10px;background:#fffaf7;
+  color:var(--staff-ink);font-size:.82rem;box-shadow:0 1px 3px #57423709;transition:border-color .18s ease,box-shadow .18s ease
+}
+.staff-board-v2 .staff-board-filters :is(input[type=search],select):focus{border-color:#b48a7e;outline:none;box-shadow:0 0 0 3px #a67e7330}
+.staff-board-v2 .staff-board-filters select{flex:0 1 172px;max-width:185px;min-width:115px;padding-inline:12px 24px}
+.staff-board-v2 .staff-board-filters .staff-board-search{position:relative;min-width:0;flex:1 1 250px}
+.maison-app.management-suite .staff-board-v2 .staff-board-search input{width:100%;padding-inline-start:12px;padding-inline-end:44px;min-width:0}
+.staff-board-v2 .staff-board-search__submit{
+  position:absolute;inset-inline-end:4px;inset-block:4px;display:grid;place-items:center;
+  width:32px;height:31px;border-radius:8px;color:#92675f;transition:background .16s ease,color .16s ease
+}
+.staff-board-v2 .staff-board-search__submit svg{width:19px;height:19px;stroke-width:1.8}
+.staff-board-v2 .staff-board-search__submit:hover{background:#f1e0d8;color:#68463d}
+.staff-board-v2 .staff-board-search__submit:focus-visible{outline:2px solid #9d7268;outline-offset:1px}
+.maison-app.management-suite .staff-board-v2 .list-view-switch{
+  flex:none;padding:3px;border:1px solid #e5d3ca;background:#fffaf7;border-radius:11px;gap:3px
+}
+.maison-app.management-suite .staff-board-v2 .list-view-switch__btn{width:36px;height:36px;min-width:36px;min-height:36px;border-radius:8px}
+.maison-app.management-suite .staff-board-v2 .list-view-switch__btn.is-active{background:#ab8178;color:white}
+.staff-board-v2 .staff-board-grid{gap:11px;margin:0}
+.maison-app.management-suite .staff-board-v2 .staff-board-card{
+  display:flex;flex-direction:column;min-width:0;min-height:155px;gap:9px;
+  padding:12px;border:1px solid #e9d7ce;background:linear-gradient(145deg,#fffdfa,#fdf7f3);
+  border-radius:17px;box-shadow:0 3px 13px #66453510
+}
+.staff-board-v2 .staff-board-card .staff-team-card__identity{display:flex;align-items:center;gap:10px;min-height:47px}
+.staff-board-v2 .staff-board-card .staff-team-card__copy{flex:1;min-width:0}
+.staff-board-v2 .staff-board-card .staff-team-card__name{font-size:.93rem;font-weight:780;line-height:1.42;color:var(--staff-ink)}
+.staff-board-v2 .staff-board-card .staff-team-card__role{font-size:.72rem;line-height:1.5;margin-top:3px;max-width:100%;overflow-wrap:anywhere}
+.maison-app.management-suite .staff-board-v2 .staff-board-card .staff-team-avatar{
+  width:51px;height:51px;border:2px solid #f0dcd2;border-radius:50%;box-shadow:0 0 0 2px #fffdfa;
+  flex:none;font-size:1rem
+}
+.staff-board-v2 .staff-board-card .staff-team-badge{
+  flex:none;align-self:flex-start;font-size:.67rem;font-weight:650;padding:5px 8px;
+  border-radius:999px;white-space:nowrap
+}
+.staff-board-v2 .staff-board-card .staff-team-badge--ok{background:#e9f1e2;color:#477652}
+.staff-board-v2 .staff-board-card .staff-team-badge--muted{background:#f3e6e1;color:#915d53}
+.maison-app.management-suite .staff-board-v2 .staff-board-card .staff-team-card__stats{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;
+  padding:8px 0 6px;gap:0;border:1px solid #eadbd3;border-width:1px 0;border-radius:0;background:none
+}
+.staff-board-v2 .staff-board-card .staff-team-card__stat{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:1px 4px}
+.staff-board-v2 .staff-board-card .staff-team-card__stat+ .staff-team-card__stat{border-inline-start:1px solid #eadbd3}
+.staff-board-v2 .staff-board-card .staff-team-card__stat dt{display:flex;align-items:center;gap:4px;order:initial;font-size:.72rem;color:var(--staff-muted);white-space:nowrap}
+.staff-board-v2 .staff-board-card .staff-team-card__stat dd{order:initial;font-size:.93rem;font-weight:750;color:var(--staff-ink)}
+.staff-board-v2 .staff-board-card .staff-team-card__stat dt svg{width:16px;height:16px;stroke-width:1.65;color:#aa7f73}
+.staff-board-v2 .staff-board-card .suite-card-actions{display:flex;align-items:center;gap:7px;margin:0}
+.maison-app.management-suite .staff-board-v2 .staff-board-card .staff-team-card__profile-link{
+  flex:1;min-height:36px;border:1px solid #b99086;border-radius:10px;background:#b48b80;color:#fff;
+  font-weight:700;font-size:.77rem;box-shadow:none;gap:6px;padding:5px 8px
+}
+.staff-board-v2 .staff-board-card .staff-team-card__profile-link svg{width:17px;height:17px;stroke-width:1.6}
+.staff-board-v2 .staff-board-card .staff-team-card__profile-link:hover{background:#a47a70;color:#fff}
+.maison-app.management-suite .staff-board-v2 .suite-icon-action{width:36px;height:36px;border-radius:10px;background:#fffaf7;border-color:#e4d2c9;color:#97675e}
+.staff-board-v2 .suite-icon-action--label{width:auto;padding-inline:9px;gap:5px;font-size:.76rem;font-weight:650;display:flex;justify-content:center;align-items:center}
+.staff-board-v2 .suite-icon-action--label span{display:inline}
+.staff-board-v2 .suite-icon-action:hover{background:#f0e1db}
+.staff-board-v2 .suite-clear{white-space:nowrap;font-size:.72rem}
+.staff-board-v2 .suite-pagination{margin:0;padding:5px 0;color:var(--staff-muted)}
+/* Apply a single quiet input language to management searches, not finance. */
+.maison-app.management-suite :is(.suite-filter-form .input-field,.customers-list-page__search,.inventory-page__filters .input-field,.loyalty-search-form__input){
+  border:1px solid #e4d0c7;border-radius:10px;background:#fffaf7;color:#514139;box-shadow:none;
+  transition:border-color .18s ease,box-shadow .18s ease
+}
+.maison-app.management-suite :is(.suite-filter-form .input-field,.customers-list-page__search,.inventory-page__filters .input-field,.loyalty-search-form__input):focus{
+  border-color:#b38b7e;outline:0;box-shadow:0 0 0 3px #ad82792a
+}
+.maison-app.management-suite :is(.suite-filter-form select,.inventory-page__filters select){border-radius:10px}
+/* Motion is deliberately understated; keyboard and reduced-motion remain first-class. */
+@keyframes staff-board-fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.maison-app.management-suite .staff-board-v2 .staff-team-page__header,
+.maison-app.management-suite .staff-board-v2 .staff-board-kpis,
+.maison-app.management-suite .staff-board-v2 .staff-board-toolbar{animation:staff-board-fade .28s ease both}
+.maison-app.management-suite .staff-board-v2 .staff-board-kpis{animation-delay:.04s}
+.maison-app.management-suite .staff-board-v2 .staff-board-toolbar{animation-delay:.075s}
+.maison-app.management-suite .staff-board-v2 .staff-board-card{animation:staff-board-fade .28s ease both;animation-delay:calc(min(var(--staff-card-index,0),5) * 38ms + 90ms);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+@media(hover:hover) and (pointer:fine){
+ .maison-app.management-suite .staff-board-v2 .staff-board-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px #6645351a;border-color:#dab8ab}
+ .staff-board-v2 .staff-team-card__profile-link,.staff-board-v2 .suite-icon-action{transition:background .18s ease,border-color .18s ease}
+}
+@container management-content (max-width:890px){
+ .maison-app.management-suite .staff-board-v2 .staff-board-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .staff-board-v2 .staff-board-filters{flex-wrap:wrap}
+ .staff-board-v2 .staff-board-filters .staff-board-search{flex:1 1 100%}
+ .staff-board-v2 .staff-board-filters select{flex:1 1 160px;max-width:none}
+}
+@container management-content (max-width:570px){
+ .maison-app.management-suite .staff-board-v2{gap:8px}
+ .maison-app.management-suite .staff-board-v2 .staff-team-page__header{min-height:86px;padding:11px 12px;border-radius:14px}
+ .staff-board-v2 .staff-team-page__title{font-size:1.2rem}
+ .maison-app.management-suite .staff-board-v2 .staff-board-kpis{gap:6px;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .maison-app.management-suite .staff-board-v2 .staff-board-kpis .suite-kpi{min-height:65px;padding:8px;gap:7px;border-radius:12px}
+ .staff-board-v2 .staff-board-kpis .suite-icon{width:30px;height:30px;border-radius:9px}
+ .staff-board-v2 .staff-board-kpis .suite-icon svg{width:17px;height:17px}
+ .staff-board-v2 .staff-board-kpis .suite-kpi small{font-size:.68rem}
+ .staff-board-v2 .staff-board-kpis .suite-kpi strong{font-size:1.2rem}
+ .maison-app.management-suite .staff-board-v2 .staff-board-toolbar{flex-wrap:wrap;align-items:stretch;padding:7px}
+ .staff-board-v2 .staff-board-filters{flex:1 1 100%}
+ .staff-board-v2 .staff-board-filters select{min-width:0;flex:1 1 125px}
+ .maison-app.management-suite .staff-board-v2 .list-view-switch{margin-inline-start:auto}
+ .staff-board-v2 .staff-board-card{padding:10px;min-height:145px}
+ .staff-board-v2 .staff-board-card .staff-team-card__stat dt{font-size:.69rem}
+ .staff-board-v2 .staff-board-card .staff-team-card__stat dd{font-size:.86rem}
+ .staff-board-v2 .staff-board-card .staff-team-card__identity{gap:7px}
+ .maison-app.management-suite .staff-board-v2 .staff-board-card .staff-team-avatar{width:43px;height:43px}
+ .staff-board-v2 .staff-board-card .staff-team-card__name{font-size:.87rem}
+ .staff-board-v2 .staff-board-card .staff-team-badge{font-size:.61rem;padding:4px 5px}
+ .staff-board-v2 .staff-board-filters :is(input[type=search],select){min-height:44px;height:44px;font-size:16px}
+ .staff-board-v2 .staff-board-search__submit{height:36px;width:36px}
+ .staff-board-v2 .suite-icon-action--label span{display:none}
+ .staff-board-v2 .suite-icon-action--label{width:44px}
+ .maison-app.management-suite .staff-board-v2 .suite-icon-action{height:44px;min-width:44px}
+ .maison-app.management-suite .staff-board-v2 .staff-board-card .staff-team-card__profile-link{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){
+ .maison-app.management-suite .staff-board-v2 :is(.staff-team-page__header,.staff-board-kpis,.staff-board-toolbar,.staff-board-card){animation:none!important;transition:none!important}
+ .staff-board-v2 :is(.staff-team-page__add,.staff-team-card__profile-link,.suite-icon-action,.staff-board-search__submit){transition:none!important;transform:none!important}
+}
