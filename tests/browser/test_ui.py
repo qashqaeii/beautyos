@@ -155,6 +155,10 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 assert not broken, f"broken static assets {broken}"
                 assert not js_errors, f"JavaScript exceptions {js_errors}"
                 if name == "customers":
+                    # Page chrome stays in the first viewport; only the customer list scrolls.
+                    if height >= 600:
+                        assert page.evaluate("document.scrollingElement.scrollHeight <= innerHeight + 3"), "customer directory causes page scroll"
+                        assert page.evaluate("getComputedStyle(document.querySelector('.customers-list-page__results')).minHeight === '0px'"), "customer list must shrink within viewport"
                     hero = page.locator(".customers-list-page__header")
                     art = hero.locator(".customers-hero__art img")
                     pw.expect(art).to_be_visible()
