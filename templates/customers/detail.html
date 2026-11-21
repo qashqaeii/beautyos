@@ -6,6 +6,7 @@
 {% block page_subtitle %}{% endblock %}
 
 {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/customer-detail-premium.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 {% if can_book_appointment %}
 <script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 <script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
@@ -34,184 +35,214 @@
   @beautyos-close-modal.window="closeModals()"
   @keydown.escape.window="(editOpen || bookOpen) && !window.__beautyosJalaliCalendarOpen && closeModals()"
 >
-  <header class="customer-detail-header">
-    <div class="customer-detail-header__identity">
-      {% if customer.avatar %}
-      <img
-        src="{{ customer.avatar.url }}"
-        alt=""
-        class="customer-detail-header__avatar"
-        width="64"
-        height="64"
-        loading="eager"
-      />
-      {% else %}
-      <span class="customer-detail-header__avatar customer-detail-header__avatar--initials" aria-hidden="true">
-        {{ customer.initials }}
-      </span>
-      {% endif %}
-      <div class="customer-detail-header__copy">
-        <div class="customer-detail-header__name-row">
-          <h1 class="customer-detail-header__name">{{ customer.full_name }}</h1>
-          {% if customer.is_vip %}<span class="customer-detail-header__vip">VIP</span>{% endif %}
-        </div>
-        <p class="customer-detail-header__phone" dir="ltr">{{ customer.phone }}</p>
-      </div>
+
+  <header class="customer-detail-header" aria-label="پروفایل مشتری">
+    <div class="customer-detail-header__top">
+      <nav class="customer-detail-breadcrumbs" aria-label="مسیر صفحه">
+        <a href="{% url 'customers:list' %}"><i data-lucide="users" aria-hidden="true"></i> مشتریان</a>
+        <i data-lucide="chevron-left" aria-hidden="true"></i>
+        <span aria-current="page">پروفایل مشتری</span>
+      </nav>
+      <span class="customer-detail-header__eyebrow"><i data-lucide="contact-round" aria-hidden="true"></i> پرونده مشتری</span>
     </div>
-    <div class="customer-detail-header__actions">
-      {% if can_book_appointment %}
-      <button
-        type="button"
-        class="customer-detail-header__btn customer-detail-header__btn--primary"
-        @click="bookOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))"
-      >
-        <i data-lucide="plus" class="customer-detail-header__icon" aria-hidden="true"></i>
-        <span>ثبت نوبت</span>
-      </button>
-      {% endif %}
-      <button
-        type="button"
-        class="customer-detail-header__btn customer-detail-header__btn--ghost"
-        @click="editOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))"
-      >
-        <i data-lucide="pencil" class="customer-detail-header__icon" aria-hidden="true"></i>
-        <span>ویرایش</span>
-      </button>
+    <div class="customer-detail-header__content">
+      <div class="customer-detail-header__identity">
+        {% if customer.avatar %}
+        <img src="{{ customer.avatar.url }}" alt="" class="customer-detail-header__avatar" width="76" height="76" loading="eager" />
+        {% else %}
+        <span class="customer-detail-header__avatar customer-detail-header__avatar--initials" aria-hidden="true">{{ customer.initials }}</span>
+        {% endif %}
+        <div class="customer-detail-header__copy">
+          <div class="customer-detail-header__name-row">
+            <h1 class="customer-detail-header__name">{{ customer.full_name }}</h1>
+            {% if customer.is_vip or customer.status == 'vip' %}
+            <span class="customer-detail-header__vip"><i data-lucide="crown" aria-hidden="true"></i> مشتری ویژه</span>
+            {% endif %}
+          </div>
+          <a class="customer-detail-header__phone" href="tel:{{ customer.phone }}" dir="ltr"><i data-lucide="phone" aria-hidden="true"></i><bdi>{{ customer.phone }}</bdi></a>
+          <p class="customer-detail-header__since">عضو سالن از {{ customer.created_at|fa_jalali }}</p>
+        </div>
+      </div>
+      <div class="customer-detail-header__actions">
+        {% if can_book_appointment %}
+        <button type="button" class="customer-detail-header__btn customer-detail-header__btn--primary"
+          @click="bookOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))">
+          <i data-lucide="calendar-plus" class="customer-detail-header__icon" aria-hidden="true"></i>
+          <span>ثبت نوبت</span>
+        </button>
+        {% endif %}
+        <button type="button" class="customer-detail-header__btn customer-detail-header__btn--ghost"
+          @click="editOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))">
+          <i data-lucide="pencil" class="customer-detail-header__icon" aria-hidden="true"></i>
+          <span>ویرایش اطلاعات</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <div
-    class="customer-detail-summary"
-    role="list"
-    aria-label="خلاصه مشتری"
-  >
-    <div class="customer-detail-summary__item" role="listitem">
-      <span class="customer-detail-summary__label">تعداد مراجعات</span>
-      <span class="customer-detail-summary__value">{{ customer.total_visits|fa_num }}</span>
+  <section class="customer-detail-summary" aria-label="خلاصه وضعیت مشتری">
+    <div class="customer-detail-summary__item">
+      <span class="customer-detail-summary__icon" aria-hidden="true"><i data-lucide="calendar-check-2"></i></span>
+      <div class="customer-detail-summary__copy">
+        <span class="customer-detail-summary__label">تعداد مراجعات</span>
+        <span class="customer-detail-summary__value">{{ customer.total_visits|fa_num }} <small>مرتبه</small></span>
+      </div>
     </div>
-    <div class="customer-detail-summary__item" role="listitem">
-      <span class="customer-detail-summary__label">آخرین مراجعه</span>
-      <span class="customer-detail-summary__value">
-        {% if customer.last_visit_at %}{{ customer.last_visit_at|fa_jalali }}{% else %}—{% endif %}
-      </span>
+    <div class="customer-detail-summary__item">
+      <span class="customer-detail-summary__icon" aria-hidden="true"><i data-lucide="calendar-days"></i></span>
+      <div class="customer-detail-summary__copy">
+        <span class="customer-detail-summary__label">آخرین مراجعه</span>
+        <span class="customer-detail-summary__value">{% if customer.last_visit_at %}{{ customer.last_visit_at|fa_jalali }}{% else %}—{% endif %}</span>
+      </div>
     </div>
     {% if 'finance.reports' in membership_permissions %}
-    <div class="customer-detail-summary__item" role="listitem">
-      <span class="customer-detail-summary__label">مجموع خرید</span>
-      <span class="customer-detail-summary__value">{{ customer.total_spent_toman|fa_money }} <span class="text-xs font-normal text-ink-secondary">تومان</span></span>
+    <div class="customer-detail-summary__item">
+      <span class="customer-detail-summary__icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
+      <div class="customer-detail-summary__copy">
+        <span class="customer-detail-summary__label">مجموع خرید</span>
+        <span class="customer-detail-summary__value">{{ customer.total_spent_toman|fa_money }} <small>تومان</small></span>
+      </div>
     </div>
     {% endif %}
-  </div>
+    <div class="customer-detail-summary__item customer-detail-summary__item--status">
+      <span class="customer-detail-summary__icon" aria-hidden="true"><i data-lucide="{% if customer.is_vip or customer.status == 'vip' %}crown{% else %}heart-handshake{% endif %}"></i></span>
+      <div class="customer-detail-summary__copy">
+        <span class="customer-detail-summary__label">وضعیت مشتری</span>
+        <span class="customer-detail-summary__value customer-detail-summary__value--status">{{ customer.get_status_display }}</span>
+      </div>
+    </div>
+  </section>
 
   <div class="customer-detail-columns">
     <section class="customer-detail-card customer-detail-card--main" aria-labelledby="customer-upcoming-heading">
       <div class="customer-detail-card__head">
-        <h2 id="customer-upcoming-heading" class="customer-detail-card__title">نوبت‌های پیش‌رو</h2>
+        <h2 id="customer-upcoming-heading" class="customer-detail-card__title"><i data-lucide="calendar-clock" aria-hidden="true"></i> نوبت‌های پیش‌رو</h2>
+        <span class="customer-detail-card__count">{{ upcoming|length|fa_num }} نوبت</span>
       </div>
       {% if upcoming %}
       <ul class="customer-detail-appt-list">
         {% for a in upcoming %}
         <li>
           <a href="{% url 'appointments:detail' pk=a.pk %}" class="customer-detail-appt-row">
+            <span class="customer-detail-appt-row__icon" aria-hidden="true"><i data-lucide="calendar-days"></i></span>
             <div class="customer-detail-appt-row__main">
-              <p class="customer-detail-appt-row__datetime">
-                {{ a.start_at|fa_jalali }} · {{ a.start_at|fa_time }}
-              </p>
-              <p class="customer-detail-appt-row__service">
-                {{ a.service.name }}{% if a.staff %} · {{ a.staff.display_name }}{% endif %}
-              </p>
+              <p class="customer-detail-appt-row__service">{{ a.service.name }}</p>
+              {% if a.staff %}<p class="customer-detail-appt-row__staff"><i data-lucide="user-round" aria-hidden="true"></i> {{ a.staff.display_name }}</p>{% endif %}
             </div>
-            <p class="customer-detail-appt-row__meta">
-              <span class="{{ a.status|status_badge }}">{{ a.get_status_display }}</span>
-            </p>
+            <div class="customer-detail-appt-row__date">
+              <time>{{ a.start_at|fa_jalali }}</time>
+              <span>{{ a.start_at|fa_time }}</span>
+            </div>
+            <span class="customer-detail-appt-row__meta"><span class="{{ a.status|status_badge }}">{{ a.get_status_display }}</span></span>
+            <i data-lucide="chevron-left" class="customer-detail-appt-row__arrow" aria-hidden="true"></i>
           </a>
         </li>
         {% endfor %}
       </ul>
       {% else %}
-      <p class="customer-detail-empty">نوبت پیش‌رویی ثبت نشده است.</p>
+      <div class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="calendar-x-2" aria-hidden="true"></i><p>هنوز نوبتی برای روزهای آینده ثبت نشده است.</p>
+        {% if can_book_appointment %}<button type="button" @click="bookOpen = true; $nextTick(() => window.dispatchEvent(new CustomEvent('beautyos-modal-opened')))">ثبت اولین نوبت</button>{% endif %}
+      </div>
       {% endif %}
     </section>
 
-    <section
-      class="customer-detail-card customer-detail-card--notes"
-      aria-labelledby="customer-notes-heading"
-      x-data="{ noteOpen: false }"
-    >
+    <section class="customer-detail-card customer-detail-card--notes" aria-labelledby="customer-notes-heading" x-data="{ noteOpen: false }">
       <div class="customer-detail-card__head">
-        <h2 id="customer-notes-heading" class="customer-detail-card__title">یادداشت‌های داخلی</h2>
-        <button type="button" class="customer-detail-card__action" @click="noteOpen = !noteOpen">
-          + یادداشت جدید
+        <h2 id="customer-notes-heading" class="customer-detail-card__title"><i data-lucide="notebook-pen" aria-hidden="true"></i> یادداشت‌های داخلی</h2>
+        <button type="button" class="customer-detail-card__action" @click="noteOpen = !noteOpen" :aria-expanded="noteOpen.toString()" aria-controls="customer-new-note-form">
+          <i data-lucide="plus" aria-hidden="true"></i> یادداشت جدید
         </button>
       </div>
       <ul class="customer-detail-notes-list">
         {% for note in recent_notes %}
         <li class="customer-detail-note">
           <p class="customer-detail-note__body">{{ note.body }}</p>
-          <p class="customer-detail-note__meta">
-            {{ note.created_at|fa_jalali_datetime }}{% if note.author %} · {{ note.author }}{% endif %}
-          </p>
+          <p class="customer-detail-note__meta">{{ note.created_at|fa_jalali_datetime }}{% if note.author %} · {{ note.author }}{% endif %}</p>
         </li>
         {% empty %}
-        <li class="customer-detail-empty">یادداشتی ثبت نشده است.</li>
+        <li class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="notebook-tabs" aria-hidden="true"></i><p>یادداشتی ثبت نشده است.</p></li>
         {% endfor %}
       </ul>
-      <form
-        method="post"
-        action="{% url 'customers:add_note' pk=customer.pk %}"
-        class="customer-detail-note-form"
-        x-show="noteOpen"
-        x-cloak
-        x-transition.opacity
-      >
+      <form id="customer-new-note-form" method="post" action="{% url 'customers:add_note' pk=customer.pk %}"
+        class="customer-detail-note-form" x-show="noteOpen" x-cloak x-transition.opacity>
         {% csrf_token %}
+        <label for="{{ note_form.body.id_for_label }}" class="customer-detail-note-form__label">متن یادداشت</label>
         {{ note_form.body }}
-        <button type="submit" class="btn-secondary w-full text-xs">ثبت یادداشت</button>
+        <button type="submit" class="customer-detail-header__btn customer-detail-header__btn--primary">ثبت یادداشت</button>
       </form>
     </section>
   </div>
 
-  {% if 'finance.reports' in membership_permissions %}
-  <section class="customer-detail-card customer-detail-payments" aria-labelledby="customer-payments-heading">
-    <div class="customer-detail-card__head">
-      <h2 id="customer-payments-heading" class="customer-detail-card__title">پرداخت‌ها</h2>
-    </div>
-    {% if payments %}
-    <ul>
-      {% for p in payments %}
-      <li class="customer-detail-pay-row">
-        <span class="customer-detail-pay-row__date">{{ p.created_at|fa_jalali }}</span>
-        <span class="text-xs text-ink-secondary">{{ p.get_status_display }}</span>
-        <span class="customer-detail-pay-row__amount">{{ p.paid_amount_toman|fa_money }} تومان</span>
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p class="customer-detail-empty">پرداختی ثبت نشده است.</p>
-    {% endif %}
-  </section>
-  {% endif %}
-
-  <details class="customer-detail-timeline">
-    <summary class="customer-detail-timeline__summary">
-      <span>سابقهٔ فعالیت</span>
-      <i data-lucide="chevron-left" class="customer-detail-timeline__chevron" aria-hidden="true"></i>
-    </summary>
-    <div class="customer-detail-timeline__body">
-      <ol class="customer-detail-timeline__list">
-        {% for act in activities %}
-        <li class="customer-detail-timeline__item">
-          <span class="customer-detail-timeline__dot" aria-hidden="true"></span>
-          <p class="font-medium text-ink">{{ act.title }}</p>
-          <p class="text-xs text-ink-muted">{{ act.created_at|fa_jalali_datetime }}</p>
-          {% if act.description %}<p class="mt-1 text-xs text-ink-secondary">{{ act.description }}</p>{% endif %}
+  <div class="customer-detail-lower">
+    {% if 'finance.reports' in membership_permissions %}
+    <section class="customer-detail-card customer-detail-payments" aria-labelledby="customer-payments-heading">
+      <div class="customer-detail-card__head">
+        <h2 id="customer-payments-heading" class="customer-detail-card__title"><i data-lucide="credit-card" aria-hidden="true"></i> سوابق پرداخت</h2>
+      </div>
+      {% if payments %}
+      <ul class="customer-detail-pay-list">
+        {% for p in payments %}
+        <li class="customer-detail-pay-row">
+          <div class="customer-detail-pay-row__top"><span class="customer-detail-pay-row__amount">{{ p.paid_amount_toman|fa_money }} <small>تومان</small></span><span class="customer-detail-pay-row__status">{{ p.get_status_display }}</span></div>
+          <span class="customer-detail-pay-row__date"><i data-lucide="calendar" aria-hidden="true"></i> {{ p.created_at|fa_jalali }}</span>
         </li>
-        {% empty %}
-        <li class="customer-detail-empty">فعالیتی ثبت نشده است.</li>
         {% endfor %}
-      </ol>
-    </div>
-  </details>
+      </ul>
+      {% else %}
+      <div class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="wallet" aria-hidden="true"></i><p>پرداختی ثبت نشده است.</p></div>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <section class="customer-detail-card customer-detail-card--activity" aria-labelledby="customer-activity-heading">
+      <details class="customer-detail-timeline" open>
+        <summary class="customer-detail-timeline__summary" id="customer-activity-heading">
+          <span class="customer-detail-card__title"><i data-lucide="activity" aria-hidden="true"></i> سابقهٔ فعالیت</span>
+          <i data-lucide="chevron-down" class="customer-detail-timeline__chevron" aria-hidden="true"></i>
+        </summary>
+        <div class="customer-detail-timeline__body">
+          <ol class="customer-detail-timeline__list">
+            {% for act in activities %}
+            <li class="customer-detail-timeline__item">
+              <span class="customer-detail-timeline__dot" aria-hidden="true"></span>
+              <p class="customer-detail-timeline__event">{{ act.title }}</p>
+              <time class="customer-detail-timeline__date">{{ act.created_at|fa_jalali_datetime }}</time>
+              {% if act.description %}<p class="customer-detail-timeline__description">{{ act.description }}</p>{% endif %}
+            </li>
+            {% empty %}
+            <li class="customer-detail-empty">فعالیتی ثبت نشده است.</li>
+            {% endfor %}
+          </ol>
+        </div>
+      </details>
+    </section>
+
+    <section class="customer-detail-card customer-detail-card--preferences" aria-label="علایق و برچسب‌های مشتری">
+      <div class="customer-detail-card__head">
+        <h2 class="customer-detail-card__title"><i data-lucide="heart" aria-hidden="true"></i> شناخت مشتری</h2>
+      </div>
+      <div class="customer-detail-preferences__group">
+        <h3><i data-lucide="tag" aria-hidden="true"></i> برچسب‌ها</h3>
+        <div class="customer-detail-preferences__tags">
+          {% for tag in customer.tags.all %}
+          <span class="customer-detail-preferences__tag">{{ tag.name }}</span>
+          {% empty %}
+          <p class="customer-detail-preferences__empty">هنوز برچسبی ثبت نشده است.</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="customer-detail-preferences__group">
+        <h3><i data-lucide="sparkles" aria-hidden="true"></i> خدمات پرتکرار</h3>
+        <div class="customer-detail-preferences__tags">
+          {% for service in frequent_services %}
+          <span class="customer-detail-preferences__tag customer-detail-preferences__tag--service">{{ service.service__name }}</span>
+          {% empty %}
+          <p class="customer-detail-preferences__empty">پس از ثبت خدمات انجام‌شده نمایش داده می‌شود.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </div>
 
   {% include "customers/partials/customer_edit_modal.html" %}
   {% if can_book_appointment and appointment_form %}
