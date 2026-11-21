@@ -161,6 +161,17 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     art = header.locator(".luna-finance-hero-art img")
                     assert art.evaluate("(img) => img.complete && img.naturalWidth > 0"), "approved finance illustration missing"
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3"), "finance horizontal viewport overflow"
+                    actions = page.locator(".fin-quick-actions-panel")
+                    balances = page.locator(".fin-balances-panel")
+                    pw.expect(actions).to_be_visible()
+                    pw.expect(balances).to_be_visible()
+                    pw.expect(balances.locator(".fin-balance-item")).to_have_count(8)
+                    action_box = actions.bounding_box()
+                    balances_box = balances.bounding_box()
+                    assert action_box and balances_box
+                    assert action_box["y"] + action_box["height"] <= balances_box["y"] + 3, "finance quick actions should be a separate compact strip"
+                    assert action_box["height"] < (148 if width >= 1024 else 270), "unnecessary empty space inside finance quick actions"
+                    assert page.evaluate("getComputedStyle(document.querySelector('.fin-quick-grid--compact')).gridTemplateColumns.split(' ').length === 1"), "finance balance layout must be stacked"
                 if name == "customers":
                     # Directory must never nest a vertical scroller or clip customer cards.
                     assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"

@@ -199,3 +199,42 @@ def test_finance_premium_hero_uses_local_art_and_preserves_all_financial_tabs(cl
     assert "finance-page--dashboard" in styles
     assert "@media(max-width:720px)" in styles
     assert "overflow:visible" in styles
+
+
+@pytest.mark.django_db
+def test_finance_quick_actions_and_balances_compact_layout(client, owner_membership):
+    """All balance amounts and permitted actions remain visible in the compact dashboard."""
+    from django.contrib.staticfiles import finders
+    from pathlib import Path
+
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+
+    for tab in ("income", "cash"):
+        response = client.get(reverse("finance:overview"), {"tab": tab})
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "fin-quick-grid--compact" in html
+        assert "fin-quick-actions-panel" in html
+        assert "fin-balances-panel" in html
+        assert 'class="fin-balance-grid"' in html
+        assert html.count('class="fin-line fin-balance-item') in (7, 8)
+        for label in (
+            "مطالبات خدمات انجام‌شده", "بدهی باز سالن",
+            "مانده سهم متخصصان", "حقوق ثبت‌شده در بازه",
+            "اجاره جایگاه ثبت‌شده", "خالص فروش محصولات",
+            "فروش پکیج ثبت‌شده در بازه",
+        ):
+            assert label in html
+        assert "دریافت پرداخت" in html
+        assert "صدور فاکتور" in html
+        assert 'aria-label="عملیات مالی"' in html
+
+    css_path = finders.find("css/finance-premium-header.css")
+    assert css_path is not None
+    css = Path(css_path).read_text(encoding="utf-8")
+    assert "fin-quick-grid--compact" in css
+    assert "grid-template-columns:repeat(4,minmax(0,1fr))" in css
+    assert "@media(max-width:480px)" in css
