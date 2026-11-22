@@ -267,3 +267,28 @@ def test_finance_insights_keep_values_but_collapses_explanatory_text(client, own
     assert "fin-insight-panel--mix" not in cash_html
     assert "ترکیب دریافتی‌ها" not in cash_html
     assert "fin-quick-grid--compact" in cash_html
+
+
+@pytest.mark.django_db
+def test_finance_commissions_only_in_quick_actions_not_top_tabs(client, owner_membership):
+    """Remove duplicate top navigation item, preserving the working quick action and route."""
+    from django.urls import reverse
+
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    for tab in ("income", "cash", "commissions"):
+        response = client.get(reverse("finance:overview"), {"tab": tab})
+        assert response.status_code == 200
+        html = response.content.decode()
+        top_nav = html.split('<nav class="finance-page__tabs finance-phase2-tabs"', 1)[1].split("</nav>", 1)[0]
+        assert "?tab=commissions" not in top_nav
+        assert "تسویه متخصصان</span>" not in top_nav
+        if tab in ("income", "cash") and response.context.get("can_settle_commission"):
+            assert 'class="fin-actions"' in html
+            assert "تسویه متخصص</span>" in html
+            assert "?tab=commissions" in html
+    commissions = client.get(reverse("finance:overview"), {"tab": "commissions"})
+    assert commissions.status_code == 200
+    assert 'aria-label="تسویه متخصص‌ها"' in commissions.content.decode()
