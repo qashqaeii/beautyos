@@ -66,6 +66,7 @@
   {% include "partials/mobile_more_sheet.html" %}
   {% include "partials/mobile_nav.html" %}
   {% include "partials/mobile_account_sheet.html" %}
+  {% if salon_onboarding_available %}{% include "onboarding/wizard/modal_host.html" %}{% endif %}
   {% block app_overlays %}{% endblock %}
 </div>
 <style>[x-cloak]{display:none!important}</style>

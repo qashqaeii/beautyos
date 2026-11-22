@@ -1,0 +1,61 @@
+/* Guided salon setup, scoped to an authenticated workspace. */
+.salon-onboarding-root[hidden],.salon-onboarding-dialog__error[hidden]{display:none!important}
+body.salon-onboarding-open{overflow:hidden}
+.salon-onboarding-root{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:clamp(10px,3vw,24px);isolation:isolate}
+.salon-onboarding-backdrop{position:absolute;inset:0;background:rgba(34,29,42,.57);backdrop-filter:blur(7px)}
+.salon-onboarding-dialog{position:relative;display:flex;flex-direction:column;max-height:min(92dvh,860px);width:min(100%,710px);background:#fffbf9;border:1px solid #eee0da;border-radius:22px;overflow:hidden;box-shadow:0 30px 95px rgba(32,22,29,.25);color:#51443f;outline:none}
+.salon-onboarding-dialog__header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:19px 23px;background:linear-gradient(125deg,#eee2ed,#faf4f5 55%,#fffaf8);border-bottom:1px solid #e8dcd9}
+.salon-onboarding-dialog__intro{display:flex;gap:13px;align-items:center;min-width:0}
+.salon-onboarding-dialog__icon{display:grid;place-items:center;flex:none;width:45px;height:45px;border-radius:13px;background:#e9d8e9;color:#765d87}
+.salon-onboarding-dialog__icon svg{width:23px;height:23px;stroke-width:1.75}
+.salon-onboarding-dialog__eyebrow{font-size:.7rem;font-weight:700;color:#866b84}
+.salon-onboarding-dialog__header h2{font-size:1.13rem;font-weight:750;line-height:1.5;margin:2px 0}
+.salon-onboarding-dialog__header p:not(.salon-onboarding-dialog__eyebrow){font-size:.76rem;color:#75635b}
+.salon-onboarding-dialog__later{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:none;padding:8px 12px;min-height:42px;background:#fffcfb;border:1px solid #e8dcd9;border-radius:11px;color:#7c625b;font-size:.8rem;font-weight:700}
+.salon-onboarding-dialog__later svg{width:17px;height:17px}
+.salon-onboarding-dialog__later:hover{background:#f5e9e5}
+.salon-onboarding-dialog__body{padding:18px 23px 20px;overflow-y:auto;overscroll-behavior:contain;min-height:140px;min-width:0}
+.salon-onboarding-dialog__body[aria-busy=true]{opacity:.65;pointer-events:none}
+.salon-onboarding-dialog__loading{text-align:center;color:#75635b;padding:40px 10px}
+.salon-onboarding-dialog__error{margin:10px 23px 0;padding:10px 12px;border-radius:9px;background:#fff0ed;color:#963e3d;font-size:.82rem}
+.salon-onboarding-dialog__footer{display:flex;gap:8px;align-items:center;border-top:1px solid #eee3df;padding:12px 23px;background:#fcf7f4;color:#786a64;font-size:.73rem;line-height:1.7}
+.salon-onboarding-dialog__footer svg{width:17px;height:17px;flex:none;color:#779980}
+.salon-onboarding-dialog__footer a{font-weight:750;color:#80618a;text-decoration:underline;text-underline-offset:3px}
+.salon-onboarding-step__progress{margin-bottom:20px}
+.salon-onboarding-step .public-auth-steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:0;padding:0;list-style:none}
+.salon-onboarding-step .public-auth-steps li{display:grid;place-items:center;min-height:43px;min-width:0;border:1px solid #eadedb;border-radius:10px;padding:6px 4px;font-size:.69rem;line-height:1.5;text-align:center;color:#776a64;background:#fdf8f5}
+.salon-onboarding-step .public-auth-steps li.is-current{background:#eee1ed;border-color:#c5adc8;color:#654a70;font-weight:750}
+.salon-onboarding-step .public-auth-steps li.is-done{background:#edf3ed;border-color:#d6e5d7;color:#527460}
+.salon-onboarding-step__copy{margin-bottom:18px}
+.salon-onboarding-step__eyebrow{font-size:.72rem;font-weight:700;color:#8c708c;margin:0 0 6px}
+.salon-onboarding-step__title{font-weight:750;font-size:1.13rem;color:#51443f}
+.salon-onboarding-step__subtitle{font-size:.81rem;color:#786b65;line-height:1.85;margin-top:6px}
+.salon-onboarding-step__fields{max-width:100%;min-width:0}
+.salon-onboarding-step__fields form{max-width:100%}
+.salon-onboarding-step__fields .public-auth-field{min-width:0}
+.salon-onboarding-step__fields .input-field{min-width:0;max-width:100%;border-radius:11px}
+.salon-onboarding-step__fields :is(input,button,a,textarea,select):focus-visible,.salon-onboarding-dialog__later:focus-visible{outline:2px solid #92729b;outline-offset:2px}
+.salon-onboarding-step__fields form :is(.btn-primary,.btn-secondary){min-height:44px}
+.salon-onboarding-settings-banner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:17px 19px!important;border:1px solid #decadd!important;background:linear-gradient(110deg,#f2e9f3,#fffaf8)!important}
+.salon-onboarding-settings-banner__copy{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 290px}
+.salon-onboarding-settings-banner__icon{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#e5d5e8;color:#775783}
+.salon-onboarding-settings-banner__icon svg{width:22px;height:22px}
+.salon-onboarding-settings-banner h2{font-size:1rem;font-weight:750}
+.salon-onboarding-settings-banner p{font-size:.79rem;color:#75635b;line-height:1.8;margin-top:3px}
+.salon-onboarding-settings-banner .btn-primary{display:inline-flex;align-items:center;gap:8px}
+.salon-onboarding-settings-banner .btn-primary svg{width:17px;height:17px}
+@media(max-width:620px){
+.salon-onboarding-root{padding:6px}
+.salon-onboarding-dialog{max-height:calc(100dvh - 12px);border-radius:16px}
+.salon-onboarding-dialog__header{padding:13px 14px;gap:8px}
+.salon-onboarding-dialog__icon{width:37px;height:37px;border-radius:10px}
+.salon-onboarding-dialog__header h2{font-size:1rem}
+.salon-onboarding-dialog__header p:not(.salon-onboarding-dialog__eyebrow){font-size:.68rem}
+.salon-onboarding-dialog__later{padding:6px 9px;min-height:40px;font-size:.73rem}
+.salon-onboarding-dialog__body{padding:14px}
+.salon-onboarding-dialog__footer{padding:10px 14px}
+.salon-onboarding-step .public-auth-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.salon-onboarding-step .public-auth-steps li{min-height:36px;font-size:.65rem}
+.salon-onboarding-settings-banner .btn-primary{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.salon-onboarding-dialog *{animation:none!important;transition:none!important}}

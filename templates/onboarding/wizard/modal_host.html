@@ -1,0 +1,29 @@
+<div id="salon-onboarding-root" class="salon-onboarding-root"
+     data-salon-onboarding data-auto-open="{{ salon_onboarding_auto_open|yesno:'true,false' }}"
+     data-step-url="{% url 'salons_onboarding:wizard' step=1 %}?modal=1"
+     data-defer-url="{% url 'salons_onboarding:defer' %}" data-csrf="{{ csrf_token }}" hidden>
+  <div class="salon-onboarding-backdrop" aria-hidden="true"></div>
+  <section class="salon-onboarding-dialog" role="dialog" aria-modal="true" aria-labelledby="salon-onboarding-title" tabindex="-1">
+    <header class="salon-onboarding-dialog__header">
+      <div class="salon-onboarding-dialog__intro">
+        <span class="salon-onboarding-dialog__icon" aria-hidden="true"><i data-lucide="sparkles"></i></span>
+        <div>
+          <p class="salon-onboarding-dialog__eyebrow">BeautyOS · شروع فعالیت</p>
+          <h2 id="salon-onboarding-title">راه‌اندازی سالن شما</h2>
+          <p>قدم‌به‌قدم فضای سالن را شخصی‌سازی کنید.</p>
+        </div>
+      </div>
+      <button type="button" class="salon-onboarding-dialog__later" data-onboarding-later aria-label="بستن راه‌اندازی و تکمیل در زمان دیگر">
+        <i data-lucide="clock-3" aria-hidden="true"></i>بعداً
+      </button>
+    </header>
+    <p class="salon-onboarding-dialog__error" data-onboarding-error role="alert" hidden></p>
+    <div class="salon-onboarding-dialog__body" data-onboarding-body aria-live="polite">
+      <p class="salon-onboarding-dialog__loading">در حال آماده‌سازی مراحل…</p>
+    </div>
+    <footer class="salon-onboarding-dialog__footer">
+      <i data-lucide="shield-check" aria-hidden="true"></i>
+      <p>اطلاعات هر مرحله ذخیره می‌شود. هر زمان می‌توانید از <a href="{% url 'salons_settings:home' %}">تنظیمات سالن</a> ادامه دهید.</p>
+    </footer>
+  </section>
+</div>

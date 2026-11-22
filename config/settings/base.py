@@ -213,6 +213,8 @@ def _beautyos_asset_version() -> str:
         "static/js/appointment-customer-picker.js",
         "static/js/appointment-deposit-preview.js",
         "static/js/time24-input.js",
+        "static/js/onboarding-modal.js",
+        "static/css/onboarding-modal.css",
     ):
         path = BASE_DIR / rel
         if path.is_file():

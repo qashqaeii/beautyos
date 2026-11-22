@@ -5,6 +5,18 @@
 
 {% block content %}
 <div class="suite-settings mx-auto space-y-6 pb-24 sm:pb-8">
+  {% if salon_onboarding_available %}
+  <section class="salon-onboarding-settings-banner premium-card" aria-labelledby="salon-onboarding-settings-title">
+    <div class="salon-onboarding-settings-banner__copy">
+      <span class="salon-onboarding-settings-banner__icon" aria-hidden="true"><i data-lucide="sparkles"></i></span>
+      <div>
+        <h2 id="salon-onboarding-settings-title">تکمیل راه‌اندازی سالن</h2>
+        <p>می‌توانید اطلاعات سالن را همین‌جا ویرایش کنید یا راهنمای مرحله‌به‌مرحله را ادامه دهید.</p>
+      </div>
+    </div>
+    <button type="button" class="btn-primary" data-open-salon-onboarding><i data-lucide="list-checks" aria-hidden="true"></i>ادامه راه‌اندازی</button>
+  </section>
+  {% endif %}
   {# هویت سالن #}
   <section class="premium-card overflow-hidden p-0">
     <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">

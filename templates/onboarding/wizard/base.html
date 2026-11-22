@@ -1,4 +1,4 @@
-{% extends "layouts/public_wizard.html" %}
+{% extends wizard_base_template|default:"layouts/public_wizard.html" %}
 {% block wizard_steps %}{% include "onboarding/wizard/_steps.html" %}{% endblock %}
 {% block wizard_content %}
 {% if form and form.non_field_errors %}
@@ -7,7 +7,7 @@
 {% block wizard_form %}{% endblock %}
 <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
   {% if step > 1 %}
-  <a href="{% url 'salons_onboarding:wizard' step=step|add:'-1' %}" class="btn-secondary min-h-[44px] px-4 text-sm">بازگشت</a>
+  <a href="{% url 'salons_onboarding:wizard' step=step|add:'-1' %}{% if request.GET.modal == '1' %}?modal=1{% endif %}" class="btn-secondary min-h-[44px] px-4 text-sm">بازگشت</a>
   {% else %}<span aria-hidden="true"></span>{% endif %}
 </div>
 {% endblock %}

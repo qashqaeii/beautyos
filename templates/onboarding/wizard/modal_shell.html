@@ -1,0 +1,9 @@
+<section class="salon-onboarding-step" data-onboarding-step="{{ step }}" data-onboarding-total="{{ steps_total }}">
+  <div class="salon-onboarding-step__progress">{% block wizard_steps %}{% endblock %}</div>
+  <div class="salon-onboarding-step__copy">
+    <p class="salon-onboarding-step__eyebrow">مرحله {{ step }} از {{ steps_total }}</p>
+    <h3 class="salon-onboarding-step__title">{% block wizard_heading %}{% endblock %}</h3>
+    <p class="salon-onboarding-step__subtitle">{% block wizard_subtitle %}{% endblock %}</p>
+  </div>
+  <div class="salon-onboarding-step__fields">{% block wizard_content %}{% endblock %}</div>
+</section>
