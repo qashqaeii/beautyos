@@ -8,5 +8,6 @@ urlpatterns = [
     path("create/", views_wizard.OnboardingLegacyRedirect.as_view(), name="create"),
     path("profile/", views_wizard.OnboardingLegacyRedirect.as_view(), name="profile"),
     path("wizard/<int:step>/", views_wizard.OnboardingWizardView.as_view(), name="wizard"),
+    path("defer/", views_wizard.defer_onboarding, name="defer"),
     path("switch/<uuid:salon_id>/", views_onboarding.SalonSwitchView.as_view(), name="switch"),
 ]

@@ -1,4 +1,5 @@
 from datetime import timedelta
+from uuid import uuid4
 
 from django.conf import settings
 from django.db import transaction
@@ -153,6 +154,17 @@ def complete_register_profile(
         raise RegisterAccountExistsError("این شماره قبلاً ثبت شده است. از ورود استفاده کنید.")
 
     user = User.objects.create(phone=phone, full_name=full_name)
+    # Create a private workspace; real salon details are collected after login.
+    from apps.salons import onboarding_wizard as ow
+    from apps.salons.models import Salon
+
+    salon = ow.create_salon_for_owner(
+        user, name="سالن زیبایی من", slug=f"salon-{uuid4().hex[:12]}",
+        public_phone="", city="", address="", tagline="", description="",
+        business_type=Salon.BusinessType.BEAUTY_WOMEN,
+    )
+    salon.is_accepting_bookings = False
+    salon.save(update_fields=["is_accepting_bookings", "updated_at"])
     locked.consumed_at = timezone.now()
     locked.save(update_fields=["consumed_at", "updated_at"])
     return user

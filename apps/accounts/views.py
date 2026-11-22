@@ -308,7 +308,10 @@ class RegisterProfileView(View):
 
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
         _clear_pending_auth_session(request)
-        return redirect("salons_onboarding:create")
+        from apps.salons.middleware import sync_login_active_salon
+
+        sync_login_active_salon(request, user)
+        return redirect("dashboard:home")
 
 
 class LogoutView(View):

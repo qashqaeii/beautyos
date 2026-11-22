@@ -1,4 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import redirect, render
@@ -44,15 +48,27 @@ class OnboardingWizardView(View):
         6: "onboarding/wizard/step_complete.html",
     }
 
+    def _step_redirect(self, request, step: int):
+        result = redirect("salons_onboarding:wizard", step=step)
+        if request.GET.get("modal") == "1":
+            result["Location"] += "?modal=1"
+        return result
+
     def _guard_step(self, request, step: int, salon: Salon | None):
+        if salon is None and SalonMembership.objects.filter(user=request.user, is_active=True).exists():
+            raise PermissionDenied
+        if salon and not SalonMembership.objects.filter(
+            user=request.user, salon=salon, role=SalonMembership.Role.OWNER, is_active=True
+        ).exists():
+            raise PermissionDenied
         # Step 2 creates the salon, so a new owner cannot have a salon yet.
         # Previous guard redirected its GET straight back to step 1, trapping
         # every first-time user in an onboarding loop.
         if salon is None:
             if step == 2 and not (request.session.get(ow.SESSION_SALON_NAME) or "").strip():
-                return redirect("salons_onboarding:wizard", step=1)
-            if 3 <= step < WIZARD_STEPS_TOTAL:
-                return redirect("salons_onboarding:wizard", step=1)
+                return self._step_redirect(request, step=1)
+            if 3 <= step <= WIZARD_STEPS_TOTAL:
+                return self._step_redirect(request, step=1)
         if salon and not ow.salon_needs_onboarding(salon) and step < WIZARD_STEPS_TOTAL:
             return redirect("dashboard:home")
         return None
@@ -120,11 +136,11 @@ class OnboardingWizardView(View):
                     salon.name = form.cleaned_data["name"]
                     salon.save(update_fields=["name", "updated_at"])
                     ow.apply_business_defaults(salon, Salon.BusinessType.BEAUTY_WOMEN)
-                return redirect("salons_onboarding:wizard", step=2)
+                return self._step_redirect(request, step=2)
         elif step == 2:
             salon_name = request.session.get(ow.SESSION_SALON_NAME, "").strip()
             if not salon_name:
-                return redirect("salons_onboarding:wizard", step=1)
+                return self._step_redirect(request, step=1)
             business_type = Salon.BusinessType.BEAUTY_WOMEN
             form = (
                 OnboardingIdentityForm(request.POST, request.FILES, instance=salon, salon_name=salon_name)
@@ -157,13 +173,13 @@ class OnboardingWizardView(View):
                 except ValidationError as exc:
                     form.add_error(None, exc.message if hasattr(exc, "message") else str(exc))
                 else:
-                    return redirect("salons_onboarding:wizard", step=3)
+                    return self._step_redirect(request, step=3)
         elif step == 3:
             salon = _wizard_salon(request)
             if not salon:
-                return redirect("salons_onboarding:wizard", step=2)
+                return self._step_redirect(request, step=2)
             if request.POST.get("action") == "skip":
-                return redirect("salons_onboarding:wizard", step=4)
+                return self._step_redirect(request, step=4)
             form = OnboardingServiceSetupForm(request.POST, salon=salon)
             if form.is_valid():
                 ow.create_selected_services(
@@ -171,36 +187,36 @@ class OnboardingWizardView(View):
                     form.cleaned_data.get("selected_presets") or [],
                     form.cleaned_data.get("custom_services") or [],
                 )
-                return redirect("salons_onboarding:wizard", step=4)
+                return self._step_redirect(request, step=4)
         elif step == 4:
             salon = _wizard_salon(request)
             if not salon:
-                return redirect("salons_onboarding:wizard", step=2)
+                return self._step_redirect(request, step=2)
             if request.POST.get("action") == "skip":
                 ow.ensure_owner_staff_profile(salon, request.user)
-                return redirect("salons_onboarding:wizard", step=5)
+                return self._step_redirect(request, step=5)
             profile = ow.ensure_owner_staff_profile(salon, request.user)
             form = OnboardingStaffForm(request.POST, instance=profile, salon=salon)
             if form.is_valid():
                 form.save()
-                return redirect("salons_onboarding:wizard", step=5)
+                return self._step_redirect(request, step=5)
         elif step == 5:
             salon = _wizard_salon(request)
             if not salon:
-                return redirect("salons_onboarding:wizard", step=2)
+                return self._step_redirect(request, step=2)
             if request.POST.get("action") == "skip":
                 profile = ow.ensure_owner_staff_profile(salon, request.user)
                 ow.apply_default_work_hours(profile)
-                return redirect("salons_onboarding:wizard", step=6)
+                return self._step_redirect(request, step=6)
             profile = ow.ensure_owner_staff_profile(salon, request.user)
             rows, hours_errors = ow.parse_work_hours_post(request.POST)
             if not hours_errors:
                 ow.save_staff_work_hours(profile, rows)
-                return redirect("salons_onboarding:wizard", step=6)
+                return self._step_redirect(request, step=6)
         elif step == WIZARD_STEPS_TOTAL:
             salon = _wizard_salon(request)
             if not salon:
-                return redirect("salons_onboarding:wizard", step=1)
+                return self._step_redirect(request, step=1)
             if not ow.salon_needs_onboarding(salon):
                 request.session.pop(ow.SESSION_SALON_KEY, None)
                 request.session.pop(ow.SESSION_BUSINESS_TYPE, None)
@@ -238,6 +254,11 @@ class OnboardingWizardView(View):
             "theme_preview": LUNA_SIGNATURE_TOKENS,
             "global_theme_key": resolve_global_dashboard_theme(),
             "global_theme_label": "Editorial Rose",
+            "wizard_base_template": (
+                "onboarding/wizard/modal_shell.html"
+                if request.GET.get("modal") == "1"
+                else "layouts/public_wizard.html"
+            ),
         }
 
 
@@ -252,3 +273,16 @@ class OnboardingLegacyRedirect(View):
                 return redirect("salons_onboarding:wizard", step=1)
             return redirect("dashboard:home")
         return redirect("salons_onboarding:wizard", step=1)
+
+@login_required
+@require_POST
+def defer_onboarding(request):
+    """Keep setup unfinished while persisting the owner's 'later' choice."""
+    membership = getattr(request, "membership", None)
+    if not request.salon or not membership or membership.role != SalonMembership.Role.OWNER:
+        raise PermissionDenied
+    if ow.salon_needs_onboarding(request.salon):
+        settings_obj = request.salon.settings
+        settings_obj.onboarding_deferred_at = timezone.now()
+        settings_obj.save(update_fields=["onboarding_deferred_at", "updated_at"])
+    return JsonResponse({"ok": True})

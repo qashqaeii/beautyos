@@ -1,4 +1,5 @@
 from apps.salons.models import SalonMembership
+from apps.salons.onboarding_wizard import salon_needs_onboarding
 from apps.dashboard.nav import (
     can_see_calendar,
     can_see_management,
@@ -31,12 +32,23 @@ def salon_context(request):
         )
         active_salon = getattr(request, "salon", None)
         active_membership = getattr(request, "membership", None)
+    onboarding_available = bool(
+        active_salon and active_membership
+        and active_membership.role == SalonMembership.Role.OWNER
+        and salon_needs_onboarding(active_salon)
+    )
+    onboarding_auto_open = bool(
+        onboarding_available and not active_salon.settings.onboarding_deferred_at
+        and getattr(getattr(request, "resolver_match", None), "view_name", "") == "dashboard:home"
+    )
     theme_key = resolve_salon_dashboard_theme(active_salon)
     theme_vars = css_variables_for_dashboard(theme_key)
     theme_style = css_variables_inline(theme_key)
 
     return {
         "active_salon": active_salon,
+        "salon_onboarding_available": onboarding_available,
+        "salon_onboarding_auto_open": onboarding_auto_open,
         "active_membership": active_membership,
         "user_salons": [m.salon for m in memberships],
         "user_memberships": memberships,
