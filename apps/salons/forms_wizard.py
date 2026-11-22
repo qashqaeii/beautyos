@@ -42,9 +42,11 @@ class OnboardingIdentityForm(PersianModelForm):
         super().__init__(*args, **kwargs)
         self.salon_name = (salon_name or "").strip()
         self.fields["slug"].widget.attrs["class"] = "input-field"
-        if self.instance and self.instance.pk and self.instance.slug:
+        # A new Salon has a UUID pk before it is saved. Use _state.adding
+        # rather than pk to distinguish new salons from persisted ones.
+        if self.instance and not self.instance._state.adding and self.instance.slug:
             self.fields["slug"].initial = self.instance.slug
-        elif self.salon_name and not (self.instance and self.instance.pk):
+        elif self.salon_name:
             self.fields["slug"].initial = (
                 slugify(self.salon_name, allow_unicode=False)
                 or f"salon-{uuid4().hex[:8]}"
