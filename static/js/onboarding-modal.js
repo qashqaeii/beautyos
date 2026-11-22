@@ -51,6 +51,7 @@
         currentUrl = destination.pathname + destination.search;
         body.innerHTML = html;
         setupHours();
+        if (window.initTime24Fields) window.initTime24Fields(body);
         icons();
         var focus = body.querySelector('input:not([type="hidden"]):not([disabled]), button, a');
         if (focus) focus.focus({preventScroll: true});
