@@ -28,3 +28,8 @@ def test_seed_realistic_salon_has_no_demo_markers():
 
     assert not Expense.scoped(salon).filter(description__icontains="demo").exists()
     assert not Expense.scoped(salon).filter(description__icontains="گردش نمایشی").exists()
+    from apps.appointments.models import Appointment
+    from apps.customers.models import Customer
+
+    assert Customer.scoped(salon).count() >= 120
+    assert Appointment.scoped(salon).count() >= 250

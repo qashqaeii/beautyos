@@ -15,7 +15,7 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.appointments.models import Appointment
 from apps.appointments.services.lifecycle import complete_appointment
-from apps.appointments.services.scheduling import SchedulingError, create_appointment
+from apps.appointments.services.scheduling import SchedulingError, create_appointment, has_overlap
 from apps.commissions.models import CommissionRule
 from apps.commissions.services import create_settlement
 from apps.core.demo_seed.purge import flush_salon_tenant_data
@@ -28,9 +28,13 @@ from apps.core.sample_seed.dataset import (
     NOTES,
     OWNER,
     PACKAGE_DEFS,
+    PORTFOLIO_ITEMS,
     PRODUCTS,
     SALON,
     SAMPLE_SALON_SLUG,
+    SEED_APPOINTMENT_TARGET,
+    SEED_FUTURE_DAYS,
+    SEED_HISTORY_DAYS,
     SERVICE_ROWS,
     SPECIALISTS,
     TEAM_EXTRAS,
@@ -330,8 +334,8 @@ class RealisticSalonSeedEngine:
         for idx, (full_name, status, is_vip, avatar_idx) in enumerate(CUSTOMERS, start=1):
             phone = customer_phone(idx)
             birth = _jalali_to_gregorian(j_today.year - 22 - (idx % 15), (idx % 12) + 1, min(28, (idx % 27) + 1))
-            if idx in (7, 14, 21, 28):
-                birth = _jalali_to_gregorian(j_today.year - 30, j_today.month, min(29, idx))
+            if idx % 11 == 0:
+                birth = _jalali_to_gregorian(j_today.year - 28 - (idx % 8), j_today.month, min(29, (idx % 27) + 2))
             c, _ = Customer.objects.update_or_create(
                 salon=salon,
                 phone=phone,
@@ -356,17 +360,17 @@ class RealisticSalonSeedEngine:
                 c.tags.add(tags["VIP"])
             if status == "new":
                 c.tags.add(tags["مشتری جدید"])
-            if idx in (25, 26):
+            if idx % 17 == 0 or idx % 19 == 11:
                 c.tags.add(tags["بدهکار"])
-            if idx in (27, 28):
+            if idx % 23 == 0 or idx % 29 == 7:
                 c.tags.add(tags["بیعانه‌دار"])
-            if idx in (5, 14, 24):
+            if idx % 13 == 0 or idx % 31 == 5:
                 c.tags.add(tags["نیاز به پیگیری"])
-            if idx <= len(NOTES):
+            if idx % 3 == 0:
                 CustomerNote.objects.get_or_create(
                     salon=salon,
                     customer=c,
-                    body=NOTES[idx - 1],
+                    body=NOTES[(idx - 1) % len(NOTES)],
                 )
             customers.append(c)
         self._say(f"customers: {len(customers)}")
@@ -481,13 +485,18 @@ class RealisticSalonSeedEngine:
                 defaults={"points_cost": cost, "description": desc, "is_active": True},
             )
 
+    @staticmethod
+    def _salon_weekday(day: date) -> int:
+        return (day.weekday() + 2) % 7
+
     def _status_for_offset(self, day_offset: int, seq: int) -> str:
         if day_offset < 0:
-            return (
-                Appointment.Status.COMPLETED
-                if seq % 7 not in (5, 6)
-                else (Appointment.Status.CANCELLED if seq % 2 else Appointment.Status.NO_SHOW)
-            )
+            roll = seq % 11
+            if roll == 9:
+                return Appointment.Status.CANCELLED
+            if roll == 10:
+                return Appointment.Status.NO_SHOW
+            return Appointment.Status.COMPLETED
         if day_offset == 0:
             mapping = (
                 Appointment.Status.CHECKED_IN,
@@ -495,9 +504,38 @@ class RealisticSalonSeedEngine:
                 Appointment.Status.PENDING,
                 Appointment.Status.CONFIRMED,
                 Appointment.Status.CHECKED_IN,
+                Appointment.Status.CONFIRMED,
             )
             return mapping[seq % len(mapping)]
-        return Appointment.Status.CONFIRMED if seq % 3 else Appointment.Status.PENDING
+        if day_offset > 0:
+            return Appointment.Status.CONFIRMED if seq % 4 else Appointment.Status.PENDING
+        return Appointment.Status.CONFIRMED
+
+    def _staff_services(self, staff_map: dict[str, StaffProfile], services: list[Service]) -> dict[int, list[Service]]:
+        by_category: dict[str, list[Service]] = {}
+        for service in services:
+            cat = service.category.name if service.category_id else ""
+            by_category.setdefault(cat, []).append(service)
+        specialty_by_staff: dict[int, str] = {}
+        for spec in SPECIALISTS:
+            staff = staff_map.get(spec["specialty"])
+            if staff:
+                specialty_by_staff[staff.pk] = spec["specialty"]
+        mapping: dict[int, list[Service]] = {}
+        for staff in staff_map.values():
+            linked = list(staff.services.all())
+            specialty = specialty_by_staff.get(staff.pk, "")
+            mapping[staff.pk] = linked or by_category.get(specialty, services)
+        return mapping
+
+    def _slot_is_open(self, salon: Salon, staff_id: int, start: datetime, end: datetime) -> bool:
+        if has_overlap(salon, staff_id, start, end):
+            return False
+        return not Appointment.scoped(salon).filter(
+            staff_id=staff_id,
+            start_at__lt=end,
+            end_at__gt=start,
+        ).exclude(status__in=(Appointment.Status.CANCELLED, Appointment.Status.NO_SHOW)).exists()
 
     def _seed_appointments(
         self,
@@ -507,36 +545,64 @@ class RealisticSalonSeedEngine:
         staff_map: dict[str, StaffProfile],
         services: list[Service],
     ) -> list[Appointment]:
-        specialists = list(staff_map.values())
-        spec_keys = list(staff_map.keys())
         tz = timezone.get_current_timezone()
         appts: list[Appointment] = []
-        now = timezone.localtime()
+        today = timezone.localdate()
+        staff_list = list(staff_map.values())
+        staff_services = self._staff_services(staff_map, services)
+        slot_rng = random.Random(20260301)
 
-        for i in range(120):
-            day_offset = -85 + (i * 100) // 119
-            target_day = now.date() + timedelta(days=day_offset)
-            if target_day.weekday() == 4:  # جمعه میلادی ≈ often off — skip to شنبه
-                target_day += timedelta(days=1)
-            hour = 9 + (i % 9)
-            minute = 15 if i % 2 else 0
+        eligible_days: list[date] = []
+        day_weights: list[float] = []
+        cursor = today - timedelta(days=SEED_HISTORY_DAYS)
+        end_day = today + timedelta(days=SEED_FUTURE_DAYS)
+        while cursor <= end_day:
+            if self._salon_weekday(cursor) != 6:
+                eligible_days.append(cursor)
+                offset = (cursor - today).days
+                if offset == 0:
+                    weight = 3.0
+                elif -7 < offset < 0:
+                    weight = 2.0
+                elif offset > 0:
+                    weight = 1.2
+                else:
+                    weight = 1.0
+                day_weights.append(weight)
+            cursor += timedelta(days=1)
+
+        attempts = 0
+        max_attempts = SEED_APPOINTMENT_TARGET * 12
+        while len(appts) < SEED_APPOINTMENT_TARGET and attempts < max_attempts:
+            attempts += 1
+            target_day = slot_rng.choices(eligible_days, weights=day_weights, k=1)[0]
+            staff = slot_rng.choice(staff_list)
+            service_pool = staff_services.get(staff.pk) or services
+            service = slot_rng.choice(service_pool)
+            hour = slot_rng.randint(9, 19)
+            minute = slot_rng.choice((0, 15, 30, 45))
             start = timezone.make_aware(datetime.combine(target_day, time(hour, minute)), tz)
-            specialty = spec_keys[i % len(spec_keys)]
-            staff = staff_map[specialty]
-            service = next(s for s in services if specialty in (s.description or "") or s.category and s.category.name == specialty)
-            customer = customers[i % len(customers)]
-            status = self._status_for_offset(day_offset, i)
-
-            exists = Appointment.scoped(salon).filter(customer=customer, start_at=start).exists()
-            if exists:
-                appts.append(Appointment.scoped(salon).get(customer=customer, start_at=start))
+            end = start + timedelta(minutes=service.duration_minutes)
+            if timezone.localtime(end).time() > time(20, 30):
+                continue
+            if not self._slot_is_open(salon, staff.pk, start, end):
                 continue
 
-            if day_offset >= 0 and status in (
+            day_offset = (target_day - today).days
+            status = self._status_for_offset(day_offset, len(appts))
+            customer = customers[slot_rng.randint(0, len(customers) - 1)]
+
+            exists = Appointment.scoped(salon).filter(staff=staff, start_at=start).exists()
+            if exists:
+                continue
+
+            use_scheduler = day_offset >= 0 and status in (
                 Appointment.Status.PENDING,
                 Appointment.Status.CONFIRMED,
                 Appointment.Status.CHECKED_IN,
-            ):
+            )
+
+            if use_scheduler:
                 try:
                     appt = create_appointment(
                         salon=salon,
@@ -548,20 +614,14 @@ class RealisticSalonSeedEngine:
                         status=status,
                     )
                 except SchedulingError:
-                    end = start + timedelta(minutes=service.duration_minutes)
-                    appt = Appointment.objects.create(
-                        salon=salon,
-                        customer=customer,
-                        staff=staff,
-                        service=service,
-                        start_at=start,
-                        end_at=end,
-                        price_toman=service.price_toman,
-                        status=status,
-                    )
+                    continue
             else:
-                end = start + timedelta(minutes=service.duration_minutes)
-                completed_at = end if status == Appointment.Status.COMPLETED else None
+                completed_at = None
+                cancelled_at = None
+                if status == Appointment.Status.COMPLETED:
+                    completed_at = end
+                elif status == Appointment.Status.CANCELLED:
+                    cancelled_at = start
                 appt = Appointment.objects.create(
                     salon=salon,
                     customer=customer,
@@ -572,6 +632,7 @@ class RealisticSalonSeedEngine:
                     price_toman=service.price_toman,
                     status=status,
                     completed_at=completed_at,
+                    cancelled_at=cancelled_at,
                 )
                 if status == Appointment.Status.COMPLETED and completed_at:
                     complete_appointment(salon=salon, appointment_id=appt.pk)
@@ -601,7 +662,7 @@ class RealisticSalonSeedEngine:
         used = {(a.staff_id, a.start_at) for a in existing}
         extra: list[Appointment] = []
         today_count = sum(1 for a in existing if timezone.localtime(a.start_at).date() == today)
-        target = max(0, 12 - today_count)
+        target = max(0, 14 - today_count)
         for n in range(target):
             start = timezone.make_aware(datetime.combine(today, time(9 + n, 15 * (n % 2))), tz)
             staff = specialists[n % len(specialists)]
@@ -671,7 +732,7 @@ class RealisticSalonSeedEngine:
             if Payment.scoped(salon).filter(appointment=appt).exists():
                 continue
             customer = appt.customer
-            if i % 11 == 0:
+            if i % 13 == 0:
                 continue  # unpaid → customer debt
             if i % 9 == 0 and i < len(completed) - 1:
                 deposit = int(appt.price_toman * 0.4)
@@ -682,6 +743,22 @@ class RealisticSalonSeedEngine:
                     amount_toman=deposit,
                     method=Payment.Method.CARD,
                 )
+                continue
+            if i % 17 == 0:
+                paid_part = max(100_000, int(appt.price_toman * 0.55))
+                payment = Payment.objects.create(
+                    salon=salon,
+                    customer=customer,
+                    appointment=appt,
+                    total_amount_toman=appt.price_toman,
+                    paid_amount_toman=paid_part,
+                    method=Payment.Method.CARD,
+                    status=Payment.Status.PARTIAL,
+                )
+                when = appt.completed_at or appt.start_at
+                if when:
+                    Payment.objects.filter(pk=payment.pk).update(created_at=when, updated_at=when)
+                refresh_customer_stats(customer)
                 continue
             methods = [Payment.Method.CASH, Payment.Method.CARD, Payment.Method.TRANSFER]
             method = methods[i % 3]
@@ -733,7 +810,7 @@ class RealisticSalonSeedEngine:
 
         # product sales
         sellable = [(items[name], price) for name, price in getattr(self, "_sell_prices", {}).items() if name in items]
-        for idx, cust in enumerate(customers[15:20]):
+        for idx, cust in enumerate(customers[15:35]):
             if idx >= len(sellable):
                 break
             it, unit_price = sellable[idx]
@@ -753,7 +830,7 @@ class RealisticSalonSeedEngine:
 
         # material consumption on completed hair/color appointments
         color_appt = next((a for a in completed if a.service and "رنگ" in a.service.name), None)
-        consumable = items.get("شامپو ترمیمی کراتین") or next(iter(items.values()))
+        consumable = items.get("شامپو ترمیمی پرو") or next(iter(items.values()))
         if color_appt and consumable:
             try:
                 consume_material(
@@ -783,7 +860,7 @@ class RealisticSalonSeedEngine:
             pass
 
     def _seed_finance_timeline(self, salon: Salon, actor: User, staff_map: dict[str, StaffProfile]):
-        expense_rows = seed_operating_expenses(salon)
+        expense_rows = seed_operating_expenses(salon, days=120)
         stamped = align_payment_timestamps(salon)
         same_day = complete_today_checkouts(salon, actor, count=5)
         month_start, _ = jalali_month_bounds(timezone.localdate())
@@ -900,7 +977,7 @@ class RealisticSalonSeedEngine:
                     kind="rent" if mode == "rent" else "advance",
                     amount=min(amount // 2, period.amount_toman),
                     request_key=_req_key(f"staff-pay-{staff.pk}"),
-                    note="ثبت اولیه موجودی انبار",
+                    note="پیش‌پرداخت حقوق و اجاره جایگاه",
                     actor=actor,
                 )
             except Exception:
@@ -913,21 +990,40 @@ class RealisticSalonSeedEngine:
             pass
 
     def _seed_portfolio(self, salon: Salon):
-        titles = ("هایلایت ملایم", "ناخن ژله‌ای", "میکاپ عروس کلاسیک", "شینیون مجلسی")
-        for i, title in enumerate(titles, start=1):
-            PortfolioItem.objects.get_or_create(
+        for i, (title, category, color) in enumerate(PORTFOLIO_ITEMS, start=1):
+            item, created = PortfolioItem.objects.get_or_create(
                 salon=salon,
                 title=title,
-                defaults={"description": "نمونه کار منتشرشده", "is_published": True, "sort_order": i},
+                defaults={
+                    "description": f"نمونه کار {category}",
+                    "category": category,
+                    "is_published": True,
+                    "sort_order": i,
+                },
             )
+            changed = False
+            if item.category != category:
+                item.category = category
+                changed = True
+            if not item.image:
+                item.image.save(f"portfolio-{i}.png", solid_avatar_file(f"portfolio-{i}", color), save=False)
+                changed = True
+            if changed or created:
+                item.save()
 
     def _seed_waitlist(self, salon: Salon, customers: list[Customer], services: list[Service]):
-        WaitlistEntry.objects.get_or_create(
-            salon=salon,
-            customer=customers[-1],
-            service=services[0],
-            defaults={"priority": 7, "time_note": "صبح", "status": WaitlistEntry.Status.OPEN},
+        seeds = (
+            (customers[-1], services[0], 7, "صبح"),
+            (customers[-3], services[8] if len(services) > 8 else services[0], 5, "عصر"),
+            (customers[-7], services[14] if len(services) > 14 else services[1], 6, "آخر هفته"),
         )
+        for customer, service, priority, time_note in seeds:
+            WaitlistEntry.objects.get_or_create(
+                salon=salon,
+                customer=customer,
+                service=service,
+                defaults={"priority": priority, "time_note": time_note, "status": WaitlistEntry.Status.OPEN},
+            )
 
     def _verify(self, salon: Salon, customers, services, appts) -> str:
         from apps.commissions.models import CommissionEntry
