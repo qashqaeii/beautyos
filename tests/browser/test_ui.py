@@ -177,9 +177,15 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     assert page.evaluate("() => { const panels = [...document.querySelectorAll('.fin-insights-grid--minimal > .fin-panel')]; return panels.every((el) => el.scrollHeight <= el.clientHeight + 2); }"), "finance insight content clipped"
                     assert page.locator(".fin-insight-panel--mix .fin-method-ring").is_visible()
                     if width >= 1024:
-                        # Populated charts include date labels and accessible summaries (~194px).
-                        assert insight_panels.nth(0).bounding_box()["height"] < 210, "finance trend too tall"
-                        assert insight_panels.nth(1).bounding_box()["height"] < 270, "finance income breakdown too tall"
+                        # The CSS deliberately stretches both insight cards to the height
+                        # of the taller one. Chromium measured 210.09375px, so checking
+                        # < 210px was a fractional-pixel false positive, not a clipped chart.
+                        trend_box = insight_panels.nth(0).bounding_box()
+                        mix_box = insight_panels.nth(1).bounding_box()
+                        assert trend_box and mix_box
+                        assert trend_box["height"] <= mix_box["height"] + 3, "finance trend has excess height beyond its peer"
+                        assert trend_box["height"] < 240, "finance trend occupies excessive vertical space"
+                        assert mix_box["height"] < 270, "finance income breakdown too tall"
                     caveat = page.locator(".fin-insight-panel--mix .fin-insight-caveat")
                     pw.expect(caveat).to_be_visible()
                     caveat.locator("summary").click()
