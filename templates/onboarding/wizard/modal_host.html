@@ -1,6 +1,6 @@
 <div id="salon-onboarding-root" class="salon-onboarding-root"
      data-salon-onboarding data-auto-open="{{ salon_onboarding_auto_open|yesno:'true,false' }}"
-     data-step-url="{% url 'salons_onboarding:wizard' step=1 %}?modal=1"
+     data-step-url="{% url 'salons_onboarding:wizard' step=salon_onboarding_resume_step %}?modal=1"
      data-defer-url="{% url 'salons_onboarding:defer' %}" data-csrf="{{ csrf_token }}" hidden>
   <div class="salon-onboarding-backdrop" aria-hidden="true"></div>
   <section class="salon-onboarding-dialog" role="dialog" aria-modal="true" aria-labelledby="salon-onboarding-title" tabindex="-1">
