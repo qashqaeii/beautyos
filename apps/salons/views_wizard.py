@@ -62,11 +62,7 @@ class OnboardingWizardView(View):
 
         if step == 1:
             form = OnboardingBusinessTypeForm(
-                initial={
-                    "business_type": request.session.get(ow.SESSION_BUSINESS_TYPE)
-                    or (salon.business_type if salon else ""),
-                    "name": salon_name,
-                }
+                initial={"name": salon_name}
             )
         elif step == 2:
             form = (
@@ -111,18 +107,19 @@ class OnboardingWizardView(View):
         if step == 1:
             form = OnboardingBusinessTypeForm(request.POST)
             if form.is_valid():
-                request.session[ow.SESSION_BUSINESS_TYPE] = form.cleaned_data["business_type"]
+                # The onboarding flow is women-only; ignore client-supplied business_type.
+                request.session[ow.SESSION_BUSINESS_TYPE] = Salon.BusinessType.BEAUTY_WOMEN
                 request.session[ow.SESSION_SALON_NAME] = form.cleaned_data["name"]
                 if salon:
                     salon.name = form.cleaned_data["name"]
                     salon.save(update_fields=["name", "updated_at"])
-                    ow.apply_business_defaults(salon, form.cleaned_data["business_type"])
+                    ow.apply_business_defaults(salon, Salon.BusinessType.BEAUTY_WOMEN)
                 return redirect("salons_onboarding:wizard", step=2)
         elif step == 2:
             salon_name = request.session.get(ow.SESSION_SALON_NAME, "").strip()
             if not salon_name:
                 return redirect("salons_onboarding:wizard", step=1)
-            business_type = request.session.get(ow.SESSION_BUSINESS_TYPE) or Salon.BusinessType.COMBINED
+            business_type = Salon.BusinessType.BEAUTY_WOMEN
             form = (
                 OnboardingIdentityForm(request.POST, request.FILES, instance=salon, salon_name=salon_name)
                 if salon

@@ -845,3 +845,47 @@ def test_finance_payment_modal_amount_partition_alignment(
         assert dialog.evaluate("(el) => el.scrollWidth <= el.clientWidth + 2"), "payment modal overflows horizontally"
         context.close()
         browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(390,800), (1366,768)])
+def test_womens_onboarding_advances_in_real_browser(live_server, client, width, height):
+    """A women's salon with a Persian name completes both first wizard steps."""
+    from apps.accounts.models import User
+    from apps.salons.models import Salon
+
+    user = User.objects.create_user(phone=f"+989121{width:06d}", full_name="مدیر سالن")
+    client.force_login(user)
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": width, "height": height},
+            locale="fa-IR", reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name": settings.SESSION_COOKIE_NAME, "value": cookie, "url": live_server.url,
+        }])
+        page = context.new_page()
+        response = page.goto(
+            live_server.url + reverse("salons_onboarding:wizard", kwargs={"step": 1}),
+            wait_until="load",
+        )
+        assert response and response.status == 200
+        assert page.locator('input[name="business_type"]').count() == 0
+        assert page.get_by_role("heading", name="اطلاعات اولیه سالن").is_visible()
+        page.get_by_label("نام سالن").fill("سالن زیبایی نورا")
+        page.get_by_role("button", name="ادامه").click()
+        page.wait_for_url("**/onboarding/wizard/2/")
+        assert page.get_by_role("heading", name="هویت سالن").is_visible()
+        slug = page.locator("#id_slug")
+        assert slug.input_value().isascii() and slug.input_value().startswith("salon-")
+        page.locator("#id_public_phone").fill("09121112233")
+        page.get_by_role("button", name="ادامه").click()
+        page.wait_for_url("**/onboarding/wizard/3/")
+        assert page.get_by_role("heading", name="خدمات سالن").is_visible()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+        context.close()
+        browser.close()
+
+    assert Salon.objects.get(name="سالن زیبایی نورا").business_type == Salon.BusinessType.BEAUTY_WOMEN

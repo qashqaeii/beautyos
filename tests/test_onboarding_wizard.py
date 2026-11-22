@@ -18,6 +18,10 @@ def test_wizard_step1_renders_public_shell(client):
     html = client.get(reverse("salons_onboarding:wizard", kwargs={"step": 1})).content.decode()
     assert "public-auth-shell" in html
     assert "اطلاعات اولیه سالن" in html
+    assert 'name="business_type"' not in html
+    assert "آرایشگاه مردانه" not in html
+    assert "سالن ترکیبی" not in html
+    assert 'name="name"' in html
 
 
 @pytest.mark.django_db
@@ -29,7 +33,7 @@ def test_wizard_full_flow_creates_salon_and_completes(client):
 
     r1 = client.post(
         reverse("salons_onboarding:wizard", kwargs={"step": 1}),
-        {"name": "سالن تست", "business_type": Salon.BusinessType.BEAUTY_WOMEN},
+        {"name": "سالن تست"},
     )
     assert r1.status_code == 302
     assert r1.url.endswith("/onboarding/wizard/2/")
@@ -102,3 +106,83 @@ def test_complete_onboarding_idempotent(owner_membership):
     completed_at = SalonSettings.objects.get(pk=settings.pk).onboarding_completed_at
     assert completed_at is not None
     assert ow.complete_onboarding(owner_membership.salon) is False
+
+@pytest.mark.django_db
+def test_wizard_step_one_accepts_name_only_and_rejects_legacy_type(client):
+    from apps.accounts.models import User
+
+    user = User.objects.create_user(phone="+989121000131", full_name="مدیر سالن")
+    client.force_login(user)
+    first = reverse("salons_onboarding:wizard", kwargs={"step": 1})
+    response = client.post(first, {"name": "  سالن زیبایی نورا  "})
+    assert response.status_code == 302
+    assert response.url == reverse("salons_onboarding:wizard", kwargs={"step": 2})
+    assert client.session[ow.SESSION_SALON_NAME] == "سالن زیبایی نورا"
+    assert client.session[ow.SESSION_BUSINESS_TYPE] == Salon.BusinessType.BEAUTY_WOMEN
+    response = client.post(first, {"name": "سالن نورا",
+                                   "business_type": Salon.BusinessType.BARBER_MEN})
+    assert response.status_code == 302
+    assert client.session[ow.SESSION_BUSINESS_TYPE] == Salon.BusinessType.BEAUTY_WOMEN
+
+
+@pytest.mark.django_db
+def test_wizard_persian_name_has_valid_public_slug_even_if_cleared(client):
+    from apps.accounts.models import User
+
+    user = User.objects.create_user(phone="+989121000132", full_name="مدیر سالن")
+    client.force_login(user)
+    client.post(reverse("salons_onboarding:wizard", kwargs={"step": 1}),
+                {"name": "آرایشگاه زیبایی نورا"})
+    second = reverse("salons_onboarding:wizard", kwargs={"step": 2})
+    initial = client.get(second)
+    assert initial.status_code == 200
+    suggested = initial.context["form"]["slug"].value()
+    assert suggested and suggested.isascii() and suggested.startswith("salon-")
+    response = client.post(second, {
+        "slug": "", "public_phone": "09121112233", "city": "تهران",
+        "address": "", "tagline": "", "description": "",
+    })
+    assert response.status_code == 302, response.content.decode()[:800]
+    assert response.url == reverse("salons_onboarding:wizard", kwargs={"step": 3})
+    salon = Salon.objects.get(name="آرایشگاه زیبایی نورا")
+    assert salon.slug.startswith("salon-")
+    assert salon.business_type == Salon.BusinessType.BEAUTY_WOMEN
+    assert SalonMembership.objects.filter(
+        user=user, salon=salon, role=SalonMembership.Role.OWNER
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_wizard_existing_unfinished_salon_uses_womens_type(client, owner_membership):
+    salon = owner_membership.salon
+    salon.settings.onboarding_completed_at = None
+    salon.settings.save(update_fields=["onboarding_completed_at"])
+    salon.business_type = Salon.BusinessType.COMBINED
+    salon.save(update_fields=["business_type"])
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    response = client.post(reverse("salons_onboarding:wizard", kwargs={"step": 1}), {
+        "name": "سالن زیبایی نوین", "business_type": Salon.BusinessType.COMBINED,
+    })
+    assert response.status_code == 302
+    salon.refresh_from_db()
+    assert salon.name == "سالن زیبایی نوین"
+    assert salon.business_type == Salon.BusinessType.BEAUTY_WOMEN
+    second = client.get(reverse("salons_onboarding:wizard", kwargs={"step": 2}))
+    assert second.status_code == 200
+    assert second.context["form"]["slug"].value() == salon.slug
+
+
+@pytest.mark.django_db
+def test_wizard_blank_name_renders_inline_error(client):
+    from apps.accounts.models import User
+
+    user = User.objects.create_user(phone="+989121000133", full_name="مدیر سالن")
+    client.force_login(user)
+    response = client.post(reverse("salons_onboarding:wizard", kwargs={"step": 1}),
+                           {"name": " "})
+    assert response.status_code == 200
+    assert 'role="alert"' in response.content.decode()
+    assert ow.SESSION_SALON_NAME not in client.session

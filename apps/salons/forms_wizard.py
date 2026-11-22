@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django import forms
 from django.utils.text import slugify
 
@@ -14,12 +16,6 @@ class OnboardingBusinessTypeForm(PersianForm):
         max_length=120,
         widget=forms.TextInput(attrs={"class": "input-field", "autocomplete": "organization"}),
     )
-    business_type = forms.ChoiceField(
-        label="نوع کسب‌وکار",
-        choices=Salon.BusinessType.choices,
-        widget=forms.RadioSelect,
-    )
-
     def clean_name(self):
         value = (self.cleaned_data.get("name") or "").strip()
         if not value:
@@ -28,7 +24,7 @@ class OnboardingBusinessTypeForm(PersianForm):
 
 
 class OnboardingIdentityForm(PersianModelForm):
-    slug = forms.SlugField(label="آدرس صفحه عمومی", max_length=140)
+    slug = forms.SlugField(label="آدرس صفحه عمومی", max_length=140, required=False)
 
     class Meta:
         model = Salon
@@ -49,13 +45,18 @@ class OnboardingIdentityForm(PersianModelForm):
         if self.instance and self.instance.pk and self.instance.slug:
             self.fields["slug"].initial = self.instance.slug
         elif self.salon_name and not (self.instance and self.instance.pk):
-            self.fields["slug"].initial = slugify(self.salon_name, allow_unicode=False)
+            self.fields["slug"].initial = (
+                slugify(self.salon_name, allow_unicode=False)
+                or f"salon-{uuid4().hex[:8]}"
+            )
 
     def clean_slug(self):
         slug = (self.cleaned_data.get("slug") or "").strip()
         if not slug:
-            base = self.instance.name if self.instance and self.instance.pk else self.salon_name
-            slug = slugify(base, allow_unicode=False)
+            if self.instance and self.instance.pk and self.instance.slug:
+                slug = self.instance.slug
+            else:
+                slug = slugify(self.salon_name, allow_unicode=False) or f"salon-{uuid4().hex[:8]}"
         qs = Salon.objects.filter(slug=slug)
         if self.instance and self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)

@@ -1,27 +1,16 @@
 {% extends "onboarding/wizard/base.html" %}
 {% block title %}اطلاعات اولیه · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
 {% block wizard_heading %}اطلاعات اولیه سالن{% endblock %}
-{% block wizard_subtitle %}نام و نوع کسب‌وکار را مشخص کنید تا فضای کار و خدمات پیشنهادی متناسب آماده شود.{% endblock %}
+{% block wizard_subtitle %}نام سالن زیبایی خود را وارد کنید تا فضای مدیریت سالن آماده شود.{% endblock %}
 {% block wizard_form %}
 <form method="post" class="space-y-5" id="onboarding-step-form">
   {% csrf_token %}
   <div class="public-auth-field">
     <label for="id_name">{{ form.name.label }}</label>
     {{ form.name }}
+    <p class="field-hint">در مرحله بعد می‌توانید اطلاعات تماس و صفحه عمومی سالن را تکمیل کنید.</p>
     {% if form.name.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ form.name.errors.0 }}</p>{% endif %}
   </div>
-  <fieldset class="space-y-3">
-    <legend class="text-sm font-medium text-aubergine">{{ form.business_type.label }}</legend>
-    <div class="grid gap-3 sm:grid-cols-3">
-      {% for value, label in form.business_type.field.choices %}
-      <label class="cursor-pointer rounded-2xl border border-line bg-surface p-4 transition hover:border-accent has-[:checked]:border-accent has-[:checked]:shadow-card">
-        <input type="radio" name="business_type" value="{{ value }}" class="sr-only" {% if form.business_type.value == value %}checked{% endif %}>
-        <p class="font-semibold text-aubergine">{{ label }}</p>
-      </label>
-      {% endfor %}
-    </div>
-    {% if form.business_type.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ form.business_type.errors.0 }}</p>{% endif %}
-  </fieldset>
   <button type="submit" class="btn-primary min-h-[48px] w-full">ادامه</button>
 </form>
 {% endblock %}
