@@ -320,12 +320,12 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
             url=reverse("finance:checkout",args=[customer.pk])+f"?appointment={completed.pk}"
             page.goto(live_server.url+url,wait_until="load")
             pw.expect(page.locator(f"input[name='appointment'][value='{completed.pk}']")).to_be_checked()
-            pw.expect(page.locator(".finance-checkout-wrap .fin-line bdi")).to_have_text("۱٬۲۵۰٬۰۰۰ تومان")
+            pw.expect(page.locator(".checkout-workspace__totals > div:first-child bdi")).to_have_text("۱٬۲۵۰٬۰۰۰ تومان")
             page.locator("select[name='voucher']").select_option(str(voucher.pk))
             page.locator("input[name='card']").fill("1200000")
-            pw.expect(page.locator(".finance-checkout-wrap .fin-received-total strong")).to_have_text("۰ تومان")
+            pw.expect(page.locator(".checkout-workspace__balance strong")).to_have_text("۰ تومان")
             page.get_by_role("button",name="ثبت فاکتور و پرداخت").click()
-            pw.expect(page.get_by_role("heading",name="فاکتور خدمات",exact=True)).to_be_visible()
+            pw.expect(page.locator(".checkout-workspace__invoice-ref")).to_contain_text("فاکتور")
             assert urlsplit(page.url).path.startswith("/finance/invoices/")
             assert not js_errors and not broken and not external
             page.screenshot(path=str(ARTIFACT/f"{width}-finance-invoice.png"),animations="disabled")
@@ -1010,7 +1010,7 @@ def test_modal_image_choose_button_hides_native_file_control_and_works(
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.parametrize("width,height", [(1366,768), (390,800)])
+@pytest.mark.parametrize("width,height", [(1280,720), (1366,768), (390,800)])
 def test_checkout_editorial_customer_selection_and_invoice_workflow(
     live_server, client, owner_membership, width, height,
 ):
