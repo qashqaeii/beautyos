@@ -3,12 +3,18 @@
 from __future__ import annotations
 
 import random
+from datetime import date
+
+import jdatetime
 
 SAMPLE_SALON_SLUG = "atiye-noor"
 
-SEED_HISTORY_DAYS = 110
-SEED_APPOINTMENT_TARGET = 320
+SEED_JALALI_MONTHS = 3
 SEED_FUTURE_DAYS = 14
+SEED_RNG = 20260115
+SEED_SPECIALIST_COUNT = 20
+SEED_HISTORY_DAYS = 95
+SEED_APPOINTMENT_TARGET = 520
 
 SALON = {
     "name": "سالن زیبایی آتیه‌نور",
@@ -31,30 +37,121 @@ TEAM_EXTRAS = (
 STAFF_PHONE_BASE = 5_010_201
 
 SPECIALTIES = (
-    "رنگ و مش",
-    "کوتاهی و استایل",
-    "ناخن",
-    "میکاپ",
-    "پوست و فیشیال",
-    "مژه",
-    "کراتین",
-    "طراحی ابرو",
-    "اپیلاسیون",
-    "شینیون",
+    "رنگ و لایت مو",
+    "کوتاهی و براشینگ",
+    "کراتین و احیای مو",
+    "کاشت و ترمیم ناخن",
+    "پدیکور و مانیکور",
+    "اکستنشن و لیفت مژه",
+    "اصلاح و طراحی ابرو",
+    "فیشیال و مراقبت پوست",
+    "میکاپ و گریم",
+    "شینیون و حالت‌دهی مو",
 )
 
-SPECIALISTS = [
-    {"full_name": "راضیه ملک‌زاده", "title": "متخصص رنگ و مش", "specialty": SPECIALTIES[0], "years": 11, "color": "#9E5B8C", "agreement": ("commission", 0)},
-    {"full_name": "فرشته پایدار", "title": "آرایشگر و استایلیست", "specialty": SPECIALTIES[1], "years": 8, "color": "#6A5B7A", "agreement": ("commission", 0)},
-    {"full_name": "کیمیا ارجمند", "title": "نیل‌آرتیست", "specialty": SPECIALTIES[2], "years": 6, "color": "#E07A5F", "agreement": ("rent", 7_200_000)},
-    {"full_name": "هانیه برومند", "title": "میکاپ‌آرتیست", "specialty": SPECIALTIES[3], "years": 9, "color": "#D4A276", "agreement": ("commission", 0)},
-    {"full_name": "آیدا رستمی", "title": "کارشناس پوست", "specialty": SPECIALTIES[4], "years": 10, "color": "#4A8FB8", "agreement": ("hybrid", 7_500_000)},
-    {"full_name": "ساناز فتوحی", "title": "لاش استایلیست", "specialty": SPECIALTIES[5], "years": 5, "color": "#5C6BC0", "agreement": ("commission", 0)},
-    {"full_name": "طاهره یزدانی", "title": "متخصص کراتین", "specialty": SPECIALTIES[6], "years": 7, "color": "#2A9D8F", "agreement": ("rent", 8_100_000)},
-    {"full_name": "نگار حصاری", "title": "طراح ابرو", "specialty": SPECIALTIES[7], "years": 6, "color": "#BC6C25", "agreement": ("salary", 16_500_000)},
-    {"full_name": "مریم قاسمی", "title": "اپیلاسیونیست", "specialty": SPECIALTIES[8], "years": 5, "color": "#8D6E63", "agreement": ("commission", 0)},
-    {"full_name": "لیلا سعادتمند", "title": "استایلیست شینیون", "specialty": SPECIALTIES[9], "years": 7, "color": "#9575CD", "agreement": ("commission", 0)},
-]
+_SPECIALIST_PAIRS: tuple[tuple[str, str, tuple[tuple[str, int, str, tuple[str, int]], tuple[str, int, str, tuple[str, int]]]], ...] = (
+    (
+        SPECIALTIES[0],
+        "متخصص رنگ",
+        (
+            ("راضیه ملک‌زاده", 11, "#9E5B8C", ("commission", 0)),
+            ("ستایش نیکنام", 7, "#B07AA8", ("hybrid", 8_200_000)),
+        ),
+    ),
+    (
+        SPECIALTIES[1],
+        "استایلیست",
+        (
+            ("فرشته پایدار", 8, "#6A5B7A", ("commission", 0)),
+            ("الهام توکلی", 6, "#7D6E8C", ("salary", 14_800_000)),
+        ),
+    ),
+    (
+        SPECIALTIES[2],
+        "متخصص کراتین",
+        (
+            ("طاهره یزدانی", 9, "#2A9D8F", ("rent", 8_100_000)),
+            ("نرگس کمالی", 5, "#3BA89C", ("commission", 0)),
+        ),
+    ),
+    (
+        SPECIALTIES[3],
+        "نیل‌آرتیست",
+        (
+            ("کیمیا ارجمند", 6, "#E07A5F", ("rent", 7_200_000)),
+            ("سارا پورکیان", 5, "#E9967A", ("commission", 0)),
+        ),
+    ),
+    (
+        SPECIALTIES[4],
+        "متخصص ناخن",
+        (
+            ("لیلا موحدی", 7, "#D16BA5", ("commission", 0)),
+            ("ریحانه قربانی", 4, "#E08CB0", ("hybrid", 6_800_000)),
+        ),
+    ),
+    (
+        SPECIALTIES[5],
+        "لاش استایلیست",
+        (
+            ("ساناز فتوحی", 6, "#5C6BC0", ("commission", 0)),
+            ("مهرناز بیاتی", 5, "#7080D0", ("commission", 0)),
+        ),
+    ),
+    (
+        SPECIALTIES[6],
+        "طراح ابرو",
+        (
+            ("نگار حصاری", 6, "#BC6C25", ("salary", 16_500_000)),
+            ("مهسا دهقان", 4, "#CF7F3A", ("commission", 0)),
+        ),
+    ),
+    (
+        SPECIALTIES[7],
+        "کارشناس پوست",
+        (
+            ("آیدا رستمی", 10, "#4A8FB8", ("hybrid", 7_500_000)),
+            ("پریا شکوهی", 7, "#5DA0C9", ("commission", 0)),
+        ),
+    ),
+    (
+        SPECIALTIES[8],
+        "میکاپ‌آرتیست",
+        (
+            ("هانیه برومند", 9, "#D4A276", ("commission", 0)),
+            ("الناز سادات", 7, "#E0B48E", ("rent", 7_800_000)),
+        ),
+    ),
+    (
+        SPECIALTIES[9],
+        "استایلیست شینیون",
+        (
+            ("لیلا سعادتمند", 8, "#9575CD", ("commission", 0)),
+            ("یاسمن خیری", 6, "#A888DA", ("salary", 15_200_000)),
+        ),
+    ),
+)
+
+
+def _build_specialists() -> tuple[dict, ...]:
+    rows: list[dict] = []
+    for specialty, title_base, pair in _SPECIALIST_PAIRS:
+        for slot, (full_name, years, color, agreement) in enumerate(pair, start=1):
+            rows.append(
+                {
+                    "full_name": full_name,
+                    "title": f"{title_base} — گروه {slot}",
+                    "specialty": specialty,
+                    "years": years,
+                    "color": color,
+                    "agreement": agreement,
+                    "half_day_thu": slot == 2,
+                }
+            )
+    return tuple(rows)
+
+
+SPECIALISTS = _build_specialists()
 
 _CUSTOMERS_CORE = [
     ("غزل بختیاری", "active", True, 1),
@@ -200,7 +297,7 @@ def _build_customers(target: int = 150) -> tuple[tuple[str, str, bool, int], ...
     return tuple(rows)
 
 
-CUSTOMERS = _build_customers(150)
+CUSTOMERS = _build_customers(120)
 
 CUSTOMER_TAGS = {
     "VIP": "#C9A227",
@@ -211,7 +308,7 @@ CUSTOMER_TAGS = {
 }
 
 NOTES = [
-    "پوست حساس؛ تست پچ قبل از رنگ",
+    "پوست حساس؛ بررسی حساسیت قبل از رنگ",
     "ترجیح بازه عصر برای نوبت",
     "پیشنهاد پکیج پوست در مراجعه بعد",
     "معرفی شده توسط خانم شیرمحمدی",
@@ -255,22 +352,22 @@ _catalog = {
         ("اتو مو و صاف‌سازی", 50, 640_000),
     ],
     SPECIALTIES[2]: [
-        ("مانیکور ژلی", 75, 620_000),
-        ("پدیکور اسپا", 85, 780_000),
-        ("کاشت ناخن", 105, 1_420_000),
-        ("طراحی سه‌بعدی", 95, 1_050_000),
+        ("کراتین برزیلی", 150, 3_950_000),
+        ("نانو کراتین", 140, 3_650_000),
+        ("بوتاکس مو", 90, 1_720_000),
+        ("ماسک ترمیمی", 75, 1_180_000),
     ],
     SPECIALTIES[3]: [
-        ("میکاپ روزمره", 70, 1_550_000),
-        ("میکاپ مجلسی", 90, 1_980_000),
-        ("میکاپ عروس", 120, 4_800_000),
-        ("گریم مینیمال", 60, 1_280_000),
+        ("کاشت ناخن", 105, 1_420_000),
+        ("طراحی سه‌بعدی", 95, 1_050_000),
+        ("ترمیم ناخن", 80, 890_000),
+        ("کاشت پودری", 100, 1_280_000),
     ],
     SPECIALTIES[4]: [
-        ("فیشیال کلاسیک", 70, 1_050_000),
-        ("پیلینگ ملایم", 65, 1_220_000),
-        ("هیدرافیشیال", 80, 1_480_000),
-        ("تراپی دور چشم", 50, 890_000),
+        ("مانیکور ژلی", 75, 620_000),
+        ("پدیکور اسپا", 85, 780_000),
+        ("پارافین‌تراپی دست", 55, 520_000),
+        ("ناخن فرنچ", 70, 680_000),
     ],
     SPECIALTIES[5]: [
         ("اکستنشن کلاسیک", 95, 1_320_000),
@@ -279,22 +376,22 @@ _catalog = {
         ("رفیل دو هفته", 70, 920_000),
     ],
     SPECIALTIES[6]: [
-        ("کراتین برزیلی", 150, 3_950_000),
-        ("نانو کراتین", 140, 3_650_000),
-        ("بوتاکس مو", 90, 1_720_000),
-        ("ماسک ترمیمی", 75, 1_180_000),
-    ],
-    SPECIALTIES[7]: [
         ("اصلاح و فرم ابرو", 35, 420_000),
         ("رنگ ابرو", 40, 460_000),
         ("لمینت ابرو", 55, 690_000),
         ("لیفت طبیعی", 50, 620_000),
     ],
+    SPECIALTIES[7]: [
+        ("فیشیال کلاسیک", 70, 1_050_000),
+        ("پیلینگ ملایم", 65, 1_220_000),
+        ("هیدرافیشیال", 80, 1_480_000),
+        ("تراپی دور چشم", 50, 890_000),
+    ],
     SPECIALTIES[8]: [
-        ("اپیلاسیون صورت", 40, 580_000),
-        ("اپیلاسیون کل بدن", 90, 1_350_000),
-        ("اپیلاسیون با موم داغ", 55, 780_000),
-        ("اپیلاسیون نواحی جزئی", 30, 420_000),
+        ("میکاپ روزمره", 70, 1_550_000),
+        ("میکاپ مجلسی", 90, 1_980_000),
+        ("میکاپ عروس", 120, 4_800_000),
+        ("گریم مینیمال", 60, 1_280_000),
     ],
     SPECIALTIES[9]: [
         ("شینیون ساده", 60, 850_000),
@@ -362,30 +459,30 @@ PACKAGE_DEFS = [
 ]
 
 PORTFOLIO_ITEMS = [
-    ("هایلایت خورشیدی", "رنگ و مش", "#D4A574"),
-    ("بالیاژ کاراملی", "رنگ و مش", "#C9956B"),
-    ("کوتاهی باب مدرن", "کوتاهی و استایل", "#8E7C8C"),
-    ("شینیون عروس", "شینیون", "#E8D4C4"),
-    ("میکاپ مجلسی شب", "میکاپ", "#C9A89A"),
-    ("میکاپ عروس کلاسیک", "میکاپ", "#B0887A"),
-    ("طراحی ناخن مینیمال", "ناخن", "#E07A8F"),
-    ("ناخن ژله‌ای مرجانی", "ناخن", "#F4845F"),
-    ("لمینت مژه طبیعی", "مژه", "#6C7A89"),
-    ("اکستنشن مژه حجیم", "مژه", "#5C6BC0"),
-    ("فیشیال درخشان", "پوست و فیشیال", "#7BA7BC"),
-    ("هیدرافیشیال قبل و بعد", "پوست و فیشیال", "#4A90A4"),
-    ("کراتین مو صاف", "کراتین", "#2A9D8F"),
-    ("فرم ابرو همراستا", "طراحی ابرو", "#BC6C25"),
-    ("لیفت ابرو طبیعی", "طراحی ابرو", "#A67C52"),
-    ("اپیلاسیون کامل", "اپیلاسیون", "#8D6E63"),
-    ("رنگ ریشه یکدست", "رنگ و مش", "#9E5B8C"),
-    ("گریم عکس رزمی", "میکاپ", "#A67B8E"),
-    ("بافت مو مجلسی", "شینیون", "#9B8BB8"),
-    ("پدیکور اسپا", "ناخن", "#E9967A"),
-    ("ویتامینه مو", "کوتاهی و استایل", "#7D6B7D"),
-    ("پاکسازی عمیق پوست", "پوست و فیشیال", "#5D8AA8"),
-    ("هایلایت ملایم", "رنگ و مش", "#C4A484"),
-    ("ناخن فانتزی", "ناخن", "#D16BA5"),
+    ("هایلایت خورشیدی", SPECIALTIES[0], "#D4A574"),
+    ("بالیاژ کاراملی", SPECIALTIES[0], "#C9956B"),
+    ("کوتاهی باب مدرن", SPECIALTIES[1], "#8E7C8C"),
+    ("شینیون عروس", SPECIALTIES[9], "#E8D4C4"),
+    ("میکاپ مجلسی شب", SPECIALTIES[8], "#C9A89A"),
+    ("میکاپ عروس کلاسیک", SPECIALTIES[8], "#B0887A"),
+    ("طراحی ناخن مینیمال", SPECIALTIES[3], "#E07A8F"),
+    ("ناخن ژله‌ای مرجانی", SPECIALTIES[4], "#F4845F"),
+    ("لمینت مژه طبیعی", SPECIALTIES[5], "#6C7A89"),
+    ("اکستنشن مژه حجیم", SPECIALTIES[5], "#5C6BC0"),
+    ("فیشیال درخشان", SPECIALTIES[7], "#7BA7BC"),
+    ("هیدرافیشیال قبل و بعد", SPECIALTIES[7], "#4A90A4"),
+    ("کراتین مو صاف", SPECIALTIES[2], "#2A9D8F"),
+    ("فرم ابرو همراستا", SPECIALTIES[6], "#BC6C25"),
+    ("لیفت ابرو طبیعی", SPECIALTIES[6], "#A67C52"),
+    ("رنگ ریشه یکدست", SPECIALTIES[0], "#9E5B8C"),
+    ("گریم عکس رزمی", SPECIALTIES[8], "#A67B8E"),
+    ("بافت مو مجلسی", SPECIALTIES[9], "#9B8BB8"),
+    ("پدیکور اسپا", SPECIALTIES[4], "#E9967A"),
+    ("ویتامینه مو", SPECIALTIES[1], "#7D6B7D"),
+    ("پاکسازی عمیق پوست", SPECIALTIES[7], "#5D8AA8"),
+    ("هایلایت ملایم", SPECIALTIES[0], "#C4A484"),
+    ("ناخن فانتزی", SPECIALTIES[3], "#D16BA5"),
+    ("کاشت ناخن بلند", SPECIALTIES[3], "#E07A8F"),
 ]
 
 CAMPAIGNS = [
@@ -403,3 +500,18 @@ def staff_phone(index: int) -> str:
 
 def customer_phone(index: int) -> str:
     return f"+98916{3_020_000 + index:07d}"
+
+
+def compute_seed_calendar(reference: date | None = None) -> tuple[date, date, int, int]:
+    """سه ماه شمسی منتهی به روز جاری؛ تعداد نوبت متناسب با ۲۰ متخصص."""
+    if reference is None:
+        from django.utils import timezone
+
+        reference = timezone.localdate()
+    from apps.core.utils.dates import jalali_three_previous_months_bounds
+
+    start, _ = jalali_three_previous_months_bounds(reference)
+    history_days = max(1, (reference - start).days)
+    working_days = history_days * 6 / 7
+    appt_target = max(450, int(SEED_SPECIALIST_COUNT * working_days * 0.35))
+    return start, reference, history_days, appt_target

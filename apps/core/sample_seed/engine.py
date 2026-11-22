@@ -32,9 +32,9 @@ from apps.core.sample_seed.dataset import (
     PRODUCTS,
     SALON,
     SAMPLE_SALON_SLUG,
-    SEED_APPOINTMENT_TARGET,
     SEED_FUTURE_DAYS,
-    SEED_HISTORY_DAYS,
+    SEED_JALALI_MONTHS,
+    compute_seed_calendar,
     SERVICE_ROWS,
     SPECIALISTS,
     TEAM_EXTRAS,
@@ -46,6 +46,7 @@ from apps.core.sample_seed.finance_history import (
     complete_today_checkouts,
     seed_operating_expenses,
 )
+from apps.core.sample_seed.seed_verify import build_seed_report
 from apps.salons.themes import BUSINESS_TYPE_DEFAULTS
 from apps.core.utils.dates import jalali_month_bounds
 from apps.customers.models import Customer, CustomerNote, CustomerTag
@@ -114,26 +115,32 @@ class RealisticSalonSeedEngine:
             self._say("clearing existing salon data before import")
             flush_salon_tenant_data(salon)
 
+        period_start, period_end, history_days, appt_target = compute_seed_calendar()
+        self._period_start = period_start
+        self._period_end = period_end
+        self._history_days = history_days
+        self._appt_target = appt_target
+
         with transaction.atomic():
             policy = self._ensure_loyalty_policy(salon)
-            staff_by_spec = self._seed_specialists(salon, owner)
-            self._seed_agreements(salon, staff_by_spec, owner)
-            services = self._seed_services(salon, staff_by_spec)
+            staff_profiles = self._seed_specialists(salon, owner)
+            self._seed_agreements(salon, staff_profiles, owner)
+            services = self._seed_services(salon, staff_profiles)
             customers = self._seed_customers(salon)
             items = self._seed_inventory(salon, owner)
             self._seed_accounts(salon)
             self._seed_expenses(salon)
             packages = self._seed_packages(salon)
             self._seed_loyalty_catalog(salon)
-            appts = self._seed_appointments(salon, owner, customers, staff_by_spec, services)
+            appts = self._seed_appointments(salon, owner, customers, staff_profiles, services)
             self._seed_finance_flows(salon, owner, customers, appts, items)
-            self._seed_finance_timeline(salon, owner, staff_by_spec)
+            self._seed_finance_timeline(salon, owner, staff_profiles)
             self._seed_loyalty_members(salon, customers, packages, owner)
             self._seed_marketing(salon, owner, customers)
-            self._seed_staff_payroll(salon, staff_by_spec, owner)
+            self._seed_staff_payroll(salon, staff_profiles, owner)
             self._seed_portfolio(salon)
             self._seed_waitlist(salon, customers, services)
-            stats = self._verify(salon, customers, services, appts)
+            stats = self._verify(salon, customers, services, appts, staff_profiles)
             self._say(f"sample salon import complete — {stats}")
 
         return self.plan
@@ -210,8 +217,8 @@ class RealisticSalonSeedEngine:
         row.save()
         return row
 
-    def _seed_specialists(self, salon: Salon, owner: User) -> dict[str, StaffProfile]:
-        out: dict[str, StaffProfile] = {}
+    def _seed_specialists(self, salon: Salon, owner: User) -> list[StaffProfile]:
+        profiles: list[StaffProfile] = []
         for i, spec in enumerate(SPECIALISTS, start=1):
             phone = staff_phone(i)
             user, _ = User.objects.get_or_create(phone=phone, defaults={"full_name": spec["full_name"]})
@@ -247,11 +254,14 @@ class RealisticSalonSeedEngine:
                 )
             staff.save()
             for weekday in range(6):
+                end_at = time(20, 30)
+                if spec.get("half_day_thu") and weekday == 5:
+                    end_at = time(14, 0)
                 StaffWorkHours.objects.get_or_create(
                     salon=salon,
                     staff=staff,
                     weekday=weekday,
-                    defaults={"start_time": time(9, 0), "end_time": time(20, 30)},
+                    defaults={"start_time": time(9, 0), "end_time": end_at},
                 )
             StaffWorkHours.objects.get_or_create(
                 salon=salon,
@@ -259,55 +269,70 @@ class RealisticSalonSeedEngine:
                 weekday=6,
                 defaults={"is_closed": True, "start_time": time(0, 0), "end_time": time(0, 0)},
             )
-            out[spec["specialty"]] = staff
-        self._say(f"specialists: {len(out)}")
-        return out
+            profiles.append(staff)
+        self._say(f"specialists: {len(profiles)}")
+        return profiles
 
-    def _seed_agreements(self, salon: Salon, staff_map: dict[str, StaffProfile], actor: User):
-        month_start, _ = jalali_month_bounds(timezone.localdate() - timedelta(days=120))
-        for spec in SPECIALISTS:
-            staff = staff_map[spec["specialty"]]
-            mode, amount = spec["agreement"]
-            if StaffAgreement.scoped(salon).filter(staff=staff, effective_month=month_start).exists():
-                continue
-            try:
-                create_agreement(
-                    salon=salon,
-                    staff_id=staff.pk,
-                    month=month_start,
-                    mode=mode,
-                    amount=amount,
-                    actor=actor,
-                )
-            except Exception:
-                StaffAgreement.objects.get_or_create(
-                    salon=salon,
-                    staff=staff,
-                    effective_month=month_start,
-                    defaults={"mode": mode, "monthly_toman": amount},
-                )
+    def _seed_agreements(self, salon: Salon, staff_profiles: list[StaffProfile], actor: User):
+        today = timezone.localdate()
+        jd = jdatetime.date.fromgregorian(date=today)
+        month_refs: list[date] = []
+        y, m = jd.year, jd.month
+        for _ in range(SEED_JALALI_MONTHS + 1):
+            month_refs.append(jdatetime.date(y, m, 1).togregorian())
+            m -= 1
+            if m < 1:
+                m = 12
+                y -= 1
+        for month_start in month_refs:
+            for idx, spec in enumerate(SPECIALISTS):
+                staff = staff_profiles[idx]
+                mode, amount = spec["agreement"]
+                if StaffAgreement.scoped(salon).filter(staff=staff, effective_month=month_start).exists():
+                    continue
+                try:
+                    create_agreement(
+                        salon=salon,
+                        staff_id=staff.pk,
+                        month=month_start,
+                        mode=mode,
+                        amount=amount,
+                        actor=actor,
+                    )
+                except Exception:
+                    StaffAgreement.objects.get_or_create(
+                        salon=salon,
+                        staff=staff,
+                        effective_month=month_start,
+                        defaults={"mode": mode, "monthly_toman": amount},
+                    )
 
         CommissionRule.objects.get_or_create(
             salon=salon,
             name="پورسانت پایه خدمات ۳۵٪",
             defaults={"percent": 35, "is_active": True},
         )
-        for spec in SPECIALISTS[:4]:
-            staff = staff_map[spec["specialty"]]
+        for idx, spec in enumerate(SPECIALISTS):
+            if spec["agreement"][0] != "commission":
+                continue
+            staff = staff_profiles[idx]
             CommissionRule.objects.get_or_create(
                 salon=salon,
                 staff=staff,
                 service=None,
-                defaults={"name": f"پورسانت {spec['full_name']}", "percent": 40, "is_active": True},
+                defaults={"name": f"پورسانت {spec['full_name']}", "percent": 38 + (idx % 4), "is_active": True},
             )
 
-    def _seed_services(self, salon: Salon, staff_map: dict[str, StaffProfile]) -> list[Service]:
+    def _seed_services(self, salon: Salon, staff_profiles: list[StaffProfile]) -> list[Service]:
+        by_specialty: dict[str, list[StaffProfile]] = {}
+        for idx, spec in enumerate(SPECIALISTS):
+            by_specialty.setdefault(spec["specialty"], []).append(staff_profiles[idx])
+
         services: list[Service] = []
         sort = 0
         for specialty, name, duration, price in SERVICE_ROWS:
             sort += 1
             cat, _ = ServiceCategory.objects.get_or_create(salon=salon, name=specialty, defaults={"sort_order": sort})
-            staff = staff_map.get(specialty)
             svc, _ = Service.objects.get_or_create(
                 salon=salon,
                 name=name,
@@ -320,7 +345,7 @@ class RealisticSalonSeedEngine:
                     "sort_order": sort,
                 },
             )
-            if staff:
+            for staff in by_specialty.get(specialty, []):
                 staff.services.add(svc)
             services.append(svc)
         self._say(f"services: {len(services)}")
@@ -511,18 +536,16 @@ class RealisticSalonSeedEngine:
             return Appointment.Status.CONFIRMED if seq % 4 else Appointment.Status.PENDING
         return Appointment.Status.CONFIRMED
 
-    def _staff_services(self, staff_map: dict[str, StaffProfile], services: list[Service]) -> dict[int, list[Service]]:
+    def _staff_services(self, staff_profiles: list[StaffProfile], services: list[Service]) -> dict[int, list[Service]]:
         by_category: dict[str, list[Service]] = {}
         for service in services:
             cat = service.category.name if service.category_id else ""
             by_category.setdefault(cat, []).append(service)
         specialty_by_staff: dict[int, str] = {}
-        for spec in SPECIALISTS:
-            staff = staff_map.get(spec["specialty"])
-            if staff:
-                specialty_by_staff[staff.pk] = spec["specialty"]
+        for idx, spec in enumerate(SPECIALISTS):
+            specialty_by_staff[staff_profiles[idx].pk] = spec["specialty"]
         mapping: dict[int, list[Service]] = {}
-        for staff in staff_map.values():
+        for staff in staff_profiles:
             linked = list(staff.services.all())
             specialty = specialty_by_staff.get(staff.pk, "")
             mapping[staff.pk] = linked or by_category.get(specialty, services)
@@ -542,38 +565,43 @@ class RealisticSalonSeedEngine:
         salon: Salon,
         actor: User,
         customers: list[Customer],
-        staff_map: dict[str, StaffProfile],
+        staff_profiles: list[StaffProfile],
         services: list[Service],
     ) -> list[Appointment]:
         tz = timezone.get_current_timezone()
         appts: list[Appointment] = []
         today = timezone.localdate()
-        staff_list = list(staff_map.values())
-        staff_services = self._staff_services(staff_map, services)
+        staff_list = staff_profiles
+        staff_services = self._staff_services(staff_profiles, services)
         slot_rng = random.Random(20260301)
+        period_start = getattr(self, "_period_start", today - timedelta(days=90))
+        appt_target = getattr(self, "_appt_target", 520)
 
         eligible_days: list[date] = []
         day_weights: list[float] = []
-        cursor = today - timedelta(days=SEED_HISTORY_DAYS)
+        cursor = period_start
         end_day = today + timedelta(days=SEED_FUTURE_DAYS)
         while cursor <= end_day:
             if self._salon_weekday(cursor) != 6:
                 eligible_days.append(cursor)
                 offset = (cursor - today).days
+                weight = 1.0
                 if offset == 0:
-                    weight = 3.0
+                    weight = 3.2
                 elif -7 < offset < 0:
-                    weight = 2.0
+                    weight = 2.1
                 elif offset > 0:
-                    weight = 1.2
-                else:
-                    weight = 1.0
+                    weight = 1.25
+                if self._salon_weekday(cursor) == 5:
+                    weight *= 1.35
+                elif self._salon_weekday(cursor) == 0:
+                    weight *= 1.15
                 day_weights.append(weight)
             cursor += timedelta(days=1)
 
         attempts = 0
-        max_attempts = SEED_APPOINTMENT_TARGET * 12
-        while len(appts) < SEED_APPOINTMENT_TARGET and attempts < max_attempts:
+        max_attempts = appt_target * 14
+        while len(appts) < appt_target and attempts < max_attempts:
             attempts += 1
             target_day = slot_rng.choices(eligible_days, weights=day_weights, k=1)[0]
             staff = slot_rng.choice(staff_list)
@@ -640,7 +668,7 @@ class RealisticSalonSeedEngine:
 
             appts.append(appt)
 
-        appts.extend(self._seed_today_appointments(salon, actor, customers, staff_map, services, appts))
+        appts.extend(self._seed_today_appointments(salon, actor, customers, staff_profiles, services, appts))
         self._say(f"appointments: {len(appts)}")
         return appts
 
@@ -649,7 +677,7 @@ class RealisticSalonSeedEngine:
         salon: Salon,
         actor: User,
         customers: list[Customer],
-        staff_map: dict[str, StaffProfile],
+        staff_profiles: list[StaffProfile],
         services: list[Service],
         existing: list[Appointment],
     ) -> list[Appointment]:
@@ -657,16 +685,15 @@ class RealisticSalonSeedEngine:
         today = timezone.localdate()
         tz = timezone.get_current_timezone()
         friday_demo = today.weekday() == 4
-        specialists = list(staff_map.values())
-        spec_keys = list(staff_map.keys())
         used = {(a.staff_id, a.start_at) for a in existing}
         extra: list[Appointment] = []
         today_count = sum(1 for a in existing if timezone.localtime(a.start_at).date() == today)
         target = max(0, 14 - today_count)
         for n in range(target):
             start = timezone.make_aware(datetime.combine(today, time(9 + n, 15 * (n % 2))), tz)
-            staff = specialists[n % len(specialists)]
-            specialty = spec_keys[n % len(spec_keys)]
+            spec = SPECIALISTS[n % len(SPECIALISTS)]
+            staff = staff_profiles[n % len(staff_profiles)]
+            specialty = spec["specialty"]
             service = next(s for s in services if (s.category and s.category.name == specialty))
             customer = customers[(20 + n) % len(customers)]
             key = (staff.pk, start)
@@ -859,18 +886,18 @@ class RealisticSalonSeedEngine:
         except Exception:
             pass
 
-    def _seed_finance_timeline(self, salon: Salon, actor: User, staff_map: dict[str, StaffProfile]):
-        expense_rows = seed_operating_expenses(salon, days=120)
+    def _seed_finance_timeline(self, salon: Salon, actor: User, staff_profiles: list[StaffProfile]):
+        period_start = getattr(self, "_period_start", timezone.localdate() - timedelta(days=90))
+        period_end = getattr(self, "_period_end", timezone.localdate())
+        expense_rows = seed_operating_expenses(salon, start=period_start, end=period_end)
         stamped = align_payment_timestamps(salon)
         same_day = complete_today_checkouts(salon, actor, count=5)
         month_start, _ = jalali_month_bounds(timezone.localdate())
         rent_opened = 0
-        for spec in SPECIALISTS:
+        for idx, spec in enumerate(SPECIALISTS):
             if spec["agreement"][0] != "rent":
                 continue
-            staff = staff_map.get(spec["specialty"])
-            if not staff:
-                continue
+            staff = staff_profiles[idx]
             try:
                 open_staff_period(salon=salon, staff_id=staff.pk, month=month_start, actor=actor)
                 rent_opened += 1
@@ -961,33 +988,42 @@ class RealisticSalonSeedEngine:
                 defaults={"days_since_visit": 40 + i, "status": FollowUp.Status.OPEN},
             )
 
-    def _seed_staff_payroll(self, salon: Salon, staff_map: dict[str, StaffProfile], actor: User):
-        last_month = timezone.localdate().replace(day=1) - timedelta(days=1)
-        month_start, _ = jalali_month_bounds(last_month)
-        for spec in SPECIALISTS:
-            mode, amount = spec["agreement"]
-            if mode not in ("salary", "rent"):
-                continue
-            staff = staff_map[spec["specialty"]]
+    def _seed_staff_payroll(self, salon: Salon, staff_profiles: list[StaffProfile], actor: User):
+        today = timezone.localdate()
+        jd = jdatetime.date.fromgregorian(date=today)
+        y, m = jd.year, jd.month
+        month_starts: list[date] = []
+        for _ in range(SEED_JALALI_MONTHS):
+            month_starts.append(jdatetime.date(y, m, 1).togregorian())
+            m -= 1
+            if m < 1:
+                m = 12
+                y -= 1
+        for month_start in month_starts:
+            for idx, spec in enumerate(SPECIALISTS):
+                mode, amount = spec["agreement"]
+                if mode not in ("salary", "rent", "hybrid"):
+                    continue
+                staff = staff_profiles[idx]
+                try:
+                    period = open_staff_period(salon=salon, staff_id=staff.pk, month=month_start, actor=actor)
+                    pay_staff_period(
+                        salon=salon,
+                        period_id=period.pk,
+                        kind="rent" if mode == "rent" else "advance",
+                        amount=min(amount // 2, period.amount_toman),
+                        request_key=_req_key(f"staff-pay-{staff.pk}-{month_start.isoformat()}"),
+                        note="پیش‌پرداخت حقوق و اجاره جایگاه",
+                        actor=actor,
+                    )
+                except Exception:
+                    pass
+
+        for idx in (0, 5, 12, 18):
             try:
-                period = open_staff_period(salon=salon, staff_id=staff.pk, month=month_start, actor=actor)
-                pay_staff_period(
-                    salon=salon,
-                    period_id=period.pk,
-                    kind="rent" if mode == "rent" else "advance",
-                    amount=min(amount // 2, period.amount_toman),
-                    request_key=_req_key(f"staff-pay-{staff.pk}"),
-                    note="پیش‌پرداخت حقوق و اجاره جایگاه",
-                    actor=actor,
-                )
+                create_settlement(salon, staff_profiles[idx], 280_000 + idx * 12_000, note="تسویه پورسانت")
             except Exception:
                 pass
-
-        commission_staff = staff_map[SPECIALISTS[0]["specialty"]]
-        try:
-            create_settlement(salon, commission_staff, 350_000, note="تسویه پورسانت")
-        except Exception:
-            pass
 
     def _seed_portfolio(self, salon: Salon):
         for i, (title, category, color) in enumerate(PORTFOLIO_ITEMS, start=1):
@@ -1025,14 +1061,18 @@ class RealisticSalonSeedEngine:
                 defaults={"priority": priority, "time_note": time_note, "status": WaitlistEntry.Status.OPEN},
             )
 
-    def _verify(self, salon: Salon, customers, services, appts) -> str:
-        from apps.commissions.models import CommissionEntry
-
-        c_appt = len(appts)
-        c_comm = CommissionEntry.scoped(salon).count()
-        c_pay = Payment.scoped(salon).filter(paid_amount_toman__gt=0).count()
+    def _verify(self, salon: Salon, customers, services, appts, staff_profiles) -> str:
+        report = build_seed_report(salon)
+        month_bits = []
+        for row in report["months"]:
+            month_bits.append(
+                f"{row['jalali_year']}/{row['jalali_month']:02d}:"
+                f"درآمد={row['revenue_toman']}, هزینه={row['expense_toman']}, سود={row['profit_toman']}"
+            )
         today = Appointment.scoped(salon).filter(start_at__date=timezone.localdate()).count()
         return (
-            f"appts={c_appt}, today={today}, services={len(services)}, customers={len(customers)}, "
-            f"payments={c_pay}, commissions={c_comm}"
+            f"staff={report['specialists']}, appts={report['appointments']}, today={today}, "
+            f"customers={report['customers']}, payments_full={report['payments_paid_full']}, "
+            f"partial={report['payments_partial']}, overlaps={report['overlap_conflicts']}; "
+            f"{' | '.join(month_bits)}"
         )

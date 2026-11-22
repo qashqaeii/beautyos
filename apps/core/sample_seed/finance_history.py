@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import random
+from datetime import date
 
 import jdatetime
 from django.utils import timezone
@@ -37,8 +38,19 @@ def align_payment_timestamps(salon) -> int:
     return updated
 
 
-def seed_operating_expenses(salon, *, days: int = 90) -> int:
+def seed_operating_expenses(
+    salon,
+    *,
+    days: int = 90,
+    start: date | None = None,
+    end: date | None = None,
+) -> int:
+    from datetime import date as date_cls
+
     today = timezone.localdate()
+    if start is not None and end is not None:
+        days = max(1, (end - start).days + 1)
+        today = end
     rng = random.Random(20260115)
     created = 0
     rolling = [
@@ -50,8 +62,11 @@ def seed_operating_expenses(salon, *, days: int = 90) -> int:
     ]
     from datetime import timedelta
 
+    period_start = start if start is not None else today - timedelta(days=days - 1)
     for offset in range(0, days, 3):
-        expense_date = today - timedelta(days=offset)
+        expense_date = period_start + timedelta(days=offset)
+        if expense_date > today:
+            break
         if expense_date.weekday() == 4:
             continue
         cat, lo, hi, title = rolling[(offset // 3) % len(rolling)]

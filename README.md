@@ -63,7 +63,7 @@ pytest
 | PHASE 1 Foundation | تکمیل |
 | PHASE 2 CRM | تکمیل (لیست، پروفایل، یادداشت، تگ، آرشیو) |
 | PHASE 3–6 | MVP هسته (خدمات، کارکنان، نوبت، مالی، عمومی/رزرو، پیگیری) — نسخه اولیه |
-| Sample data | `seed_realistic_salon --reset` — slug `atiye-noor` (بدون برچسب دمو) |
+| Sample data | `seed_realistic_salon --reset` — slug `atiye-noor`، ۱۲۰ مشتری، ۲۰ متخصص، ۳ ماه شمسی مالی (بدون برچسب دمو) |
 | Demo (legacy) | `seed_demo` — slugs: `demo-salon-a`, `demo-barber-b` · فقط با `ALLOW_DEMO_SEED` |
 
 ## فاز ۶ — آماده‌سازی انتشار

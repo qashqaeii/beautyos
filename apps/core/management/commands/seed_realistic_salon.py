@@ -38,4 +38,8 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(f"Dry-run: {len(plan.actions)} steps planned."))
         else:
             self.stdout.write(self.style.SUCCESS("Realistic salon data imported (slug: atiye-noor)."))
+            self.stdout.write(
+                "سه ماه شمسی گذشته + نوبت‌های آینده · ۲۰ متخصص · slug: atiye-noor · "
+                "پاک‌سازی: seed_realistic_salon --reset"
+            )
             self.stdout.write("Owner login: +989150100001 · set password via ensure_superuser or register OTP.")
