@@ -26,10 +26,14 @@ def test_register_new_user_otp_to_profile(client, settings, monkeypatch):
     assert dev
     client.post(reverse("accounts:verify"), {"code": dev})
     assert client.session.get("register_verification_id")
-    client.post(reverse("accounts:register_profile"), {"full_name": "مالک تست"})
+    completed = client.post(reverse("accounts:register_profile"), {"full_name": "مالک تست"})
+    assert completed.status_code == 302
+    assert completed.url == reverse("dashboard:home")
     assert User.objects.filter(phone__contains="9122223333").exists()
-    response = client.get(reverse("salons_onboarding:create"))
-    assert response.status_code in (200, 302)
+    response = client.get(reverse("dashboard:home"))
+    assert response.status_code == 200
+    assert 'data-salon-onboarding' in response.content.decode()
+    assert 'data-auto-open="true"' in response.content.decode()
 
 
 @pytest.mark.django_db
