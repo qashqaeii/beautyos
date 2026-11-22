@@ -90,6 +90,7 @@ class SalonSettings(TimeStampedModel):
     )
     onboarding_completed_at = models.DateTimeField(null=True, blank=True)
     onboarding_deferred_at = models.DateTimeField(null=True, blank=True)
+    onboarding_step = models.PositiveSmallIntegerField(default=1)
     specialist_can_view_commission = models.BooleanField(default=False)
     retention_days_30 = models.PositiveSmallIntegerField(default=30)
     retention_days_60 = models.PositiveSmallIntegerField(default=60)
