@@ -1284,7 +1284,7 @@ def test_owner_onboarding_modal_later_resume_in_browser(
         dialog.locator('input[name="name"]').fill("سالن زیبایی نیلوفر")
         dialog.get_by_role("button", name="ادامه", exact=True).click()
         pw.expect(page.locator('[data-onboarding-step="2"]')).to_be_visible()
-        dialog.get_by_role("button", name="بعداً").click()
+        dialog.locator("[data-onboarding-later]").click()
         pw.expect(dialog).not_to_be_visible()
         page.goto(live_server.url + reverse("dashboard:home"), wait_until="load")
         pw.expect(page.get_by_role("dialog", name="راه‌اندازی سالن شما")).not_to_be_visible()
