@@ -186,3 +186,24 @@ def test_wizard_blank_name_renders_inline_error(client):
     assert response.status_code == 200
     assert 'role="alert"' in response.content.decode()
     assert ow.SESSION_SALON_NAME not in client.session
+
+
+@pytest.mark.django_db
+def test_wizard_step_two_requires_completed_first_step_not_created_salon(client):
+    from apps.accounts.models import User
+
+    user = User.objects.create_user(phone="+989121000134", full_name="مدیر سالن")
+    client.force_login(user)
+    step_one = reverse("salons_onboarding:wizard", kwargs={"step": 1})
+    step_two = reverse("salons_onboarding:wizard", kwargs={"step": 2})
+
+    direct = client.get(step_two)
+    assert direct.status_code == 302
+    assert direct.url == step_one
+
+    advance = client.post(step_one, {"name": "سالن نورا"})
+    assert advance.status_code == 302
+    assert advance.url == step_two
+    ready = client.get(step_two)
+    assert ready.status_code == 200
+    assert "هویت سالن" in ready.content.decode()

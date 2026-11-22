@@ -45,8 +45,14 @@ class OnboardingWizardView(View):
     }
 
     def _guard_step(self, request, step: int, salon: Salon | None):
-        if step > 1 and salon is None and step < WIZARD_STEPS_TOTAL:
-            return redirect("salons_onboarding:wizard", step=1)
+        # Step 2 creates the salon, so a new owner cannot have a salon yet.
+        # Previous guard redirected its GET straight back to step 1, trapping
+        # every first-time user in an onboarding loop.
+        if salon is None:
+            if step == 2 and not (request.session.get(ow.SESSION_SALON_NAME) or "").strip():
+                return redirect("salons_onboarding:wizard", step=1)
+            if 3 <= step < WIZARD_STEPS_TOTAL:
+                return redirect("salons_onboarding:wizard", step=1)
         if salon and not ow.salon_needs_onboarding(salon) and step < WIZARD_STEPS_TOTAL:
             return redirect("dashboard:home")
         return None
