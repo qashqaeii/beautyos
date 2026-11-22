@@ -114,14 +114,10 @@
           <div class="service-form-field">
             <span class="field-label" id="service-edit-image-label">{{ edit_form.image.label }}</span>
             <div class="service-form-file">
-              {{ edit_form.image }}
-              <button
-                type="button"
-                class="service-form-file__btn"
-                @click="$refs.serviceEditImage.click()"
-              >
-                انتخاب تصویر
-              </button>
+              <label class="service-form-file__btn">
+                {{ edit_form.image }}
+                <span>انتخاب تصویر</span>
+              </label>
               <span class="service-form-file__name" x-text="editImageName" x-show="editImageName" x-cloak></span>
               {% if edit_service.image %}
               <p class="service-form-file__current text-xs text-ink-muted mt-1">تصویر فعلی ذخیره شده است.</p>

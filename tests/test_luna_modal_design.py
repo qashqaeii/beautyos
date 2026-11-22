@@ -80,3 +80,65 @@ def test_staff_editor_upload_clear_and_service_selection(client, salon, owner_me
     staff.refresh_from_db()
     assert not staff.avatar
     assert staff.services.filter(pk=service.pk).exists()
+
+
+def test_image_upload_buttons_wrap_an_accessible_native_file_input():
+    """Create/edit forms have one Persian chooser, never a second native file UI."""
+    files = (
+        "templates/customers/partials/customer_create_form.html",
+        "templates/customers/form.html",
+        "templates/services/partials/service_create_form.html",
+        "templates/services/partials/service_edit_form.html",
+    )
+    for path in files:
+        html = (ROOT / path).read_text(encoding="utf-8")
+        cls = "customer-form-file__btn" if "customers/" in path else "service-form-file__btn"
+        assert f'<label class="{cls}">' in html
+        assert "<span>انتخاب تصویر</span>" in html
+        assert f'<button type="button" class="{cls}"' not in html
+        assert '@click="$refs.customerAvatar.click()"' not in html
+        assert '@click="$refs.serviceImage.click()"' not in html
+        assert '@click="$refs.serviceEditImage.click()"' not in html
+    css = (ROOT / "static/css/luna-modals.css").read_text(encoding="utf-8")
+    assert '.customer-form-file__btn > input[type="file"]' in css
+    assert '.service-form-file__btn > input[type="file"]' in css
+    assert "clip-path: inset(50%) !important" in css
+    assert "display: block !important" in css
+    assert ":focus-within" in css
+
+
+@pytest.mark.django_db
+def test_customer_and_service_modals_keep_file_upload_inputs(client, owner_membership, salon):
+    from apps.services.models import Service
+    from django.urls import reverse
+
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    service = Service.objects.create(salon=salon, name="رنگ مو")
+    for route, query in (
+        ("customers:list", {"create": "1"}),
+        ("services:list", {"create": "1"}),
+        ("services:list", {"edit": str(service.pk)}),
+    ):
+        response = client.get(reverse(route), query)
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert 'type="file"' in html
+        assert "انتخاب تصویر" in html
+        assert 'enctype="multipart/form-data"' in html
+
+
+def test_shared_profile_image_widget_keeps_its_custom_chooser():
+    from apps.core.modal_widgets import ProfileImageWidget
+    from apps.staff.forms import StaffProfileForm
+    from apps.customers.forms import CustomerForm
+
+    for form in (StaffProfileForm(), CustomerForm()):
+        widget = form.fields["avatar"].widget
+        assert isinstance(widget, ProfileImageWidget)
+        html = str(widget.render("avatar", None, attrs={"id": "id_avatar"}))
+        assert 'class="luna-upload__button"' in html
+        assert "انتخاب تصویر" in html
+        assert 'type="file"' in html

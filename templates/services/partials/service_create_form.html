@@ -99,14 +99,10 @@
         <div class="service-form-field">
           <span class="field-label" id="service-image-label">{{ form.image.label }}</span>
           <div class="service-form-file">
-            {{ form.image }}
-            <button
-              type="button"
-              class="service-form-file__btn"
-              @click="$refs.serviceImage.click()"
-            >
-              انتخاب تصویر
-            </button>
+            <label class="service-form-file__btn">
+              {{ form.image }}
+              <span>انتخاب تصویر</span>
+            </label>
             <span class="service-form-file__name" x-text="imageName" x-show="imageName" x-cloak></span>
           </div>
           {% if form.image.errors %}<p class="service-form-field__error">{{ form.image.errors.0 }}</p>{% endif %}

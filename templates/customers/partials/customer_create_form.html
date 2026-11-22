@@ -55,10 +55,10 @@
           <div class="customer-form-field">
             <span class="field-label" id="customer-avatar-label">{{ form.avatar.label }}</span>
             <div class="customer-form-file">
-              {{ form.avatar }}
-              <button type="button" class="customer-form-file__btn" @click="$refs.customerAvatar.click()">
-                انتخاب تصویر
-              </button>
+              <label class="customer-form-file__btn">
+                {{ form.avatar }}
+                <span>انتخاب تصویر</span>
+              </label>
               <span class="customer-form-file__name" x-text="imageName" x-show="imageName" x-cloak></span>
             </div>
             <img

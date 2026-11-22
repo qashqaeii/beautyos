@@ -939,3 +939,71 @@ def test_staff_invite_specialty_select_shows_saved_salon_services(
 
     invitation = SalonInvitation.objects.get(salon=salon, phone="+989123459877")
     assert invitation.invitee_service_id == second.pk
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(390,800), (1366,768)])
+def test_modal_image_choose_button_hides_native_file_control_and_works(
+    live_server, client, owner_membership, width, height,
+):
+    """Customer and service dialogs show only the localized image picker."""
+    from io import BytesIO
+    from PIL import Image
+    from apps.services.models import Service
+
+    salon = owner_membership.salon
+    service = Service.objects.create(salon=salon, name="رنگ و لایت")
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+    payload = BytesIO()
+    Image.new("RGB", (8, 8), "white").save(payload, "PNG")
+    file_data = {
+        "name": "salon-photo.png", "mimeType": "image/png",
+        "buffer": payload.getvalue(),
+    }
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": width, "height": height},
+            locale="fa-IR", reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name": settings.SESSION_COOKIE_NAME, "value": cookie,
+            "url": live_server.url,
+        }])
+        page = context.new_page()
+        for route, query, form_id, cls in (
+            ("customers:list", "?create=1", "customer-create-form", "customer-form-file__btn"),
+            ("services:list", "?create=1", "service-create-form", "service-form-file__btn"),
+            ("services:list", f"?edit={service.pk}", "service-edit-form", "service-form-file__btn"),
+        ):
+            response = page.goto(live_server.url + reverse(route) + query, wait_until="load")
+            assert response and response.status == 200
+            form = page.locator(f"#{form_id}")
+            pw.expect(form).to_be_visible()
+            if route == "services:list":
+                form.get_by_role("button", name="تنظیمات بیشتر").click()
+            else:
+                form.get_by_role("button", name="اطلاعات تکمیلی").click()
+            label = form.locator(f"label.{cls}")
+            pw.expect(label).to_be_visible()
+            assert label.inner_text().strip() == "انتخاب تصویر"
+            native = label.locator("input[type=file]")
+            pw.expect(native).to_have_count(1)
+            dimensions = native.evaluate("""(el) => {
+                const css=getComputedStyle(el), b=el.getBoundingClientRect();
+                return [css.position, css.opacity, css.display, b.width, b.height];
+            }""")
+            assert dimensions[0:2] == ["absolute", "0"]
+            assert dimensions[2] != "none" and dimensions[3] <= 2 and dimensions[4] <= 2
+            with page.expect_file_chooser() as pending:
+                label.click()
+            pending.value.set_files(file_data)
+            assert native.evaluate("(el) => el.files[0].name") == "salon-photo.png"
+            assert "salon-photo.png" in form.inner_text()
+            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+        context.close()
+        browser.close()
