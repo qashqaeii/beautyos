@@ -889,3 +889,53 @@ def test_womens_onboarding_advances_in_real_browser(live_server, client, width, 
         browser.close()
 
     assert Salon.objects.get(name="سالن زیبایی نورا").business_type == Salon.BusinessType.BEAUTY_WOMEN
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(390,800), (1366,768)])
+def test_staff_invite_specialty_select_shows_saved_salon_services(
+    live_server, client, owner_membership, width, height,
+):
+    """The invited specialist's specialty is a dropdown backed by salon services."""
+    from apps.services.models import Service
+    from apps.salons.models import SalonInvitation
+
+    salon = owner_membership.salon
+    first = Service.objects.create(salon=salon, name="رنگ و لایت")
+    second = Service.objects.create(salon=salon, name="ناخن")
+    Service.objects.create(salon=salon, name="غیرفعال", is_active=False)
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": width, "height": height},
+            locale="fa-IR", reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name": settings.SESSION_COOKIE_NAME, "value": cookie, "url": live_server.url,
+        }])
+        page = context.new_page()
+        page.goto(live_server.url + reverse("staff:list") + "?create=1", wait_until="load")
+        modal = page.get_by_role("dialog", name="افزودن متخصص")
+        pw.expect(modal).to_be_visible()
+        specialty = modal.locator('select[name="specialty"]')
+        pw.expect(specialty).to_be_visible()
+        option_names = specialty.locator("option").all_text_contents()
+        assert "رنگ و لایت" in option_names and "ناخن" in option_names
+        assert "غیرفعال" not in option_names
+        assert len(option_names) == 3
+        modal.locator('input[name="first_name"]').fill("مریم")
+        modal.locator('input[name="last_name"]').fill("امینی")
+        modal.locator('input[name="phone"]').fill("09123459877")
+        specialty.select_option(str(second.pk))
+        modal.get_by_role("button", name="ارسال دعوت").click()
+        page.wait_for_url("**/staff/", wait_until="load")
+        context.close()
+        browser.close()
+
+    invitation = SalonInvitation.objects.get(salon=salon, phone="+989123459877")
+    assert invitation.invitee_service_id == second.pk

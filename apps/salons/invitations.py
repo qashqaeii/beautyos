@@ -7,6 +7,7 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.core.utils.phone import normalize_iran_mobile
 from apps.salons.models import Salon, SalonInvitation, SalonMembership
+from apps.services.models import Service
 
 
 def _active_owner_count(salon: Salon) -> int:
@@ -25,8 +26,19 @@ def create_invitation(
     invitee_first_name: str = "",
     invitee_last_name: str = "",
     invitee_specialty: str = "",
+    invitee_service: Service | None = None,
 ) -> SalonInvitation:
     phone = normalize_iran_mobile(phone)
+    if invitee_service is not None:
+        # Never trust a service id from another tenant or a disabled service.
+        invitee_service = Service.scoped(salon).filter(
+            pk=getattr(invitee_service, "pk", None),
+            is_active=True,
+            is_deleted=False,
+        ).first()
+        if invitee_service is None:
+            raise ValueError("خدمت انتخاب‌شده معتبر یا متعلق به این سالن نیست.")
+        invitee_specialty = invitee_service.name[:80]
     if SalonMembership.objects.filter(salon=salon, user__phone=phone, is_active=True).exists():
         raise ValueError("این کاربر از قبل عضو سالن است.")
     if SalonInvitation.objects.filter(salon=salon, phone=phone, status=SalonInvitation.Status.PENDING).exists():
@@ -40,6 +52,7 @@ def create_invitation(
         invitee_first_name=(invitee_first_name or "").strip(),
         invitee_last_name=(invitee_last_name or "").strip(),
         invitee_specialty=(invitee_specialty or "").strip(),
+        invitee_service=invitee_service,
         invited_by=inviter,
         token=secrets.token_urlsafe(32),
         expires_at=timezone.now() + timedelta(days=7),
@@ -87,6 +100,15 @@ def _ensure_specialist_profile_from_invite(invite: SalonInvitation, membership: 
             "title": invite.invitee_specialty or "",
         },
     )
+    # Apply the selected service only after the invite is accepted. A service
+    # deleted/disabled during the pending period must not be newly assigned.
+    selected_service = None
+    if invite.invitee_service_id:
+        selected_service = Service.scoped(invite.salon).filter(
+            pk=invite.invitee_service_id, is_active=True, is_deleted=False
+        ).first()
+    if selected_service is not None:
+        profile.services.add(selected_service)
     if created:
         return
     update_fields = []

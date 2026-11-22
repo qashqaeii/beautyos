@@ -93,7 +93,8 @@ def _staff_list_context(
     # Keep the default desktop table inside the first viewport; remaining rows use pagination.
     page = Paginator(filtered, 6).get_page(request.GET.get("page"))
     if form is None:
-        form = StaffInviteForm()
+        form = StaffInviteForm(salon=salon)
+    has_salon_services = form.fields["specialty"].queryset.exists()
     return {
         "staff_list": page.object_list,
         "staff_page": page, "directory_stats": directory_stats, "q": q,
@@ -101,6 +102,7 @@ def _staff_list_context(
         "view_mode": view_mode,
         "can_add_staff": has_permission(membership, P_STAFF_MANAGE),
         "form": form,
+        "has_salon_services": has_salon_services,
         "create_modal_open": create_modal_open,
     }
 
@@ -126,7 +128,7 @@ def staff_create(request):
         params["create"] = "1"
         return redirect(f"{reverse('staff:list')}?{params.urlencode()}")
 
-    form = StaffInviteForm(request.POST)
+    form = StaffInviteForm(request.POST, salon=request.salon)
     if form.is_valid():
         try:
             invitations.create_invitation(
@@ -136,7 +138,7 @@ def staff_create(request):
                 role=SalonMembership.Role.SPECIALIST,
                 invitee_first_name=form.cleaned_data["first_name"],
                 invitee_last_name=form.cleaned_data["last_name"],
-                invitee_specialty=form.cleaned_data["specialty"],
+                invitee_service=form.cleaned_data["specialty"],
             )
             full_name = f"{form.cleaned_data['first_name']} {form.cleaned_data['last_name']}"
             messages.success(request, f"دعوت برای {full_name} ارسال شد.")

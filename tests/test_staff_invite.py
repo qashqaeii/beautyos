@@ -44,3 +44,39 @@ def test_legacy_invite_without_names_still_accepts(salon, owner_membership):
     assert membership.role == SalonMembership.Role.SPECIALIST
     profile = StaffProfile.objects.get(membership=membership)
     assert profile.display_name == ""
+
+
+@pytest.mark.django_db
+def test_invitation_service_must_match_salon_even_without_form(salon, owner_membership):
+    import pytest
+    from apps.salons.models import Salon
+    from apps.services.models import Service
+
+    other = Salon.objects.create(name="سالن دیگر")
+    foreign = Service.objects.create(salon=other, name="ناخن")
+    with pytest.raises(ValueError, match="متعلق به این سالن"):
+        invitations.create_invitation(
+            salon=salon, inviter=owner_membership.user,
+            phone="+989121009990", role=SalonMembership.Role.SPECIALIST,
+            invitee_service=foreign,
+        )
+
+
+@pytest.mark.django_db
+def test_deleted_service_not_linked_when_invitation_accepted(salon, owner_membership):
+    from apps.services.models import Service
+
+    chosen = Service.objects.create(salon=salon, name="رنگ و لایت")
+    phone = "+989121009991"
+    user = UserModel.objects.create_user(phone=phone, full_name="")
+    invite = invitations.create_invitation(
+        salon=salon, inviter=owner_membership.user,
+        phone=phone, role=SalonMembership.Role.SPECIALIST,
+        invitee_service=chosen,
+    )
+    chosen.is_deleted = True
+    chosen.save(update_fields=["is_deleted"])
+    member = invitations.accept_invitation(invite.token, user)
+    profile = StaffProfile.objects.get(membership=member)
+    assert profile.title == "رنگ و لایت"
+    assert profile.services.count() == 0

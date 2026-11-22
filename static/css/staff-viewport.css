@@ -402,3 +402,26 @@
     transition:none;
   }
 }
+
+/* Staff invitation: native keyboard-accessible list of saved salon services. */
+body.theme-app .luna-modal--staff-invite select.staff-invite-service-select {
+  cursor: pointer;
+  direction: rtl;
+  text-align: right;
+  background-color: #fffdfa;
+  padding-inline-end: 28px;
+  line-height: 1.5;
+}
+body.theme-app .luna-modal--staff-invite select.staff-invite-service-select:focus-visible {
+  outline: 2px solid #a47d72;
+  outline-offset: 2px;
+}
+body.theme-app .luna-modal--staff-invite .staff-invite-field__services-link {
+  color: #83554e;
+  text-underline-offset: 3px;
+  text-decoration: underline;
+  font-weight: 700;
+}
+body.theme-app .luna-modal--staff-invite .staff-invite-field__services-link:hover {
+  color: #6c4039;
+}

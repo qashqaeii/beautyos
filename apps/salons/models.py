@@ -163,6 +163,10 @@ class SalonInvitation(TimeStampedModel):
     invitee_first_name = models.CharField(max_length=60, blank=True)
     invitee_last_name = models.CharField(max_length=60, blank=True)
     invitee_specialty = models.CharField(max_length=80, blank=True)
+    invitee_service = models.ForeignKey(
+        "services.Service", null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="specialist_invitations",
+    )
     role = models.CharField(max_length=20, choices=SalonMembership.Role.choices, default=SalonMembership.Role.RECEPTIONIST)
     invited_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="salon_invites_sent")
     token = models.CharField(max_length=64, unique=True, db_index=True)

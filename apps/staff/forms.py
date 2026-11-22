@@ -24,10 +24,15 @@ class StaffInviteForm(PersianForm):
         max_length=60,
         widget=forms.TextInput(attrs={"class": "input-field", "autocomplete": "family-name", "placeholder": "نام خانوادگی را وارد کنید"}),
     )
-    specialty = forms.CharField(
+    specialty = forms.ModelChoiceField(
         label="تخصص",
-        max_length=80,
-        widget=forms.TextInput(attrs={"class": "input-field", "placeholder": "مثلاً رنگ و مش"}),
+        queryset=Service.objects.none(),
+        empty_label="انتخاب از خدمات سالن",
+        widget=forms.Select(attrs={"class": "input-field staff-invite-service-select"}),
+        error_messages={
+            "required": "یکی از خدمات ثبت‌شده سالن را انتخاب کنید.",
+            "invalid_choice": "خدمت انتخاب‌شده معتبر یا متعلق به این سالن نیست.",
+        },
     )
     phone = forms.CharField(
         label="شماره موبایل",
@@ -43,6 +48,15 @@ class StaffInviteForm(PersianForm):
         ),
     )
 
+    def __init__(self, *args, salon=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if salon is not None:
+            self.fields["specialty"].queryset = (
+                Service.scoped(salon)
+                .filter(is_active=True, is_deleted=False)
+                .order_by("sort_order", "name", "pk")
+            )
+
     def clean_first_name(self):
         value = (self.cleaned_data.get("first_name") or "").strip()
         if not value:
@@ -53,12 +67,6 @@ class StaffInviteForm(PersianForm):
         value = (self.cleaned_data.get("last_name") or "").strip()
         if not value:
             raise ValidationError("نام خانوادگی را وارد کنید.")
-        return value
-
-    def clean_specialty(self):
-        value = (self.cleaned_data.get("specialty") or "").strip()
-        if not value:
-            raise ValidationError("تخصص را وارد کنید.")
         return value
 
     def clean_phone(self):
