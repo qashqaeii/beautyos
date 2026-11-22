@@ -1007,3 +1007,100 @@ def test_modal_image_choose_button_hides_native_file_control_and_works(
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
         context.close()
         browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(1366,768), (390,800)])
+def test_checkout_editorial_customer_selection_and_invoice_workflow(
+    live_server, client, owner_membership, width, height,
+):
+    """Real browser: compact selection, live totals, safe issue and thank-you."""
+    from apps.appointments.models import Appointment
+    from apps.customers.models import Customer
+    from apps.finance.models import Invoice
+    from apps.services.models import Service
+    from apps.staff.models import StaffProfile
+
+    salon = owner_membership.salon
+    customers = [
+        Customer.objects.create(
+            salon=salon, full_name=f"مشتری زیبایی {index}",
+            phone=f"+989121980{index:04d}",
+        )
+        for index in range(7)
+    ]
+    customer = customers[0]
+    staff, _ = StaffProfile.objects.get_or_create(
+        salon=salon, membership=owner_membership,
+    )
+    service = Service.objects.create(
+        salon=salon, name="رنگ و لایت", price_toman=800000,
+    )
+    now = timezone.now()
+    appt = Appointment.objects.create(
+        salon=salon, customer=customer, staff=staff, service=service,
+        status=Appointment.Status.COMPLETED,
+        start_at=now - timedelta(days=1),
+        end_at=now - timedelta(days=1) + timedelta(minutes=50),
+        completed_at=now, price_toman=800000,
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": width, "height": height},
+            locale="fa-IR", reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name": settings.SESSION_COOKIE_NAME,
+            "value": cookie, "url": live_server.url,
+        }])
+        page = context.new_page()
+        search_url = live_server.url + reverse("finance:checkout_customers")
+        response = page.goto(search_url, wait_until="load")
+        assert response and response.status == 200
+        pw.expect(page.get_by_role("heading", name="صدور فاکتور")).to_be_visible()
+        pw.expect(page.locator(".checkout-workspace__customer-row")).to_have_count(6)
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+        if width >= 1100:
+            assert page.locator(".checkout-workspace__paper").bounding_box()["y"] < height
+            assert page.locator(".checkout-workspace__gratitude").bounding_box()["y"] < height
+
+        # Search is functional and not just a visual mockup.
+        page.locator("#checkout-search").fill("مشتری زیبایی 0")
+        page.get_by_role("button", name="جستجو").click()
+        pw.expect(page.locator(".checkout-workspace__customer-row")).to_have_count(1)
+        page.locator(".checkout-workspace__customer-row").click()
+        page.wait_for_url("**/finance/checkout/*/")
+        invoice_form = page.locator("form.checkout-workspace__invoice")
+        pw.expect(invoice_form).to_be_visible()
+        pw.expect(page.locator(".checkout-workspace__table tbody tr")).to_have_count(1)
+        assert "پیش‌نویس فاکتور" in invoice_form.inner_text()
+        assert "رنگ و لایت" in invoice_form.inner_text()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+        if width >= 1100:
+            assert invoice_form.bounding_box()["y"] + invoice_form.bounding_box()["height"] <= height + 3, "ordinary invoice extends beyond desktop viewport"
+
+        checkbox = invoice_form.locator(f'input[name="appointment"][value="{appt.pk}"]')
+        checkbox.check()
+        cash = invoice_form.locator('input[name="cash"]')
+        cash.fill("200000")
+        assert "تومان" in invoice_form.locator(".checkout-workspace__balance strong").inner_text()
+        invoice_form.get_by_role("button", name="ثبت فاکتور و پرداخت").click()
+        page.wait_for_url("**/finance/invoices/*/")
+        assert page.locator(".checkout-workspace--issued").count() == 1
+        assert "از اعتماد شما سپاسگزاریم" in page.locator(".checkout-workspace__gratitude").inner_text()
+        assert "چاپ / ذخیره PDF" in page.locator(".checkout-workspace__invoice-actions").inner_text()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+        context.close()
+        browser.close()
+
+    issued = Invoice.scoped(salon).get(customer=customer)
+    assert issued.gross_toman == 800000
+    assert issued.received_toman == 200000
+    assert issued.balance_at_issue_toman == 600000

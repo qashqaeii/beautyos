@@ -3,7 +3,8 @@ from uuid import uuid4
 from django import forms
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Count, Q, Sum
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
@@ -34,6 +35,25 @@ def _require(request, permission):
         raise PermissionDenied
 
 
+def _checkout_invoice_context(request):
+    """Real, permission-scoped invoice figures shared by both checkout screens."""
+    if not has_permission(request.membership, P_PAYMENT_VIEW):
+        return {"can_view_invoices": False, "latest_invoices": []}
+    invoices = Invoice.scoped(request.salon)
+    totals = invoices.filter(created_at__date=timezone.localdate()).aggregate(
+        count=Count("pk"),
+        customers=Count("customer_id", distinct=True),
+        amount=Sum("gross_toman"),
+    )
+    return {
+        "can_view_invoices": True,
+        "today_invoice_count": totals["count"] or 0,
+        "today_customer_count": totals["customers"] or 0,
+        "today_gross_toman": totals["amount"] or 0,
+        "latest_invoices": invoices.order_by("-created_at", "-pk")[:3],
+    }
+
+
 @salon_required
 @require_http_methods(["GET"])
 def checkout_customers(request):
@@ -42,7 +62,11 @@ def checkout_customers(request):
     customers = Customer.scoped(request.salon).filter(is_deleted=False)
     if q:
         customers = customers.filter(Q(full_name__icontains=q) | Q(phone__icontains=q))
-    return render(request, "finance/checkout_customers.html", {"customers": customers.order_by("full_name", "pk")[:50], "q": q})
+    customers_page = Paginator(customers.order_by("full_name", "pk"), 6).get_page(request.GET.get("page"))
+    return render(request, "finance/checkout_customers.html", {
+        "customers": customers_page.object_list, "customers_page": customers_page,
+        "q": q, **_checkout_invoice_context(request),
+    })
 
 
 @salon_required
@@ -69,7 +93,12 @@ def checkout(request, customer_id):
         gross, paid, discount, owed=appointment_amounts(appt)
         rows.append({"appointment":appt,"gross":gross,"paid":paid,"discount":discount,"owed":owed,"selected":str(appt.pk) in selected})
     from apps.loyalty.benefits import available_vouchers
-    return render(request, "finance/checkout.html", {"customer":customer,"form":form,"rows":rows,"vouchers":available_vouchers(request.salon,customer),"selected_voucher":str(form["voucher"].value() or "")})
+    return render(request, "finance/checkout.html", {
+        "customer": customer, "form": form, "rows": rows,
+        "vouchers": available_vouchers(request.salon, customer),
+        "selected_voucher": str(form["voucher"].value() or ""),
+        **_checkout_invoice_context(request),
+    })
 
 
 @salon_required
@@ -90,5 +119,8 @@ def invoice_detail(request, invoice_id):
     lines=list(invoice.lines.filter(salon=request.salon).select_related("appointment").prefetch_related("appointment__payments").order_by("pk"))
     current_balance = sum(appointment_amounts(line.appointment)[3] for line in lines
                           if line.appointment.status == Appointment.Status.COMPLETED)
-    return render(request, "finance/invoice.html", {"invoice":invoice,"lines":lines,
-        "current_balance":current_balance,"receipts":invoice.payments.filter(salon=request.salon,paid_amount_toman__gt=0)})
+    return render(request, "finance/invoice.html", {
+        "invoice": invoice, "lines": lines, "current_balance": current_balance,
+        "receipts": invoice.payments.filter(salon=request.salon,paid_amount_toman__gt=0),
+        **_checkout_invoice_context(request),
+    })

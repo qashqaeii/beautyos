@@ -1,12 +1,52 @@
 {% extends "layouts/app_shell.html" %}
-{% block page_title %}صدور فاکتور{% endblock %}
-{% block page_subtitle %}ابتدا مشتری را انتخاب کنید{% endblock %}
+{% load static format_tags l10n %}
+{% block title %}صدور فاکتور | BeautyOS{% endblock %}
+{% block workspace_header %}{% endblock %}
+{% block shell_modifier %}beautyos-checkout-shell{% endblock %}
+{% block page_styles_after_suite %}<link rel="stylesheet" href="{% static 'css/checkout-editorial.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
 {% block content %}
-<section class="premium-card p-4 max-w-2xl mx-auto space-y-4">
-  <form method="get" class="flex gap-2"><label for="checkout-search" class="sr-only">نام یا شماره مشتری</label><input id="checkout-search" name="q" value="{{ q }}" class="input-field min-w-0 flex-1" placeholder="نام یا شماره مشتری"><button class="btn-primary" type="submit">جستجو</button></form>
-  {% for customer in customers %}
-  <a class="flex items-center justify-between gap-3 border-b border-line py-3" href="{% url 'finance:checkout' customer.pk %}"><span>{{ customer.full_name }}<small class="block text-xs text-ink-secondary" dir="ltr">{{ customer.phone }}</small></span><i data-lucide="chevron-left" aria-hidden="true"></i></a>
-  {% empty %}<p class="text-sm text-ink-secondary">مشتری یافت نشد.</p>{% endfor %}
-  <p class="text-xs text-ink-secondary">حداکثر ۵۰ نتیجه؛ برای مشتری‌های دیگر جستجو کنید.</p>
-</section>
+<div class="checkout-workspace checkout-workspace--search">
+  {% include "finance/partials/checkout_hero.html" with subtitle="فاکتور خدمات زیبایی، با ثبت دقیق دریافت‌ها و مانده‌ها" %}
+  <form class="checkout-workspace__search" action="{% url 'finance:checkout_customers' %}" method="get" role="search">
+    <label for="checkout-search" class="sr-only">نام یا شماره موبایل مشتری</label>
+    <i data-lucide="search" aria-hidden="true"></i>
+    <input id="checkout-search" name="q" type="search" value="{{ q }}" class="input-field" autocomplete="off" placeholder="نام یا شماره موبایل مشتری را جستجو کنید">
+    <button class="checkout-workspace__btn checkout-workspace__btn--primary" type="submit">جستجو</button>
+  </form>
+  <div class="checkout-workspace__layout">
+    <section class="checkout-workspace__paper checkout-workspace__customers" aria-labelledby="checkout-customers-title">
+      <div class="checkout-workspace__section-heading">
+        <div><h2 id="checkout-customers-title"><i data-lucide="users-round" aria-hidden="true"></i>{% if q %}نتایج جستجو{% else %}انتخاب مشتری{% endif %}</h2>
+          <p>{% if q %}مشتری‌های مطابق «{{ q }}»{% else %}برای صدور فاکتور، یکی از مشتریان سالن را انتخاب کنید{% endif %}</p></div>
+        <span class="checkout-workspace__count">{{ customers_page.paginator.count|fa_num }} مشتری</span>
+      </div>
+      <div class="checkout-workspace__customer-list">
+      {% for customer in customers %}
+        <a href="{% url 'finance:checkout' customer.pk %}" class="checkout-workspace__customer-row">
+          <span class="checkout-workspace__avatar" aria-hidden="true"><i data-lucide="user-round"></i></span>
+          <span class="checkout-workspace__customer-name"><strong>{{ customer.full_name }}</strong><small dir="ltr">{{ customer.phone }}</small></span>
+          <span class="checkout-workspace__customer-open">انتخاب <i data-lucide="chevron-left" aria-hidden="true"></i></span>
+        </a>
+      {% empty %}
+        <div class="checkout-workspace__empty">
+          <i data-lucide="search-x" aria-hidden="true"></i><strong>مشتری یافت نشد</strong>
+          <span>نام یا شماره موبایل دیگری وارد کنید.</span>
+          {% if q %}<a href="{% url 'finance:checkout_customers' %}">نمایش همه مشتریان</a>{% endif %}
+        </div>
+      {% endfor %}
+      </div>
+      <nav class="checkout-workspace__paging" aria-label="صفحه‌بندی مشتریان">
+        {% if customers_page.has_previous %}
+          <a href="?q={{ q|urlencode }}&amp;page={{ customers_page.previous_page_number|unlocalize }}"><i data-lucide="chevron-right" aria-hidden="true"></i> قبلی</a>
+        {% endif %}
+        <span>صفحه {{ customers_page.number|fa_num }} از {{ customers_page.paginator.num_pages|fa_num }}</span>
+        {% if customers_page.has_next %}
+          <a href="?q={{ q|urlencode }}&amp;page={{ customers_page.next_page_number|unlocalize }}">بعدی <i data-lucide="chevron-left" aria-hidden="true"></i></a>
+        {% endif %}
+      </nav>
+      <div class="checkout-workspace__gratitude checkout-workspace__gratitude--compact"><i data-lucide="flower-2" aria-hidden="true"></i><p>از اعتماد شما سپاسگزاریم؛ زیبایی شما افتخار ماست.</p></div>
+    </section>
+    {% include "finance/partials/checkout_sidebar.html" %}
+  </div>
+</div>
 {% endblock %}

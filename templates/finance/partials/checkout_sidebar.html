@@ -1,0 +1,30 @@
+{% load format_tags %}
+{% if can_view_invoices %}
+<aside class="checkout-workspace__sidebar" aria-label="خلاصه فاکتورهای سالن">
+  <section class="checkout-workspace__sidebar-card">
+    <h2><i data-lucide="chart-no-axes-column" aria-hidden="true"></i>فاکتورهای امروز</h2>
+    <div class="checkout-workspace__stats">
+      <div><i data-lucide="users-round" aria-hidden="true"></i><strong>{{ today_customer_count|fa_num }}</strong><small>مشتری</small></div>
+      <div><i data-lucide="receipt" aria-hidden="true"></i><strong>{{ today_invoice_count|fa_num }}</strong><small>فاکتور</small></div>
+    </div>
+    <div class="checkout-workspace__today-total"><span>جمع مبلغ فاکتورهای امروز</span><strong><bdi>{{ today_gross_toman|fa_money }}</bdi> <small>تومان</small></strong></div>
+  </section>
+  <section class="checkout-workspace__sidebar-card checkout-workspace__recent">
+    <h2><i data-lucide="history" aria-hidden="true"></i>فاکتورهای اخیر</h2>
+    {% for previous in latest_invoices %}
+      <a href="{% url 'finance:invoice_detail' previous.pk %}">
+        <span><strong>{{ previous.customer_name }}</strong><small>فاکتور {{ previous.pk|fa_num }} · {{ previous.created_at|fa_jalali }}</small></span>
+        <bdi>{{ previous.gross_toman|fa_money }}</bdi>
+      </a>
+    {% empty %}<p class="checkout-workspace__sidebar-empty">هنوز فاکتوری ثبت نشده است.</p>{% endfor %}
+    <a class="checkout-workspace__recent-all" href="{% url 'finance:invoices' %}">مشاهده همه فاکتورها <i data-lucide="chevron-left" aria-hidden="true"></i></a>
+  </section>
+</aside>
+{% else %}
+<aside class="checkout-workspace__sidebar checkout-workspace__sidebar--restricted">
+  <section class="checkout-workspace__sidebar-card">
+    <h2><i data-lucide="shield-check" aria-hidden="true"></i>ثبت امن فاکتور</h2>
+    <p>فقط خدمات انجام‌شده همین سالن قابل صدور هستند. مبالغ و تسویه‌ها هنگام ثبت بررسی می‌شوند.</p>
+  </section>
+</aside>
+{% endif %}

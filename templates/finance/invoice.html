@@ -1,24 +1,65 @@
 {% extends "layouts/app_shell.html" %}
-{% load format_tags static %}
-{% block page_title %}فاکتور خدمات{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% load static format_tags l10n %}
+{% block title %}فاکتور {{ invoice.pk|fa_num }} | BeautyOS{% endblock %}
+{% block workspace_header %}{% endblock %}
+{% block shell_modifier %}beautyos-checkout-shell{% endblock %}
+{% block page_styles_after_suite %}<link rel="stylesheet" href="{% static 'css/checkout-editorial.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
 {% block content %}
-<style>@media print { .maison-sidebar,.maison-mobile-bar,.maison-unified-header,.receipt-actions,.maison-sheet {display:none!important} body,.maison-app,.maison-main{background:white!important} .maison-content{padding:0!important} .fin-panel{box-shadow:none!important;border:0!important} }</style>
-<div class="max-w-2xl mx-auto space-y-3">
-  <article class="fin-panel">
-    <header class="fin-panel-head"><div><h2>{{ active_salon.name }} · فاکتور {{ invoice.pk|fa_num }}</h2><p class="fin-muted">{{ invoice.customer_name }} · {{ invoice.created_at|fa_jalali_datetime }}</p></div></header>
-    {% for line in lines %}<div class="fin-line"><span><strong>{{ line.service_name }}</strong> · {{ line.staff_name }}{% if line.appointment.status == 'cancelled' %} · لغوشده{% endif %}</span><bdi>{{ line.gross_toman|fa_money }} تومان</bdi></div>{% endfor %}
-    <div class="fin-line"><span>کل خدمات</span><bdi>{{ invoice.gross_toman|fa_money }} تومان</bdi></div>
-    <div class="fin-line"><span>تخفیف قبلی</span><bdi>{{ invoice.prior_discount_toman|fa_money }} تومان</bdi></div>
-    <div class="fin-line"><span>پرداخت قبلی / بیعانه</span><bdi>{{ invoice.prior_paid_toman|fa_money }} تومان</bdi></div>
-    <div class="fin-line"><span>تخفیف جدید</span><bdi>{{ invoice.discount_toman|fa_money }} تومان</bdi></div>
-    {% if invoice.loyalty_voucher %}<div class="fin-line"><span>از تخفیف بالا: {{ invoice.loyalty_voucher.title }}</span><bdi>{{ invoice.loyalty_voucher.amount_toman|fa_money }} تومان</bdi></div>{% endif %}
-    <div class="fin-line"><span>دریافتی هنگام صدور</span><bdi>{{ invoice.received_toman|fa_money }} تومان</bdi></div>
-    <div class="fin-received-total"><small>مانده هنگام صدور</small><strong>{{ invoice.balance_at_issue_toman|fa_money }} تومان</strong></div>
-    <div class="fin-line"><span>مانده فعلی خدمات فعال</span><bdi>{{ current_balance|fa_money }} تومان</bdi></div>
-    {% for receipt in receipts %}<div class="fin-line"><span>{{ receipt.get_method_display }}</span><a href="{% url 'finance:receipt' receipt.pk %}">{{ receipt.paid_amount_toman|fa_money }} تومان · رسید</a></div>{% endfor %}
-    <p class="fin-muted">مبالغ هنگام صدور ثابت هستند. پرداخت‌های بعدی در مانده فعلی خدمات منعکس می‌شوند. این فاکتور داخلی سالن است.</p>
-  </article>
-  <div class="receipt-actions flex gap-2 flex-wrap"><button type="button" class="btn-primary" onclick="window.print()">چاپ / ذخیره PDF</button><a href="{% url 'finance:invoices' %}" class="btn-secondary">فهرست فاکتورها</a></div>
+<div class="checkout-workspace checkout-workspace--issued">
+  {% include "finance/partials/checkout_hero.html" with subtitle="فاکتور ثبت‌شده سالن، قابل چاپ و نگهداری در پرونده مالی" %}
+  <div class="checkout-workspace__layout">
+    <article class="checkout-workspace__paper checkout-workspace__invoice">
+      <div class="checkout-workspace__invoice-head checkout-workspace__invoice-head--issued">
+        <span class="checkout-workspace__invoice-ref"><i data-lucide="badge-check" aria-hidden="true"></i>فاکتور {{ invoice.pk|fa_num }}<small>{{ invoice.created_at|fa_jalali_datetime }}</small></span>
+        <div class="checkout-workspace__invoice-brand"><i data-lucide="flower-2" aria-hidden="true"></i><strong>{{ active_salon.name }}</strong><small>فاکتور خدمات زیبایی</small></div>
+        <span class="checkout-workspace__invoice-status">ثبت‌شده</span>
+      </div>
+      <div class="checkout-workspace__issued-customer"><i data-lucide="user-round" aria-hidden="true"></i><span>مشتری</span><strong>{{ invoice.customer_name }}</strong></div>
+      <section class="checkout-workspace__services" aria-label="خدمات فاکتور">
+        <div class="checkout-workspace__table-wrap">
+          <table class="checkout-workspace__table checkout-workspace__table--issued">
+            <thead><tr><th scope="col">ردیف</th><th scope="col">خدمت و متخصص</th><th scope="col">مبلغ خدمت</th><th scope="col">پرداخت قبلی</th><th scope="col">مانده هنگام صدور</th></tr></thead>
+            <tbody>
+              {% for line in lines %}
+              <tr>
+                <td>{{ forloop.counter|fa_num }}</td>
+                <td><strong>{{ line.service_name }}</strong><small>{{ line.staff_name }}{% if line.appointment.status == 'cancelled' %} · لغوشده{% endif %}</small></td>
+                <td data-label="مبلغ خدمت"><bdi>{{ line.gross_toman|fa_money }}</bdi></td>
+                <td data-label="پرداخت قبلی"><bdi>{{ line.prior_paid_toman|fa_money }}</bdi></td>
+                <td data-label="مانده هنگام صدور" class="checkout-workspace__due"><bdi>{{ line.balance_at_issue_toman|fa_money }}</bdi></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <div class="checkout-workspace__settlement checkout-workspace__settlement--issued">
+        <div class="checkout-workspace__issued-lines">
+          <div><span>جمع خدمات</span><bdi>{{ invoice.gross_toman|fa_money }} تومان</bdi></div>
+          <div><span>تخفیف قبلی</span><bdi>{{ invoice.prior_discount_toman|fa_money }} تومان</bdi></div>
+          <div><span>بیعانه و پرداخت قبلی</span><bdi>{{ invoice.prior_paid_toman|fa_money }} تومان</bdi></div>
+          <div><span>تخفیف زمان صدور</span><bdi>{{ invoice.discount_toman|fa_money }} تومان</bdi></div>
+          {% if invoice.loyalty_voucher %}<div><span>شامل اعتبار {{ invoice.loyalty_voucher.title }}</span><span>{{ invoice.loyalty_voucher.amount_toman|fa_money }} تومان</span></div>{% endif %}
+          <div><span>دریافتی هنگام صدور</span><bdi>{{ invoice.received_toman|fa_money }} تومان</bdi></div>
+        </div>
+        <div class="checkout-workspace__totals">
+          <div><span>مانده هنگام صدور</span><bdi>{{ invoice.balance_at_issue_toman|fa_money }} تومان</bdi></div>
+          <div class="checkout-workspace__balance"><span>مانده فعلی خدمات فعال</span><strong>{{ current_balance|fa_money }} تومان</strong></div>
+          <small>مبالغ هنگام صدور ثابت هستند و پرداخت‌های بعدی در مانده فعلی منعکس می‌شوند.</small>
+        </div>
+      </div>
+      {% if receipts %}
+      <section class="checkout-workspace__receipts"><h2><i data-lucide="receipt" aria-hidden="true"></i>رسیدهای پرداخت</h2>
+        {% for receipt in receipts %}<a href="{% url 'finance:receipt' receipt.pk %}">{{ receipt.get_method_display }} · {{ receipt.paid_amount_toman|fa_money }} تومان <i data-lucide="chevron-left" aria-hidden="true"></i></a>{% endfor %}
+      </section>
+      {% endif %}
+      <div class="checkout-workspace__invoice-actions checkout-workspace__invoice-actions--issued">
+        <a href="{% url 'finance:invoices' %}" class="checkout-workspace__btn checkout-workspace__btn--outline"><i data-lucide="files" aria-hidden="true"></i>فهرست فاکتورها</a>
+        <button type="button" class="checkout-workspace__btn checkout-workspace__btn--primary" onclick="window.print()"><i data-lucide="printer" aria-hidden="true"></i>چاپ / ذخیره PDF</button>
+      </div>
+      <div class="checkout-workspace__gratitude"><i data-lucide="flower-2" aria-hidden="true"></i><p>از اعتماد شما سپاسگزاریم؛ زیبایی شما افتخار ماست.</p></div>
+    </article>
+    {% include "finance/partials/checkout_sidebar.html" %}
+  </div>
 </div>
 {% endblock %}

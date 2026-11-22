@@ -57,3 +57,119 @@ def test_checkout_rejects_uncompleted_and_foreign_ids(salon,owner_membership):
         issue_invoice(salon=salon,customer_id=customer.pk,appointment_ids=[999999],request_key=uuid4(),
             discount=0,amounts={"cash":0,"card":0,"transfer":0},actor=owner_membership.user)
     assert not Invoice.scoped(salon).exists()
+
+
+@pytest.mark.django_db
+def test_editorial_checkout_customer_picker_is_paginated_tenant_scoped_and_real(
+    client, owner_membership, salon, salon_b,
+):
+    from django.contrib.staticfiles import finders
+
+    for index in range(8):
+        Customer.objects.create(
+            salon=salon, full_name=f"مشتری خدمات {index}",
+            phone=f"+989121780{index:04d}",
+        )
+    Customer.objects.create(
+        salon=salon_b, full_name="مشتری سالن دیگر",
+        phone="+989121799999",
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+
+    url = reverse("finance:checkout_customers")
+    first = client.get(url)
+    assert first.status_code == 200
+    html = first.content.decode()
+    assert 'class="checkout-workspace checkout-workspace--search"' in html
+    assert html.count('class="checkout-workspace__customer-row"') == 6
+    assert first.context["customers_page"].paginator.count == 8
+    assert "مشتری سالن دیگر" not in html
+    assert "checkout-editorial.css" in html
+    assert "فاکتورهای امروز" in html
+    assert "از اعتماد شما سپاسگزاریم" in html
+    assert "page=2" in html
+    assert finders.find("css/checkout-editorial.css")
+
+    second = client.get(url, {"page": "2"})
+    assert second.status_code == 200
+    assert len(second.context["customers"]) == 2
+    filtered = client.get(url, {"q": "خدمات 3"})
+    assert filtered.status_code == 200
+    assert filtered.context["customers_page"].paginator.count == 1
+    assert "مشتری خدمات 3" in filtered.content.decode()
+
+
+@pytest.mark.django_db
+def test_editorial_checkout_preserves_payment_fields_and_empty_state(
+    client, owner_membership, salon,
+):
+    customer = Customer.objects.create(
+        salon=salon, full_name="نگار امینی", phone="+989121780100",
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    response = client.get(reverse("finance:checkout", args=[customer.pk]))
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert "checkout-workspace--builder" in html
+    assert "خدمت قابل صدور وجود ندارد" in html
+    assert "ثبت فاکتور و پرداخت" in html
+    assert 'name="request_key"' in html
+    assert 'name="appointment"' not in html
+    assert 'type="submit"' in html
+    for key in ("discount", "cash", "card", "transfer"):
+        assert f'name="{key}"' in html
+    assert "از اعتماد شما سپاسگزاریم" in html
+
+
+@pytest.mark.django_db
+def test_editorial_invoice_detail_is_printable_and_keeps_issue_time_amounts(
+    client, owner_membership, salon,
+):
+    customer = Customer.objects.create(
+        salon=salon, full_name="مریم رضایی", phone="+989121780101",
+    )
+    staff, _ = StaffProfile.objects.get_or_create(
+        salon=salon, membership=owner_membership,
+    )
+    service = Service.objects.create(
+        salon=salon, name="مراقبت پوست", price_toman=760000,
+    )
+    now = timezone.now()
+    appt = Appointment.objects.create(
+        salon=salon, customer=customer, staff=staff, service=service,
+        start_at=now - timedelta(days=1),
+        end_at=now - timedelta(days=1) + timedelta(minutes=40),
+        completed_at=now, status=Appointment.Status.COMPLETED,
+        price_toman=760000,
+    )
+    invoice = issue_invoice(
+        salon=salon, customer_id=customer.pk,
+        appointment_ids=[appt.pk], request_key=uuid4(), discount=60000,
+        amounts={"cash": 200000, "card": 0, "transfer": 0},
+        actor=owner_membership.user,
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    response = client.get(reverse("finance:invoice_detail", args=[invoice.pk]))
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert "checkout-workspace--issued" in html
+    assert "مراقبت پوست" in html
+    assert "مریم رضایی" in html
+    assert "چاپ / ذخیره PDF" in html
+    assert "window.print()" in html
+    assert "از اعتماد شما سپاسگزاریم" in html
+    assert "checkout-workspace__balance" in html
+    invoice.refresh_from_db()
+    assert invoice.gross_toman == 760000
+    assert invoice.discount_toman == 60000
+    assert invoice.received_toman == 200000
+    assert invoice.balance_at_issue_toman == 500000

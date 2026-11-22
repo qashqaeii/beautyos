@@ -1,0 +1,8 @@
+{% load static %}
+<header class="checkout-workspace__hero">
+  <div class="checkout-workspace__hero-copy">
+    <span class="checkout-workspace__hero-icon" aria-hidden="true"><i data-lucide="receipt-text"></i></span>
+    <div><h1>صدور فاکتور</h1><p>{{ subtitle }}</p></div>
+  </div>
+  <img class="checkout-workspace__hero-art" src="{% static 'images/finance-hero-approved.webp' %}?v={{ BEAUTYOS_ASSET_VERSION }}" width="360" height="179" alt="" aria-hidden="true" decoding="async">
+</header>
