@@ -1,0 +1,41 @@
+# Never send local secrets or runtime state to the Docker build context.
+.git
+.github
+.env
+.env.*
+*.env
+*.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+*.log
+*.log.*
+.pg_test_data/
+
+# Developer/runtime clutter
+.venv/
+venv/
+node_modules/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage/
+htmlcov/
+browser-artifacts/
+*.xml
+
+# Runtime image needs the application and its vendored static files, not tests
+# or local development documentation.
+tests/
+docs/
+.gitignore
+docker-compose.yml

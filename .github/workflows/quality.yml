@@ -86,3 +86,26 @@ jobs:
           name: test-report
           path: pytest-report.xml
           if-no-files-found: ignore
+
+  docker:
+    name: Docker image safety
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build release image and verify context isolation
+        run: |
+          # Intentional test secrets: prove they cannot enter the final image.
+          printf 'DOCKER_TEST_PRIVATE_SENTINEL=never-ship\n' > .env
+          mkdir -p media
+          printf 'private-media-marker\n' > media/ci-private-file.txt
+          docker build --file docker/Dockerfile --tag beautyos:ci .
+          docker run --rm --entrypoint sh beautyos:ci -ec '
+            test "$(id -u)" = "10001"
+            test "$DJANGO_SETTINGS_MODULE" = "config.settings.production"
+            test -s /app/staticfiles/css/beautyos.css
+            test ! -e /app/.env
+            test ! -d /app/.git
+            test ! -e /app/media/ci-private-file.txt
+            echo "Release Docker image context and runtime checks passed."
+          '
