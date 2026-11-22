@@ -17,14 +17,14 @@
   >
     <template x-if="birthPicker">
       <header class="jalali-date__popover-head jalali-date__popover-head--birth">
-        <select class="jalali-date__month-select" x-model.number="viewJm" aria-label="ماه">
+        <select class="jalali-date__month-select jalali-date__period-control" x-model.number="viewJm" aria-label="ماه">
           <template x-for="(m, idx) in monthsFaList" :key="idx">
             <option :value="idx + 1" x-text="m"></option>
           </template>
         </select>
         <input
           type="number"
-          class="jalali-date__year-input input-field"
+          class="jalali-date__year-input jalali-date__period-control input-field"
           x-model.number="viewJy"
           :max="maxJalaliYear"
           min="1300"
@@ -38,11 +38,11 @@
         <button type="button" class="jalali-date__nav" @click.stop="prevMonth()" :disabled="!canMoveMonth(-1)" aria-label="ماه قبل">
           <span class="jalali-date__nav-icon" aria-hidden="true">›</span>
         </button>
-        <div class="jalali-date__direct-selects">
-          <select class="jalali-date__direct-select" @change="setViewMonth(Number($event.target.value))" aria-label="انتخاب ماه">
+        <div class="jalali-date__direct-selects jalali-date__period-controls">
+          <select class="jalali-date__direct-select jalali-date__period-control" @change="setViewMonth(Number($event.target.value))" aria-label="انتخاب ماه">
             <template x-for="month in monthOptions" :key="month.value"><option :value="month.value" :selected="month.value === viewJm" :disabled="month.disabled" x-text="month.label"></option></template>
           </select>
-          <select class="jalali-date__direct-select" @change="setViewYear(Number($event.target.value))" aria-label="انتخاب سال">
+          <select class="jalali-date__direct-select jalali-date__period-control" @change="setViewYear(Number($event.target.value))" aria-label="انتخاب سال">
             <template x-for="year in yearOptions" :key="year.value"><option :value="year.value" :selected="year.value === viewJy" x-text="year.label"></option></template>
           </select>
         </div>

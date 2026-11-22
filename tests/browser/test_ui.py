@@ -1104,3 +1104,123 @@ def test_checkout_editorial_customer_selection_and_invoice_workflow(
     assert issued.gross_toman == 800000
     assert issued.received_toman == 200000
     assert issued.balance_at_issue_toman == 600000
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(390,800), (1366,768)])
+def test_shared_jalali_birth_picker_has_equal_month_year_cards_and_working_days(
+    live_server, client, owner_membership, width, height,
+):
+    """The customer birthday calendar shares the Editorial Rose geometry on mobile and desktop."""
+    import jdatetime
+
+    client.force_login(owner_membership.user)
+    session=client.session
+    session["active_salon_id"]=str(owner_membership.salon_id)
+    session.save()
+    with pw.sync_playwright() as playwright:
+        browser=playwright.chromium.launch(headless=True)
+        context=browser.new_context(
+            viewport={"width":width,"height":height},
+            locale="fa-IR",reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name":settings.SESSION_COOKIE_NAME,
+            "value":client.cookies[settings.SESSION_COOKIE_NAME].value,
+            "url":live_server.url,
+        }])
+        page=context.new_page()
+        errors=[]
+        page.on("pageerror",lambda error:errors.append(str(error)))
+        response=page.goto(
+            live_server.url+reverse("customers:list")+"?create=1",
+            wait_until="load",
+        )
+        assert response and response.status==200
+        form=page.locator("#customer-create-form")
+        pw.expect(form).to_be_visible()
+        form.get_by_role("button",name="اطلاعات تکمیلی").click()
+        trigger=form.locator('[data-jalali-calendar-trigger]')
+        pw.expect(trigger).to_be_visible()
+        trigger.click()
+        calendar=page.locator(".jalali-date__popover--portal:visible")
+        pw.expect(calendar).to_be_visible()
+        pw.expect(calendar).to_have_class("jalali-date__popover jalali-date__popover--portal jalali-date__popover--birth")
+        month=calendar.get_by_label("ماه",exact=True)
+        year=calendar.get_by_label("سال",exact=True)
+        pw.expect(month).to_be_visible()
+        pw.expect(year).to_be_visible()
+        mb=month.bounding_box()
+        yb=year.bounding_box()
+        assert mb and yb
+        assert abs(mb["width"]-yb["width"])<=1, (width,mb,yb)
+        assert abs(mb["height"]-yb["height"])<=1, (width,mb,yb)
+        assert 38<=mb["height"]<=42, mb
+        assert abs(mb["y"]-yb["y"])<=1
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+        box=calendar.bounding_box()
+        assert box and box["x"]>=0 and box["x"]+box["width"]<=width+1
+        assert box["y"]>=0 and box["y"]+box["height"]<=height+1
+
+        year.fill("1403")
+        year.press("Tab")
+        month.select_option("7")
+        pw.expect(month).to_have_value("7")
+        pw.expect(year).to_have_value("1403")
+        dates=calendar.locator('.jalali-date__grid button[role="gridcell"]:not([disabled])')
+        assert dates.count()==30
+        dates.first.click()
+        pw.expect(calendar).not_to_be_visible()
+        selected=form.locator('[name="birth_date"]')
+        expected=jdatetime.date(1403,7,1).togregorian().isoformat()
+        pw.expect(selected).to_have_value(expected)
+        assert not errors, errors
+        context.close()
+        browser.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(360,800), (1366,640)])
+def test_shared_jalali_direct_selects_have_identical_card_geometry(
+    live_server, client, owner_membership, width, height,
+):
+    """The same sizing applies to month/year controls in overview and finance pickers."""
+    client.force_login(owner_membership.user)
+    session=client.session
+    session["active_salon_id"]=str(owner_membership.salon_id)
+    session.save()
+    with pw.sync_playwright() as playwright:
+        browser=playwright.chromium.launch(headless=True)
+        context=browser.new_context(
+            viewport={"width":width,"height":height},
+            locale="fa-IR",reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name":settings.SESSION_COOKIE_NAME,
+            "value":client.cookies[settings.SESSION_COOKIE_NAME].value,
+            "url":live_server.url,
+        }])
+        page=context.new_page()
+        response=page.goto(
+            live_server.url+"/app/?day=2026-11-20&range=week&trend=30",
+            wait_until="load",
+        )
+        assert response and response.status==200
+        page.locator(".dash-page-header__jalali-form [data-jalali-calendar-trigger]").click()
+        calendar=page.locator(".jalali-date__popover--portal:visible")
+        pw.expect(calendar).to_be_visible()
+        month=calendar.get_by_label("انتخاب ماه",exact=True)
+        year=calendar.get_by_label("انتخاب سال",exact=True)
+        mb=month.bounding_box()
+        yb=year.bounding_box()
+        assert mb and yb
+        assert abs(mb["width"]-yb["width"])<=1
+        assert abs(mb["height"]-yb["height"])<=1
+        assert 38<=mb["height"]<=42
+        assert calendar.evaluate("(el) => el.scrollHeight <= el.clientHeight+2")
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+3")
+        calendar.get_by_role("button",name="ماه قبل").click()
+        pw.expect(month).to_have_value("7")
+        pw.expect(year).to_have_value("1405")
+        context.close()
+        browser.close()
