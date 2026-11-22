@@ -207,3 +207,108 @@ def test_wizard_step_two_requires_completed_first_step_not_created_salon(client)
     ready = client.get(step_two)
     assert ready.status_code == 200
     assert "هویت سالن" in ready.content.decode()
+
+@pytest.mark.django_db
+def test_unfinished_owner_can_open_dashboard_and_settings(client, owner_membership):
+    settings_obj = owner_membership.salon.settings
+    settings_obj.onboarding_completed_at = None
+    settings_obj.save(update_fields=["onboarding_completed_at"])
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    home = client.get(reverse("dashboard:home"))
+    assert home.status_code == 200
+    assert home.context["salon_onboarding_auto_open"] is True
+    assert 'data-salon-onboarding' in home.content.decode()
+    assert 'data-auto-open="true"' in home.content.decode()
+    settings_page = client.get(reverse("salons_settings:home"))
+    assert settings_page.status_code == 200
+    assert 'data-open-salon-onboarding' in settings_page.content.decode()
+
+
+@pytest.mark.django_db
+def test_onboarding_later_persists_without_completing_and_is_owner_only(client, owner_membership):
+    from apps.accounts.models import User
+
+    settings_obj = owner_membership.salon.settings
+    settings_obj.onboarding_completed_at = None
+    settings_obj.save(update_fields=["onboarding_completed_at"])
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    response = client.post(reverse("salons_onboarding:defer"))
+    assert response.status_code == 200
+    settings_obj.refresh_from_db()
+    assert settings_obj.onboarding_deferred_at is not None
+    assert settings_obj.onboarding_completed_at is None
+    home = client.get(reverse("dashboard:home"))
+    assert home.context["salon_onboarding_auto_open"] is False
+    assert home.context["salon_onboarding_available"] is True
+    assert 'data-auto-open="false"' in home.content.decode()
+    employee = User.objects.create_user(phone="+989121000311", full_name="منشی")
+    SalonMembership.objects.create(user=employee, salon=owner_membership.salon,
+                                   role=SalonMembership.Role.RECEPTIONIST)
+    client.force_login(employee)
+    assert client.post(reverse("salons_onboarding:defer")).status_code == 403
+    assert 'data-salon-onboarding' not in client.get(reverse("dashboard:home")).content.decode()
+
+
+@pytest.mark.django_db
+def test_wizard_modal_partial_redirect_and_resumable_progress(client, owner_membership):
+    settings_obj = owner_membership.salon.settings
+    settings_obj.onboarding_completed_at = None
+    settings_obj.save(update_fields=["onboarding_completed_at"])
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    route = reverse("salons_onboarding:wizard", kwargs={"step": 1}) + "?modal=1"
+    opened = client.get(route)
+    assert opened.status_code == 200
+    html = opened.content.decode()
+    assert 'data-onboarding-step="1"' in html
+    assert "<html" not in html
+    assert 'name="name"' in html
+    submitted = client.post(route, {"name": "سالن زیبایی مهتاب"})
+    assert submitted.status_code == 302
+    assert submitted.url.endswith("/onboarding/wizard/2/?modal=1")
+    settings_obj.refresh_from_db()
+    assert settings_obj.onboarding_step == 2
+    assert client.post(reverse("salons_onboarding:defer")).status_code == 200
+    resume = client.get(reverse("salons_settings:home"))
+    assert 'data-step-url="/onboarding/wizard/2/?modal=1"' in resume.content.decode()
+    next_response = client.get(submitted.url)
+    assert next_response.status_code == 200
+    assert 'data-onboarding-step="2"' in next_response.content.decode()
+    owner_membership.salon.refresh_from_db()
+    assert owner_membership.salon.name == "سالن زیبایی مهتاب"
+
+
+@pytest.mark.django_db
+def test_wizard_modal_rejects_non_owner_post_and_get(client, owner_membership):
+    from apps.accounts.models import User
+
+    employee = User.objects.create_user(phone="+989121000312", full_name="کارمند")
+    SalonMembership.objects.create(user=employee, salon=owner_membership.salon,
+                                   role=SalonMembership.Role.RECEPTIONIST)
+    client.force_login(employee)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    route = reverse("salons_onboarding:wizard", kwargs={"step": 1}) + "?modal=1"
+    assert client.get(route).status_code == 403
+    assert client.post(route, {"name": "سالن دیگر"}).status_code == 403
+
+
+@pytest.mark.django_db
+def test_defer_onboarding_requires_csrf(client, owner_membership):
+    from django.test import Client
+
+    settings_obj = owner_membership.salon.settings
+    settings_obj.onboarding_completed_at = None
+    settings_obj.save(update_fields=["onboarding_completed_at"])
+    secured = Client(enforce_csrf_checks=True)
+    secured.force_login(owner_membership.user)
+    assert secured.post(reverse("salons_onboarding:defer")).status_code == 403
