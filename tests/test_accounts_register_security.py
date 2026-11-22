@@ -126,9 +126,16 @@ def test_register_happy_path_csrf(secure_auth_env, db):
     assert vid
     resp = _csrf_post(client, reverse("accounts:register_profile"), {"full_name": "مالک جدید"})
     assert resp.status_code == 302
-    assert resp.url == reverse("salons_onboarding:create")
+    assert resp.url == reverse("dashboard:home")
     user = User.objects.get(phone=phone_e164)
     assert user.full_name == "مالک جدید"
+    from apps.salons.models import SalonMembership
+    membership = SalonMembership.objects.select_related("salon__settings").get(user=user)
+    assert membership.role == SalonMembership.Role.OWNER
+    assert membership.salon.business_type == "beauty_women"
+    assert membership.salon.is_accepting_bookings is False
+    assert membership.salon.settings.onboarding_completed_at is None
+    assert client.get(reverse("dashboard:home")).status_code == 200
     assert RegisterPhoneVerification.objects.get(pk=vid).consumed_at is not None
 
 
