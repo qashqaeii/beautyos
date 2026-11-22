@@ -49,6 +49,13 @@ class OnboardingWizardView(View):
     }
 
     def _step_redirect(self, request, step: int):
+        if request.method == "POST" and step > 1:
+            salon = _wizard_salon(request)
+            if salon and ow.salon_needs_onboarding(salon):
+                settings_obj = salon.settings
+                if step > settings_obj.onboarding_step:
+                    settings_obj.onboarding_step = step
+                    settings_obj.save(update_fields=["onboarding_step", "updated_at"])
         result = redirect("salons_onboarding:wizard", step=step)
         if request.GET.get("modal") == "1":
             result["Location"] += "?modal=1"
