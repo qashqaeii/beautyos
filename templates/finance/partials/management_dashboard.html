@@ -62,6 +62,7 @@
     <nav class="fin-actions" aria-label="عملیات مالی">
       {% if can_payment_create %}<a class="fin-action fin-action--primary" href="{{ payment_return_url }}&amp;payment=1"><i data-lucide="credit-card" aria-hidden="true"></i><span>دریافت پرداخت</span></a>{% endif %}
       {% if can_payment_create %}<a class="fin-action" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>صدور فاکتور</span></a>{% else %}<a class="fin-action" href="{% url 'finance:invoices' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>فاکتورها</span></a>{% endif %}
+      {% if can_settle_commission %}<a class="fin-action" href="{% url 'finance:overview' %}?tab=commissions"><i data-lucide="users-round" aria-hidden="true"></i><span>تسویه متخصص</span></a>{% endif %}
       {% if can_manage_expenses %}<a class="fin-action" href="{% url 'expenses:create' %}"><i data-lucide="layers" aria-hidden="true"></i><span>ثبت هزینه</span></a>{% endif %}
     </nav>
   </article>
