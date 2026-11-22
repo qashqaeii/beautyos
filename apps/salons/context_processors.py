@@ -49,6 +49,10 @@ def salon_context(request):
         "active_salon": active_salon,
         "salon_onboarding_available": onboarding_available,
         "salon_onboarding_auto_open": onboarding_auto_open,
+        "salon_onboarding_resume_step": (
+            min(max(active_salon.settings.onboarding_step, 1), 6)
+            if onboarding_available else 1
+        ),
         "active_membership": active_membership,
         "user_salons": [m.salon for m in memberships],
         "user_memberships": memberships,
