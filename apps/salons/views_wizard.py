@@ -123,6 +123,9 @@ class OnboardingWizardView(View):
     def post(self, request, step: int):
         step = max(1, min(step, WIZARD_STEPS_TOTAL))
         salon = _wizard_salon(request)
+        blocked = self._guard_step(request, step, salon)
+        if blocked:
+            return blocked
         form = None
         hours_errors = None
 
