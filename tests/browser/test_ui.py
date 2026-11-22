@@ -1246,3 +1246,52 @@ def test_shared_jalali_direct_selects_have_identical_card_geometry(
         pw.expect(year).to_have_value("1405")
         context.close()
         browser.close()
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("width,height", [(390,800), (1280,720)])
+def test_owner_onboarding_modal_later_resume_in_browser(
+    live_server, client, owner_membership, width, height
+):
+    """New owners see the guided setup inside their dashboard; deferral reopens at the saved step."""
+    salon = owner_membership.salon
+    salon.settings.onboarding_completed_at = None
+    salon.settings.save(update_fields=["onboarding_completed_at"])
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.id)
+    session.save()
+
+    with pw.sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": width, "height": height},
+            locale="fa-IR", reduced_motion="reduce",
+        )
+        context.add_cookies([{
+            "name": settings.SESSION_COOKIE_NAME,
+            "value": client.cookies[settings.SESSION_COOKIE_NAME].value,
+            "url": live_server.url,
+        }])
+        page = context.new_page()
+        errors = []
+        page.on("pageerror", lambda error: errors.append(str(error)))
+        result = page.goto(live_server.url + reverse("dashboard:home"), wait_until="load")
+        assert result and result.status == 200
+        dialog = page.get_by_role("dialog", name="راه‌اندازی سالن شما")
+        pw.expect(dialog).to_be_visible()
+        pw.expect(page.locator('[data-onboarding-step="1"]')).to_be_visible()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+3")
+        dialog.locator('input[name="name"]').fill("سالن زیبایی نیلوفر")
+        dialog.get_by_role("button", name="ادامه", exact=True).click()
+        pw.expect(page.locator('[data-onboarding-step="2"]')).to_be_visible()
+        dialog.get_by_role("button", name="بعداً").click()
+        pw.expect(dialog).not_to_be_visible()
+        page.goto(live_server.url + reverse("dashboard:home"), wait_until="load")
+        pw.expect(page.get_by_role("dialog", name="راه‌اندازی سالن شما")).not_to_be_visible()
+        page.goto(live_server.url + reverse("salons_settings:home"), wait_until="load")
+        page.locator("[data-open-salon-onboarding]").click()
+        pw.expect(page.locator('[data-onboarding-step="2"]')).to_be_visible()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+3")
+        assert not errors, errors
+        context.close()
+        browser.close()
