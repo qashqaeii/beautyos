@@ -292,3 +292,22 @@ def test_finance_commissions_only_in_quick_actions_not_top_tabs(client, owner_me
     commissions = client.get(reverse("finance:overview"), {"tab": "commissions"})
     assert commissions.status_code == 200
     assert 'aria-label="تسویه متخصص‌ها"' in commissions.content.decode()
+
+@pytest.mark.django_db
+def test_commission_destination_hierarchy_and_accessible_panels(client, owner_membership):
+    """Specialist settlement comes before salary tools, with back navigation and accessible controls."""
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+
+    response = client.get(reverse("finance:overview"), {"tab": "commissions"})
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert html.count('aria-label="تسویه متخصص‌ها"') == 1
+    assert html.index('aria-label="تسویه متخصص‌ها"') < html.index("مدل همکاری و حقوق")
+    assert 'class="finance-comm-back"' in html
+    for panel in ("pending", "settled"):
+        assert f'aria-controls="finance-comm-{panel}-panel"' in html
+        assert f'id="finance-comm-{panel}-panel"' in html
+    assert "تسویه متخصصان</h2>" in html

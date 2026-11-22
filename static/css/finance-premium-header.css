@@ -57,11 +57,12 @@
   margin:3px 0 0;font-size:12px;line-height:1.65;color:var(--fin-premium-muted);
 }
 .luna-finance-shell .finance-page .finance-page__tabs.finance-phase2-tabs{
+  display:flex;flex-wrap:wrap;align-items:stretch;
   margin:0;min-height:0;gap:4px;padding:5px;
   border-radius:13px;background:rgba(255,250,247,.97);
 }
 .luna-finance-shell .finance-page .finance-phase2-tabs .finance-page__tab{
-  min-height:39px;gap:6px;padding:6px 7px;
+  flex:1 1 calc(25% - 6px);min-width:0;min-height:44px;gap:6px;padding:6px 7px;
   flex-direction:row;white-space:normal;border-radius:9px;font-size:11px;line-height:1.45;
 }
 .luna-finance-shell .finance-page .finance-phase2-tabs .finance-page__tab svg{
@@ -178,7 +179,6 @@
   }
   .luna-finance-shell .finance-page .finance-page__header--premium .finance-page__title{font-size:18px}
   .luna-finance-shell .finance-page .finance-page__header--premium .luna-finance-subtitle{font-size:10px}
-  .luna-finance-shell .finance-page .finance-page__tabs.finance-phase2-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
   .luna-finance-shell .finance-page .finance-phase2-tabs .finance-page__tab{min-height:44px;font-size:11px}
   .luna-finance-shell .finance-page .finance-page__range-bar{padding:8px;gap:7px}
   .luna-finance-shell .finance-page .finance-page__range-pill{min-height:40px}
@@ -569,6 +569,25 @@
     min-height:0;
     grid-template-rows:none;
   }
+}
+/* Finance tabs use balanced 4+3 wraps on smaller viewports and seven equal slots on desktop. */
+@media(min-width:1100px){
+  .luna-finance-shell .finance-page .finance-page__tabs.finance-phase2-tabs{flex-wrap:nowrap}
+  .luna-finance-shell .finance-page .finance-phase2-tabs .finance-page__tab{flex:1 1 0}
+}
+.luna-finance-shell .finance-page .finance-comm-heading{margin:0;padding:3px 2px 0;align-items:center}
+.luna-finance-shell .finance-page .finance-comm-heading .luna-finance-panel-title{gap:9px}
+.luna-finance-shell .finance-page .finance-comm-heading .luna-finance-panel-title > svg{width:22px;height:22px;color:#95675f;flex:none}
+.luna-finance-shell .finance-page .finance-comm-back{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:40px;padding:7px 11px;border:1px solid #e5d5ce;border-radius:9px;
+  color:#80554d;background:#fffdfb;font-size:.75rem;font-weight:650;
+}
+.luna-finance-shell .finance-page .finance-comm-back svg{width:16px;height:16px}
+.luna-finance-shell .finance-page .finance-comm-back:hover{background:#f4e7e0;border-color:#cfa99d}
+@media(max-width:480px){
+  .luna-finance-shell .finance-page .finance-comm-heading{align-items:stretch}
+  .luna-finance-shell .finance-page .finance-comm-back{width:100%}
 }
 @media(max-width:720px){
   .luna-finance-shell .finance-page .fin-insights-grid--minimal{

@@ -249,8 +249,8 @@ body.beautyos-main-bg .maison-app.luna-finance-shell {
 }
 
 /* Phase 2: compact financial management surfaces, same Editorial Rose tokens. */
-.luna-finance-shell .finance-page__tabs.finance-phase2-tabs {grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
-.luna-finance-shell .finance-phase2-tabs .finance-page__tab {min-height:43px;gap:5px;font-size:.72rem}
+.luna-finance-shell .finance-page__tabs.finance-phase2-tabs {display:flex;flex-wrap:wrap;gap:4px}
+.luna-finance-shell .finance-phase2-tabs .finance-page__tab {flex:1 1 calc(25% - 6px);min-width:0;min-height:44px;gap:5px;font-size:.72rem}
 .luna-finance-shell .finance-phase2-tabs .finance-page__tab::after {display:none}
 .fin-summary-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .fin-kpi,.fin-panel {min-width:0;background:#fffaf8;border:1px solid #ecded8;border-radius:15px;box-shadow:0 4px 16px rgba(73,48,42,.045)}
@@ -302,7 +302,7 @@ body.beautyos-main-bg .maison-app.luna-finance-shell {
 .fin-report-row {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px 0;border-bottom:1px solid #eaded8;font-size:.8rem;overflow-wrap:anywhere}
 .fin-report-row strong {font-weight:700}
 @media(min-width:640px) {
- .luna-finance-shell .finance-page__tabs.finance-phase2-tabs {grid-template-columns:repeat(4,minmax(0,1fr))}
+ .luna-finance-shell .finance-page__tabs.finance-phase2-tabs {gap:7px}
  .fin-summary-grid {grid-template-columns:repeat(4,minmax(0,1fr))}
  .fin-insights-grid {grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
  .fin-quick-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -310,7 +310,7 @@ body.beautyos-main-bg .maison-app.luna-finance-shell {
  .fin-report-row {grid-template-columns:minmax(0,1.1fr) .6fr repeat(3,minmax(0,1fr))}
 }
 @media(min-width:1100px) {
- .luna-finance-shell .finance-page__tabs.finance-phase2-tabs {grid-template-columns:repeat(7,minmax(0,1fr))}
+ .luna-finance-shell .finance-page__tabs.finance-phase2-tabs {flex-wrap:nowrap}
  .luna-finance-shell .finance-phase2-tabs .finance-page__tab {font-size:.76rem;min-height:44px;white-space:normal}
  .luna-finance-shell .finance-page__header {border-radius:18px;min-height:118px}
  .luna-finance-shell .maison-content {padding-block-start:16px}
@@ -344,7 +344,6 @@ body.beautyos-main-bg .maison-app.luna-finance-shell {
 @media(min-width:450px) {.fin-method-layout {grid-template-columns:minmax(0,.85fr) minmax(0,1fr)}}
 @media(min-width:640px) and (max-width:950px) {.fin-method-layout {grid-template-columns:minmax(0,1fr)}}
 
-@media(min-width:1100px){.luna-finance-shell .finance-page__tabs.finance-phase2-tabs {grid-template-columns:repeat(8,minmax(0,1fr))}}
 .fin-tools-grid{display:grid;gap:12px;grid-template-columns:minmax(0,1fr);align-items:start}.fin-tools-form{display:grid;gap:10px}.fin-tools-form .input-field{width:100%;min-width:0}.fin-tools-form label{display:grid;gap:4px;font-size:.8rem}.fin-tools-form .errorlist{font-size:.75rem;color:#a33e38}.fin-account-card{display:grid;gap:6px;padding:14px;border-radius:12px;background:#f4eae5;overflow-wrap:anywhere}.fin-account-card strong{font-size:1.3rem}.fin-account-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}@media(min-width:900px){.fin-tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fin-account-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 @media(min-width:640px){.fin-report-row:has(> :nth-child(6)){grid-template-columns:minmax(0,1.1fr) .5fr repeat(4,minmax(0,1fr))}}

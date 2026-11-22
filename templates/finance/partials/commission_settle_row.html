@@ -17,6 +17,8 @@
       <label class="finance-comm-settle-form__label" for="settle-amount-{{ row.staff.pk }}">مبلغ تسویه (تومان)</label>
       <input
         type="number"
+        inputmode="numeric"
+        step="1"
         name="amount_toman"
         id="settle-amount-{{ row.staff.pk }}"
         class="input-field finance-comm-settle-form__amount"

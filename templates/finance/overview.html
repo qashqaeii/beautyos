@@ -253,17 +253,24 @@
   {% endif %}
 
   {% if tab == 'commissions' %}
-  <section class="fin-panel"><header class="fin-panel-head"><h2>مدل همکاری و حقوق</h2>{% if can_settle_commission %}<a class="btn-primary" href="{% url 'finance:staff_finance' %}">حقوق، مساعده و اجاره جایگاه</a>{% endif %}</header><p class="fin-muted">پورسانت خدمات در همین بخش و قراردادهای ماهانه در پرونده همکاری ثبت می‌شوند.</p></section>
   <section
     class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="تسویه متخصص‌ها"
     x-data="{ commPanel: '{% if commissions.pending_rows %}pending{% elif commissions.settled_rows %}settled{% else %}pending{% endif %}' }"
   >
+    <header class="finance-section-head finance-comm-heading">
+      <div class="luna-finance-panel-title">
+        <i data-lucide="users-round" aria-hidden="true"></i>
+        <div><h2 class="finance-section-head__title">تسویه متخصصان</h2><p>سهم‌های در انتظار پرداخت و سابقه تسویه روز انتخاب‌شده</p></div>
+      </div>
+      <a class="finance-comm-back" href="{% url 'finance:overview' %}?tab=income"><i data-lucide="arrow-right" aria-hidden="true"></i>بازگشت به نمای کلی</a>
+    </header>
     <div class="finance-stat-grid finance-stat-grid--two finance-comm-stat-grid">
       <button
         type="button"
         class="finance-stat-card finance-stat-card--success finance-stat-card--interactive text-start"
         :class="commPanel === 'settled' && 'is-active'"
         @click="commPanel = 'settled'"
+        aria-controls="finance-comm-settled-panel"
         :aria-pressed="commPanel === 'settled'"
       >
         <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="circle-check"></i></span>
@@ -276,6 +283,7 @@
         class="finance-stat-card finance-stat-card--warning finance-stat-card--interactive text-start"
         :class="commPanel === 'pending' && 'is-active'"
         @click="commPanel = 'pending'"
+        aria-controls="finance-comm-pending-panel"
         :aria-pressed="commPanel === 'pending'"
       >
         <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="clock"></i></span>
@@ -289,6 +297,7 @@
       <section
         x-show="commPanel === 'settled'"
         x-cloak
+        id="finance-comm-settled-panel"
         class="finance-comm-panel finance-comm-panel--settled"
         aria-labelledby="finance-comm-settled-title"
       >
@@ -307,6 +316,7 @@
       <section
         x-show="commPanel === 'pending'"
         x-cloak
+        id="finance-comm-pending-panel"
         class="finance-comm-panel finance-comm-panel--pending"
         aria-labelledby="finance-comm-pending-title"
       >
@@ -325,6 +335,7 @@
       </section>
     </div>
   </section>
+  <section class="fin-panel"><header class="fin-panel-head"><h2>مدل همکاری و حقوق</h2>{% if can_settle_commission %}<a class="btn-primary" href="{% url 'finance:staff_finance' %}">حقوق، مساعده و اجاره جایگاه</a>{% endif %}</header><p class="fin-muted">پورسانت خدمات در همین بخش و قراردادهای ماهانه در پرونده همکاری ثبت می‌شوند.</p></section>
   {% endif %}
 
   {% include "finance/partials/payment_create_modal.html" %}

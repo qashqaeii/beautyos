@@ -89,7 +89,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
         ("customers","/customers/"),("customer-detail",reverse("customers:detail",args=[customer.pk])),
         ("staff","/staff/"),("staff-detail",reverse("staff:detail",args=[staff.pk])),
         ("staff-hours",reverse("staff:hours",args=[staff.pk])),("services","/services/"),
-        ("finance","/finance/"),("finance-debts","/finance/?tab=debts"),("finance-cash","/finance/?tab=cash"),("finance-reports","/finance/?tab=reports"),("finance-receipts","/finance/?tab=receipts"),
+        ("finance","/finance/"),("finance-commissions","/finance/?tab=commissions"),("finance-debts","/finance/?tab=debts"),("finance-cash","/finance/?tab=cash"),("finance-reports","/finance/?tab=reports"),("finance-receipts","/finance/?tab=receipts"),
         ("finance-checkout-customers",reverse("finance:checkout_customers")),
         ("finance-checkout",reverse("finance:checkout",args=[customer.pk])),
         ("finance-invoices",reverse("finance:invoices")),
@@ -154,6 +154,28 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 assert not external, f"external runtime requests {external}"
                 assert not broken, f"broken static assets {broken}"
                 assert not js_errors, f"JavaScript exceptions {js_errors}"
+                if name in {"finance", "finance-commissions"}:
+                    tabs = page.locator(".finance-page__tabs.finance-phase2-tabs .finance-page__tab")
+                    assert tabs.count() == 7, "finance tabs mismatch after moving settlement to quick actions"
+                    row_counts = tabs.evaluate_all("""(nodes) => {
+                        const rows = [];
+                        for (const node of nodes) {
+                            const top = node.getBoundingClientRect().top;
+                            const last = rows[rows.length - 1];
+                            if (last && Math.abs(last.top - top) < 3) last.count++;
+                            else rows.push({top, count: 1});
+                        }
+                        return rows.map(row => row.count);
+                    }""")
+                    assert row_counts == ([7] if width >= 1100 else [4, 3]), f"unbalanced finance tabs: {row_counts}"
+                if name == "finance-commissions":
+                    pw.expect(page.locator(".finance-comm-heading")).to_be_visible()
+                    pw.expect(page.locator(".finance-comm-back")).to_be_visible()
+                    page.locator('[aria-controls="finance-comm-settled-panel"]').click()
+                    pw.expect(page.locator("#finance-comm-settled-panel")).to_be_visible()
+                    pw.expect(page.locator("#finance-comm-pending-panel")).not_to_be_visible()
+                    page.locator('[aria-controls="finance-comm-pending-panel"]').click()
+                    pw.expect(page.locator("#finance-comm-pending-panel")).to_be_visible()
                 if name == "finance":
                     header = page.locator(".finance-page__header--premium")
                     pw.expect(header).to_be_visible()
