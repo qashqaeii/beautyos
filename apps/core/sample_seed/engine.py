@@ -77,8 +77,8 @@ from apps.waitlist.models import WaitlistEntry
 REQUEST_NS = uuid.UUID("f47ac10b-58cc-4372-a567-0e02b2c3d479")
 
 
-def _req_key(label: str) -> uuid.UUID:
-    return uuid.uuid5(REQUEST_NS, f"atiye-noor:{label}")
+def _req_key(salon_slug: str, label: str) -> uuid.UUID:
+    return uuid.uuid5(REQUEST_NS, f"{salon_slug}:{label}")
 
 
 def _jalali_to_gregorian(year: int, month: int, day: int) -> date:
@@ -94,7 +94,9 @@ class SalonSeedPlan:
 
 
 class RealisticSalonSeedEngine:
-    def __init__(self, *, dry_run: bool = False, stdout=None):
+    def __init__(self, *, salon_slug: str | None = None, dry_run: bool = False, stdout=None):
+        self.salon_slug = (salon_slug or SAMPLE_SALON_SLUG).strip()
+        self.showcase_salon = self.salon_slug == SAMPLE_SALON_SLUG
         self.dry_run = dry_run
         self.stdout = stdout
         self.plan = SalonSeedPlan()
@@ -105,6 +107,9 @@ class RealisticSalonSeedEngine:
             self.stdout.write(msg)
         self.plan.log(msg)
 
+    def _req(self, label: str) -> uuid.UUID:
+        return _req_key(self.salon_slug, label)
+
     def run(self, *, reset_first: bool = False):
         if self.dry_run:
             self._say("dry-run: comprehensive salon seed planned")
@@ -114,6 +119,7 @@ class RealisticSalonSeedEngine:
         if reset_first:
             self._say("clearing existing salon data before import")
             flush_salon_tenant_data(salon)
+            self._ensure_salon_memberships(salon, owner)
 
         period_start, period_end, history_days, appt_target = compute_seed_calendar()
         self._period_start = period_start
@@ -148,40 +154,94 @@ class RealisticSalonSeedEngine:
   # ——— setup ———
 
     def _ensure_salon(self) -> tuple[User, Salon]:
+        slug = self.salon_slug
         if self.dry_run:
             return (
                 User(phone=OWNER["phone"], full_name=OWNER["full_name"]),
-                Salon(slug=SAMPLE_SALON_SLUG, name=SALON["name"]),
+                Salon(slug=slug, name=SALON["name"] if self.showcase_salon else "نورا"),
             )
-        owner, _ = User.objects.get_or_create(phone=OWNER["phone"], defaults={"full_name": OWNER["full_name"]})
-        if owner.full_name != OWNER["full_name"]:
-            owner.full_name = OWNER["full_name"]
-            owner.save(update_fields=["full_name", "updated_at"])
-        salon, _ = Salon.objects.get_or_create(
-            slug=SAMPLE_SALON_SLUG,
-            defaults={
-                "name": SALON["name"],
-                "city": SALON["city"],
-                "tagline": SALON["tagline"],
-                "address": SALON["address"],
-                "public_phone": SALON["public_phone"],
-                "description": SALON["tagline"],
-                "business_type": Salon.BusinessType.BEAUTY_WOMEN,
-                "public_theme": Salon.PublicTheme.ELEGANT_BEAUTY,
-            },
-        )
-        for field, val in (
-            ("name", SALON["name"]),
-            ("city", SALON["city"]),
-            ("tagline", SALON["tagline"]),
-            ("address", SALON["address"]),
-            ("public_phone", SALON["public_phone"]),
-            ("business_type", Salon.BusinessType.BEAUTY_WOMEN),
-            ("public_theme", Salon.PublicTheme.ELEGANT_BEAUTY),
-        ):
-            if getattr(salon, field) != val:
-                setattr(salon, field, val)
+
+        seed_phones = {OWNER["phone"], "+989150100101", "+989150100102"}
+        seed_phones.update(staff_phone(i) for i in range(1, len(SPECIALISTS) + 1))
+
+        existing = Salon.objects.filter(slug=slug).first()
+        if existing:
+            salon = existing
+            owner_membership = (
+                SalonMembership.objects.filter(salon=salon, role=SalonMembership.Role.OWNER)
+                .select_related("user")
+                .first()
+            )
+            if owner_membership:
+                owner = owner_membership.user
+            elif not self.showcase_salon:
+                fallback_owner = (
+                    User.objects.exclude(phone__in=seed_phones)
+                    .filter(salon_memberships__role=SalonMembership.Role.OWNER)
+                    .distinct()
+                    .order_by("pk")
+                    .first()
+                )
+                if fallback_owner:
+                    owner = fallback_owner
+                else:
+                    owner, _ = User.objects.get_or_create(
+                        phone=OWNER["phone"],
+                        defaults={"full_name": OWNER["full_name"]},
+                    )
+                SalonMembership.objects.get_or_create(
+                    user=owner,
+                    salon=salon,
+                    defaults={"role": SalonMembership.Role.OWNER},
+                )
+            else:
+                owner, _ = User.objects.get_or_create(phone=OWNER["phone"], defaults={"full_name": OWNER["full_name"]})
+                SalonMembership.objects.get_or_create(
+                    user=owner,
+                    salon=salon,
+                    defaults={"role": SalonMembership.Role.OWNER},
+                )
+        else:
+            owner, _ = User.objects.get_or_create(phone=OWNER["phone"], defaults={"full_name": OWNER["full_name"]})
+            if owner.full_name != OWNER["full_name"]:
+                owner.full_name = OWNER["full_name"]
+                owner.save(update_fields=["full_name", "updated_at"])
+            salon, _ = Salon.objects.get_or_create(
+                slug=slug,
+                defaults={
+                    "name": SALON["name"],
+                    "city": SALON["city"],
+                    "tagline": SALON["tagline"],
+                    "address": SALON["address"],
+                    "public_phone": SALON["public_phone"],
+                    "description": SALON["tagline"],
+                    "business_type": Salon.BusinessType.BEAUTY_WOMEN,
+                    "public_theme": Salon.PublicTheme.ELEGANT_BEAUTY,
+                },
+            )
+
+        if self.showcase_salon:
+            for field, val in (
+                ("name", SALON["name"]),
+                ("city", SALON["city"]),
+                ("tagline", SALON["tagline"]),
+                ("address", SALON["address"]),
+                ("public_phone", SALON["public_phone"]),
+                ("business_type", Salon.BusinessType.BEAUTY_WOMEN),
+                ("public_theme", Salon.PublicTheme.ELEGANT_BEAUTY),
+            ):
+                if getattr(salon, field) != val:
+                    setattr(salon, field, val)
+        else:
+            salon.business_type = Salon.BusinessType.BEAUTY_WOMEN
+            if not salon.tagline:
+                salon.tagline = SALON["tagline"]
+            if not salon.address:
+                salon.address = SALON["address"]
+            if not salon.city:
+                salon.city = SALON["city"]
         salon.save()
+
         settings, _ = SalonSettings.objects.get_or_create(salon=salon)
         dash, _ = BUSINESS_TYPE_DEFAULTS[Salon.BusinessType.BEAUTY_WOMEN]
         if settings.dashboard_theme != dash:
@@ -189,23 +249,47 @@ class RealisticSalonSeedEngine:
         if not settings.onboarding_completed_at:
             settings.onboarding_completed_at = timezone.now()
         settings.save()
-        SalonMembership.objects.get_or_create(user=owner, salon=salon, defaults={"role": SalonMembership.Role.OWNER})
+
+        if self.showcase_salon:
+            SalonMembership.objects.get_or_create(user=owner, salon=salon, defaults={"role": SalonMembership.Role.OWNER})
+            role_map = {
+                "receptionist": SalonMembership.Role.RECEPTIONIST,
+                "manager": SalonMembership.Role.MANAGER,
+            }
+            for phone, name, role_key, _title in TEAM_EXTRAS:
+                user, _ = User.objects.get_or_create(phone=phone, defaults={"full_name": name})
+                if user.full_name != name:
+                    user.full_name = name
+                    user.save(update_fields=["full_name", "updated_at"])
+                SalonMembership.objects.get_or_create(
+                    user=user,
+                    salon=salon,
+                    defaults={"role": role_map[role_key]},
+                )
+
+        self._say(f"salon ready: {slug} ({salon.name})")
+        return owner, salon
+
+    def _ensure_salon_memberships(self, salon: Salon, owner: User) -> None:
+        """Restore roles removed by flush_salon_tenant_data (SalonMembership is salon-scoped)."""
+        SalonMembership.objects.get_or_create(
+            user=owner,
+            salon=salon,
+            defaults={"role": SalonMembership.Role.OWNER},
+        )
+        if not self.showcase_salon:
+            return
         role_map = {
             "receptionist": SalonMembership.Role.RECEPTIONIST,
             "manager": SalonMembership.Role.MANAGER,
         }
         for phone, name, role_key, _title in TEAM_EXTRAS:
             user, _ = User.objects.get_or_create(phone=phone, defaults={"full_name": name})
-            if user.full_name != name:
-                user.full_name = name
-                user.save(update_fields=["full_name", "updated_at"])
             SalonMembership.objects.get_or_create(
                 user=user,
                 salon=salon,
                 defaults={"role": role_map[role_key]},
             )
-        self._say(f"salon ready: {SAMPLE_SALON_SLUG}")
-        return owner, salon
 
     def _ensure_loyalty_policy(self, salon: Salon) -> LoyaltyPolicy:
         row, _ = LoyaltyPolicy.objects.get_or_create(salon=salon)
@@ -813,7 +897,7 @@ class RealisticSalonSeedEngine:
                     salon=salon,
                     customer_id=anchor.pk,
                     appointment_ids=[a.pk for a in day_appts],
-                    request_key=_req_key("invoice-multi-1"),
+                    request_key=self._req("invoice-multi-1"),
                     discount=100_000,
                     amounts={"cash": 200_000, "card": day_appts[0].price_toman, "transfer": 0},
                     actor=actor,
@@ -829,7 +913,7 @@ class RealisticSalonSeedEngine:
                     payment_id=paid.pk,
                     amount=min(150_000, int(paid.paid_amount_toman // 3)),
                     reason="درخواست مشتری — تغییر برنامه",
-                    request_key=_req_key("refund-1"),
+                    request_key=self._req("refund-1"),
                     actor=actor,
                 )
             except Exception:
@@ -849,7 +933,7 @@ class RealisticSalonSeedEngine:
                     quantity=Decimal("1"),
                     unit_price=unit_price,
                     method=Payment.Method.CARD,
-                    request_key=_req_key(f"sale-{cust.pk}-{it.pk}"),
+                    request_key=self._req(f"sale-{cust.pk}-{it.pk}"),
                     actor=actor,
                 )
             except Exception:
@@ -865,7 +949,7 @@ class RealisticSalonSeedEngine:
                     appointment_id=color_appt.pk,
                     item_id=consumable.pk,
                     quantity=Decimal("0.25"),
-                    request_key=_req_key(f"material-{color_appt.pk}"),
+                    request_key=self._req(f"material-{color_appt.pk}"),
                     actor=actor,
                 )
             except Exception:
@@ -929,7 +1013,7 @@ class RealisticSalonSeedEngine:
                     salon=salon,
                     account_id=account.pk,
                     reward_id=reward.pk,
-                    request_key=_req_key("redeem-1"),
+                    request_key=self._req("redeem-1"),
                     actor=actor,
                 )
             except Exception:
@@ -943,7 +1027,7 @@ class RealisticSalonSeedEngine:
                 salon=salon,
                 customer_id=customers[2].pk,
                 package_id=packages[0].pk,
-                request_key=_req_key("membership-1"),
+                request_key=self._req("membership-1"),
                 actor=actor,
             )
 
@@ -972,7 +1056,7 @@ class RealisticSalonSeedEngine:
                     "segment": segment,
                     "message": message,
                     "status": Campaign.Status.DRAFT,
-                    "request_key": _req_key(f"campaign-{idx}"),
+                    "request_key": self._req(f"campaign-{idx}"),
                 },
             )
             try:
@@ -1012,7 +1096,7 @@ class RealisticSalonSeedEngine:
                         period_id=period.pk,
                         kind="rent" if mode == "rent" else "advance",
                         amount=min(amount // 2, period.amount_toman),
-                        request_key=_req_key(f"staff-pay-{staff.pk}-{month_start.isoformat()}"),
+                        request_key=self._req(f"staff-pay-{staff.pk}-{month_start.isoformat()}"),
                         note="پیش‌پرداخت حقوق و اجاره جایگاه",
                         actor=actor,
                     )

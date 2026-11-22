@@ -3,6 +3,7 @@ import os
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
+from apps.core.sample_seed.dataset import SAMPLE_SALON_SLUG
 from apps.core.sample_seed.engine import RealisticSalonSeedEngine
 
 
@@ -16,6 +17,11 @@ class Command(BaseCommand):
             help="Clear existing data for this sample salon before import",
         )
         parser.add_argument("--dry-run", action="store_true", help="Print plan without writing")
+        parser.add_argument(
+            "--slug",
+            default=None,
+            help="Target salon slug (default: atiye-noor). Example: salon-nora",
+        )
 
     def handle(self, *args, **options):
         module = (
@@ -32,14 +38,19 @@ class Command(BaseCommand):
                 "seed_realistic_salon is disabled in production. Set ALLOW_SAMPLE_SEED=True in non-production settings."
             )
 
-        engine = RealisticSalonSeedEngine(dry_run=options["dry_run"], stdout=self.stdout)
+        slug = (options["slug"] or "").strip() or SAMPLE_SALON_SLUG
+        engine = RealisticSalonSeedEngine(
+            salon_slug=slug,
+            dry_run=options["dry_run"],
+            stdout=self.stdout,
+        )
         plan = engine.run(reset_first=options["reset"])
         if options["dry_run"]:
             self.stdout.write(self.style.WARNING(f"Dry-run: {len(plan.actions)} steps planned."))
         else:
-            self.stdout.write(self.style.SUCCESS("Realistic salon data imported (slug: atiye-noor)."))
+            self.stdout.write(self.style.SUCCESS(f"Realistic salon data imported (slug: {slug})."))
             self.stdout.write(
-                "سه ماه شمسی گذشته + نوبت‌های آینده · ۲۰ متخصص · slug: atiye-noor · "
-                "پاک‌سازی: seed_realistic_salon --reset"
+                f"سه ماه شمسی گذشته + نوبت‌های آینده · ۲۰ متخصص · slug: {slug} · "
+                f"پاک‌سازی: seed_realistic_salon --reset --slug {slug}"
             )
             self.stdout.write("Owner login: +989150100001 · set password via ensure_superuser or register OTP.")
