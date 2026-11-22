@@ -1,22 +1,63 @@
 {% extends "layouts/app_shell.html" %}
-{% block page_title %}نمونه‌کارها{% endblock %}
-{% block page_subtitle %}گالری و نمایش خدمات سالن{% endblock %}
+{% load static format_tags %}
+{% block title %}نمونه‌کارها{% endblock %}
+{% block workspace_header %}{% endblock %}
+{% block page_styles_after_suite %}
+<link rel="stylesheet" href="{% static 'css/phase1-catalog.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
 {% block content %}
-<div class="editorial-module-toolbar">
-  <p class="text-sm text-muted">تصاویر منتشرشده در صفحه عمومی سالن نمایش داده می‌شوند.</p>
-  <a href="{% url 'portfolio:create' %}" class="btn-primary text-sm">افزودن تصویر</a>
-</div>
-<div class="suite-catalog-grid suite-gallery">
-  {% for item in items %}
-  <article class="editorial-module-card !p-0 overflow-hidden">
-    {% if item.image %}<img src="{{ item.image.url }}" alt="" class="aspect-[4/3] w-full object-cover" loading="lazy" decoding="async">{% else %}<div class="flex h-40 items-center justify-center bg-ivory text-muted">بدون تصویر</div>{% endif %}
-    <div class="p-4">
-      <h3 class="font-medium text-aubergine">{{ item.title }}</h3>
-      <p class="mt-1 text-xs text-muted">{% if item.is_published %}منتشر{% else %}پیش‌نویس{% endif %}</p>
-      <a href="{% url 'portfolio:edit' pk=item.pk %}" class="btn-secondary mt-3 text-xs">ویرایش</a>
+<div class="phase1-directory phase1-directory--portfolio">
+  <header class="phase1-directory__hero">
+    <div class="phase1-directory__identity">
+      <span class="phase1-directory__hero-icon" aria-hidden="true"><i data-lucide="images"></i></span>
+      <div class="phase1-directory__heading">
+        <h1>نمونه‌کارهای سالن</h1>
+        <p>مدیریت گالری و تصاویر قابل‌نمایش در صفحه عمومی</p>
+      </div>
     </div>
-  </article>
-  {% empty %}<div class="col-span-full">{% url 'portfolio:create' as create_url %}{% include "partials/empty_state.html" with icon="images" title="گالری خالی است" description="نمونه‌کارهای سالن را اضافه کنید." cta_url=create_url cta_label="افزودن تصویر" %}</div>{% endfor %}
+    <div class="phase1-directory__actions">
+      <a href="{% url 'portfolio:create' %}" class="phase1-directory__button phase1-directory__button--primary"><i data-lucide="image-plus" aria-hidden="true"></i>افزودن تصویر</a>
+    </div>
+    <span class="phase1-directory__hero-decoration" aria-hidden="true"><i data-lucide="image"></i></span>
+  </header>
+
+  <div class="phase1-directory__summary" aria-label="خلاصه نمونه‌کارها">
+    <div class="phase1-directory__summary-item"><i data-lucide="images" aria-hidden="true"></i><span>نمونه‌کارهای ثبت‌شده</span><strong>{{ portfolio_page.paginator.count|fa_num }}</strong></div>
+    <p class="phase1-directory__summary-note">فقط تصاویر منتشرشده در صفحه عمومی سالن نمایش داده می‌شوند.</p>
+  </div>
+
+  <section class="phase1-directory__section" aria-labelledby="portfolio-gallery-heading">
+    <div class="phase1-directory__section-head">
+      <h2 id="portfolio-gallery-heading"><i data-lucide="grid-2x2" aria-hidden="true"></i>گالری سالن</h2>
+      <p>وضعیت انتشار و ویرایش تصاویر</p>
+    </div>
+    {% if items %}
+      <div class="phase1-directory__gallery">
+        {% for item in items %}
+          <article class="phase1-directory__gallery-card">
+            <div class="phase1-directory__gallery-media">
+              {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.title }}" loading="lazy" decoding="async" width="480" height="300">
+              {% else %}
+                <div class="phase1-directory__gallery-fallback"><i data-lucide="image-off" aria-hidden="true"></i><span>بدون تصویر</span></div>
+              {% endif %}
+              <span class="phase1-directory__status phase1-directory__gallery-status {% if item.is_published %}phase1-directory__status--active{% else %}phase1-directory__status--inactive{% endif %}">{% if item.is_published %}منتشر{% else %}پیش‌نویس{% endif %}</span>
+            </div>
+            <div class="phase1-directory__gallery-details">
+              <div class="phase1-directory__gallery-copy">
+                <h3>{{ item.title }}</h3>
+                {% if item.category %}<p>{{ item.category }}</p>{% endif %}
+              </div>
+              <a href="{% url 'portfolio:edit' pk=item.pk %}" class="phase1-directory__gallery-edit"><i data-lucide="pencil" aria-hidden="true"></i>ویرایش</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% url 'portfolio:create' as create_url %}
+      {% include "partials/empty_state.html" with icon="images" title="گالری خالی است" description="نمونه‌کارهای سالن را اضافه کنید." cta_url=create_url cta_label="افزودن تصویر" %}
+    {% endif %}
+  </section>
+  {% include "partials/suite_pagination.html" with pager=portfolio_page %}
 </div>
-{% include "partials/suite_pagination.html" with pager=portfolio_page %}
 {% endblock %}

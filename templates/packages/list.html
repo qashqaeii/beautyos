@@ -1,31 +1,87 @@
 {% extends "layouts/app_shell.html" %}
-{% load humanize %}
-{% block page_title %}پکیج‌های خدمات{% endblock %}
-{% block page_subtitle %}مدیریت پکیج‌ها، فروش و جلسات مشتریان{% endblock %}
+{% load format_tags static %}
+{% block title %}پکیج‌های خدمات{% endblock %}
+{% block workspace_header %}{% endblock %}
+{% block page_styles_after_suite %}
+<link rel="stylesheet" href="{% static 'css/phase1-catalog.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
 {% block content %}
-<div class="editorial-module-toolbar"><p>پکیج‌ها را تعریف کنید و جلسات فروخته‌شده را پیگیری کنید.</p><div class="editorial-module-actions"><a href="{% url 'packages:create' %}" class="btn-secondary"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>تعریف پکیج</a><a href="{% url 'packages:sell' %}" class="btn-primary"><i data-lucide="shopping-bag" class="h-4 w-4" aria-hidden="true"></i>فروش به مشتری</a></div></div>
-{% if packages %}
-<section class="editorial-section" aria-labelledby="package-list-heading"><div class="editorial-section-head"><h2 id="package-list-heading">پکیج‌های سالن</h2></div>
-<div class="editorial-module-grid">
-  {% for p in packages %}
-  <article class="editorial-module-card"><div class="editorial-module-card__head"><span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="package"></i></span><div><h3>{{ p.name }}</h3><p>{{ p.session_count|fa_num }} جلسه · {{ p.validity_days|fa_num }} روز اعتبار</p></div></div>
-    <div class="editorial-module-value">{{ p.price_toman|fa_money }} <span class="text-xs font-normal">تومان</span></div>
-    {% if p.description %}<p>{{ p.description }}</p>{% endif %}
-    <p>{% if p.is_active %}فعال{% else %}غیرفعال{% endif %}</p>
-  </article>
-  {% endfor %}
-</div></section>
-{% else %}
-{% url 'packages:create' as create_url %}
-{% include "partials/empty_state.html" with icon="package" title="پکیجی تعریف نشده" description="برای فروش چند جلسه خدمات، یک پکیج تعریف کنید." cta_url=create_url cta_label="تعریف پکیج" %}
-{% endif %}
-<section class="editorial-section" aria-labelledby="package-sales-heading"><div class="editorial-section-head"><h2 id="package-sales-heading">فروش اخیر</h2></div>
-{% if sales %}
-<ul class="editorial-ledger">
-  {% for s in sales %}
-  <li><span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="user-round"></i></span><div class="editorial-ledger-copy"><strong>{{ s.customer.full_name }}</strong><small>{{ s.package.name }}</small></div><span class="editorial-ledger-aside">{{ s.sessions_remaining|fa_num }} جلسه باقی‌مانده</span></li>
-  {% endfor %}
-</ul>
-{% else %}<p class="text-sm text-ink-secondary">هنوز فروشی ثبت نشده است.</p>{% endif %}
-</section>
+<div class="phase1-directory phase1-directory--packages">
+  <header class="phase1-directory__hero">
+    <div class="phase1-directory__identity">
+      <span class="phase1-directory__hero-icon" aria-hidden="true"><i data-lucide="package-check"></i></span>
+      <div class="phase1-directory__heading">
+        <h1>پکیج‌های خدمات</h1>
+        <p>تعریف پکیج، فروش و پیگیری جلسات مشتریان</p>
+      </div>
+    </div>
+    <div class="phase1-directory__actions">
+      <a href="{% url 'packages:create' %}" class="phase1-directory__button phase1-directory__button--outline"><i data-lucide="plus" aria-hidden="true"></i>تعریف پکیج</a>
+      <a href="{% url 'packages:sell' %}" class="phase1-directory__button phase1-directory__button--primary"><i data-lucide="shopping-bag" aria-hidden="true"></i>فروش به مشتری</a>
+    </div>
+    <span class="phase1-directory__hero-decoration" aria-hidden="true"><i data-lucide="gift"></i></span>
+  </header>
+
+  <div class="phase1-directory__summary" aria-label="خلاصه پکیج‌ها">
+    <div class="phase1-directory__summary-item">
+      <i data-lucide="layers-3" aria-hidden="true"></i>
+      <span>پکیج‌های تعریف‌شده</span>
+      <strong>{{ packages|length|fa_num }}</strong>
+    </div>
+    <div class="phase1-directory__summary-item">
+      <i data-lucide="history" aria-hidden="true"></i>
+      <span>فروش‌های اخیر</span>
+      <strong>{{ sales|length|fa_num }}</strong>
+    </div>
+  </div>
+
+  <section class="phase1-directory__section" aria-labelledby="package-list-heading">
+    <div class="phase1-directory__section-head">
+      <h2 id="package-list-heading"><i data-lucide="layers" aria-hidden="true"></i>پکیج‌های سالن</h2>
+      <p>تعرفه و تعداد جلسات هر پکیج</p>
+    </div>
+    {% if packages %}
+      <div class="phase1-directory__cards">
+        {% for p in packages %}
+          <article class="phase1-directory__card">
+            <div class="phase1-directory__card-top">
+              <span class="phase1-directory__card-icon" aria-hidden="true"><i data-lucide="package"></i></span>
+              <span class="phase1-directory__status {% if p.is_active %}phase1-directory__status--active{% else %}phase1-directory__status--inactive{% endif %}">{% if p.is_active %}فعال{% else %}غیرفعال{% endif %}</span>
+            </div>
+            <h3 class="phase1-directory__card-title">{{ p.name }}</h3>
+            <div class="phase1-directory__meta">
+              <span><i data-lucide="calendar-check" aria-hidden="true"></i>{{ p.session_count|fa_num }} جلسه</span>
+              <span><i data-lucide="clock-3" aria-hidden="true"></i>{{ p.validity_days|fa_num }} روز اعتبار</span>
+            </div>
+            {% if p.description %}<p class="phase1-directory__description">{{ p.description }}</p>{% endif %}
+            <div class="phase1-directory__price"><span>قیمت پکیج</span><strong><bdi>{{ p.price_toman|fa_money }}</bdi> <small>تومان</small></strong></div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% url 'packages:create' as create_url %}
+      {% include "partials/empty_state.html" with icon="package" title="پکیجی تعریف نشده" description="برای فروش چند جلسه خدمات، یک پکیج تعریف کنید." cta_url=create_url cta_label="تعریف پکیج" %}
+    {% endif %}
+  </section>
+
+  <section class="phase1-directory__section" aria-labelledby="package-sales-heading">
+    <div class="phase1-directory__section-head">
+      <h2 id="package-sales-heading"><i data-lucide="receipt-text" aria-hidden="true"></i>فروش اخیر</h2>
+      <p>آخرین ثبت‌های واقعی پکیج</p>
+    </div>
+    {% if sales %}
+      <ul class="phase1-directory__sales">
+        {% for s in sales %}
+          <li>
+            <span class="phase1-directory__sales-icon" aria-hidden="true"><i data-lucide="user-round"></i></span>
+            <div class="phase1-directory__sales-copy"><strong>{{ s.customer.full_name }}</strong><span>{{ s.package.name }}</span></div>
+            <span class="phase1-directory__sales-remaining"><bdi>{{ s.sessions_remaining|fa_num }}</bdi> جلسه باقی‌مانده</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="phase1-directory__empty-inline">هنوز فروشی ثبت نشده است.</p>
+    {% endif %}
+  </section>
+</div>
 {% endblock %}
