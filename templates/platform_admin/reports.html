@@ -1,0 +1,14 @@
+{% extends "platform_admin/base.html" %}
+{% block title %}گزارش‌ها · BeautyOS{% endblock %}
+{% block control_content %}
+<div class="pc-heading"><div><p class="pc-eyebrow">PLATFORM INTELLIGENCE / ۰۴</p><h1>گزارش‌های پلتفرم</h1><p>داده‌های عملیاتی برگرفته از تراکنش‌ها و فعالیت‌های واقعی ثبت‌شده.</p></div></div>
+<div class="pc-period"><span><i data-lucide="calendar-range"></i> دوره آمار</span><a href="?days=7" class="{% if days == 7 %}is-active{% endif %}">۷ روز</a><a href="?days=30" class="{% if days == 30 %}is-active{% endif %}">۳۰ روز</a><a href="?days=90" class="{% if days == 90 %}is-active{% endif %}">۹۰ روز</a></div>
+<div class="pc-kpis"><article class="pc-kpi pc-kpi--primary"><span>سالن‌های جدید</span><strong>{{ kpis.salons_recent|fa_num }}</strong><p>ثبت‌شده در بازه</p></article><article class="pc-kpi"><span>کاربران جدید</span><strong>{{ kpis.users_recent|fa_num }}</strong><p>حساب‌های تازه</p></article><article class="pc-kpi"><span>نوبت‌های انجام‌شده</span><strong>{{ kpis.appointments_completed|fa_num }}</strong><p>نوبت‌های تکمیل‌شده ثبت‌شده</p></article><article class="pc-kpi"><span>تراکنش‌های وصولی سالن‌ها</span><strong class="pc-kpi__amount">{{ kpis.salon_receipts_toman|fa_money }} <small>تومان</small></strong><p>گردش مالی سالن‌ها، نه درآمد پلتفرم</p></article></div>
+<div class="pc-two-col pc-two-col--asym">
+<section class="pc-panel pc-panel--padded"><div class="pc-panel__header"><div><p class="pc-eyebrow">SIX MONTH TREND</p><h2>روند نوبت‌های ثبت‌شده</h2></div></div><div class="pc-chart">
+{% for row in months %}<div class="pc-chart-row"><span class="pc-chart-row__label" dir="ltr">{{ row.label|fa_num }}</span><div class="pc-chart-row__track"><div class="pc-chart-row__bar" style="width: {{ row.bar_width }}%"></div></div><strong>{{ row.bookings|fa_num }}</strong></div>{% empty %}<div class="pc-empty">اطلاعاتی وجود ندارد.</div>{% endfor %}
+</div><p class="pc-chart-note">این نمودار تعداد نوبت‌های ثبت‌شده را به تفکیک ماه شمسی نشان می‌دهد.</p></section>
+<section class="pc-panel pc-panel--padded"><div class="pc-panel__header"><h2>تفکیک ماهانه</h2></div><div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>ماه شمسی</th><th>سالن جدید</th><th>وصولی سالن‌ها (تومان)</th></tr></thead><tbody>{% for row in months %}<tr><td dir="ltr">{{ row.label|fa_num }}</td><td>{{ row.salons|fa_num }}</td><td>{{ row.received|fa_money }}</td></tr>{% endfor %}</tbody></table></div></section>
+</div>
+<section class="pc-note"><i data-lucide="info"></i><div><strong>تفاوت درآمد BeautyOS و درآمد سالن‌ها</strong><p>در این مرحله اعداد مالی از پرداخت‌های ثبت‌شده در سالن‌ها محاسبه می‌شوند. درآمد اشتراک خود BeautyOS بعد از راه‌اندازی ماژول Billing قابل گزارش خواهد بود؛ اینجا هیچ مبلغی به‌عنوان فروش اشتراک تخمین زده نشده است.</p></div></section>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/platform-control.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
+{% block body %}
+<div class="pc-shell">
+  <a class="pc-skip" href="#pc-content">رفتن به محتوا</a>
+  <aside class="pc-sidebar" aria-label="مدیریت مرکزی">
+    <a href="{% url 'platform_admin:overview' %}" class="pc-brand">
+      <span class="pc-brand__mark"><i data-lucide="flower-2" aria-hidden="true"></i></span>
+      <span><strong>BeautyOS</strong><small>مرکز مدیریت پلتفرم</small></span>
+    </a>
+    <p class="pc-nav-label">مدیریت مجموعه</p>
+    <nav class="pc-navigation" aria-label="بخش‌های پنل مرکزی">
+      <a href="{% url 'platform_admin:overview' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'overview' %}is-active{% endif %}"><i data-lucide="layout-dashboard"></i><span>نمای کلی</span></a>
+      <a href="{% url 'platform_admin:salons' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'salons' or request.resolver_match.url_name == 'salon_detail' %}is-active{% endif %}"><i data-lucide="store"></i><span>سالن‌ها</span></a>
+      <a href="{% url 'platform_admin:users' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'users' or request.resolver_match.url_name == 'user_detail' %}is-active{% endif %}"><i data-lucide="users-round"></i><span>کاربران</span></a>
+      <a href="{% url 'platform_admin:reports' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'reports' %}is-active{% endif %}"><i data-lucide="chart-no-axes-combined"></i><span>گزارش‌ها</span></a>
+      <a href="{% url 'platform_admin:support' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'support' or request.resolver_match.url_name == 'ticket_detail' %}is-active{% endif %}"><i data-lucide="messages-square"></i><span>پشتیبانی</span></a>
+      <p class="pc-nav-label pc-nav-label--group">محتوا و سیستم</p>
+      <a href="{% url 'platform_admin:articles' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'articles' or request.resolver_match.url_name == 'article_edit' or request.resolver_match.url_name == 'article_new' %}is-active{% endif %}"><i data-lucide="newspaper"></i><span>مقالات</span></a>
+      <a href="{% url 'platform_admin:audit' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'audit' %}is-active{% endif %}"><i data-lucide="shield-check"></i><span>لاگ و امنیت</span></a>
+      <a href="{% url 'platform_admin:system' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'system' %}is-active{% endif %}"><i data-lucide="settings-2"></i><span>وضعیت سیستم</span></a>
+    </nav>
+    <div class="pc-sidebar__footer">
+      <div class="pc-operator"><span class="pc-operator__avatar"><i data-lucide="user-round"></i></span><span><strong>{{ request.user.full_name|default:"مدیر پلتفرم" }}</strong><small>مدیر ارشد سیستم</small></span></div>
+      <div class="pc-sidebar__bottom">
+        <a href="{% url 'website:home' %}" class="pc-link-muted"><i data-lucide="external-link"></i> سایت اصلی</a>
+        <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit" class="pc-link-muted"><i data-lucide="log-out"></i> خروج</button></form>
+      </div>
+    </div>
+  </aside>
+  <div class="pc-main">
+    <header class="pc-topbar">
+      <div class="pc-topbar__identity"><span class="pc-mobile-mark"><i data-lucide="flower-2"></i></span><div><strong>مدیریت مرکزی</strong><small>BeautyOS Control Center</small></div></div>
+      <div class="pc-topbar__right"><span class="pc-online-indicator"><span class="pc-online-dot"></span> مدیریت امن</span><a href="{% url 'website:home' %}" class="pc-topbar__home" title="مشاهده سایت اصلی"><i data-lucide="external-link"></i></a></div>
+    </header>
+    <details class="pc-mobile-menu"><summary><i data-lucide="menu"></i> بخش‌های مدیریت <i data-lucide="chevron-down"></i></summary>
+      <nav aria-label="منوی موبایل مدیریت">
+        <a href="{% url 'platform_admin:overview' %}">نمای کلی</a>
+        <a href="{% url 'platform_admin:salons' %}">سالن‌ها</a>
+        <a href="{% url 'platform_admin:users' %}">کاربران</a>
+        <a href="{% url 'platform_admin:reports' %}">گزارش‌ها</a>
+        <a href="{% url 'platform_admin:support' %}">پشتیبانی</a>
+        <a href="{% url 'platform_admin:articles' %}">مقالات</a>
+        <a href="{% url 'platform_admin:audit' %}">لاگ‌ها</a>
+        <a href="{% url 'platform_admin:system' %}">وضعیت سیستم</a>
+        <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">خروج از حساب</button></form>
+      </nav>
+    </details>
+    <main class="pc-content" id="pc-content" tabindex="-1">
+      {% block control_content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "platform_admin/base.html" %}
+{% block title %}مدیریت سالن‌ها · BeautyOS{% endblock %}
+{% block control_content %}
+<div class="pc-heading"><div><p class="pc-eyebrow">SALON DIRECTORY / ۰۲</p><h1>مدیریت سالن‌ها</h1><p>وضعیت فعالیت، پیشرفت راه‌اندازی و اعضای هر مجموعه را مدیریت کنید.</p></div></div>
+<section class="pc-panel">
+  <form method="get" class="pc-filterbar" role="search">
+    <label class="pc-search"><i data-lucide="search"></i><input name="q" value="{{ q }}" maxlength="80" placeholder="جستجو در نام، شهر، شماره یا آدرس سالن" aria-label="جستجوی سالن"></label>
+    <label class="pc-select-wrap"><span>وضعیت</span><select name="status"><option value="">همه سالن‌ها</option><option value="active" {% if status == 'active' %}selected{% endif %}>فعال</option><option value="inactive" {% if status == 'inactive' %}selected{% endif %}>غیرفعال</option><option value="setup" {% if status == 'setup' %}selected{% endif %}>نیازمند تکمیل</option></select></label>
+    <button type="submit" class="pc-button">اعمال فیلتر</button><a href="{% url 'platform_admin:salons' %}" class="pc-button pc-button--ghost">پاک‌سازی</a>
+  </form>
+  <div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>سالن</th><th>مالک و اعضا</th><th>راه‌اندازی</th><th>رزرو آنلاین</th><th>وضعیت</th><th></th></tr></thead><tbody>
+    {% for salon in page %}
+    <tr><td><div class="pc-table-name"><span class="pc-list-avatar">{{ salon.name|slice:":1" }}</span><div><strong>{{ salon.name }}</strong><small>{{ salon.city|default:"نامشخص" }} · {{ salon.slug }}</small></div></div></td><td>{{ salon.owners_count|fa_num }} مالک · {{ salon.members_count|fa_num }} عضو</td><td>{% if salon.settings.onboarding_completed_at %}<span class="pc-status pc-status--good">تکمیل</span>{% else %}<span class="pc-status pc-status--warn">در حال تکمیل</span>{% endif %}</td><td>{% if salon.is_accepting_bookings %}<span class="pc-status pc-status--good">فعال</span>{% else %}<span class="pc-status pc-status--muted">غیرفعال</span>{% endif %}</td><td><span class="pc-status {% if salon.is_active %}pc-status--good{% else %}pc-status--muted{% endif %}">{% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</span></td><td><a href="{% url 'platform_admin:salon_detail' salon_id=salon.pk %}" class="pc-table-link">پرونده سالن <i data-lucide="arrow-up-left"></i></a></td></tr>
+    {% empty %}<tr><td colspan="6" class="pc-empty">سالنی با این مشخصات پیدا نشد.</td></tr>{% endfor %}
+  </tbody></table></div>
+  {% include "platform_admin/_pagination.html" %}
+</section>
+{% endblock %}
