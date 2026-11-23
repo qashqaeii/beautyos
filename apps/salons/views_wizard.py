@@ -22,14 +22,19 @@ from apps.salons.themes import LUNA_SIGNATURE_TOKENS, resolve_global_dashboard_t
 
 
 def _wizard_salon(request) -> Salon | None:
-    salon_id = request.session.get(ow.SESSION_SALON_KEY) or request.session.get("active_salon_id")
+    # Prefer middleware-validated active tenant over a stale onboarding session.
+    salon_id = (
+        getattr(getattr(request, "salon", None), "pk", None)
+        or request.session.get(ow.SESSION_SALON_KEY)
+        or request.session.get("active_salon_id")
+    )
     if not salon_id:
         return None
     membership = SalonMembership.objects.filter(
         user=request.user,
         salon_id=salon_id,
         is_active=True,
-        role__in=[SalonMembership.Role.OWNER, SalonMembership.Role.MANAGER],
+        role=SalonMembership.Role.OWNER,
     ).select_related("salon", "salon__settings").first()
     return membership.salon if membership else None
 
@@ -103,11 +108,12 @@ class OnboardingWizardView(View):
             form = OnboardingServiceSetupForm(salon=salon)
         elif step == 4:
             profile = ow.get_owner_staff_profile(salon, request.user) if salon else None
-            if profile is None and salon:
-                profile = ow.ensure_owner_staff_profile(salon, request.user)
-            form = OnboardingStaffForm(instance=profile, salon=salon) if profile else None
+            form = OnboardingStaffForm(
+                instance=profile, salon=salon,
+                initial={"display_name": request.user.full_name, "is_bookable": False}
+                if profile is None else None,
+            )
         elif step == 5:
-            profile = ow.get_owner_staff_profile(salon, request.user) if salon else None
             form = None
         else:
             form = None
@@ -118,11 +124,7 @@ class OnboardingWizardView(View):
         if step == 4 and salon:
             ctx["salon_name"] = salon.name
         if step == 5 and salon:
-            profile = ow.get_owner_staff_profile(salon, request.user)
-            if profile is None:
-                profile = ow.ensure_owner_staff_profile(salon, request.user)
-            ctx["hours_rows"] = ow.work_hours_grid(profile)
-            ctx["owner_staff"] = profile
+            ctx["hours_rows"] = ow.salon_hours_grid(salon)
         if step == WIZARD_STEPS_TOTAL and salon:
             ctx["summary"] = ow.onboarding_summary(salon)
         return render(request, self.steps[step], ctx)
@@ -203,25 +205,34 @@ class OnboardingWizardView(View):
             if not salon:
                 return self._step_redirect(request, step=2)
             if request.POST.get("action") == "skip":
-                ow.ensure_owner_staff_profile(salon, request.user)
                 return self._step_redirect(request, step=5)
-            profile = ow.ensure_owner_staff_profile(salon, request.user)
+            profile = ow.get_owner_staff_profile(salon, request.user)
+            if request.POST.get("is_bookable") != "on":
+                # Leaving this unchecked does not create a specialist account.
+                if profile and profile.is_bookable:
+                    profile.is_bookable = False
+                    profile.save(update_fields=["is_bookable", "updated_at"])
+                return self._step_redirect(request, step=5)
             form = OnboardingStaffForm(request.POST, instance=profile, salon=salon)
             if form.is_valid():
-                form.save()
+                with transaction.atomic():
+                    if profile is None:
+                        profile = ow.ensure_owner_staff_profile(salon, request.user)
+                        form.instance = profile
+                    form.save()
                 return self._step_redirect(request, step=5)
         elif step == 5:
             salon = _wizard_salon(request)
             if not salon:
                 return self._step_redirect(request, step=2)
             if request.POST.get("action") == "skip":
-                profile = ow.ensure_owner_staff_profile(salon, request.user)
-                ow.apply_default_work_hours(profile)
+                ow.apply_default_salon_work_hours(salon)
+                ow.initialize_owner_specialist_hours(salon, request.user)
                 return self._step_redirect(request, step=6)
-            profile = ow.ensure_owner_staff_profile(salon, request.user)
             rows, hours_errors = ow.parse_work_hours_post(request.POST)
             if not hours_errors:
-                ow.save_staff_work_hours(profile, rows)
+                ow.save_salon_work_hours(salon, rows)
+                ow.initialize_owner_specialist_hours(salon, request.user)
                 return self._step_redirect(request, step=6)
         elif step == WIZARD_STEPS_TOTAL:
             salon = _wizard_salon(request)
@@ -242,12 +253,8 @@ class OnboardingWizardView(View):
         if step == 3 and salon:
             ctx["presets"] = presets_for(salon.business_type)
         if step == 5 and salon:
-            profile = ow.get_owner_staff_profile(salon, request.user) or ow.ensure_owner_staff_profile(
-                salon, request.user
-            )
-            ctx["hours_rows"] = ow.work_hours_grid(profile)
+            ctx["hours_rows"] = ow.salon_hours_grid(salon)
             ctx["hours_errors"] = hours_errors
-            ctx["owner_staff"] = profile
         if step == WIZARD_STEPS_TOTAL and salon:
             ctx["summary"] = ow.onboarding_summary(salon)
         return render(request, self.steps.get(step, self.steps[1]), ctx)
@@ -276,11 +283,6 @@ class OnboardingWizardView(View):
 class OnboardingLegacyRedirect(View):
     def get(self, request):
         if SalonMembership.objects.filter(user=request.user, is_active=True).exists():
-            salon = _wizard_salon(request) or SalonMembership.objects.filter(
-                user=request.user, is_active=True
-            ).select_related("salon__settings").first().salon
-            if salon and ow.salon_needs_onboarding(salon):
-                return redirect("salons_onboarding:wizard", step=1)
             return redirect("dashboard:home")
         return redirect("salons_onboarding:wizard", step=1)
 

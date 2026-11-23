@@ -10,7 +10,7 @@ from django.utils.text import slugify
 
 from apps.core.utils.time_input import parse_hhmm
 from apps.salons.business_catalog import presets_for
-from apps.salons.models import Salon, SalonMembership, SalonSettings
+from apps.salons.models import Salon, SalonMembership, SalonSettings, SalonWorkHours
 from apps.salons.themes import BUSINESS_TYPE_DEFAULTS
 from apps.services.models import Service
 from apps.staff.models import StaffProfile, StaffWorkHours
@@ -139,7 +139,7 @@ def ensure_owner_staff_profile(salon: Salon, user) -> StaffProfile:
         membership=membership,
         display_name=display,
         title="",
-        is_bookable=True,
+        is_bookable=False,
         is_active=True,
     )
 
@@ -162,35 +162,73 @@ def _default_hours_for_weekday(weekday: int) -> tuple[time, time, bool]:
     return DEFAULT_OPEN_START, DEFAULT_OPEN_END, False
 
 
-def work_hours_grid(staff: StaffProfile | None) -> list[dict]:
-    by_day = {}
-    if staff:
-        by_day = {h.weekday: h for h in staff.work_hours.all()}
+def _hours_grid(records) -> list[dict]:
+    by_day = {row.weekday: row for row in records}
     rows = []
     for choice in StaffWorkHours.Weekday:
         record = by_day.get(choice.value)
         if record:
-            rows.append(
-                {
-                    "weekday": choice.value,
-                    "label": choice.label,
-                    "is_closed": record.is_closed,
-                    "start": record.start_time.strftime("%H:%M") if not record.is_closed else "",
-                    "end": record.end_time.strftime("%H:%M") if not record.is_closed else "",
-                }
-            )
+            rows.append({
+                "weekday": choice.value, "label": choice.label,
+                "is_closed": record.is_closed,
+                "start": record.start_time.strftime("%H:%M") if not record.is_closed else "",
+                "end": record.end_time.strftime("%H:%M") if not record.is_closed else "",
+            })
         else:
             start, end, closed = _default_hours_for_weekday(choice.value)
-            rows.append(
-                {
-                    "weekday": choice.value,
-                    "label": choice.label,
-                    "is_closed": closed,
-                    "start": "" if closed else start.strftime("%H:%M"),
-                    "end": "" if closed else end.strftime("%H:%M"),
-                }
-            )
+            rows.append({
+                "weekday": choice.value, "label": choice.label,
+                "is_closed": closed,
+                "start": "" if closed else start.strftime("%H:%M"),
+                "end": "" if closed else end.strftime("%H:%M"),
+            })
     return rows
+
+
+def work_hours_grid(staff: StaffProfile | None) -> list[dict]:
+    """Individual specialist's hours, independent of salon opening hours."""
+    return _hours_grid(staff.work_hours.all() if staff else [])
+
+
+def salon_hours_grid(salon: Salon) -> list[dict]:
+    """The salon's own weekly schedule; reading never creates an owner specialist."""
+    return _hours_grid(SalonWorkHours.objects.filter(salon=salon))
+
+
+@transaction.atomic
+def save_salon_work_hours(salon: Salon, rows: list[dict]) -> None:
+    for row in rows:
+        SalonWorkHours.objects.update_or_create(
+            salon=salon,
+            weekday=row["weekday"],
+            defaults={
+                "start_time": row["start_time"],
+                "end_time": row["end_time"],
+                "is_closed": row["is_closed"],
+            },
+        )
+
+
+def apply_default_salon_work_hours(salon: Salon) -> None:
+    rows = []
+    for choice in SalonWorkHours.Weekday:
+        start, end, closed = _default_hours_for_weekday(choice.value)
+        rows.append({
+            "weekday": choice.value, "is_closed": closed,
+            "start_time": start, "end_time": end,
+        })
+    save_salon_work_hours(salon, rows)
+
+
+def initialize_owner_specialist_hours(salon: Salon, user) -> None:
+    """Only an explicitly bookable owner gets an initial personal schedule."""
+    profile = get_owner_staff_profile(salon, user)
+    if profile and profile.is_bookable and not profile.work_hours.exists():
+        rows = list(SalonWorkHours.objects.filter(salon=salon).values(
+            "weekday", "start_time", "end_time", "is_closed"
+        ))
+        if rows:
+            save_staff_work_hours(profile, rows)
 
 
 def parse_work_hours_post(data) -> tuple[list[dict], list[str]]:
@@ -257,21 +295,20 @@ def apply_default_work_hours(staff: StaffProfile) -> None:
 def onboarding_summary(salon: Salon) -> dict:
     from apps.staff.models import StaffProfile
 
-    services = Service.scoped(salon).filter(is_deleted=False).count()
-    staff = StaffProfile.scoped(salon).filter(is_deleted=False).count()
-    owner_staff = (
-        StaffProfile.scoped(salon).filter(is_deleted=False, membership__role=SalonMembership.Role.OWNER).first()
-    )
-    hours_count = owner_staff.work_hours.count() if owner_staff else 0
+    services = Service.scoped(salon).filter(is_deleted=False, is_active=True).count()
+    staff = StaffProfile.scoped(salon).filter(is_deleted=False, is_active=True, is_bookable=True).count()
+    hours_count = SalonWorkHours.objects.filter(salon=salon, is_closed=False).count()
     missing = []
     if not (salon.public_phone or "").strip():
         missing.append("شماره تماس عمومی")
     if services == 0:
         missing.append("حداقل یک خدمت")
     if staff == 0:
-        missing.append("پروفایل متخصص (مالک)")
+        missing.append("افزودن متخصص قابل رزرو از بخش کارکنان")
     if hours_count == 0:
-        missing.append("ساعات کاری")
+        missing.append("ساعات فعالیت سالن")
+    if not salon.is_accepting_bookings:
+        missing.append("فعال‌سازی آگاهانه رزرو آنلاین از تنظیمات، پس از آماده‌شدن خدمات و تیم")
     return {
         "services": services,
         "staff": staff,
