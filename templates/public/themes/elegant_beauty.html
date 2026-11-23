@@ -20,7 +20,11 @@
         {% if portfolio %}<a class="luna-public-nav__link" href="#portfolio">نمونه‌کارها</a>{% endif %}
         {% if staff_list %}<a class="luna-public-nav__link hidden lg:inline" href="#staff">متخصصان</a>{% endif %}
       </nav>
+      {% if salon.is_accepting_bookings %}
       <a href="{% url 'salons_public:booking_start' slug=salon.slug %}" class="btn-luna-book">رزرو نوبت</a>
+      {% else %}
+      <span class="btn-luna-book opacity-65 cursor-default" aria-disabled="true">رزرو به‌زودی</span>
+      {% endif %}
     </div>
   </header>
 
@@ -37,9 +41,11 @@
           {% if salon.tagline %}{{ salon.tagline }}{% else %}زیبایی به سبک خودت{% endif %}
         </h1>
         <div class="mt-10 flex justify-center md:justify-start">
-          <a href="{% url 'salons_public:booking_start' slug=salon.slug %}" class="btn-luna-book btn-luna-book--lg w-full max-w-xs sm:w-auto">
-            رزرو نوبت
-          </a>
+          {% if salon.is_accepting_bookings %}
+          <a href="{% url 'salons_public:booking_start' slug=salon.slug %}" class="btn-luna-book btn-luna-book--lg w-full max-w-xs sm:w-auto">رزرو نوبت</a>
+          {% else %}
+          <span class="btn-luna-book btn-luna-book--lg w-full max-w-xs sm:w-auto cursor-default opacity-65" aria-disabled="true">رزرو آنلاین هنوز فعال نیست</span>
+          {% endif %}
         </div>
       </div>
       <div class="order-1 flex justify-center md:order-2 md:justify-end">
@@ -135,7 +141,11 @@
       </div>
       <div class="flex flex-wrap items-center justify-center gap-4 md:justify-end">
         {% if salon.public_phone %}<span dir="ltr">{{ salon.public_phone }}</span>{% endif %}
+        {% if salon.is_accepting_bookings %}
         <a href="{% url 'salons_public:booking_start' slug=salon.slug %}" class="btn-luna-book text-xs">رزرو آنلاین</a>
+        {% else %}
+        <span class="text-xs text-ink-muted" role="status">رزرو آنلاین غیرفعال است</span>
+        {% endif %}
       </div>
     </div>
     <p class="mt-8 text-center text-xs text-ink-muted">قدرت‌گرفته از {{ BEAUTYOS_PRODUCT_NAME }}</p>

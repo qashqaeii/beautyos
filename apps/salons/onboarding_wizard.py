@@ -67,6 +67,7 @@ def create_salon_for_owner(user, *, name, slug, public_phone, city, address, tag
         tagline=tagline or "",
         description=description or "",
         business_type=business_type,
+        is_accepting_bookings=False,
     )
     if logo:
         salon.logo = logo

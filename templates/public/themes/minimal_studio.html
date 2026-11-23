@@ -30,7 +30,11 @@
       <h1 class="mt-2 text-3xl font-semibold md:text-5xl">{{ salon.name }}</h1>
       {% if salon.tagline %}<p class="mt-4 max-w-xl text-white/85">{{ salon.tagline }}</p>{% endif %}
       <div class="mt-8 flex flex-wrap gap-3">
+        {% if salon.is_accepting_bookings %}
         <a href="{% url 'salons_public:booking_start' slug=salon.slug %}" class="btn-public rounded-xl bg-accent px-6 py-3 text-sm font-medium text-espresso shadow-sm transition hover:bg-accent/90">رزرو آنلاین</a>
+        {% else %}
+        <span class="btn-public rounded-xl bg-surface-elevated px-6 py-3 text-sm text-ink-muted" aria-disabled="true">رزرو آنلاین هنوز فعال نیست</span>
+        {% endif %}
       </div>
     </div>
   </header>
