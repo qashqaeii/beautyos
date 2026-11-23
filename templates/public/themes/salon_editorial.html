@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ salon.name }} · خدمات و رزرو نوبت{% endblock %}
+{% block body %}
+<div class="pub3-salon {% block salon_variant %}pub3-salon--elegant{% endblock %}{% if salon.is_accepting_bookings %} pub3-salon--with-booking{% endif %}" id="top">
+  <a href="#salon-content" class="editorial-skip-link">رفتن به محتوای سالن</a>
+  <div class="pub3-salon__nav-wrap">
+    <div class="pub3-salon__container">
+      <header class="pub3-salon__nav">
+        <a class="pub3-salon__logo" href="#top" title="{{ salon.name }}">
+          {% if salon.logo %}
+          <img src="{{ salon.logo.url }}" alt="{{ salon.name }}" loading="eager" width="110" height="44">
+          {% else %}
+          <span class="pub3-salon__monogram" aria-hidden="true">{{ salon.name|slice:":1" }}</span>
+          <span>{{ salon.name|truncatechars:29 }}</span>
+          {% endif %}
+        </a>
+        <nav class="pub3-salon__links" aria-label="بخش‌های صفحه سالن">
+          {% if services %}<a href="#services">خدمات</a>{% endif %}
+          {% if staff_list %}<a href="#team">متخصصان</a>{% endif %}
+          {% if portfolio %}<a href="#portfolio">نمونه‌کارها</a>{% endif %}
+          <a href="#contact">ارتباط و ساعات</a>
+        </nav>
+        {% if salon.is_accepting_bookings %}
+          <a class="pub3-salon__nav-cta" href="{% url 'salons_public:booking_start' slug=salon.slug %}">رزرو آنلاین</a>
+        {% else %}
+          <span class="pub3-salon__nav-status" role="status">رزرو آنلاین غیرفعال</span>
+        {% endif %}
+      </header>
+    </div>
+  </div>
+
+  <main id="salon-content">
+    <div class="pub3-salon__container">
+      <section class="pub3-salon__hero" aria-labelledby="salon-hero-title">
+        <div class="pub3-salon__hero-copy">
+          <span class="pub3-salon__badge"><i data-lucide="flower-2" aria-hidden="true"></i> سالن زیبایی زنانه{% if salon.city %} · {{ salon.city }}{% endif %}</span>
+          <h1 id="salon-hero-title">{{ salon.name }}</h1>
+          <p>{% if salon.tagline %}{{ salon.tagline }}{% elif salon.description %}{{ salon.description|truncatechars:180 }}{% else %}خدمات زیبایی و مراقبت، با امکان آشنایی با خدمات و متخصصان این سالن.{% endif %}</p>
+          <div class="pub3-salon__hero-actions">
+            {% if salon.is_accepting_bookings %}
+              <a class="pub3-button pub3-button--primary" href="{% url 'salons_public:booking_start' slug=salon.slug %}"><i data-lucide="calendar-check" aria-hidden="true"></i> انتخاب وقت و رزرو</a>
+            {% else %}
+              <span class="pub3-button pub3-button--soft" aria-disabled="true">رزرو آنلاین در حال حاضر غیرفعال است</span>
+            {% endif %}
+            {% if services %}<a class="pub3-button pub3-button--soft" href="#services">مشاهده خدمات <i data-lucide="arrow-down-left"></i></a>{% endif %}
+          </div>
+          {% if salon.is_accepting_bookings %}<span class="pub3-salon__hero-note">انتخاب خدمت، متخصص و زمان از میان ظرفیت‌های قابل رزرو سالن</span>{% endif %}
+        </div>
+        <div class="pub3-salon__hero-media">
+          {% if salon.cover_image %}
+            <img src="{{ salon.cover_image.url }}" alt="نمای معرفی {{ salon.name }}" width="800" height="640" loading="eager" fetchpriority="high" decoding="async">
+          {% else %}
+            <div class="pub3-salon__cover-fallback" aria-hidden="true">
+              <i data-lucide="flower-2"></i><span>زیبایی، ظرافت و توجه به جزئیات</span>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+
+    {% if services %}
+    <section id="services" class="pub3-salon__section pub3-salon__section--alternate" aria-labelledby="salon-services-title">
+      <div class="pub3-salon__container">
+        <header class="pub3-salon__section-head">
+          <div><span class="pub3-eyebrow">OUR SERVICES</span><h2 id="salon-services-title">خدمات سالن</h2><p>خدماتی که از سوی این سالن برای مراجعه‌کنندگان معرفی شده‌اند.</p></div>
+        </header>
+        <div class="pub3-salon__services">
+          {% for service in services %}
+          <article class="pub3-salon__service">
+            <div class="pub3-salon__service-head">
+              <span><i data-lucide="sparkles" aria-hidden="true"></i></span>
+              <h3>{{ service.name }}</h3>
+            </div>
+            <div class="pub3-salon__service-info">
+              <span>{{ service.duration_minutes|fa_num }} دقیقه</span>
+              {% if service.price_toman %}<strong>{{ service.price_toman|fa_money }} تومان</strong>{% else %}<span>برای اطلاع از هزینه تماس بگیرید</span>{% endif %}
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if staff_list %}
+    <section id="team" class="pub3-salon__section" aria-labelledby="salon-team-title">
+      <div class="pub3-salon__container">
+        <header class="pub3-salon__section-head">
+          <div><span class="pub3-eyebrow">OUR TEAM</span><h2 id="salon-team-title">متخصصان سالن</h2><p>با تیمی که خدمات سالن را ارائه می‌دهد آشنا شوید.</p></div>
+        </header>
+        <ul class="pub3-salon__team">
+          {% for specialist in staff_list %}
+          <li>
+            <span class="pub3-salon__team-avatar" aria-hidden="true">{{ specialist.display_name|slice:":1" }}</span>
+            <div><strong>{{ specialist.display_name }}</strong>{% if specialist.title %}<small>{{ specialist.title }}</small>{% endif %}</div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if portfolio %}
+    <section id="portfolio" class="pub3-salon__section pub3-salon__section--alternate" aria-labelledby="salon-portfolio-title">
+      <div class="pub3-salon__container">
+        <header class="pub3-salon__section-head">
+          <div><span class="pub3-eyebrow">SELECTED WORK</span><h2 id="salon-portfolio-title">نمونه‌کارهای سالن</h2><p>تصاویری که خود سالن برای معرفی خدماتش منتشر کرده است.</p></div>
+        </header>
+        <div class="pub3-salon__portfolio">
+          {% for item in portfolio %}
+          {% if item.image %}
+          <figure>
+            <img src="{{ item.image.url }}" alt="{{ item.title|default:'نمونه‌کار سالن' }}" width="400" height="500" loading="lazy" decoding="async">
+            {% if item.title %}<figcaption>{{ item.title }}</figcaption>{% endif %}
+          </figure>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if salon.description %}
+    <section id="about" class="pub3-salon__section">
+      <div class="pub3-salon__container">
+        <div class="pub3-salon__about"><span class="pub3-eyebrow">ABOUT US</span><h2>درباره {{ salon.name }}</h2><p>{{ salon.description }}</p></div>
+      </div>
+    </section>
+    {% endif %}
+
+    <section id="contact" class="pub3-salon__section pub3-salon__section--alternate" aria-labelledby="salon-contact-title">
+      <div class="pub3-salon__container">
+        <header class="pub3-salon__section-head">
+          <div><span class="pub3-eyebrow">VISIT & CONTACT</span><h2 id="salon-contact-title">ارتباط و ساعات فعالیت</h2><p>اطلاعات اعلام‌شده توسط سالن برای هماهنگی مراجعه</p></div>
+        </header>
+        <div class="pub3-salon__details">
+          <div class="pub3-salon__details-card">
+            <h3>راه‌های ارتباطی</h3>
+            <div class="pub3-salon__detail-list">
+              {% if salon.city or salon.address %}<div><i data-lucide="map-pin" aria-hidden="true"></i><span>{{ salon.city }}{% if salon.city and salon.address %}، {% endif %}{{ salon.address }}</span></div>{% endif %}
+              {% if salon.public_phone %}
+              <div><i data-lucide="phone" aria-hidden="true"></i>
+                {% if salon_phone_href %}<a href="{{ salon_phone_href }}" dir="ltr">{{ salon.public_phone }}</a>{% else %}<span dir="ltr">{{ salon.public_phone }}</span>{% endif %}
+              </div>
+              {% endif %}
+              {% if salon_instagram_url %}
+                <div><i data-lucide="instagram" aria-hidden="true"></i><a href="{{ salon_instagram_url }}" target="_blank" rel="noopener noreferrer">اینستاگرام سالن <i data-lucide="external-link" aria-hidden="true"></i></a></div>
+              {% endif %}
+              {% if salon_whatsapp_url %}
+                <div><i data-lucide="message-circle" aria-hidden="true"></i><a href="{{ salon_whatsapp_url }}" target="_blank" rel="noopener noreferrer">واتساپ سالن <i data-lucide="external-link" aria-hidden="true"></i></a></div>
+              {% endif %}
+              {% if not salon.city and not salon.address and not salon.public_phone and not salon_instagram_url and not salon_whatsapp_url %}
+              <div><i data-lucide="info" aria-hidden="true"></i><span>اطلاعات تماس هنوز ثبت نشده است.</span></div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="pub3-salon__details-card">
+            <h3>برنامه هفتگی سالن</h3>
+            {% if salon_hours %}
+            <ul class="pub3-salon__hours">
+              {% for hours in salon_hours %}
+              <li><span>{{ hours.get_weekday_display }}</span>
+              {% if hours.is_closed %}<strong>تعطیل</strong>{% else %}
+              <strong dir="ltr">{{ hours.start_time|time:"H:i"|fa_num }} – {{ hours.end_time|time:"H:i"|fa_num }}</strong>
+              {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+              <p class="pub3-salon__hero-note">ساعات فعالیت در صفحه سالن درج نشده است. برای اطلاع از زمان مراجعه تماس بگیرید.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pub3-salon__footer">
+    <div class="pub3-salon__container pub3-salon__footer-inner">
+      <div><strong>{{ salon.name }}</strong><p>صفحه رسمی معرفی خدمات این سالن</p></div>
+      <a href="{% url 'website:home' %}" target="_blank" rel="noopener noreferrer">ساخته‌شده با BeautyOS <i data-lucide="arrow-up-left" aria-hidden="true"></i></a>
+    </div>
+  </footer>
+  {% if salon.is_accepting_bookings %}
+  <div class="pub3-salon__mobile-book">
+    <span>وقت رزرو کنید</span>
+    <a class="pub3-button pub3-button--primary" href="{% url 'salons_public:booking_start' slug=salon.slug %}"><i data-lucide="calendar-check"></i> انتخاب زمان</a>
+  </div>
+  {% endif %}
+</div>
+<script>document.addEventListener("DOMContentLoaded", function(){ if(window.beautyosInitIcons) window.beautyosInitIcons(); });</script>
+{% endblock %}
