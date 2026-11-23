@@ -1,37 +1,109 @@
 {% extends "layouts/public_site.html" %}
-{% block title %}تماس و پشتیبانی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block title %}تماس با ما و پشتیبانی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
 {% block public_content %}
-{% include "partials/public_page_hero.html" with eyebrow="پشتیبانی" title="تماس و پشتیبانی" lead="برای مشکلات فنی یا راه‌اندازی سالن، از مسیرهای زیر کمک بگیرید." %}
-<div class="mx-auto max-w-3xl px-4 pb-14 sm:px-6">
-  <div class="public-contact-grid">
-    <article class="public-contact-card">
-      <i data-lucide="building-2" class="h-6 w-6 text-lavender" aria-hidden="true"></i>
-      <h2 class="mt-3 font-semibold text-aubergine">صاحبان سالن</h2>
-      <p class="mt-2 text-sm leading-relaxed text-charcoal/70">
-        اگر سالن ثبت کرده‌اید، از داخل پنل با نقش مدیر می‌توانید هماهنگی پشتیبانی و تنظیمات را انجام دهید.
-      </p>
-      <a href="{% url 'dashboard:home' %}" class="mt-4 inline-flex text-sm font-medium text-lavender hover:underline">رفتن به پنل سالن</a>
-    </article>
-    <article class="public-contact-card">
-      <i data-lucide="sparkles" class="h-6 w-6 text-lavender" aria-hidden="true"></i>
-      <h2 class="mt-3 font-semibold text-aubergine">شروع تازه</h2>
-      <p class="mt-2 text-sm leading-relaxed text-charcoal/70">
-        هنوز حساب ندارید؟ ثبت‌نام سالن رایگان است و در چند دقیقه پنل، تقویم و صفحه رزرو آنلاین آماده می‌شود.
-      </p>
-      <a href="{% url 'accounts:register' %}" class="mt-4 inline-flex text-sm font-medium text-lavender hover:underline">ثبت‌نام سالن</a>
-    </article>
-    <article class="public-contact-card sm:col-span-2">
-      <i data-lucide="book-open" class="h-6 w-6 text-lavender" aria-hidden="true"></i>
-      <h2 class="mt-3 font-semibold text-aubergine">راهنمای سریع</h2>
-      <p class="mt-2 text-sm leading-relaxed text-charcoal/70">
-        پیش از تماس، بخش سؤالات متداول و مقالات بلاگ پاسخ بسیاری از سؤالات درباره نوبت عمومی، نقش‌های تیم و ورود پیامکی را پوشش می‌دهد.
-      </p>
-      <div class="mt-4 flex flex-wrap gap-4 text-sm">
-        <a href="{% url 'website:faq' %}" class="font-medium text-lavender hover:underline">سؤالات متداول</a>
-        <a href="{% url 'website:blog' %}" class="font-medium text-lavender hover:underline">مقالات بلاگ</a>
-        <a href="{% url 'website:features' %}" class="font-medium text-lavender hover:underline">امکانات پنل</a>
+<section class="pub3-contact">
+  <div class="pub3-container">
+    <nav class="pub3-breadcrumb" aria-label="موقعیت صفحه">
+      <a href="{% url 'website:home' %}">صفحه اصلی</a>
+      <i data-lucide="chevron-left" aria-hidden="true"></i>
+      <span>تماس با ما</span>
+    </nav>
+    <div class="pub3-contact__intro">
+      <span class="pub3-eyebrow"><i data-lucide="messages-square" aria-hidden="true"></i> ارتباط با BeautyOS</span>
+      <h1>ما اینجا هستیم تا کار سالن شما ساده‌تر شود.</h1>
+      <p>سؤالی درباره شروع کار، امکانات یا همکاری دارید؟ پیام بفرستید. اگر از قبل سالن دارید، صندوق پشتیبانی داخل پنل نیز در دسترس شماست.</p>
+    </div>
+    <div class="pub3-contact__grid">
+      <div class="pub3-contact__information">
+        <div class="pub3-contact__illustration" aria-hidden="true">
+          <div class="pub3-contact__emblem"><i data-lucide="heart-handshake"></i></div>
+          <p>گفت‌وگو، آغاز یک تجربه بهتر است.</p>
+        </div>
+        <div class="pub3-contact__assist">
+          <article>
+            <span><i data-lucide="life-buoy"></i></span>
+            <div>
+              <h2>پشتیبانی کاربران سالن</h2>
+              <p>برای پیگیری مسائل مربوط به سالن، درخواست خود را در پنل ثبت کنید.</p>
+              {% if nav_salon_settings %}
+              <a href="{% url 'salon_support:home' %}">صندوق پشتیبانی سالن <i data-lucide="arrow-up-left"></i></a>
+              {% elif user.is_authenticated %}
+              <a href="{% url 'dashboard:home' %}">ورود به میزکار <i data-lucide="arrow-up-left"></i></a>
+              {% else %}
+              <a href="{% url 'accounts:login' %}">ورود به حساب سالن <i data-lucide="arrow-up-left"></i></a>
+              {% endif %}
+            </div>
+          </article>
+          <article>
+            <span><i data-lucide="book-open-text"></i></span>
+            <div>
+              <h2>راهنمای خودآموز</h2>
+              <p>پاسخ پرسش‌های رایج و نکته‌های مدیریت سالن را پیدا کنید.</p>
+              <a href="{% url 'website:faq' %}">سؤالات متداول <i data-lucide="arrow-up-left"></i></a>
+            </div>
+          </article>
+          <article>
+            <span><i data-lucide="sparkles"></i></span>
+            <div>
+              <h2>شروع کار با BeautyOS</h2>
+              <p>با شماره موبایل ثبت‌نام کنید و اطلاعات سالن را بعداً کامل کنید.</p>
+              <a href="{% url 'accounts:register' %}">ساخت حساب سالن <i data-lucide="arrow-up-left"></i></a>
+            </div>
+          </article>
+        </div>
       </div>
-    </article>
+      <div class="pub3-contact__form-card">
+        <div class="pub3-contact__form-title">
+          <span class="pub3-eyebrow">ارسال پیام</span>
+          <h2>پیام شما را می‌خوانیم</h2>
+          <p>لطفاً اطلاعات تماس صحیح وارد کنید تا امکان پاسخ‌گویی وجود داشته باشد.</p>
+        </div>
+        {% if contact_sent %}
+        <div class="pub3-contact__success" role="status"><i data-lucide="check-circle-2"></i> پیام دریافت شد.</div>
+        {% endif %}
+        <form method="post" class="pub3-contact-form" novalidate>
+          {% csrf_token %}
+          {{ contact_form.website_url }}
+          {% if contact_form.non_field_errors %}
+          <div class="pub3-form-error" role="alert">{{ contact_form.non_field_errors }}</div>
+          {% endif %}
+          <div class="pub3-field">
+            <label for="{{ contact_form.name.id_for_label }}">نام و نام خانوادگی <span aria-hidden="true">*</span></label>
+            {{ contact_form.name }}
+            {% for error in contact_form.name.errors %}<span class="pub3-field__error" role="alert">{{ error }}</span>{% endfor %}
+          </div>
+          <div class="pub3-fields-two">
+            <div class="pub3-field">
+              <label for="{{ contact_form.phone.id_for_label }}">شماره موبایل</label>
+              {{ contact_form.phone }}
+              {% for error in contact_form.phone.errors %}<span class="pub3-field__error" role="alert">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="pub3-field">
+              <label for="{{ contact_form.email.id_for_label }}">ایمیل</label>
+              {{ contact_form.email }}
+              {% for error in contact_form.email.errors %}<span class="pub3-field__error" role="alert">{{ error }}</span>{% endfor %}
+            </div>
+          </div>
+          <p class="pub3-field__hint">حداقل یکی از راه‌های تماس را وارد کنید.</p>
+          <div class="pub3-field">
+            <label for="{{ contact_form.topic.id_for_label }}">موضوع درخواست</label>
+            {{ contact_form.topic }}
+            {% for error in contact_form.topic.errors %}<span class="pub3-field__error" role="alert">{{ error }}</span>{% endfor %}
+          </div>
+          <div class="pub3-field">
+            <label for="{{ contact_form.message.id_for_label }}">متن پیام <span aria-hidden="true">*</span></label>
+            {{ contact_form.message }}
+            {% for error in contact_form.message.errors %}<span class="pub3-field__error" role="alert">{{ error }}</span>{% endfor %}
+          </div>
+          <label class="pub3-contact-form__consent">
+            {{ contact_form.consent }}
+            <span>با پردازش اطلاعاتم برای پاسخ‌گویی مطابق <a href="{% url 'website:privacy' %}" target="_blank" rel="noopener noreferrer">حریم خصوصی</a> موافقم.</span>
+          </label>
+          {% for error in contact_form.consent.errors %}<span class="pub3-field__error" role="alert">{{ error }}</span>{% endfor %}
+          <button type="submit" class="pub3-button pub3-button--primary">ثبت و ارسال پیام <i data-lucide="arrow-up-left" aria-hidden="true"></i></button>
+        </form>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 {% endblock %}
