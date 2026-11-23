@@ -1,13 +1,13 @@
 {% extends "onboarding/wizard/base.html" %}
 {% block title %}تکمیل راه‌اندازی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
-{% block wizard_heading %}آماده ورود به میزکار{% endblock %}
-{% block wizard_subtitle %}خلاصه تنظیمات سالن را بررسی کنید. هر زمان می‌توانید از پنل جزئیات را ویرایش کنید.{% endblock %}
+{% block wizard_heading %}فضای مدیریت سالن آماده است{% endblock %}
+{% block wizard_subtitle %}جزئیات را مرور کنید. رزرو عمومی فقط پس از فعال‌سازی آگاهانه شما در تنظیمات در دسترس مشتریان قرار می‌گیرد.{% endblock %}
 {% block wizard_form %}
 {% if salon and summary %}
 <ul class="space-y-2 text-sm text-charcoal/80">
   <li>نام سالن: <strong class="text-aubergine">{{ salon.name }}</strong></li>
   <li>صفحه عمومی: <a href="{% url 'salons_public:landing' slug=salon.slug %}" class="text-accent hover:underline" target="_blank" rel="noopener noreferrer" dir="ltr">{{ salon.slug }}</a></li>
-  <li>{{ summary.services }} خدمت · {{ summary.staff }} عضو تیم{% if summary.hours_configured %} · ساعات کاری ثبت شد{% endif %}</li>
+  <li>{{ summary.services }} خدمت · {{ summary.staff }} متخصص قابل رزرو{% if summary.hours_configured %} · ساعات فعالیت سالن ثبت شد{% endif %}</li>
 </ul>
 {% if summary.missing_optional %}
 <div class="mt-4 rounded-xl border border-champagne/40 bg-champagne/20 px-3 py-2 text-sm text-charcoal">
@@ -25,7 +25,7 @@
     <i data-lucide="layout-dashboard" class="h-4 w-4" aria-hidden="true"></i>
     ورود به میزکار
   </button>
-  <a href="{% url 'salons_public:landing' slug=salon.slug %}" class="btn-secondary flex min-h-[44px] w-full items-center justify-center text-sm" target="_blank" rel="noopener noreferrer">مشاهده صفحه عمومی</a>
+  <a href="{% url 'salons_settings:home' %}" class="btn-secondary flex min-h-[44px] w-full items-center justify-center text-sm">تنظیمات و فعال‌سازی رزرو آنلاین</a>
 </form>
 {% endif %}
 {% endblock %}

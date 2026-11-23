@@ -41,7 +41,9 @@
         <span class="rounded-full bg-coral/10 px-2.5 py-1 text-coral">غیرفعال</span>
         {% endif %}
         {% if salon.is_accepting_bookings %}
-        <span class="rounded-full border border-line px-2.5 py-1 text-ink-secondary">رزرو آنلاین</span>
+        <span class="rounded-full border border-sage/30 bg-sage/10 px-2.5 py-1 text-sage">رزرو آنلاین فعال</span>
+        {% else %}
+        <span class="rounded-full border border-line px-2.5 py-1 text-ink-muted">رزرو آنلاین غیرفعال</span>
         {% endif %}
       </div>
     </div>
@@ -142,6 +144,12 @@
           {{ profile_form.is_active.label }}
         </label>
       </div>
+      {% if profile_form.is_accepting_bookings.errors %}
+      <p class="text-xs text-coral" role="alert">{{ profile_form.is_accepting_bookings.errors.0 }}</p>
+      {% endif %}
+      {% if not salon.is_accepting_bookings %}
+      <p class="text-xs text-ink-muted">رزرو آنلاین تا زمانی که خودتان آن را فعال نکنید غیرفعال می‌ماند. ابتدا خدمات، متخصصان و ساعات فعالیت سالن را ثبت کنید.</p>
+      {% endif %}
     </section>
 
     <button
@@ -163,13 +171,13 @@
   </form>
   {% endif %}
 
-  {# ساعات فعالیت — منبع: StaffWorkHours مالک #}
+  {# ساعات فعالیت مستقل سالن، بدون وابستگی به تخصص یا تقویم مالک #}
   <section class="premium-card space-y-4 p-5 sm:p-6">
     <div>
       <h3 class="text-base font-semibold text-espresso">ساعات فعالیت</h3>
       <p class="mt-1 text-xs text-ink-muted">
-        برنامه هفتگی بر اساس پروفایل <strong>{{ owner_staff.display_name }}</strong> (مالک) است.
-        ساعات سایر متخصصان از بخش «کارکنان» قابل تنظیم است.
+        ساعات باز بودن سالن مستقل از برنامه کاری مالک و متخصصان است.
+        برای رزرو آنلاین، متخصص نیز باید در همان زمان برنامه کاری فعال داشته باشد.
       </p>
     </div>
     {% if hours_errors %}

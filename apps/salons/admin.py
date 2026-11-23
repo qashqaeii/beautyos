@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.salons.models import Salon, SalonMembership, SalonSettings
+from apps.salons.models import Salon, SalonMembership, SalonSettings, SalonWorkHours
 
 
 class SalonSettingsInline(admin.StackedInline):
@@ -26,3 +26,10 @@ class SalonMembershipAdmin(admin.ModelAdmin):
 @admin.register(SalonSettings)
 class SalonSettingsAdmin(admin.ModelAdmin):
     list_display = ("salon", "timezone", "currency_code")
+
+
+@admin.register(SalonWorkHours)
+class SalonWorkHoursAdmin(admin.ModelAdmin):
+    list_display = ("salon", "weekday", "start_time", "end_time", "is_closed")
+    list_filter = ("weekday", "is_closed")
+    search_fields = ("salon__name", "salon__slug")

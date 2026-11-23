@@ -1,10 +1,15 @@
 {% extends "onboarding/wizard/base.html" %}
 {% block title %}متخصصان · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
 {% block wizard_heading %}متخصصان و رزروپذیری{% endblock %}
-{% block wizard_subtitle %}پروفایل شما به‌عنوان متخصص قابل رزرو ثبت می‌شود. دعوت سایر اعضا پس از ورود به پنل از بخش «کارکنان» انجام می‌شود.{% endblock %}
+{% block wizard_subtitle %}مالک سالن لازم نیست متخصص باشد. فقط اگر خودتان خدمات ارائه می‌دهید، این گزینه را فعال کنید. سایر متخصصان از بخش «کارکنان» اضافه می‌شوند.{% endblock %}
 {% block wizard_form %}
 <form method="post" class="space-y-5">
   {% csrf_token %}
+  <p class="text-sm text-charcoal/70">این مرحله کاملاً اختیاری است و با رد کردن آن هیچ متخصصی برای مالک ایجاد نمی‌شود.</p>
+  <div class="flex items-center gap-2 rounded-xl border border-line bg-surface-elevated p-3 text-sm">
+    {{ form.is_bookable }}
+    <label for="id_is_bookable">من شخصاً خدمات ارائه می‌دهم و می‌خواهم در رزرو آنلاین نمایش داده شوم.</label>
+  </div>
   <div class="public-auth-field">
     <label for="id_display_name">{{ form.display_name.label }}</label>
     {{ form.display_name }}
@@ -14,10 +19,6 @@
     <label for="id_title">{{ form.title.label }}</label>
     {{ form.title }}
     <p class="field-hint">مثال: آرایشگر، لاین استایلیست — اختیاری</p>
-  </div>
-  <div class="flex items-center gap-2 text-sm">
-    {{ form.is_bookable }}
-    <label for="id_is_bookable">{{ form.is_bookable.label }}</label>
   </div>
   {% if form.services.field.queryset.exists %}
   <fieldset class="space-y-2">
@@ -31,7 +32,7 @@
   {% endif %}
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
     <button type="submit" class="btn-primary min-h-[48px] flex-1">ادامه</button>
-    <button type="submit" name="action" value="skip" class="btn-secondary min-h-[48px] px-4 text-sm">ادامه با پیش‌فرض</button>
+    <button type="submit" name="action" value="skip" class="btn-secondary min-h-[48px] px-4 text-sm">فعلاً متخصص اضافه نمی‌کنم</button>
   </div>
 </form>
 {% endblock %}

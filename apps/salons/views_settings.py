@@ -9,12 +9,6 @@ from apps.salons.forms_settings import SalonProfileForm, SalonRetentionSettingsF
 from apps.salons.permissions_policy import P_SALON_SETTINGS, require_permission
 
 
-def _owner_staff(request):
-    return ow.get_owner_staff_profile(request.salon, request.user) or ow.ensure_owner_staff_profile(
-        request.salon, request.user
-    )
-
-
 @salon_required
 @require_permission(P_SALON_SETTINGS)
 @require_http_methods(["GET", "POST"])
@@ -23,8 +17,7 @@ def salon_settings(request):
     settings_obj = salon.settings
     profile_form = SalonProfileForm(instance=salon)
     retention_form = SalonRetentionSettingsForm(instance=settings_obj)
-    owner_staff = _owner_staff(request)
-    hours_rows = ow.work_hours_grid(owner_staff)
+    hours_rows = ow.salon_hours_grid(salon)
     hours_errors = []
 
     if request.method == "POST":
@@ -43,7 +36,7 @@ def salon_settings(request):
             if hours_errors:
                 messages.error(request, "لطفاً ساعات کاری را اصلاح کنید.")
             else:
-                ow.save_staff_work_hours(owner_staff, rows)
+                ow.save_salon_work_hours(salon, rows)
                 messages.success(request, "ساعات فعالیت ذخیره شد.")
                 return redirect("salons_settings:home")
 
@@ -70,7 +63,6 @@ def salon_settings(request):
             "salon": salon,
             "profile_form": profile_form,
             "retention_form": retention_form,
-            "owner_staff": owner_staff,
             "hours_rows": hours_rows,
             "hours_errors": hours_errors,
             "public_url": public_url,
