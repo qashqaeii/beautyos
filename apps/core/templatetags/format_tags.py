@@ -1,4 +1,7 @@
 from datetime import date, datetime
+import json
+
+from django.utils.safestring import mark_safe
 
 import jdatetime
 from django import template
@@ -87,3 +90,13 @@ def fa_weekday(value) -> str:
         return ""
     jd = jdatetime.date.fromgregorian(date=value)
     return _WEEKDAYS_FA[jd.weekday()]
+
+@register.filter
+def jsonld(value):
+    """Protect JSON-LD text from script-termination or HTML injection."""
+    if not value:
+        return ""
+    return mark_safe(
+        json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+        .replace("<", r"\u003C").replace(">", r"\u003E").replace("&", r"\u0026")
+    )

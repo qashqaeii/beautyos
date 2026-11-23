@@ -1,4 +1,7 @@
 from django.urls import path
+from django.contrib.sitemaps.views import sitemap
+
+from apps.website.sitemaps import SITEMAPS
 
 from apps.website import views
 
@@ -14,4 +17,6 @@ urlpatterns = [
     path("faq/", views.faq, name="faq"),
     path("privacy/", views.privacy, name="privacy"),
     path("terms/", views.terms, name="terms"),
+    path("sitemap.xml", sitemap, {"sitemaps": SITEMAPS}, name="sitemap"),
+    path("robots.txt", views.robots_txt, name="robots"),
 ]
