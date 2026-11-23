@@ -6,8 +6,9 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 from apps.accounts.models import User
-from apps.salons.models import SalonMembership
-from apps.staff.models import StaffWorkHours
+from apps.salons.models import SalonMembership, SalonWorkHours
+from apps.staff.models import StaffProfile, StaffWorkHours
+from apps.services.models import Service
 
 
 def _profile_post_payload(salon, **overrides):
@@ -191,7 +192,9 @@ def test_salon_profile_save_work_hours(client, owner_membership):
             post[f"wh_{wd}_end"] = "18:00"
     resp = client.post("/settings/", post)
     assert resp.status_code == 302
-    assert StaffWorkHours.objects.filter(salon=owner_membership.salon, weekday=0).exists()
+    assert SalonWorkHours.objects.filter(salon=owner_membership.salon, weekday=0).exists()
+    assert not StaffProfile.objects.filter(membership=owner_membership).exists()
+    assert not StaffWorkHours.objects.filter(salon=owner_membership.salon).exists()
 
 
 @pytest.mark.django_db
@@ -213,3 +216,86 @@ def test_salon_profile_public_link(client, owner_membership):
     session.save()
     html = client.get("/settings/").content.decode()
     assert reverse("salons_public:landing", kwargs={"slug": owner_membership.salon.slug}) in html
+
+@pytest.mark.django_db
+def test_reading_salon_settings_does_not_create_specialist(client, owner_membership):
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(owner_membership.salon_id)
+    session.save()
+    assert not StaffProfile.objects.filter(membership=owner_membership).exists()
+    page = client.get(reverse("salons_settings:home"))
+    assert page.status_code == 200
+    assert "ساعات باز بودن سالن مستقل" in page.content.decode()
+    assert not StaffProfile.objects.filter(membership=owner_membership).exists()
+    assert not StaffWorkHours.objects.filter(salon=owner_membership.salon).exists()
+
+
+@pytest.mark.django_db
+def test_booking_activation_requires_real_operational_readiness(client, owner_membership):
+    salon = owner_membership.salon
+    salon.is_accepting_bookings = False
+    salon.save(update_fields=["is_accepting_bookings"])
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+
+    payload = _profile_post_payload(salon, public_phone="09121112233")
+    rejected = client.post(reverse("salons_settings:home"), payload)
+    assert rejected.status_code == 200
+    assert "برای فعال‌سازی رزرو آنلاین" in rejected.content.decode()
+    salon.refresh_from_db()
+    assert not salon.is_accepting_bookings
+
+    service = Service.objects.create(
+        salon=salon, name="مانیکور", duration_minutes=30,
+        price_toman=550000, is_public=True, is_active=True,
+    )
+    specialist = StaffProfile.objects.create(
+        salon=salon, membership=owner_membership, display_name="متخصص",
+        is_bookable=True, is_active=True,
+    )
+    specialist.services.add(service)
+    StaffWorkHours.objects.create(
+        salon=salon, staff=specialist, weekday=0,
+        start_time="09:00", end_time="18:00",
+    )
+    SalonWorkHours.objects.create(
+        salon=salon, weekday=0,
+        start_time="10:00", end_time="17:00",
+    )
+    accepted = client.post(reverse("salons_settings:home"), payload)
+    assert accepted.status_code == 302
+    salon.refresh_from_db()
+    assert salon.is_accepting_bookings
+
+
+@pytest.mark.django_db
+def test_salon_hours_and_staff_hours_are_independent(client, owner_membership):
+    salon = owner_membership.salon
+    staff = StaffProfile.objects.create(
+        salon=salon, membership=owner_membership,
+        display_name="متخصص", is_bookable=True,
+    )
+    StaffWorkHours.objects.create(
+        salon=salon, staff=staff, weekday=0,
+        start_time="08:00", end_time="16:00",
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    post = {"form_kind": "hours"}
+    for weekday in range(7):
+        if weekday == 6:
+            post[f"wh_{weekday}_closed"] = "on"
+        else:
+            post[f"wh_{weekday}_start"] = "11:00"
+            post[f"wh_{weekday}_end"] = "20:00"
+    saved = client.post(reverse("salons_settings:home"), post)
+    assert saved.status_code == 302
+    personal = StaffWorkHours.objects.get(staff=staff, weekday=0)
+    business = SalonWorkHours.objects.get(salon=salon, weekday=0)
+    assert personal.start_time.strftime("%H:%M") == "08:00"
+    assert business.start_time.strftime("%H:%M") == "11:00"

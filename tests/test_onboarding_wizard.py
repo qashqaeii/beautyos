@@ -4,7 +4,7 @@ import pytest
 from django.urls import reverse
 
 from apps.salons import onboarding_wizard as ow
-from apps.salons.models import Salon, SalonMembership, SalonSettings
+from apps.salons.models import Salon, SalonMembership, SalonSettings, SalonWorkHours
 from apps.services.models import Service
 from apps.staff.models import StaffProfile, StaffWorkHours
 
@@ -73,6 +73,8 @@ def test_wizard_full_flow_creates_salon_and_completes(client):
     assert settings.onboarding_completed_at is not None
     assert StaffProfile.scoped(salon).filter(is_deleted=False).count() >= 1
     assert StaffWorkHours.objects.filter(salon=salon).exists()
+    assert SalonWorkHours.objects.filter(salon=salon).count() == 7
+    assert salon.is_accepting_bookings is False
 
 
 @pytest.mark.django_db
@@ -312,3 +314,81 @@ def test_defer_onboarding_requires_csrf(client, owner_membership):
     secured = Client(enforce_csrf_checks=True)
     secured.force_login(owner_membership.user)
     assert secured.post(reverse("salons_onboarding:defer")).status_code == 403
+
+@pytest.mark.django_db
+def test_wizard_owner_not_created_as_specialist_on_get_or_skip(client, owner_membership):
+    salon = owner_membership.salon
+    settings_obj = salon.settings
+    settings_obj.onboarding_completed_at = None
+    settings_obj.save(update_fields=["onboarding_completed_at"])
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+
+    staff_step = reverse("salons_onboarding:wizard", kwargs={"step": 4})
+    rendered = client.get(staff_step + "?modal=1")
+    assert rendered.status_code == 200
+    assert 'data-onboarding-step="4"' in rendered.content.decode()
+    assert "مالک سالن لازم نیست متخصص باشد" in rendered.content.decode()
+    assert not StaffProfile.objects.filter(membership=owner_membership).exists()
+    skipped = client.post(staff_step, {"action": "skip"})
+    assert skipped.status_code == 302
+    assert not StaffProfile.objects.filter(membership=owner_membership).exists()
+
+    hours_step = reverse("salons_onboarding:wizard", kwargs={"step": 5})
+    assert client.get(hours_step).status_code == 200
+    assert not StaffProfile.objects.filter(membership=owner_membership).exists()
+    assert client.post(hours_step, {"action": "skip"}).status_code == 302
+    assert SalonWorkHours.objects.filter(salon=salon).count() == 7
+    assert not StaffProfile.objects.filter(membership=owner_membership).exists()
+    assert not StaffWorkHours.objects.filter(salon=salon).exists()
+
+
+@pytest.mark.django_db
+def test_wizard_explicit_specialist_opt_in_preserves_services(client, owner_membership):
+    salon = owner_membership.salon
+    salon.settings.onboarding_completed_at = None
+    salon.settings.save(update_fields=["onboarding_completed_at"])
+    service = Service.objects.create(
+        salon=salon, name="فیشیال", duration_minutes=45,
+        price_toman=750000, is_active=True, is_public=True,
+    )
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    route = reverse("salons_onboarding:wizard", kwargs={"step": 4})
+    response = client.post(route, {
+        "display_name": "نیلوفر", "title": "متخصص پوست",
+        "is_bookable": "on", "services": [str(service.pk)],
+    })
+    assert response.status_code == 302
+    profile = StaffProfile.objects.get(membership=owner_membership)
+    assert profile.display_name == "نیلوفر"
+    assert profile.title == "متخصص پوست"
+    assert profile.is_bookable
+    assert list(profile.services.values_list("pk", flat=True)) == [service.pk]
+
+    hours_step = reverse("salons_onboarding:wizard", kwargs={"step": 5})
+    assert client.post(hours_step, {"action": "skip"}).status_code == 302
+    assert StaffWorkHours.objects.filter(staff=profile).count() == 7
+
+
+@pytest.mark.django_db
+def test_finishing_onboarding_never_silently_enables_public_booking(client, owner_membership):
+    salon = owner_membership.salon
+    salon.is_accepting_bookings = False
+    salon.save(update_fields=["is_accepting_bookings"])
+    salon.settings.onboarding_completed_at = None
+    salon.settings.save(update_fields=["onboarding_completed_at"])
+    client.force_login(owner_membership.user)
+    session = client.session
+    session["active_salon_id"] = str(salon.pk)
+    session.save()
+    complete = client.post(reverse("salons_onboarding:wizard", kwargs={"step": 6}))
+    assert complete.status_code == 302
+    assert complete.url == reverse("dashboard:home")
+    salon.refresh_from_db()
+    assert salon.settings.onboarding_completed_at is not None
+    assert not salon.is_accepting_bookings
