@@ -163,7 +163,7 @@ def salon_detail(request, salon_id):
 @require_POST
 def salon_status(request, salon_id):
     action = request.POST.get("action")
-    reason = (request.POST.get("reason") or "").strip()
+    reason = (request.POST.get("reason") or "").strip()[:500]
     if action not in ("activate", "deactivate") or len(reason) < 8:
         messages.error(request, "برای تغییر وضعیت، اقدام معتبر و دلیل حداقل ۸ کاراکتری لازم است.")
         return redirect("platform_admin:salon_detail", salon_id=salon_id)
@@ -214,7 +214,7 @@ def user_detail(request, user_id):
 @require_POST
 def user_status(request, user_id):
     action = request.POST.get("action")
-    reason = (request.POST.get("reason") or "").strip()
+    reason = (request.POST.get("reason") or "").strip()[:500]
     if action not in ("activate", "deactivate") or len(reason) < 8:
         messages.error(request, "اقدام معتبر و دلیل حداقل ۸ کاراکتری لازم است.")
         return redirect("platform_admin:user_detail", user_id=user_id)

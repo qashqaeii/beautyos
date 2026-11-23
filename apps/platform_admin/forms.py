@@ -70,10 +70,12 @@ class ArticleForm(forms.ModelForm):
 
     def clean_cover_image(self):
         image = self.cleaned_data.get("cover_image")
-        if image and hasattr(image, "size"):
+        # Existing ImageFieldFile instances have size but no content_type.
+        # Requiring a new upload on every text edit would break published posts.
+        if image and hasattr(image, "content_type"):
             if image.size > 4 * 1024 * 1024:
                 raise forms.ValidationError("حداکثر حجم تصویر ۴ مگابایت است.")
-            if getattr(image, "content_type", "") not in ("image/png", "image/jpeg", "image/webp"):
+            if image.content_type not in ("image/png", "image/jpeg", "image/webp"):
                 raise forms.ValidationError("تصویر باید JPG، PNG یا WebP باشد.")
         return image
 

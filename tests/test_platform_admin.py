@@ -279,3 +279,35 @@ def test_platform_post_actions_require_csrf(platform_operator, salon):
     }).status_code == 403
     salon.refresh_from_db()
     assert salon.is_active
+
+@pytest.mark.django_db
+def test_existing_article_cover_is_preserved_on_text_edit(platform_client):
+    from io import BytesIO
+
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from PIL import Image
+
+    output = BytesIO()
+    Image.new("RGB", (2, 2), "white").save(output, format="PNG")
+    cover = SimpleUploadedFile("salon-cover.png", output.getvalue(), content_type="image/png")
+    article = BlogPost.objects.create(
+        title="راهنمای خدمات", slug="service-guide",
+        summary="متن اولیه", body="مقاله اولیه", status=BlogPost.Status.DRAFT,
+        cover_image=cover,
+    )
+    original_cover_name = article.cover_image.name
+    response = platform_client.post(
+        reverse("platform_admin:article_edit", kwargs={"article_id": article.pk}),
+        {
+            "title": "راهنمای کامل خدمات",
+            "slug": article.slug,
+            "summary": "خلاصه جدید",
+            "body": "متن کامل مقاله جدید",
+            "category": "راهنما",
+            "status": "draft",
+        },
+    )
+    assert response.status_code == 302
+    article.refresh_from_db()
+    assert article.title == "راهنمای کامل خدمات"
+    assert article.cover_image.name == original_cover_name
