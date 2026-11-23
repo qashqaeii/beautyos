@@ -98,6 +98,8 @@ class LoginView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
+            if request.user.is_active and request.user.is_superuser:
+                return redirect("platform_admin:overview")
             return redirect("dashboard:home")
         return render(request, self.template_name, {"phone_form": PhoneForm()})
 
@@ -275,6 +277,8 @@ class VerifyOTPView(View):
     def _post_login_redirect(self, request, user):
         from apps.salons.models import SalonMembership
 
+        if user.is_active and user.is_superuser:
+            return reverse("platform_admin:overview")
         if SalonMembership.objects.filter(user=user, is_active=True, salon__is_active=True).exists():
             return reverse("dashboard:home")
         return reverse("salons_onboarding:create")

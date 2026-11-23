@@ -16,6 +16,11 @@ class TicketForm(forms.ModelForm):
         fields = ["title", "category"]
         labels = {"title": "عنوان درخواست", "category": "دسته‌بندی"}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "input-field"
+
     def clean_title(self):
         return self.cleaned_data["title"].strip()
 
@@ -26,6 +31,10 @@ class MessageForm(forms.ModelForm):
         fields = ["body"]
         labels = {"body": "پاسخ"}
         widgets = {"body": forms.Textarea(attrs={"rows": 4, "placeholder": "متن پیام را وارد کنید…"})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["body"].widget.attrs["class"] = "input-field"
 
     def clean_body(self):
         body = self.cleaned_data["body"].strip()

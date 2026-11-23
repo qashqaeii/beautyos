@@ -38,6 +38,18 @@
       <i data-lucide="building-2" class="beautyos-lucide beautyos-lucide--nav"></i>
       <span class="nav-label">اطلاعات سالن</span>
     </a>
+    <a href="{% url 'salon_support:home' %}" class="nav-link {% if request.resolver_match.app_name == 'salon_support' %}nav-link-active{% endif %}" title="پشتیبانی">
+      <i data-lucide="life-buoy" class="beautyos-lucide beautyos-lucide--nav"></i>
+      <span class="nav-label">پشتیبانی</span>
+    </a>
+  </div>
+  {% endif %}
+  {% if user.is_superuser %}
+  <div class="maison-sidebar__extras shrink-0 px-2.5 pb-1">
+    <a href="{% url 'platform_admin:overview' %}" class="nav-link" title="مدیریت مرکزی">
+      <i data-lucide="shield-check" class="beautyos-lucide beautyos-lucide--nav"></i>
+      <span class="nav-label">مدیریت مرکزی</span>
+    </a>
   </div>
   {% endif %}
   <div class="maison-sidebar__footer theme-sidebar-footer shrink-0 border-t p-3 text-xs">
