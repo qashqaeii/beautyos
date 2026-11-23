@@ -1,11 +1,19 @@
 """BeautyOS public pages, canonical SEO and published content discovery."""
+import hashlib
+import hmac
+from datetime import timedelta
+
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.staticfiles import finders
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
+from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 
 from apps.core.utils.dates import to_jalali
 from apps.website.features_data import (
@@ -17,7 +25,8 @@ from apps.website.features_data import (
     ROLE_PANELS,
     START_STEPS,
 )
-from apps.website.models import BlogPost
+from apps.website.forms import ContactInquiryForm
+from apps.website.models import BlogPost, ContactInquiry
 from apps.website.seo import DEFAULT_DESCRIPTION, blog_schema, brand_schema, meta
 
 
@@ -128,10 +137,43 @@ def blog_post(request, slug):
     )
 
 
+def _request_ip_digest(request):
+    # Only REMOTE_ADDR is trusted. Unvalidated X-Forwarded-For can be spoofed.
+    ip = request.META.get("REMOTE_ADDR", "").strip()
+    if not ip:
+        return ""
+    return hmac.new(
+        settings.SECRET_KEY.encode("utf-8"), ip.encode("utf-8"), hashlib.sha256,
+    ).hexdigest()
+
+
+@require_http_methods(["GET", "POST"])
 def contact(request):
+    form = ContactInquiryForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        if form.cleaned_data.get("website_url"):
+            # Honeypot: quietly ignore non-human submissions.
+            return render(request, "website/contact.html", _public_ctx(
+                contact_form=ContactInquiryForm(), contact_sent=True,
+                **meta(request, "تماس با تیم BeautyOS", canonical=reverse("website:contact")),
+            ))
+        digest = _request_ip_digest(request)
+        recent_count = ContactInquiry.objects.filter(
+            ip_digest=digest, created_at__gte=timezone.now() - timedelta(hours=1),
+        ).count() if digest else 0
+        if recent_count >= 5:
+            form.add_error(None, "تعداد پیام‌های اخیر زیاد است. بعداً دوباره تلاش کنید.")
+        else:
+            inquiry = form.save(commit=False)
+            inquiry.ip_digest = digest
+            inquiry.consented_at = timezone.now()
+            inquiry.save()
+            messages.success(request, "پیام شما ثبت شد و از طریق اطلاعات تماس ارائه‌شده پیگیری می‌شود.")
+            return redirect("website:contact")
     return render(
         request, "website/contact.html",
         _public_ctx(
+            contact_form=form,
             **meta(
                 request, "تماس با تیم BeautyOS",
                 "ارتباط با تیم BeautyOS درباره مدیریت سالن زیبایی زنانه، ثبت‌نام و راهنمایی محصول.",
