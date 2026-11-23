@@ -1,31 +1,40 @@
 {% extends "layouts/public_site.html" %}
-{% block title %}{{ post.title }} · بلاگ · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
-{% block extra_head %}
-<meta name="description" content="{{ post.summary|default:post.title }}">
-{% endblock %}
+{% block title %}{{ post.title }} · مجله {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
 {% block public_content %}
-<article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-  {% if post.category %}<p class="text-sm font-medium text-lavender">{{ post.category }}</p>{% endif %}
-  <h1 class="mt-2 text-3xl font-bold leading-snug text-aubergine">{{ post.title }}</h1>
-  {% if post.published_at %}
-  <p class="mt-3 text-sm text-charcoal/55">{{ published_jalali }}</p>
-  {% endif %}
-  {% if post.cover_image %}
-  <img src="{{ post.cover_image.url }}" alt="" class="mt-8 w-full rounded-2xl border border-line object-cover">
-  {% endif %}
-  <div class="prose-public mt-8 space-y-4 text-base leading-8 text-charcoal/80">
-    {{ post.body|linebreaks }}
+<article class="pub3-article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="pub3-article__container">
+    <nav class="pub3-breadcrumb" aria-label="موقعیت صفحه">
+      <a href="{% url 'website:home' %}">خانه</a><i data-lucide="chevron-left" aria-hidden="true"></i>
+      <a href="{% url 'website:blog' %}">مجله</a><i data-lucide="chevron-left" aria-hidden="true"></i>
+      <span aria-current="page">{{ post.title|truncatechars:42 }}</span>
+    </nav>
+    <header class="pub3-article__header">
+      <div class="pub3-article__tagline"><span class="pub3-eyebrow">BEAUTYOS JOURNAL</span>{% if post.category %}<a href="{% url 'website:blog' %}?category={{ post.category|urlencode }}" class="pub3-article__category">{{ post.category }}</a>{% endif %}</div>
+      <h1 itemprop="headline">{{ post.title }}</h1>
+      {% if post.summary %}<p class="pub3-article__summary" itemprop="description">{{ post.summary }}</p>{% endif %}
+      <div class="pub3-article__byline">
+        <span><i data-lucide="calendar-days" aria-hidden="true"></i> {{ published_jalali|fa_num }}</span>
+        <span><i data-lucide="clock-3" aria-hidden="true"></i> {{ reading_minutes|fa_num }} دقیقه مطالعه</span>
+        <span><i data-lucide="flower-2" aria-hidden="true"></i> تحریریه BeautyOS</span>
+      </div>
+      {% if post.published_at %}<meta itemprop="datePublished" content="{{ post.published_at|date:'c' }}">{% endif %}
+    </header>
+    {% if post.cover_image %}
+    <figure class="pub3-article__cover"><img src="{{ post.cover_image.url }}" alt="تصویر شاخص مقاله {{ post.title }}" itemprop="image" width="1200" height="750" fetchpriority="high" decoding="async"></figure>
+    {% else %}
+    <div class="pub3-article__cover pub3-article__cover--empty" aria-hidden="true"><i data-lucide="book-heart"></i></div>
+    {% endif %}
+    <div class="pub3-article__content" itemprop="articleBody">
+      {{ post.body|linebreaks }}
+    </div>
+    <footer class="pub3-article__footer"><div><i data-lucide="sparkles"></i><p>این مقاله بخشی از مجله BeautyOS است؛ جایی برای یادگیری نکات کاربردی مدیریت سالن زیبایی.</p></div><a href="{% url 'website:blog' %}">بازگشت به مجله <i data-lucide="arrow-up-left"></i></a></footer>
   </div>
 </article>
 {% if related_posts %}
-<section class="border-t border-line bg-surface/40">
-  <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-    <h2 class="text-xl font-bold text-aubergine">مقالات مرتبط</h2>
-    <div class="mt-6 grid gap-6 sm:grid-cols-3">
-      {% for related in related_posts %}
-      {% include "website/partials/blog_card.html" with post=related %}
-      {% endfor %}
-    </div>
+<section class="pub3-related" aria-labelledby="related-title">
+  <div class="pub3-container">
+    <div class="pub3-blog__section-heading"><div><span class="pub3-eyebrow">KEEP READING</span><h2 id="related-title">مقالات مرتبط</h2></div><a href="{% url 'website:blog' %}">مشاهده همه مقالات <i data-lucide="arrow-up-left"></i></a></div>
+    <div class="pub3-blog__grid">{% for post in related_posts %}{% include "website/partials/blog_card.html" with post=post %}{% endfor %}</div>
   </div>
 </section>
 {% endif %}
