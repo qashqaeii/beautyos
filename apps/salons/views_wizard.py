@@ -218,8 +218,15 @@ class OnboardingWizardView(View):
                 with transaction.atomic():
                     if profile is None:
                         profile = ow.ensure_owner_staff_profile(salon, request.user)
-                        form.instance = profile
-                    form.save()
+                        profile.display_name = form.cleaned_data["display_name"]
+                        profile.title = form.cleaned_data["title"]
+                        profile.is_bookable = True
+                        profile.save(update_fields=[
+                            "display_name", "title", "is_bookable", "updated_at"
+                        ])
+                        profile.services.set(form.cleaned_data["services"])
+                    else:
+                        form.save()
                 return self._step_redirect(request, step=5)
         elif step == 5:
             salon = _wizard_salon(request)
