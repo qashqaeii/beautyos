@@ -1,27 +1,74 @@
 {% extends "layouts/public_site.html" %}
-{% load static %}
-{% block title %}بلاگ · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block title %}مجله مدیریت سالن زیبایی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
 {% block public_content %}
-{% include "partials/public_page_hero.html" with eyebrow="مجله" title="بلاگ" lead="مقالات و راهنماهای عملی برای مدیریت نوبت، تیم و رشد سالن." %}
-<div class="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
-  {% if categories %}
-  <nav class="mt-6 flex flex-wrap gap-2" aria-label="دسته‌بندی">
-    <a href="{% url 'website:blog' %}" class="rounded-full border px-4 py-2 text-sm {% if not active_category %}border-lavender bg-lavender/10 text-aubergine{% else %}border-line text-charcoal/70{% endif %}">همه</a>
-    {% for cat in categories %}
-    <a href="{% url 'website:blog' %}?category={{ cat|urlencode }}" class="rounded-full border px-4 py-2 text-sm {% if active_category == cat %}border-lavender bg-lavender/10 text-aubergine{% else %}border-line text-charcoal/70{% endif %}">{{ cat }}</a>
-    {% endfor %}
-  </nav>
-  {% endif %}
-  {% if posts %}
-  <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    {% for post in posts %}
-    {% include "website/partials/blog_card.html" with post=post %}
-    {% endfor %}
+<section class="pub3-blog">
+  <div class="pub3-container">
+    <nav class="pub3-breadcrumb" aria-label="موقعیت صفحه">
+      <a href="{% url 'website:home' %}">خانه</a><i data-lucide="chevron-left" aria-hidden="true"></i><span>مجله</span>
+    </nav>
+    <header class="pub3-blog__hero">
+      <div>
+        <span class="pub3-eyebrow"><i data-lucide="book-open-text" aria-hidden="true"></i> BEAUTYOS JOURNAL</span>
+        <h1>مجله مدیریت سالن‌های زیبایی</h1>
+        <p>از سامان‌دهی نوبت‌ها تا تجربه بهتر مشتری؛ راهنماهای کاربردی برای مدیریت و رشد سالن زیبایی زنانه.</p>
+      </div>
+      <div class="pub3-blog__illustration" aria-hidden="true"><i data-lucide="book-open"></i><span>دانش و تجربه</span></div>
+    </header>
+
+    <div class="pub3-blog__toolbar">
+      <form class="pub3-blog__search" method="get" action="{% url 'website:blog' %}" role="search">
+        <label for="blog-query" class="sr-only">جستجو در مقالات</label>
+        <i data-lucide="search" aria-hidden="true"></i>
+        <input id="blog-query" type="search" name="q" value="{{ q }}" maxlength="80" placeholder="دنبال چه موضوعی می‌گردید؟">
+        {% if active_category %}<input type="hidden" name="category" value="{{ active_category }}">{% endif %}
+        <button type="submit">جستجو</button>
+      </form>
+      {% if q or active_category %}
+      <a href="{% url 'website:blog' %}" class="pub3-blog__clear"><i data-lucide="x"></i> حذف فیلترها</a>
+      {% endif %}
+    </div>
+    {% if categories %}
+    <nav class="pub3-blog__categories" aria-label="دسته‌بندی مقالات">
+      <a href="{% url 'website:blog' %}{% if q %}?q={{ q|urlencode }}{% endif %}" class="{% if not active_category %}is-active{% endif %}" {% if not active_category %}aria-current="page"{% endif %}>همه موضوعات</a>
+      {% for cat in categories %}
+      <a href="{% url 'website:blog' %}?category={{ cat|urlencode }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="{% if active_category == cat %}is-active{% endif %}" {% if active_category == cat %}aria-current="page"{% endif %}>{{ cat }}</a>
+      {% endfor %}
+    </nav>
+    {% endif %}
+
+    <div class="pub3-blog__section-heading">
+      <div><span class="pub3-eyebrow">ARTICLES</span><h2>{% if q %}نتایج جستجو{% elif active_category %}مقالات {{ active_category }}{% else %}تازه‌ترین مقالات{% endif %}</h2></div>
+      <span>{{ results_count|fa_num }} مقاله</span>
+    </div>
+
+    {% if posts %}
+    <div class="pub3-blog__grid">
+      {% for post in posts %}
+      {% include "website/partials/blog_card.html" with post=post %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="pub3-blog__empty">
+      <i data-lucide="search-x" aria-hidden="true"></i>
+      <h2>{% if q or active_category %}مقاله‌ای با این مشخصات پیدا نشد{% else %}مقالات به‌زودی منتشر می‌شوند{% endif %}</h2>
+      <p>{% if q or active_category %}عبارت یا دسته‌بندی دیگری را امتحان کنید.{% else %}راهنماها و نکات کاربردی مدیریت سالن را همین‌جا دنبال کنید.{% endif %}</p>
+      {% if q or active_category %}<a class="pub3-button pub3-button--soft" href="{% url 'website:blog' %}">نمایش همه مقالات</a>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if page_obj.has_other_pages %}
+    <nav class="pub3-pagination" aria-label="صفحه‌بندی مقالات">
+      {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&category={{ active_category|urlencode }}" rel="prev"><i data-lucide="chevron-right"></i> صفحه قبل</a>
+      {% else %}<span class="is-disabled">صفحه قبل</span>{% endif %}
+      <span>صفحه {{ page_obj.number|fa_num }} از {{ page_obj.paginator.num_pages|fa_num }}</span>
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&category={{ active_category|urlencode }}" rel="next">صفحه بعد <i data-lucide="chevron-left"></i></a>
+      {% else %}<span class="is-disabled">صفحه بعد</span>{% endif %}
+    </nav>
+    {% endif %}
+
+    <aside class="pub3-blog__cta"><div><span class="pub3-eyebrow">YOUR BEAUTY BUSINESS</span><h2>دانش را به نظم روزانه سالن تبدیل کنید.</h2><p>نوبت‌ها، مشتریان و تیم را از یک فضای هماهنگ مدیریت کنید.</p></div><a href="{% url 'accounts:register' %}" class="pub3-button pub3-button--primary">شروع با BeautyOS <i data-lucide="arrow-up-left"></i></a></aside>
   </div>
-  {% else %}
-  <p class="mt-10 rounded-xl border border-dashed border-line bg-surface px-4 py-12 text-center text-sm text-charcoal/60">
-    هنوز مقاله‌ای منتشر نشده است.
-  </p>
-  {% endif %}
-</div>
+</section>
 {% endblock %}
