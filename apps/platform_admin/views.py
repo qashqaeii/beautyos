@@ -31,7 +31,7 @@ from apps.salons.models import Salon, SalonMembership
 from apps.salons.permissions_policy import P_SALON_SETTINGS, require_permission
 from apps.services.models import Service
 from apps.staff.models import StaffProfile
-from apps.website.models import BlogPost
+from apps.website.models import BlogPost, ContactInquiry
 
 
 def _last_days(request, default=30):
@@ -467,4 +467,54 @@ def salon_ticket_detail(request, ticket_id):
         "ticket": ticket,
         "thread": ticket.messages.filter(is_internal=False).select_related("author"),
         "form": form,
+    })
+
+
+@platform_required
+def public_inquiries(request):
+    query = (request.GET.get("q") or "").strip()[:80]
+    status = (request.GET.get("status") or "").strip()
+    qs = ContactInquiry.objects.all()
+    if query:
+        qs = qs.filter(
+            Q(name__icontains=query) | Q(phone__icontains=query)
+            | Q(email__icontains=query) | Q(message__icontains=query)
+        )
+    if status in ContactInquiry.Status.values:
+        qs = qs.filter(status=status)
+    else:
+        status = ""
+    return render(request, "platform_admin/inquiries.html", {
+        "page": _page(request, qs.order_by("-created_at")),
+        "q": query, "status": status, "statuses": ContactInquiry.Status.choices,
+    })
+
+
+@platform_required
+@require_http_methods(["GET", "POST"])
+def public_inquiry_detail(request, inquiry_id):
+    if request.method == "POST":
+        status = (request.POST.get("status") or "").strip()
+        note = (request.POST.get("internal_note") or "").strip()
+        if status not in ContactInquiry.Status.values or len(note) > 3000:
+            messages.error(request, "وضعیت یا یادداشت معتبر نیست.")
+            return redirect("platform_admin:inquiry_detail", inquiry_id=inquiry_id)
+        if status == ContactInquiry.Status.CLOSED and not note:
+            messages.error(request, "برای بستن پیام، نتیجه پیگیری را در یادداشت داخلی ثبت کنید.")
+            return redirect("platform_admin:inquiry_detail", inquiry_id=inquiry_id)
+        with transaction.atomic():
+            inquiry = get_object_or_404(ContactInquiry.objects.select_for_update(), pk=inquiry_id)
+            inquiry.status = status
+            inquiry.internal_note = note
+            inquiry.handled_by = request.user
+            inquiry.save(update_fields=["status", "internal_note", "handled_by", "updated_at"])
+            _audit(
+                request, AuditLog.Action.UPDATE, "public_inquiry", inquiry.pk,
+                "وضعیت پیگیری پیام عمومی به‌روزرسانی شد",
+            )
+        messages.success(request, "وضعیت پیام ثبت شد.")
+        return redirect("platform_admin:inquiry_detail", inquiry_id=inquiry_id)
+    inquiry = get_object_or_404(ContactInquiry.objects.select_related("handled_by"), pk=inquiry_id)
+    return render(request, "platform_admin/inquiry_detail.html", {
+        "inquiry": inquiry, "statuses": ContactInquiry.Status.choices,
     })
