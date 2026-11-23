@@ -1,0 +1,10 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}پشتیبانی BeautyOS{% endblock %}
+{% block page_title %}پشتیبانی{% endblock %}
+{% block page_subtitle %}پیگیری درخواست‌ها و ارتباط مستقیم با تیم پشتیبانی{% endblock %}
+{% block page_actions %}<a href="{% url 'salon_support:new' %}" class="btn-primary min-h-[44px]">درخواست جدید</a>{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl space-y-5 pb-20"><section class="premium-card space-y-3 p-5 sm:p-6"><div class="flex items-center justify-between gap-3"><div><h2 class="text-base font-semibold">درخواست‌های شما</h2><p class="mt-1 text-sm text-ink-secondary">تاریخچه و پاسخ تیم BeautyOS</p></div><a class="btn-secondary" href="{% url 'salon_support:new' %}">ثبت درخواست</a></div>
+<div class="divide-y divide-line">{% for ticket in page %}<a href="{% url 'salon_support:detail' ticket_id=ticket.pk %}" class="flex flex-wrap items-center justify-between gap-3 py-4 text-sm hover:text-accent"><span><strong>{{ ticket.title }}</strong><small class="mt-1 block text-ink-muted">#{{ ticket.pk|fa_num }} · {{ ticket.last_activity_at|fa_jalali_datetime }}</small></span><span class="rounded-lg border border-line px-3 py-1 text-xs">{{ ticket.get_status_display }}</span></a>{% empty %}<div class="py-10 text-center text-sm text-ink-secondary">درخواستی ثبت نشده است. برای شروع از «ثبت درخواست» استفاده کنید.</div>{% endfor %}</div>
+{% if page.has_other_pages %}<nav class="flex items-center justify-center gap-4 pt-4 text-sm" aria-label="صفحه‌بندی">{% if page.has_previous %}<a class="text-accent" href="?page={{ page.previous_page_number }}">قبلی</a>{% endif %}<span>صفحه {{ page.number|fa_num }}</span>{% if page.has_next %}<a class="text-accent" href="?page={{ page.next_page_number }}">بعدی</a>{% endif %}</nav>{% endif %}</section></div>
+{% endblock %}

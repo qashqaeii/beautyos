@@ -1,0 +1,12 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}پیگیری درخواست · BeautyOS{% endblock %}
+{% block page_title %}پیگیری پشتیبانی{% endblock %}
+{% block page_subtitle %}{{ ticket.title }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-4 pb-20">
+<a href="{% url 'salon_support:home' %}" class="inline-flex items-center gap-2 text-sm text-accent">بازگشت به درخواست‌ها</a>
+<section class="premium-card space-y-2 p-5"><div class="flex flex-wrap items-center justify-between gap-3"><h2 class="font-semibold">{{ ticket.title }}</h2><span class="rounded-full border border-line px-3 py-1 text-xs">{{ ticket.get_status_display }}</span></div><p class="text-sm text-ink-secondary">درخواست {{ ticket.pk|fa_num }} · {{ ticket.created_at|fa_jalali_datetime }} · {{ ticket.get_category_display }}</p></section>
+<section class="premium-card space-y-4 p-5 sm:p-6"><h2 class="text-base font-semibold">گفت‌وگو با پشتیبانی</h2>{% for item in thread %}<article class="rounded-xl border border-line bg-surface-elevated p-4"><div class="mb-2 flex flex-wrap justify-between gap-2 text-xs text-ink-muted"><strong>{{ item.author.full_name|default:"تیم پشتیبانی" }}</strong><time>{{ item.created_at|fa_jalali_datetime }}</time></div><div class="text-sm leading-8 text-ink-secondary">{{ item.body|linebreaksbr }}</div></article>{% empty %}<p class="text-sm text-ink-secondary">پیامی ثبت نشده است.</p>{% endfor %}
+{% if ticket.status != 'closed' %}<form method="post" class="space-y-3 border-t border-line pt-5">{% csrf_token %}<label class="block text-sm font-semibold" for="{{ form.body.id_for_label }}">ارسال پیام جدید</label>{{ form.body }}{% if form.body.errors %}<p class="text-xs text-coral">{{ form.body.errors.0 }}</p>{% endif %}<button class="btn-primary min-h-[44px]" type="submit">ارسال پاسخ</button></form>{% else %}<p class="rounded-xl bg-surface px-4 py-3 text-sm text-ink-secondary">این درخواست بسته شده است. در صورت نیاز درخواست جدید ثبت کنید.</p>{% endif %}
+</section></div>
+{% endblock %}

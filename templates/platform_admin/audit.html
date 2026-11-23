@@ -1,0 +1,10 @@
+{% extends "platform_admin/base.html" %}
+{% block title %}تاریخچه رویدادها · BeautyOS{% endblock %}
+{% block control_content %}
+<div class="pc-heading"><div><p class="pc-eyebrow">SECURITY & AUDIT / ۰۷</p><h1>لاگ‌ها و رویدادها</h1><p>تاریخچه قابل جستجوی اقدامات ثبت‌شده در سالن‌ها و مدیریت مرکزی.</p></div></div>
+<section class="pc-note"><i data-lucide="shield-check"></i><div><strong>قابلیت ردیابی تغییرات حساس</strong><p>تغییر وضعیت سالن و کاربر، به‌روزرسانی درخواست پشتیبانی و ویرایش مقاله با شناسه مدیر و دلیل یا شرح اقدام ثبت می‌شود.</p></div></section>
+<section class="pc-panel"><form class="pc-filterbar" method="get" role="search"><label class="pc-search"><i data-lucide="search"></i><input name="q" maxlength="80" value="{{ q }}" placeholder="متن رویداد، نوع یا نام سالن" aria-label="جستجوی لاگ"></label><label class="pc-select-wrap"><span>نوع</span><select name="action"><option value="">همه رویدادها</option>{% for value,label in actions %}<option value="{{ value }}" {% if action == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><button class="pc-button" type="submit">فیلتر</button><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:audit' %}">پاک‌سازی</a></form>
+<div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>رویداد</th><th>کاربر اقدام‌کننده</th><th>سالن</th><th>دسته</th><th>زمان</th></tr></thead><tbody>
+{% for item in page %}<tr><td><strong>{{ item.message|default:item.entity_type|truncatechars:145 }}</strong><small class="pc-table-subtitle">{{ item.entity_type }} · {{ item.entity_id }}</small></td><td>{{ item.actor.full_name|default:"سیستم" }}</td><td>{{ item.salon.name|default:"در سطح پلتفرم" }}</td><td><span class="pc-status pc-status--info">{{ item.get_action_display }}</span></td><td class="pc-date">{{ item.created_at|fa_jalali_datetime }}</td></tr>{% empty %}<tr><td colspan="5" class="pc-empty">رویدادی یافت نشد.</td></tr>{% endfor %}
+</tbody></table></div>{% include "platform_admin/_pagination.html" %}</section>
+{% endblock %}

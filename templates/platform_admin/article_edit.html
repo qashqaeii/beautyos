@@ -1,0 +1,15 @@
+{% extends "platform_admin/base.html" %}
+{% block title %}{% if article %}ویرایش مقاله{% else %}مقاله جدید{% endif %} · BeautyOS{% endblock %}
+{% block control_content %}
+<nav class="pc-breadcrumb"><a href="{% url 'platform_admin:articles' %}">مقالات</a><i data-lucide="chevron-left"></i><span>{% if article %}ویرایش{% else %}نوشتن مقاله{% endif %}</span></nav>
+<div class="pc-heading"><div><p class="pc-eyebrow">EDITORIAL WORKSPACE</p><h1>{% if article %}ویرایش مقاله{% else %}مقاله جدید{% endif %}</h1><p>متن مقالات در صفحه عمومی به شکل امن نمایش داده می‌شود. محتوای HTML خام اجرا نمی‌شود.</p></div>{% if article and article.status == 'published' %}<a class="pc-button pc-button--ghost" href="{% url 'website:blog_post' slug=article.slug %}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i> نمایش مقاله</a>{% endif %}</div>
+<form method="post" enctype="multipart/form-data" class="pc-panel pc-panel--padded pc-form pc-article-form">{% csrf_token %}
+{% if form.non_field_errors %}<div class="pc-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="pc-field"><label for="{{ form.title.id_for_label }}">عنوان مقاله</label>{{ form.title }}{% if form.title.errors %}<p class="pc-error">{{ form.title.errors.0 }}</p>{% endif %}</div>
+<div class="pc-form-grid"><div class="pc-field"><label for="{{ form.slug.id_for_label }}">آدرس مقاله</label>{{ form.slug }}{% if form.slug.errors %}<p class="pc-error">{{ form.slug.errors.0 }}</p>{% endif %}<p class="pc-subtle">خالی بگذارید تا از عنوان ساخته شود.</p></div><div class="pc-field"><label for="{{ form.category.id_for_label }}">دسته‌بندی</label>{{ form.category }}{% if form.category.errors %}<p class="pc-error">{{ form.category.errors.0 }}</p>{% endif %}</div></div>
+<div class="pc-field"><label for="{{ form.summary.id_for_label }}">خلاصه مقاله</label>{{ form.summary }}{% if form.summary.errors %}<p class="pc-error">{{ form.summary.errors.0 }}</p>{% endif %}</div>
+<div class="pc-field"><label for="{{ form.body.id_for_label }}">متن مقاله</label>{{ form.body }}{% if form.body.errors %}<p class="pc-error">{{ form.body.errors.0 }}</p>{% endif %}</div>
+<div class="pc-form-grid"><div class="pc-field"><label for="{{ form.cover_image.id_for_label }}">تصویر شاخص</label>{{ form.cover_image }}{% if form.cover_image.errors %}<p class="pc-error">{{ form.cover_image.errors.0 }}</p>{% endif %}<p class="pc-subtle">JPG، PNG، WebP تا ۴ مگابایت</p>{% if article.cover_image %}<img src="{{ article.cover_image.url }}" class="pc-image-preview" alt="تصویر شاخص فعلی">{% endif %}</div><div class="pc-field"><label for="{{ form.status.id_for_label }}">وضعیت انتشار</label>{{ form.status }}{% if form.status.errors %}<p class="pc-error">{{ form.status.errors.0 }}</p>{% endif %}<p class="pc-subtle">مقاله تا زمانی که منتشر شود در سایت عمومی نمایش داده نمی‌شود.</p></div></div>
+<div class="pc-form-actions"><button class="pc-button" type="submit"><i data-lucide="save"></i> ذخیره مقاله</button><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:articles' %}">بازگشت</a></div>
+</form>
+{% endblock %}

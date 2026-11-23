@@ -1,0 +1,17 @@
+{% extends "platform_admin/base.html" %}
+{% block title %}پشتیبانی · BeautyOS{% endblock %}
+{% block control_content %}
+<div class="pc-heading"><div><p class="pc-eyebrow">CUSTOMER SUCCESS / ۰۵</p><h1>صندوق پشتیبانی</h1><p>پیگیری متمرکز درخواست‌های ثبت‌شده توسط مدیران سالن‌ها.</p></div></div>
+<section class="pc-panel">
+<form method="get" role="search" class="pc-filterbar">
+  <label class="pc-search"><i data-lucide="search"></i><input type="search" name="q" maxlength="80" value="{{ q }}" placeholder="عنوان درخواست یا نام سالن" aria-label="جستجوی درخواست"></label>
+  <label class="pc-select-wrap"><span>وضعیت</span><select name="status"><option value="">همه درخواست‌ها</option>{% for value,label in statuses %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+  <button class="pc-button" type="submit">جستجو</button><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:support' %}">پاک‌سازی</a>
+</form>
+<div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>شماره و عنوان</th><th>سالن</th><th>دسته‌بندی</th><th>اولویت</th><th>وضعیت</th><th>آخرین فعالیت</th><th></th></tr></thead><tbody>
+{% for ticket in page %}<tr><td><div class="pc-table-name"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="message-square-text"></i></span><div><strong>{{ ticket.title|truncatechars:65 }}</strong><small>#{{ ticket.pk|fa_num }}</small></div></div></td><td>{{ ticket.salon.name }}</td><td>{{ ticket.get_category_display }}</td><td><span class="pc-status {% if ticket.priority == 'urgent' %}pc-status--warn{% else %}pc-status--info{% endif %}">{{ ticket.get_priority_display }}</span></td><td><span class="pc-status {% if ticket.status == 'open' %}pc-status--warn{% elif ticket.status == 'in_progress' %}pc-status--info{% else %}pc-status--good{% endif %}">{{ ticket.get_status_display }}</span></td><td class="pc-date">{{ ticket.last_activity_at|fa_jalali_datetime }}</td><td><a class="pc-table-link" href="{% url 'platform_admin:ticket_detail' ticket_id=ticket.pk %}">بررسی <i data-lucide="arrow-up-left"></i></a></td></tr>
+{% empty %}<tr><td class="pc-empty" colspan="7">درخواستی در این وضعیت وجود ندارد.</td></tr>{% endfor %}
+</tbody></table></div>
+{% include "platform_admin/_pagination.html" %}
+</section>
+{% endblock %}

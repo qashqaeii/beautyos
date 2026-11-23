@@ -1,0 +1,10 @@
+{% extends "layouts/app_shell.html" %}
+{% block title %}درخواست پشتیبانی جدید · BeautyOS{% endblock %}
+{% block page_title %}درخواست پشتیبانی{% endblock %}
+{% block page_subtitle %}مشکل یا پیشنهاد خود را برای تیم BeautyOS ارسال کنید{% endblock %}
+{% block content %}<div class="mx-auto max-w-3xl pb-20"><form method="post" class="premium-card space-y-5 p-5 sm:p-7">{% csrf_token %}{% if form.non_field_errors %}<div class="text-sm text-coral" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="public-auth-field"><label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>{{ form.title }}{% if form.title.errors %}<p class="text-xs text-coral">{{ form.title.errors.0 }}</p>{% endif %}</div>
+<div class="public-auth-field"><label for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>{{ form.category }}{% if form.category.errors %}<p class="text-xs text-coral">{{ form.category.errors.0 }}</p>{% endif %}</div>
+<div class="public-auth-field"><label for="{{ form.body.id_for_label }}">{{ form.body.label }}</label>{{ form.body }}{% if form.body.errors %}<p class="text-xs text-coral">{{ form.body.errors.0 }}</p>{% endif %}</div>
+<div class="flex flex-wrap gap-3"><button class="btn-primary min-h-[44px]" type="submit">ثبت درخواست</button><a class="btn-secondary min-h-[44px]" href="{% url 'salon_support:home' %}">بازگشت</a></div>
+</form></div>{% endblock %}

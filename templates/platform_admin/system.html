@@ -1,0 +1,12 @@
+{% extends "platform_admin/base.html" %}
+{% block title %}وضعیت سیستم · BeautyOS{% endblock %}
+{% block control_content %}
+<div class="pc-heading"><div><p class="pc-eyebrow">PLATFORM OPERATIONS / ۰۸</p><h1>وضعیت سیستم</h1><p>وضعیت پیکربندی و قابلیت‌های سرویس، بدون نمایش کلیدها یا اطلاعات محرمانه.</p></div></div>
+<div class="pc-kpis pc-kpis--three">
+  <article class="pc-kpi"><div class="pc-kpi__head"><span>حالت دیباگ</span><i data-lucide="shield"></i></div><strong class="pc-kpi__text">{% if diagnostics.debug_disabled %}غیرفعال{% else %}فعال{% endif %}</strong><p>{% if diagnostics.debug_disabled %}مناسب محیط انتشار{% else %}در محیط توسعه قابل انتظار است؛ برای پروداکشن غیرفعال شود{% endif %}</p></article>
+  <article class="pc-kpi"><div class="pc-kpi__head"><span>تنظیمات ارائه‌دهنده پیامک</span><i data-lucide="message-square"></i></div><strong class="pc-kpi__text">{% if diagnostics.sms_provider_configured %}کلید تنظیم شده{% else %}بدون کلید{% endif %}</strong><p>فقط وضعیت تنظیم کلید بررسی می‌شود؛ ارسال واقعی جداگانه نیازمند تست است.</p></article>
+  <article class="pc-kpi"><div class="pc-kpi__head"><span>ارسال خودکار پیام‌ها</span><i data-lucide="send"></i></div><strong class="pc-kpi__text">{% if diagnostics.automation_enabled %}فعال{% else %}غیرفعال{% endif %}</strong><p>به تنظیمات استقرار وابسته است. درخواست‌های باز: {{ tickets_open|fa_num }}</p></article>
+</div>
+<section class="pc-panel pc-panel--padded"><div class="pc-panel__header"><h2>وضعیت آماده‌سازی محصول</h2></div><div class="pc-feature-list"><div><i data-lucide="check-circle-2"></i><div><strong>پنل مدیریت مرکزی</strong><p>مدیریت سالن، کاربر، گزارش، محتوای بلاگ، پشتیبانی و لاگ‌ها.</p></div></div><div><i data-lucide="info"></i><div><strong>مدیریت اشتراک‌های BeautyOS</strong><p>پرداخت‌های ثبت‌شده متعلق به سالن‌ها هستند. برای درآمد خود پلتفرم، زیرسیستم اشتراک و Billing باید در فاز تجاری تکمیل شود.</p></div></div><div><i data-lucide="shield-check"></i><div><strong>امنیت اطلاعات مشتریان</strong><p>پرونده مدیریتی فقط آمار تجمیعی سالن و حساب‌های اعضا را نمایش می‌دهد؛ سوابق خصوصی مراجعه‌کنندگان در این پنل فهرست نمی‌شوند.</p></div></div></div></section>
+<section class="pc-note"><i data-lucide="info"></i><div><strong>این صفحه جایگزین سامانه مانیتورینگ نیست.</strong><p>در دسترس بودن سرویس‌ها، ارسال واقعی پیامک، مانیتورینگ و بکاپ/بازیابی در مرحله آماده‌سازی استقرار باید جداگانه آزمایش شوند.</p></div></section>
+{% endblock %}
