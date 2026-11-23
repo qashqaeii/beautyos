@@ -1,0 +1,29 @@
+{% extends "platform_admin/base.html" %}
+{% block title %}بررسی پیام تماس · BeautyOS{% endblock %}
+{% block control_content %}
+<nav class="pc-breadcrumb"><a href="{% url 'platform_admin:inquiries' %}">پیام‌های سایت</a><i data-lucide="chevron-left"></i><span>پیام {{ inquiry.pk|fa_num }}</span></nav>
+<div class="pc-heading"><div><p class="pc-eyebrow">CONTACT INQUIRY / {{ inquiry.pk }}</p><h1>{{ inquiry.name }}</h1><p>موضوع: {{ inquiry.get_topic_display }} · {{ inquiry.created_at|fa_jalali_datetime }}</p></div><span class="pc-status {% if inquiry.status == 'new' %}pc-status--warn{% elif inquiry.status == 'in_progress' %}pc-status--info{% else %}pc-status--good{% endif %}">{{ inquiry.get_status_display }}</span></div>
+<div class="pc-two-col pc-two-col--asym">
+  <section class="pc-panel pc-panel--padded">
+    <div class="pc-panel__header"><h2>متن پیام</h2></div>
+    <p style="line-height:2;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.88rem">{{ inquiry.message }}</p>
+    <dl class="pc-facts">
+      <div><dt>شماره تماس</dt><dd dir="ltr">{{ inquiry.phone|default:"ثبت نشده" }}</dd></div>
+      <div><dt>ایمیل</dt><dd dir="ltr">{{ inquiry.email|default:"ثبت نشده" }}</dd></div>
+      <div><dt>رضایت در زمان ارسال</dt><dd>{% if inquiry.consented_at %}{{ inquiry.consented_at|fa_jalali_datetime }}{% else %}ثبت نشده{% endif %}</dd></div>
+      <div><dt>پیگیری‌کننده</dt><dd>{{ inquiry.handled_by.full_name|default:"هنوز اختصاص نیافته" }}</dd></div>
+    </dl>
+  </section>
+  <section class="pc-panel pc-panel--padded">
+    <div class="pc-panel__header"><h2>ثبت نتیجه پیگیری</h2></div>
+    <form class="pc-form" method="post">{% csrf_token %}
+      <label for="inquiry-status">وضعیت پیام</label>
+      <select name="status" id="inquiry-status">{% for value,label in statuses %}<option value="{{ value }}" {% if inquiry.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+      <label for="inquiry-note">یادداشت داخلی (حداکثر ۳۰۰۰ کاراکتر)</label>
+      <textarea id="inquiry-note" name="internal_note" maxlength="3000" rows="8" placeholder="نتیجه پیگیری و اقدام بعدی را ثبت کنید">{{ inquiry.internal_note }}</textarea>
+      <button type="submit" class="pc-button"><i data-lucide="save"></i> ذخیره پیگیری</button>
+    </form>
+    <div class="pc-note" style="margin-top:20px"><i data-lucide="info"></i><div><strong>این بخش، ارسال‌کننده پیام نیست.</strong><p>تغییر وضعیت و یادداشت صرفاً در مدیریت مرکزی ذخیره می‌شوند. پاسخ به فرستنده باید از مسیر ارتباطی تأییدشده انجام شود.</p></div></div>
+  </section>
+</div>
+{% endblock %}

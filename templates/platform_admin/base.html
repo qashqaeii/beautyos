@@ -19,6 +19,7 @@
       <a href="{% url 'platform_admin:reports' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'reports' %}is-active{% endif %}"><i data-lucide="chart-no-axes-combined"></i><span>گزارش‌ها</span></a>
       <a href="{% url 'platform_admin:support' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'support' or request.resolver_match.url_name == 'ticket_detail' %}is-active{% endif %}"><i data-lucide="messages-square"></i><span>پشتیبانی</span></a>
       <p class="pc-nav-label pc-nav-label--group">محتوا و سیستم</p>
+      <a href="{% url 'platform_admin:inquiries' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'inquiries' or request.resolver_match.url_name == 'inquiry_detail' %}is-active{% endif %}"><i data-lucide="mail-open"></i><span>پیام‌های سایت</span></a>
       <a href="{% url 'platform_admin:articles' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'articles' or request.resolver_match.url_name == 'article_edit' or request.resolver_match.url_name == 'article_new' %}is-active{% endif %}"><i data-lucide="newspaper"></i><span>مقالات</span></a>
       <a href="{% url 'platform_admin:audit' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'audit' %}is-active{% endif %}"><i data-lucide="shield-check"></i><span>لاگ و امنیت</span></a>
       <a href="{% url 'platform_admin:system' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'system' %}is-active{% endif %}"><i data-lucide="settings-2"></i><span>وضعیت سیستم</span></a>
@@ -43,6 +44,7 @@
         <a href="{% url 'platform_admin:users' %}">کاربران</a>
         <a href="{% url 'platform_admin:reports' %}">گزارش‌ها</a>
         <a href="{% url 'platform_admin:support' %}">پشتیبانی</a>
+        <a href="{% url 'platform_admin:inquiries' %}">پیام‌های سایت</a>
         <a href="{% url 'platform_admin:articles' %}">مقالات</a>
         <a href="{% url 'platform_admin:audit' %}">لاگ‌ها</a>
         <a href="{% url 'platform_admin:system' %}">وضعیت سیستم</a>

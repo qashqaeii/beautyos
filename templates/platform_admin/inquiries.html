@@ -1,0 +1,19 @@
+{% extends "platform_admin/base.html" %}
+{% block title %}پیام‌های سایت · BeautyOS{% endblock %}
+{% block control_content %}
+<div class="pc-heading"><div><p class="pc-eyebrow">PUBLIC CONTACT / INBOX</p><h1>پیام‌های سایت</h1><p>پیام‌های ثبت‌شده از فرم تماس عمومی BeautyOS و وضعیت پیگیری آن‌ها.</p></div></div>
+<section class="pc-panel">
+<form class="pc-filterbar" method="get" role="search">
+  <label class="pc-search"><i data-lucide="search"></i><input type="search" name="q" value="{{ q }}" placeholder="جستجو در نام، موبایل، ایمیل یا متن" maxlength="80"></label>
+  <label class="pc-select-wrap"><span>وضعیت</span><select name="status"><option value="">همه پیام‌ها</option>{% for value, label in statuses %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+  <button class="pc-button" type="submit">جستجو</button>
+  <a href="{% url 'platform_admin:inquiries' %}" class="pc-button pc-button--ghost">پاک‌سازی</a>
+</form>
+<div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>فرستنده</th><th>موضوع و پیام</th><th>وضعیت</th><th>زمان</th><th></th></tr></thead><tbody>
+{% for inquiry in page %}
+<tr><td><div class="pc-table-name"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="mail-open"></i></span><div><strong>{{ inquiry.name }}</strong><small>{{ inquiry.phone|default:inquiry.email }}</small></div></div></td><td><strong>{{ inquiry.get_topic_display }}</strong><small class="pc-table-subtitle">{{ inquiry.message|truncatechars:90 }}</small></td><td><span class="pc-status {% if inquiry.status == 'new' %}pc-status--warn{% elif inquiry.status == 'in_progress' %}pc-status--info{% else %}pc-status--good{% endif %}">{{ inquiry.get_status_display }}</span></td><td class="pc-date">{{ inquiry.created_at|fa_jalali_datetime }}</td><td><a class="pc-table-link" href="{% url 'platform_admin:inquiry_detail' inquiry_id=inquiry.pk %}">بررسی <i data-lucide="arrow-up-left"></i></a></td></tr>
+{% empty %}<tr><td colspan="5" class="pc-empty">پیامی با این مشخصات وجود ندارد.</td></tr>{% endfor %}
+</tbody></table></div>
+{% include "platform_admin/_pagination.html" %}
+</section>
+{% endblock %}
