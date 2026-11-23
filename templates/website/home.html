@@ -58,7 +58,7 @@
         </ul>
         <div class="luna-hero__actions">
           {% if user.is_authenticated %}
-          <a href="{% url 'dashboard:home' %}" class="btn-public-primary luna-hero__primary"><i data-lucide="layout-dashboard" aria-hidden="true"></i>ورود به پنل سالن</a>
+          <a href="{% if user.is_superuser %}{% url 'platform_admin:overview' %}{% else %}{% url 'dashboard:home' %}{% endif %}" class="btn-public-primary luna-hero__primary"><i data-lucide="layout-dashboard" aria-hidden="true"></i>{% if user.is_superuser %}مدیریت مرکزی{% else %}ورود به پنل سالن{% endif %}</a>
           {% else %}
           <a href="{% url 'accounts:register' %}" class="btn-public-primary luna-hero__primary"><i data-lucide="sparkles" aria-hidden="true"></i>ثبت‌نام سالن</a>
           {% endif %}

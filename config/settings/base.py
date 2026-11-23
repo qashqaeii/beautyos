@@ -184,6 +184,7 @@ def _beautyos_asset_version() -> str:
         "static/css/editorial-foundation.css",
         "static/css/editorial-workspace.css",
         "static/css/editorial-public.css",
+        "static/css/public-v3.css",
         "static/css/editorial-calendar.css",
         "static/css/luna-home-hero.css",
         "static/css/luna-auth.css",

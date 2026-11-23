@@ -126,6 +126,7 @@ def blog_post(request, slug):
         request, "website/blog_post.html",
         _public_ctx(
             post=post, published_jalali=to_jalali(post.published_at),
+            reading_minutes=max(1, (len(post.body.split()) + 179) // 180),
             related_posts=related,
             **meta(
                 request, f"{post.title} | مجله BeautyOS", post.summary or post.title,
