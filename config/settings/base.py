@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "apps.loyalty",
     "apps.waitlist",
     "apps.website",
+    "apps.platform_admin",
 ]
 
 MIDDLEWARE = [
