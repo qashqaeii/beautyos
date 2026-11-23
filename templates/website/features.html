@@ -1,33 +1,57 @@
 {% extends "layouts/public_site.html" %}
-{% block title %}امکانات · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block title %}امکانات مدیریت سالن زیبایی · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
 {% block public_content %}
-{% include "partials/public_page_hero.html" with eyebrow="محصول" title="امکانات پنل سالن" lead="هر نقش به بخش‌های مشخصی دسترسی دارد؛ موارد زیر بر اساس مجوزهای واقعی نقش‌ها در سیستم است." %}
-<div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
-  <div class="mt-12 space-y-10">
-    {% for panel in role_panels %}
-    <section class="rounded-[24px] border border-line bg-surface p-6 sm:p-8">
-      <div class="flex items-start gap-4">
-        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent-soft/60 text-accent">
-          <i data-lucide="{{ panel.icon }}" class="h-6 w-6" aria-hidden="true"></i>
-        </span>
-        <div class="min-w-0 flex-1">
-          <h2 class="display-editorial text-2xl text-aubergine">{{ panel.role }}</h2>
-          <p class="text-sm text-charcoal/55">{{ panel.subtitle }}</p>
-          <ul class="mt-4 space-y-2 text-sm text-charcoal/75">
-            {% for cap in panel.capabilities %}
-            <li class="flex gap-2">
-              <span class="text-sage" aria-hidden="true">✓</span>
-              <span>{{ cap }}</span>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
+<div class="pub3-features">
+  <div class="pub3-container">
+    <nav class="pub3-breadcrumb" aria-label="موقعیت صفحه"><a href="{% url 'website:home' %}">خانه</a><i data-lucide="chevron-left"></i><span>امکانات</span></nav>
+    <section class="pub3-features__hero" aria-labelledby="features-hero-title">
+      <div><span class="pub3-eyebrow"><i data-lucide="sparkles"></i> BEAUTYOS PLATFORM</span>
+        <h1 id="features-hero-title">تمام بخش‌های سالن، در یک جریان هماهنگ.</h1>
+        <p>از برنامه‌ریزی زمان متخصصان تا پرونده مشتری، پذیرش و گزارش‌های مالی؛ با نقش‌های مشخص و امکانات متناسب با کار واقعی سالن‌های زیبایی زنانه.</p>
+        <div class="pub3-features__actions"><a href="{% url 'accounts:register' %}" class="pub3-button pub3-button--primary">شروع مدیریت سالن <i data-lucide="arrow-up-left"></i></a><a href="#features-sections" class="pub3-button pub3-button--soft">مشاهده امکانات</a></div>
+      </div>
+      <div class="pub3-features__visual" aria-hidden="true">
+        <div class="pub3-features__visual-icon"><i data-lucide="layout-dashboard"></i></div>
+        <span><i data-lucide="calendar-check"></i> تقویم سالن</span>
+        <span><i data-lucide="users-round"></i> مشتریان</span>
+        <span><i data-lucide="wallet"></i> امور مالی</span>
       </div>
     </section>
-    {% endfor %}
   </div>
-  <p class="mt-12 text-center">
-    <a href="{% url 'accounts:register' %}" class="btn-public-primary">ثبت‌نام سالن</a>
-  </p>
+  <section id="features-sections" class="pub3-features__section" aria-labelledby="features-modules-title">
+    <div class="pub3-container">
+      <header class="pub3-features__heading"><span class="pub3-eyebrow">WORKSPACE TOOLS</span><h2 id="features-modules-title">بخش‌های اصلی میزکار</h2><p>قابلیت‌هایی که برای سامان‌دهی روزانه سالن کنار هم قرار گرفته‌اند.</p></header>
+      <div class="pub3-features__grid">
+      {% for feature in feature_groups %}
+      <article class="pub3-features__module">
+        <span class="pub3-features__module-icon"><i data-lucide="{{ feature.icon }}"></i></span>
+        <span class="pub3-features__module-number">۰{{ forloop.counter|fa_num }}</span>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+      </article>
+      {% endfor %}
+      </div>
+    </div>
+  </section>
+  <section class="pub3-features__section pub3-features__section--soft" aria-labelledby="features-roles-title">
+    <div class="pub3-container">
+      <header class="pub3-features__heading"><span class="pub3-eyebrow">ROLE BASED ACCESS</span><h2 id="features-roles-title">تجربه متناسب با نقش هر نفر</h2><p>هر عضو فقط به بخش‌های مجاز و مورد نیاز خود دسترسی دارد.</p></header>
+      <div class="pub3-features__roles">
+      {% for panel in role_panels %}
+      <article class="pub3-features__role">
+        <div class="pub3-features__role-head"><span><i data-lucide="{{ panel.icon }}"></i></span><div><h3>{{ panel.role }}</h3><p>{{ panel.subtitle }}</p></div></div>
+        <ul>{% for item in panel.capabilities %}<li><i data-lucide="check" aria-hidden="true"></i><span>{{ item }}</span></li>{% endfor %}</ul>
+      </article>
+      {% endfor %}
+      </div>
+    </div>
+  </section>
+  <section class="pub3-features__section" aria-labelledby="features-start-title">
+    <div class="pub3-container">
+      <header class="pub3-features__heading"><span class="pub3-eyebrow">GET STARTED</span><h2 id="features-start-title">شروع کار در سه مرحله</h2><p>بدون فرم‌های طولانی و اجباری؛ اطلاعات سالن را هر زمان که خواستید تکمیل کنید.</p></header>
+      <ol class="pub3-features__steps">{% for item in start_steps %}<li><span>{{ item.step }}</span><div><h3>{{ item.title }}</h3><p>{{ item.description }}</p></div></li>{% endfor %}</ol>
+      <div class="pub3-features__closing"><div><h2>برای نظم بیشتر سالن آماده‌اید؟</h2><p>از ثبت نوبت تا پیگیری مشتریان، کارهای روزانه را در یک پنل دنبال کنید.</p></div><a href="{% url 'accounts:register' %}" class="pub3-button pub3-button--primary">ثبت‌نام سالن <i data-lucide="arrow-up-left"></i></a></div>
+    </div>
+  </section>
 </div>
 {% endblock %}
