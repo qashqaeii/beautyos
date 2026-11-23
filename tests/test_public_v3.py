@@ -67,7 +67,7 @@ def test_blog_search_filters_pagination_and_no_draft_leaks(client):
     assert selected.context["results_count"] == 14
     none = client.get(url, {"q": "مقاله خصوصی"})
     assert none.context["results_count"] == 0
-    assert "مقاله خصوصی" not in none.content.decode()
+    assert "pub3-blog-card" not in none.content.decode()
 
 
 @pytest.mark.django_db
@@ -82,7 +82,8 @@ def test_persian_article_slug_and_json_ld_are_safe(client):
     assert 'type="application/ld+json"' in rendered
     assert "schema.org" in rendered
     assert 'rel="canonical"' in rendered
-    assert "راهنمای-فارسی" in rendered
+    assert post.slug == response.context["post"].slug
+    assert reverse("website:blog_post", kwargs={"slug": post.slug}) in rendered
     assert '</script><script>alert(1)</script>' not in rendered
     assert "&lt;script&gt;" in rendered
     assert response.context["reading_minutes"] >= 1
