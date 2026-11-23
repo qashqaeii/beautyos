@@ -104,12 +104,12 @@ def test_sitemap_excludes_unpublished_content_and_unready_salons(client, salon):
     xml = response.content.decode()
     assert "visible-article" in xml
     assert "hidden-draft" not in xml
-    assert salon.slug in xml
-    assert not_ready.slug not in xml
+    assert reverse("salons_public:landing", kwargs={"slug": salon.slug}) in xml
+    assert reverse("salons_public:landing", kwargs={"slug": not_ready.slug}) not in xml
 
     salon.is_accepting_bookings = False
     salon.save(update_fields=["is_accepting_bookings"])
-    assert salon.slug not in client.get(reverse("website:sitemap")).content.decode()
+    assert reverse("salons_public:landing", kwargs={"slug": salon.slug}) not in client.get(reverse("website:sitemap")).content.decode()
 
 
 @pytest.mark.django_db
