@@ -107,6 +107,32 @@ class SalonSettings(TimeStampedModel):
         verbose_name_plural = "تنظیمات سالن‌ها"
 
 
+class SalonWorkHours(TimeStampedModel):
+    """Opening hours belong to the salon, not to the account owner as a specialist."""
+
+    class Weekday(models.IntegerChoices):
+        SAT = 0, "شنبه"
+        SUN = 1, "یکشنبه"
+        MON = 2, "دوشنبه"
+        TUE = 3, "سه‌شنبه"
+        WED = 4, "چهارشنبه"
+        THU = 5, "پنجشنبه"
+        FRI = 6, "جمعه"
+
+    salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name="opening_hours")
+    weekday = models.PositiveSmallIntegerField(choices=Weekday.choices)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_closed = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["salon", "weekday"], name="unique_salon_opening_weekday"),
+        ]
+        verbose_name = "ساعات فعالیت سالن"
+        verbose_name_plural = "ساعات فعالیت سالن"
+
+
 class SalonMembership(TimeStampedModel):
     class Role(models.TextChoices):
         OWNER = "owner", "مالک"

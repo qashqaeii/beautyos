@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from apps.appointments.models import Appointment
 from apps.staff.models import StaffProfile, StaffTimeOff, StaffWorkHours
+from apps.salons.models import SalonWorkHours
 
 
 class SchedulingError(ValidationError):
@@ -34,6 +35,15 @@ def staff_is_available(staff: StaffProfile, start: datetime, end: datetime) -> N
         raise SchedulingError("در این روز سالن برای این متخصص تعطیل است.")
     if local_start.time() < hours.start_time or local_end.time() > hours.end_time:
         raise SchedulingError("خارج از ساعت کاری متخصص است.")
+
+    salon_hours_qs = SalonWorkHours.objects.filter(salon_id=staff.salon_id)
+    opening = salon_hours_qs.filter(weekday=weekday).first()
+    if (opening is None and salon_hours_qs.exists()) or (opening and opening.is_closed):
+        raise SchedulingError("سالن در این روز تعطیل است.")
+    if opening and (
+        local_start.time() < opening.start_time or local_end.time() > opening.end_time
+    ):
+        raise SchedulingError("خارج از ساعات فعالیت سالن است.")
 
     if StaffTimeOff.objects.filter(
         staff=staff,
@@ -129,14 +139,21 @@ def iter_day_slots(staff: StaffProfile, day: date, service_duration: int, step_m
     if not hours:
         return
 
+    salon_hours_qs = SalonWorkHours.objects.filter(salon_id=staff.salon_id)
+    opening = salon_hours_qs.filter(weekday=weekday).first()
+    if (opening is None and salon_hours_qs.exists()) or (opening and opening.is_closed):
+        return
+
     if StaffTimeOff.objects.filter(
         staff=staff, start_date__lte=day, end_date__gte=day
     ).exists():
         return
 
     tz = timezone.get_current_timezone()
-    cursor = timezone.make_aware(datetime.combine(day, hours.start_time), tz)
-    day_end = timezone.make_aware(datetime.combine(day, hours.end_time), tz)
+    start_time = max(hours.start_time, opening.start_time) if opening else hours.start_time
+    end_time = min(hours.end_time, opening.end_time) if opening else hours.end_time
+    cursor = timezone.make_aware(datetime.combine(day, start_time), tz)
+    day_end = timezone.make_aware(datetime.combine(day, end_time), tz)
     duration = timedelta(minutes=service_duration)
 
     while cursor + duration <= day_end:

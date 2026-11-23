@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 
 from apps.core.forms import PersianModelForm
-from apps.salons.models import Salon, SalonSettings
+from apps.salons.models import Salon, SalonSettings, SalonWorkHours
 
 LOGO_MAX_BYTES = 2 * 1024 * 1024
 LOGO_ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
@@ -79,6 +79,41 @@ class SalonProfileForm(PersianModelForm):
         if content_type and content_type not in LOGO_ALLOWED_CONTENT_TYPES:
             raise ValidationError("فرمت مجاز: JPG، PNG یا WebP.")
         return logo
+
+    def clean(self):
+        cleaned = super().clean()
+        # A new salon must not silently publish booking before staff, service
+        # and opening-hour prerequisites are actually configured.
+        if cleaned.get("is_accepting_bookings") and not self.instance.is_accepting_bookings:
+            from apps.services.models import Service
+            from apps.staff.models import StaffProfile, StaffWorkHours
+
+            salon = self.instance
+            active_services = Service.scoped(salon).filter(
+                is_active=True, is_public=True, is_deleted=False
+            )
+            eligible_staff = StaffProfile.scoped(salon).filter(
+                is_active=True, is_bookable=True, is_deleted=False,
+                services__in=active_services,
+            ).distinct()
+            open_days = set(SalonWorkHours.objects.filter(
+                salon=salon, is_closed=False
+            ).values_list("weekday", flat=True))
+            ready = (
+                bool((cleaned.get("public_phone") or "").strip())
+                and active_services.exists()
+                and bool(open_days)
+                and StaffWorkHours.objects.filter(
+                    staff__in=eligible_staff, is_closed=False,
+                    weekday__in=open_days,
+                ).exists()
+            )
+            if not ready:
+                self.add_error(
+                    "is_accepting_bookings",
+                    "برای فعال‌سازی رزرو آنلاین، شماره تماس سالن، خدمات عمومی، متخصص قابل رزرو و ساعات کاری هماهنگ سالن و متخصص را تکمیل کنید.",
+                )
+        return cleaned
 
     def save(self, commit=True):
         instance = super().save(commit=False)
