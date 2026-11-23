@@ -8,7 +8,8 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("features/", views.features, name="features"),
     path("blog/", views.blog_index, name="blog"),
-    path("blog/<slug:slug>/", views.blog_post, name="blog_post"),
+    # str also accepts validated Persian slugs; slug converter is ASCII-only.
+    path("blog/<str:slug>/", views.blog_post, name="blog_post"),
     path("contact/", views.contact, name="contact"),
     path("faq/", views.faq, name="faq"),
     path("privacy/", views.privacy, name="privacy"),
