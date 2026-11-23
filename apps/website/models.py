@@ -11,7 +11,7 @@ class BlogPost(TimeStampedModel):
         PUBLISHED = "published", "منتشرشده"
 
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=220, unique=True, db_index=True)
+    slug = models.SlugField(max_length=220, unique=True, db_index=True, allow_unicode=True)
     summary = models.CharField(max_length=320, blank=True)
     body = models.TextField()
     category = models.CharField(max_length=80, blank=True, db_index=True)
