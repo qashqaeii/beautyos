@@ -39,6 +39,7 @@
   {% block extra_head %}{% endblock %}
   <link rel="stylesheet" href="{% static 'css/luna-management-suite.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
   {% block page_styles_after_suite %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/phase7-ui-polish.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
   {# Page-specific Alpine.data registrations must run before startup. #}
   <script defer src="{% static 'js/vendor/alpine-3.14.8.min.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 </head>
