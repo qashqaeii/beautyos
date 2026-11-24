@@ -101,3 +101,97 @@
     scroll-behavior:auto;
   }
 }
+
+
+/* Phase 7 / operational surfaces — avoid accidental nested document scroll.
+   These rules are deliberately scoped and do not change business logic. */
+.maison-app .reception-flow,
+.maison-app .reception-flow__item,
+.maison-app .reception-flow__person,
+.maison-app .reception-flow__invoice-panel,
+.maison-app .reception-flow__invoice-form,
+.maison-app .reception-flow__invoice-fields {
+  min-inline-size:0;
+}
+.maison-app .reception-flow__person :is(strong,small),
+.maison-app .reception-flow__invoice-intro,
+.maison-app .reception-flow__invoice-hint {
+  overflow-wrap:anywhere;
+}
+.maison-app .reception-flow__invoice-fields input {
+  max-inline-size:100%;
+  min-inline-size:0;
+  font-variant-numeric:tabular-nums;
+}
+.maison-app .reception-flow__invoice-controls :is(button,a) {
+  min-height:42px;
+}
+.maison-app :is(.services-page,.staff-board-v2,.customers-list-page,.checkout-workspace) {
+  min-inline-size:0;
+}
+.maison-app :is(.services-page,.staff-board-v2,.customers-list-page,.checkout-workspace) :is(.input-field,input,select,textarea) {
+  max-inline-size:100%;
+}
+.maison-app .checkout-workspace__table-wrap {
+  max-inline-size:100%;
+  overscroll-behavior-inline:contain;
+}
+.maison-app .checkout-workspace__invoice-actions {
+  flex-wrap:wrap;
+  min-inline-size:0;
+}
+.maison-app .checkout-workspace__invoice-actions :is(a,button) {
+  min-height:42px;
+}
+.editorial-calendar-shell .appt-month-card,
+.editorial-calendar-shell .appt-month-card__day {
+  min-inline-size:0;
+}
+body.theme-app .luna-modal-root .luna-modal {
+  max-inline-size:calc(100vw - 16px);
+}
+body.theme-app .luna-modal .inventory-create-modal__scroll {
+  scrollbar-width:thin;
+  scrollbar-color:var(--modal-rose,#9d726e) transparent;
+  overflow-wrap:anywhere;
+}
+body.theme-app .luna-modal .inventory-create-modal__foot {
+  min-inline-size:0;
+  flex-wrap:wrap;
+}
+body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
+  min-height:42px;
+}
+@media(max-width:639px) {
+  .maison-app .reception-flow__actions,
+  .maison-app .reception-flow__invoice-controls {
+    flex-wrap:wrap;
+    min-inline-size:0;
+  }
+  .maison-app .reception-flow__actions > :is(a,button),
+  .maison-app .reception-flow__invoice-controls > :is(a,button) {
+    min-height:44px;
+  }
+  .maison-app .reception-flow__invoice-fields {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .maison-app .reception-flow__invoice-fields input {
+    font-size:16px;
+  }
+  .maison-app .checkout-workspace__invoice-actions > :is(a,button) {
+    flex:1 1 135px;
+    justify-content:center;
+    white-space:normal;
+  }
+  .editorial-calendar-shell .appt-month-card__day {
+    overflow-wrap:anywhere;
+  }
+  body.theme-app .luna-modal .inventory-create-modal__foot > :is(button,a) {
+    min-height:44px;
+  }
+}
+@media(max-width:359px) {
+  .maison-app .reception-flow__invoice-fields {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
