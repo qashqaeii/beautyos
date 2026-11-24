@@ -1,15 +1,18 @@
 {% extends "layouts/public_auth.html" %}
 {% block title %}ورود · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block auth_variant %}public-auth--login{% endblock %}
 {% block auth_steps %}
-<ol class="public-auth-steps" aria-label="مراحل ورود">
-  <li class="is-current" aria-current="step"><i data-lucide="smartphone" aria-hidden="true"></i><span>۱. شماره موبایل</span></li>
-  <li><i data-lucide="message-square" aria-hidden="true"></i><span>۲. کد تأیید</span></li>
-</ol>
+<div class="register-progress">
+  <ol class="public-auth-steps" aria-label="مراحل ورود">
+    <li class="is-current" aria-current="step"><span class="register-step-number">۱</span><span>شماره موبایل</span></li>
+    <li><span class="register-step-number">۲</span><span>کد تأیید</span></li>
+  </ol>
+</div>
 {% endblock %}
-{% block auth_heading %}ورود به پنل{% endblock %}
-{% block auth_subtitle %}شماره موبایل خود را وارد کنید تا کد ورود برایتان ارسال شود.{% endblock %}
+{% block auth_heading %}ورود به پنل سالن{% endblock %}
+{% block auth_subtitle %}شماره موبایلت را وارد کن تا کد ورود برایت ارسال شود.{% endblock %}
 {% block auth_content %}
-<form method="post" class="luna-auth-phone-form">
+<form method="post" class="luna-auth-phone-form" aria-label="فرم ورود به پنل">
   {% csrf_token %}
   <input type="hidden" name="step" value="phone">
   {% if phone_form.non_field_errors %}
@@ -21,18 +24,16 @@
       {{ phone_form.phone }}
       <i data-lucide="smartphone" aria-hidden="true"></i>
     </div>
-    <p class="field-hint">شماره ثبت‌شده در سالن را با ۰۹ وارد کنید.</p>
+    <p class="field-hint">شماره ثبت‌شده در سالن را با ۰۹ وارد کن.</p>
     {% if phone_form.phone.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ phone_form.phone.errors.0 }}</p>{% endif %}
   </div>
-  <button type="submit" class="btn-primary min-h-[48px] w-full gap-2">
-    <i data-lucide="arrow-left" class="h-4 w-4" aria-hidden="true"></i>
-    دریافت کد ورود
+  <button type="submit" class="btn-primary register-submit">
+    <span>دریافت کد ورود</span><i data-lucide="arrow-left" aria-hidden="true"></i>
   </button>
 </form>
-<p class="public-auth-crosslink">
-  هنوز حسابی ندارید؟
-  <a href="{% url 'accounts:register' %}">ثبت‌نام سالن جدید</a>
-</p>
+<div class="register-after-form">
+  <p class="public-auth-crosslink">هنوز حسابی نداری؟ <a href="{% url 'accounts:register' %}">ثبت‌نام سالن جدید <i data-lucide="arrow-up-left" aria-hidden="true"></i></a></p>
+</div>
 {% if BEAUTYOS_DEBUG %}
 <p class="luna-auth-dev-note">حالت توسعه: کد OTP در مرحله بعد یا کنسول سرور نمایش داده می‌شود.</p>
 {% endif %}
