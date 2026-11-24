@@ -228,6 +228,16 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 if name == "customer-detail":
                     assert page.locator(".customer-detail-header__avatar--icon").count() == 1
                     assert page.locator(".customer-detail-hero-art__glass svg").count() == 1
+                    assert page.locator(".customer-detail-hero-art").evaluate(
+                        "(el) => getComputedStyle(el).display === 'none'"
+                    ), "customer hero must use the same restrained icon treatment as other management pages"
+                    assert page.locator(".customer-detail-header").evaluate(
+                        "(el) => getComputedStyle(el).backgroundImage.includes('linear-gradient')"
+                    )
+                    assert page.locator(".customer-detail-card--main").evaluate(
+                        "(el) => getComputedStyle(el).color === 'rgb(80, 62, 55)'"
+                    ), "appointments must inherit the shared management ink color"
+
                     assert page.locator(".customer-detail-hero-title h1").inner_text() == "پروفایل مشتری"
                     assert page.locator(".customer-detail-header__content").is_visible()
 
