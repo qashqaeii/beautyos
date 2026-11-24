@@ -82,7 +82,8 @@
         x-cloak
         x-transition.opacity.duration.200ms
       >
-        <div class="service-form-field service-form-field--checkbox">
+        <div class="luna-modal-choice-grid">
+<div class="service-form-field service-form-field--checkbox">
           <label class="service-form-checkbox">
             {{ form.is_active }}
             <span>{{ form.is_active.label }}</span>
@@ -95,6 +96,7 @@
             <span>{{ form.is_public.label }}</span>
           </label>
           {% if form.is_public.errors %}<p class="service-form-field__error">{{ form.is_public.errors.0 }}</p>{% endif %}
+        </div>
         </div>
         <div class="service-form-field">
           <span class="field-label" id="service-image-label">{{ form.image.label }}</span>
