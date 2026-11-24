@@ -20,6 +20,7 @@
   {% endif %}
 
   <div class="inventory-create-modal__scroll maison-scroll-themed">
+    <div class="appt-booking-modal__primary-pair">
     <section class="appt-booking-section appt-booking-section--modal">
       {% if customer_locked %}
       <div class="appt-booking-section__head">
@@ -58,6 +59,8 @@
       </div>
     </section>
 
+    </div>
+
     <section class="appt-booking-section appt-booking-section--modal appt-booking-section--last">
       <h2 class="appt-booking-section__title">زمان نوبت</h2>
       <div class="appt-booking-datetime">
@@ -79,6 +82,7 @@
       >
         <summary class="appt-booking-advanced__toggle customer-form-advanced__toggle">جزئیات بیشتر</summary>
         <div class="appt-booking-advanced__body customer-form-advanced__body space-y-3">
+          <div class="appt-booking-advanced__pair">
           {% if can_payment_create %}
           {{ service_prices|json_script:"appt-service-prices-booking" }}
           <div
@@ -103,16 +107,20 @@
           </div>
           {% endif %}
 
-          <div class="customer-form-field">
-            <label class="field-label" for="{{ appointment_form.notes.id_for_label }}">{{ appointment_form.notes.label }}</label>
-            {{ appointment_form.notes }}
-            {% if appointment_form.notes.errors %}<p class="customer-form-field__error">{{ appointment_form.notes.errors.0 }}</p>{% endif %}
-          </div>
+            <div class="appt-booking-status-card">
           <div class="customer-form-field">
             <label class="field-label" for="{{ appointment_form.status.id_for_label }}">{{ appointment_form.status.label }}</label>
             {{ appointment_form.status }}
             {% if appointment_form.status.errors %}<p class="customer-form-field__error">{{ appointment_form.status.errors.0 }}</p>{% endif %}
           </div>
+            </div>
+          </div>
+          <div class="customer-form-field">
+            <label class="field-label" for="{{ appointment_form.notes.id_for_label }}">{{ appointment_form.notes.label }}</label>
+            {{ appointment_form.notes }}
+            {% if appointment_form.notes.errors %}<p class="customer-form-field__error">{{ appointment_form.notes.errors.0 }}</p>{% endif %}
+          </div>
+
         </div>
       </details>
     </section>
