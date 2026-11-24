@@ -1713,3 +1713,83 @@
     min-height:120px;
   }
 }
+
+
+/* Customer profile header overlap fix: keep title and identity in normal grid flow.
+   Previously absolute top/bottom positioning let the two blocks collide. */
+.maison-app.management-suite .customer-detail-page .customer-detail-header {
+  display:grid;
+  grid-template-rows:auto auto minmax(0,1fr);
+  align-content:stretch;
+  gap:7px;
+  min-height:166px;
+  height:auto;
+  overflow:hidden;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__top,
+.maison-app.management-suite .customer-detail-page .customer-detail-hero-title,
+.maison-app.management-suite .customer-detail-page .customer-detail-header__content {
+  position:relative;
+  inset:auto;
+  top:auto;
+  bottom:auto;
+  width:100%;
+  min-width:0;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__top {
+  min-height:15px;
+  justify-content:flex-start;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-hero-title {
+  align-self:center;
+  margin:0;
+  padding:0;
+  min-height:38px;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__content {
+  align-self:end;
+  min-height:61px;
+  padding:7px 11px;
+  box-sizing:border-box;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-hero-title__text {
+  min-width:0;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-hero-title__text p {
+  line-height:1.5;
+}
+@media (min-width:1180px) and (min-height:560px) {
+  .maison-app.management-suite .customer-detail-page {
+    grid-template-rows:166px 60px minmax(0,1fr);
+  }
+  .maison-app.management-suite .customer-detail-page .customer-detail-header {
+    height:166px;
+    min-height:166px;
+  }
+}
+@media (max-width:850px) {
+  .maison-app.management-suite .customer-detail-page .customer-detail-header {
+    height:auto;
+    min-height:166px;
+  }
+}
+@media (max-width:580px) {
+  .maison-app.management-suite .customer-detail-page .customer-detail-header {
+    display:grid;
+    min-height:0;
+    height:auto;
+    grid-template-rows:auto auto auto;
+    padding:11px;
+    gap:9px;
+  }
+  .maison-app.management-suite .customer-detail-page .customer-detail-hero-title {
+    min-height:41px;
+  }
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__content {
+    min-height:0;
+    display:flex;
+    align-items:stretch;
+    flex-direction:column;
+    gap:9px;
+  }
+}
