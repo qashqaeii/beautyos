@@ -1,0 +1,54 @@
+/* Salon visit detail — compact premium editor, shared RTL design language. */
+.ops-appt{--o-accent:#725a90;--o-ink:#3c3347;--o-muted:#8a8292;--o-line:#eae4ee;direction:rtl;max-width:1080px;margin:0 auto;padding-bottom:20px;color:var(--o-ink)}
+.ops-appt *{box-sizing:border-box}
+.ops-appt__back{display:inline-flex;align-items:center;gap:6px;color:#846f96!important;text-decoration:none;font-weight:740;font-size:.77rem;margin-bottom:16px}
+.ops-appt__back svg{width:17px;height:17px}
+.ops-appt__heading{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:19px}
+.ops-appt__eyebrow{font-size:.66rem;color:#9b85ad;letter-spacing:.09em;font-weight:820}
+.ops-appt__heading h1{font-weight:880;font-size:1.5rem;margin:5px 0 7px}
+.ops-appt__heading p{color:var(--o-muted);font-size:.78rem}
+.ops-appt__status{background:#efecf2;color:#766a81;border-radius:8px;padding:8px 15px;font-size:.73rem;font-weight:830}
+.ops-appt__status--pending{background:#fcf1df;color:#936b34}
+.ops-appt__status--confirmed{background:#ede8f9;color:#6654a0}
+.ops-appt__status--checked_in{background:#e7eefb;color:#4a7196}
+.ops-appt__status--completed{background:#e8f5ed;color:#4c8263}
+.ops-appt__status--cancelled{background:#fbefef;color:#985963}
+.ops-appt__grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,1fr);gap:14px}
+.ops-appt__card{padding:22px 24px;background:#fff;border:1px solid var(--o-line);border-radius:18px;box-shadow:0 14px 30px rgba(47,31,65,.035);min-width:0}
+.ops-appt__card-title{display:flex;align-items:center;gap:10px;padding-bottom:16px;border-bottom:1px solid #f0eaf2;color:#735a8c}
+.ops-appt__card-title h2{font-size:.96rem;font-weight:850;color:#4d3c5d;margin:0}
+.ops-appt__card-title svg{width:19px;height:19px;stroke-width:1.8}
+.ops-appt__identity{display:flex;gap:13px;align-items:center;margin:19px 0 8px}
+.ops-appt__avatar{width:45px;height:45px;background:#efe8f5;display:grid;place-items:center;border-radius:13px;color:#755b91;font-weight:840;font-size:1.17rem}
+.ops-appt__identity strong{display:block;font-size:1rem;font-weight:850}
+.ops-appt__identity span{display:block;text-align:right;direction:ltr;color:#9b91a3;margin-top:5px;font-size:.75rem}
+.ops-appt__facts{margin:0}
+.ops-appt__facts>div{display:flex;justify-content:space-between;gap:14px;align-items:baseline;padding:12px 2px;border-bottom:1px solid #f4eff6}
+.ops-appt__facts>div:last-child{border:0}
+.ops-appt__facts dt{font-size:.76rem;color:var(--o-muted)}
+.ops-appt__facts dd{font-size:.81rem;color:#52435f;font-weight:770;text-align:left;margin:0}
+.ops-appt__code{letter-spacing:.11em;font-weight:850!important}
+.ops-appt__money{margin:18px 0 5px;padding:17px 18px;border-radius:12px;background:#f4eff8;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ops-appt__money span{font-size:.77rem;color:#806d8f}
+.ops-appt__money strong{font-size:1.16rem;color:#624a7b;font-weight:900}
+.ops-appt__money small{font-size:.67rem;font-weight:600}
+.ops-appt__due{color:#a35d55!important}
+.ops-appt__settled{color:#548261!important}
+.ops-appt__note{background:#f9f7fb;border-radius:9px;padding:12px 14px;color:#84788c;font-size:.73rem;line-height:1.9;margin:18px 0 0}
+.ops-appt__checkout{padding-top:16px}
+.ops-appt__actions{margin-top:14px;padding-block:17px}
+.ops-appt__actions .ops-appt__card-title{border:0;padding-bottom:12px}
+.ops-appt__action-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ops-appt__action-row form{margin:0}
+.ops-appt__btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:41px;border:1px solid #e3dbea;border-radius:10px;padding:10px 16px;text-decoration:none!important;cursor:pointer;font-family:inherit;font-size:.76rem;font-weight:770}
+.ops-appt__btn svg{width:17px;height:17px;stroke-width:1.8}
+.ops-appt__btn--primary{background:#76608e;border-color:#76608e;color:#fff!important}
+.ops-appt__btn--primary:hover{background:#66507d}
+.ops-appt__btn--soft{background:#f2eef7;color:#745b8d!important}
+.ops-appt__btn--soft:hover{background:#e9e1f1}
+.ops-appt__btn--danger{background:#fff9f9;color:#a2626a!important;border-color:#ecd3d7}
+.ops-appt__note--inline{margin:0}
+.ops-appt :is(button,a):focus-visible{outline:3px solid #b9a6ca;outline-offset:2px}
+@media(max-width:780px){.ops-appt__grid{grid-template-columns:1fr}.ops-appt__heading h1{font-size:1.24rem}.ops-appt__card{padding:18px}.ops-appt__actions{margin-top:11px}}
+@media(max-width:420px){.ops-appt__facts>div{flex-wrap:wrap}.ops-appt__money strong{font-size:.99rem}.ops-appt__action-row .ops-appt__btn{width:100%}.ops-appt__action-row form{width:100%}}
+@media(prefers-reduced-motion:reduce){.ops-appt *{transition:none!important}}

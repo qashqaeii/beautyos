@@ -1,16 +1,78 @@
 {% extends "layouts/app_shell.html" %}
+{% load static %}
 {% block page_title %}جزئیات نوبت{% endblock %}
+{% block page_styles_after_suite %}
+<link rel="stylesheet" href="{% static 'css/appointment-operations.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
 {% block content %}
-<div class="card max-w-2xl">
-  <p class="text-xs text-charcoal/50">کد پیگیری: <span dir="ltr">{{ appointment.tracking_code }}</span></p>
-  <h2 class="mt-2 text-xl font-semibold text-aubergine">{{ appointment.customer.full_name }}</h2>
-  <p class="text-sm text-charcoal/70">{{ appointment.service.name }} · {{ appointment.staff.display_name }}</p>
-  <p class="mt-2">{{ appointment.start_at|fa_jalali_datetime }} — {{ appointment.get_status_display }}</p>
-  <form method="post" class="mt-6 flex flex-wrap gap-2">{% csrf_token %}
-    {% if appointment.status != 'cancelled' and appointment.status != 'completed' %}
-    <button name="action" value="complete" class="btn-primary text-xs">تکمیل مراجعه</button>
-    <button name="action" value="cancel" class="btn-secondary text-xs">لغو</button>
-    {% endif %}
-  </form>
+<div class="ops-appt">
+  <a class="ops-appt__back" href="{% url 'reception:desk' %}?day={{ appointment.start_at|date:'Y-m-d' }}"><i data-lucide="arrow-right" aria-hidden="true"></i> بازگشت به میز پذیرش</a>
+  <div class="ops-appt__heading">
+    <div><span class="ops-appt__eyebrow">APPOINTMENT / {{ appointment.tracking_code }}</span><h1>جزئیات نوبت</h1><p>اطلاعات مراجعه و اقدامات مرتبط با پذیرش و تسویه</p></div>
+    <span class="ops-appt__status ops-appt__status--{{ appointment.status }}">{{ appointment.get_status_display }}</span>
+  </div>
+  <div class="ops-appt__grid">
+    <section class="ops-appt__card" aria-labelledby="ops-visit-title">
+      <div class="ops-appt__card-title"><i data-lucide="calendar-days" aria-hidden="true"></i><h2 id="ops-visit-title">اطلاعات مراجعه</h2></div>
+      <div class="ops-appt__identity">
+        <div class="ops-appt__avatar" aria-hidden="true">{{ appointment.customer.full_name|slice:":1" }}</div>
+        <div><strong>{{ appointment.customer.full_name }}</strong><span dir="ltr">{{ appointment.customer.phone }}</span></div>
+      </div>
+      <dl class="ops-appt__facts">
+        <div><dt>خدمت</dt><dd>{{ appointment.service.name }}</dd></div>
+        <div><dt>متخصص</dt><dd>{{ appointment.staff.full_display_name }}</dd></div>
+        <div><dt>تاریخ و ساعت</dt><dd>{{ appointment.start_at|fa_jalali_datetime }}</dd></div>
+        <div><dt>مدت خدمت</dt><dd>{{ appointment.service.duration_minutes|fa_num }} دقیقه</dd></div>
+        <div><dt>نحوه ثبت</dt><dd>{{ appointment.get_source_display }}</dd></div>
+        <div><dt>کد پیگیری</dt><dd dir="ltr" class="ops-appt__code">{{ appointment.tracking_code }}</dd></div>
+      </dl>
+    </section>
+    <section class="ops-appt__card ops-appt__finance" aria-labelledby="ops-finance-title">
+      <div class="ops-appt__card-title"><i data-lucide="receipt-text" aria-hidden="true"></i><h2 id="ops-finance-title">وضعیت مالی خدمت</h2></div>
+      <div class="ops-appt__money">
+        <span>مبلغ خدمت</span><strong>{{ appointment.price_toman|fa_money }} <small>تومان</small></strong>
+      </div>
+      <dl class="ops-appt__facts">
+        <div><dt>مبلغ دریافت‌شده</dt><dd>{{ payment_summary.paid_toman|fa_money }} تومان</dd></div>
+        <div><dt>مانده قابل دریافت</dt><dd class="{% if payment_summary.owed_toman %}ops-appt__due{% else %}ops-appt__settled{% endif %}">{{ payment_summary.owed_toman|fa_money }} تومان</dd></div>
+        <div><dt>وضعیت پرداخت</dt><dd>{{ payment_summary.label }}</dd></div>
+      </dl>
+      {% if can_payment_create and appointment.status == 'completed' %}
+      <div class="ops-appt__checkout">
+        {% if invoice_id %}
+        <a class="ops-appt__btn ops-appt__btn--primary" href="{% url 'finance:invoice_detail' invoice_id=invoice_id %}"><i data-lucide="receipt" aria-hidden="true"></i> مشاهده فاکتور</a>
+        {% else %}
+        <a class="ops-appt__btn ops-appt__btn--primary" href="{% url 'finance:checkout' appointment.customer_id %}?appointment={{ appointment.pk|unlocalize }}"><i data-lucide="wallet" aria-hidden="true"></i> صدور فاکتور و تسویه</a>
+        {% endif %}
+      </div>
+      {% elif appointment.status == 'pending' %}
+        <p class="ops-appt__note">این رزرو هنوز در انتظار تأیید سالن است.</p>
+      {% elif appointment.status != 'completed' %}
+        <p class="ops-appt__note">صندوق نهایی پس از تکمیل خدمت در دسترس است.</p>
+      {% endif %}
+    </section>
+  </div>
+  <section class="ops-appt__card ops-appt__actions" aria-labelledby="ops-actions-title">
+    <div class="ops-appt__card-title"><i data-lucide="workflow" aria-hidden="true"></i><h2 id="ops-actions-title">اقدامات نوبت</h2></div>
+    <div class="ops-appt__action-row">
+      {% if appointment.status == 'pending' and can_confirm %}
+      <form method="post" action="{% url 'reception:confirm' pk=appointment.pk %}">{% csrf_token %}<input type="hidden" name="day" value="{{ appointment.start_at|date:'Y-m-d' }}"><button type="submit" class="ops-appt__btn ops-appt__btn--primary"><i data-lucide="check-circle" aria-hidden="true"></i> تأیید نوبت</button></form>
+      {% endif %}
+      {% if appointment.status == 'confirmed' and can_checkin %}
+      <form method="post" action="{% url 'reception:checkin' pk=appointment.pk %}">{% csrf_token %}<input type="hidden" name="day" value="{{ appointment.start_at|date:'Y-m-d' }}"><button type="submit" class="ops-appt__btn ops-appt__btn--primary"><i data-lucide="user-check" aria-hidden="true"></i> ثبت ورود مشتری</button></form>
+      {% endif %}
+      {% if appointment.status == 'checked_in' and can_complete or appointment.status == 'confirmed' and can_complete %}
+      <form method="post" action="{% url 'reception:complete' pk=appointment.pk %}">{% csrf_token %}<input type="hidden" name="day" value="{{ appointment.start_at|date:'Y-m-d' }}"><button type="submit" class="ops-appt__btn ops-appt__btn--soft"><i data-lucide="check-check" aria-hidden="true"></i> تکمیل خدمت</button></form>
+      {% endif %}
+      {% if can_cancel %}
+      <form method="post" onsubmit="return confirm('از لغو نوبت مطمئن هستید؟');">{% csrf_token %}<button type="submit" name="action" value="cancel" class="ops-appt__btn ops-appt__btn--danger"><i data-lucide="x-circle" aria-hidden="true"></i> لغو نوبت</button></form>
+      {% elif appointment.status == 'pending' or appointment.status == 'confirmed' or appointment.status == 'checked_in' %}
+      {% if payment_summary.paid_toman %}
+      <p class="ops-appt__note ops-appt__note--inline">برای لغو نوبت دارای بیعانه، ابتدا استرداد مبلغ را از بخش مالی ثبت کنید.</p>
+      {% endif %}
+      {% endif %}
+      {% if appointment.status == 'completed' %}<span class="ops-appt__note ops-appt__note--inline">خدمت تکمیل شده و برای صندوق آماده است.</span>{% endif %}
+    </div>
+  </section>
 </div>
 {% endblock %}
