@@ -5,7 +5,7 @@
 {% endblock %}
 {% block body %}
 <style>[x-cloak]{display:none!important}</style>
-<div class="public-site public-auth-shell luna-auth beautyos-main-bg__shell min-h-screen min-h-[100dvh] text-aubergine" data-theme="luna_signature">
+<div class="public-site public-auth-shell luna-auth {% block auth_variant %}{% endblock %} beautyos-main-bg__shell min-h-screen min-h-[100dvh] text-aubergine" data-theme="luna_signature">
   <div class="public-auth-layout">
     <aside class="public-auth-brand luna-auth-showcase" aria-label="معرفی BeautyOS">
       <div class="luna-auth-showcase__media" aria-hidden="true">
