@@ -1508,3 +1508,11 @@
     scrollbar-color:#d8beb4 transparent;
   }
 }
+
+
+/* Must outrank the management-suite page-padding rule loaded after this stylesheet. */
+@media (min-width:1180px) and (min-height:560px) {
+  .maison-app.management-suite .maison-content .customer-detail-page {
+    padding-block:0;
+  }
+}
