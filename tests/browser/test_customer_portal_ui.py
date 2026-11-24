@@ -27,6 +27,16 @@ def test_customer_portal_responsive_no_external_assets(
         end_at=timezone.datetime.fromisoformat(data["start_iso"]) + timezone.timedelta(minutes=30),
         source=Appointment.Source.PUBLIC, status=Appointment.Status.CONFIRMED,
     )
+    # Django's synchronous session DB work must happen before Playwright
+    # starts its event loop (otherwise Django raises SynchronousOnlyOperation).
+    session = client.session
+    session[ACCESS_SESSION_KEY] = {
+        "salon_id": str(salon.pk), "phone": data["phone"],
+        "verified_at": int(timezone.now().timestamp()),
+    }
+    session.save()
+    session_cookie = client.cookies[settings.SESSION_COOKIE_NAME].value
+
     with pw.sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
         context = browser.new_context(
@@ -50,15 +60,9 @@ def test_customer_portal_responsive_no_external_assets(
         assert page.get_by_role("heading", name="نوبت‌ها همیشه در دسترس شما").is_visible()
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
 
-        session = client.session
-        session[ACCESS_SESSION_KEY] = {
-            "salon_id": str(salon.pk), "phone": data["phone"],
-            "verified_at": int(timezone.now().timestamp()),
-        }
-        session.save()
         context.add_cookies([{
             "name": settings.SESSION_COOKIE_NAME,
-            "value": client.cookies[settings.SESSION_COOKIE_NAME].value,
+            "value": session_cookie,
             "url": live_server.url,
         }])
         routes = [
