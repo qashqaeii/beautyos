@@ -121,6 +121,7 @@ def invoice_detail(request, invoice_id):
                           if line.appointment.status == Appointment.Status.COMPLETED)
     return render(request, "finance/invoice.html", {
         "invoice": invoice, "lines": lines, "current_balance": current_balance,
+        "auto_print": request.GET.get("print") == "1",
         "receipts": invoice.payments.filter(salon=request.salon,paid_amount_toman__gt=0),
         **_checkout_invoice_context(request),
     })
