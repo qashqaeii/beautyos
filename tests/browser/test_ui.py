@@ -159,6 +159,22 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                             assert before and after and abs(before["y"] - after["y"]) < 3, "desktop sidebar moved while reception content scrolled"
                             assert page.evaluate("window.scrollY > 0"), "reception content must still scroll"
                             page.evaluate("window.scrollTo(0, 0)")
+                if workspace and width >= 1024:
+                    standardized_headers = {
+                        "customers": ".customers-list-page__header",
+                        "staff": ".staff-team-page__header",
+                        "finance": ".finance-page__header--premium",
+                        "reception": ".reception-desk-header",
+                    }
+                    header_selector = standardized_headers.get(name)
+                    if header_selector:
+                        header = page.locator(header_selector).first
+                        pw.expect(header).to_be_visible()
+                        header_height = header.evaluate("(el) => el.getBoundingClientRect().height")
+                        assert abs(header_height - 88) <= 3, f"{name} page header height differs: {header_height}px"
+                        assert header.evaluate("(el) => el.scrollHeight <= el.clientHeight + 3"), (
+                            f"{name} page header clips its contents"
+                        )
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 2"), "horizontal page overflow"
                 assert page.locator('link[href*="phase7-ui-polish.css"]').count() == 1, "phase 7 styling missing"
                 if width <= 639 and name == "reception":
