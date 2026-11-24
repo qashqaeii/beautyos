@@ -8,7 +8,7 @@
 <div class="ops-appt">
   <a class="ops-appt__back" href="{% url 'reception:desk' %}?day={{ appointment.start_at|date:'Y-m-d' }}"><i data-lucide="arrow-right" aria-hidden="true"></i> بازگشت به میز پذیرش</a>
   <div class="ops-appt__heading">
-    <div><span class="ops-appt__eyebrow">APPOINTMENT / {{ appointment.tracking_code }}</span><h1>جزئیات نوبت</h1><p>اطلاعات مراجعه و اقدامات مرتبط با پذیرش و تسویه</p></div>
+    <div><span class="ops-appt__eyebrow">APPOINTMENT / {{ appointment.tracking_code }}</span><h2>جزئیات نوبت</h2><p>اطلاعات مراجعه و اقدامات مرتبط با پذیرش و تسویه</p></div>
     <span class="ops-appt__status ops-appt__status--{{ appointment.status }}">{{ appointment.get_status_display }}</span>
   </div>
   <div class="ops-appt__grid">
