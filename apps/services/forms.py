@@ -74,7 +74,7 @@ class ServiceCreateForm(PersianModelForm):
                     "class": "service-form-file-native",
                     "accept": "image/*",
                     "x-ref": "serviceImage",
-                    "@change": "imageName = $refs.serviceImage?.files?.[0]?.name || ''",
+                    "@change": "imageName = $event.target.files?.[0]?.name || ''",
                 }
             ),
         }
@@ -115,7 +115,7 @@ class ServiceForm(PersianModelForm):
                     "class": "service-form-file-native",
                     "accept": "image/*",
                     "x-ref": "serviceEditImage",
-                    "@change": "editImageName = $refs.serviceEditImage?.files?.[0]?.name || ''",
+                    "@change": "editImageName = $event.target.files?.[0]?.name || ''",
                 }
             ),
         }

@@ -1025,7 +1025,11 @@ def test_modal_image_choose_button_hides_native_file_control_and_works(
                 label.click()
             pending.value.set_files(file_data)
             assert native.evaluate("(el) => el.files[0].name") == "salon-photo.png"
-            assert "salon-photo.png" in form.inner_text()
+            # Alpine updates the filename in a reactive microtask after the
+            # browser's file chooser resolves. Wait for the actual UI state.
+            name_selector = (".customer-form-file__name" if route == "customers:list"
+                             else ".service-form-file__name")
+            pw.expect(form.locator(name_selector)).to_have_text("salon-photo.png")
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
         context.close()
         browser.close()
