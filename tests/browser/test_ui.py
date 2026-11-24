@@ -227,6 +227,10 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     assert caveat.evaluate("(el) => el.open"), "finance explanatory note must stay accessible"
                 if name == "customer-detail":
                     assert page.locator(".customer-detail-header__avatar--icon").count() == 1
+                    assert page.locator(".customer-detail-hero-art__glass svg").count() == 1
+                    assert page.locator(".customer-detail-hero-title h1").inner_text() == "پروفایل مشتری"
+                    assert page.locator(".customer-detail-header__content").is_visible()
+
                     assert page.locator(".customer-detail-header img.customer-detail-header__avatar").count() == 0
                     upcoming = page.locator(".customer-detail-workspace__primary > .customer-detail-card--main")
                     pw.expect(upcoming).to_be_visible()
@@ -239,6 +243,15 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     if width >= 900:
                         assert abs(main_box["y"] - aside_box["y"]) < 8, "customer sections should share a row"
                         assert main_box["width"] > aside_box["width"], "upcoming appointments must be the primary column"
+                        if width >= 1180 and height >= 560:
+                            profile = page.locator(".customer-detail-page").bounding_box()
+                            assert profile and profile["y"] + profile["height"] <= height + 3, "customer profile must fit desktop viewport"
+                            cards = page.locator(".customer-detail-history > .customer-detail-card")
+                            assert cards.count() >= 1
+                            for card in cards.all():
+                                box = card.bounding_box()
+                                assert box and box["y"] + box["height"] <= height + 3, "history card extends beyond desktop viewport"
+
                     else:
                         assert aside_box["y"] >= main_box["y"] + main_box["height"] - 4, "mobile customer cards should stack below upcoming appointments"
                 if name == "customers":
