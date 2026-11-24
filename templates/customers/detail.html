@@ -45,10 +45,15 @@
       </nav>
       <span class="customer-detail-header__eyebrow"><i data-lucide="contact-round" aria-hidden="true"></i> پرونده مشتری</span>
     </div>
+    <div class="customer-detail-hero-art" aria-hidden="true">
+      <div class="customer-detail-hero-art__halo"></div>
+      <div class="customer-detail-hero-art__glass"><i data-lucide="users-round"></i></div>
+      <div class="customer-detail-hero-art__heart"><i data-lucide="heart"></i></div>
+    </div>
     <div class="customer-detail-hero-title">
       <span class="customer-detail-hero-title__icon" aria-hidden="true"><i data-lucide="users-round"></i></span>
       <div class="customer-detail-hero-title__text">
-        <h2>پروفایل مشتری</h2>
+        <h1>پروفایل مشتری</h1>
         <p>اطلاعات، نوبت‌ها و سوابق ارتباط با مشتری</p>
       </div>
     </div>
@@ -57,7 +62,7 @@
         <span class="customer-detail-header__avatar customer-detail-header__avatar--icon" aria-hidden="true"><i data-lucide="user-round" aria-hidden="true"></i></span>
         <div class="customer-detail-header__copy">
           <div class="customer-detail-header__name-row">
-            <h1 class="customer-detail-header__name">{{ customer.full_name }}</h1>
+            <h2 class="customer-detail-header__name">{{ customer.full_name }}</h2>
             {% if customer.is_vip or customer.status == 'vip' %}
             <span class="customer-detail-header__vip"><i data-lucide="crown" aria-hidden="true"></i> مشتری ویژه</span>
             {% endif %}
