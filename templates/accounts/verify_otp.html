@@ -1,18 +1,16 @@
 {% extends "layouts/public_auth.html" %}
 {% block title %}تأیید کد · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block auth_variant %}public-auth--verify{% endblock %}
 {% block auth_steps %}
-<ol class="public-auth-steps" aria-label="مراحل">
-  {% if purpose == "register" %}
-  <li class="is-done"><i data-lucide="check" aria-hidden="true"></i><span>۱. تأیید موبایل</span></li>
-  <li class="is-current" aria-current="step"><i data-lucide="message-square" aria-hidden="true"></i><span>۲. کد پیامکی</span></li>
-  <li><i data-lucide="user-round" aria-hidden="true"></i><span>۳. اطلاعات مالک</span></li>
-  {% else %}
-  <li class="is-done"><i data-lucide="check" aria-hidden="true"></i><span>۱. شماره موبایل</span></li>
-  <li class="is-current" aria-current="step"><i data-lucide="message-square" aria-hidden="true"></i><span>۲. کد تأیید</span></li>
-  {% endif %}
-</ol>
+<div class="register-progress">
+  <ol class="public-auth-steps" aria-label="مراحل تأیید">
+    <li class="is-done"><span class="register-step-number"><i data-lucide="check" aria-hidden="true"></i></span><span>شماره موبایل</span></li>
+    <li class="is-current" aria-current="step"><span class="register-step-number">۲</span><span>کد تأیید</span></li>
+    {% if purpose == "register" %}<li><span class="register-step-number">۳</span><span>اطلاعات مالک</span></li>{% endif %}
+  </ol>
+</div>
 {% endblock %}
-{% block auth_heading %}کد پیامکی را وارد کنید{% endblock %}
+{% block auth_heading %}کد تأیید را وارد کن{% endblock %}
 {% block auth_subtitle %}
 {% if purpose == "register" %}
 کد ۶ رقمی برای تکمیل ثبت‌نام سالن به شماره
@@ -23,7 +21,7 @@
 {% endblock %}
 {% block auth_content %}
 {% if BEAUTYOS_DEBUG and dev_otp_code %}
-<p class="mb-4 rounded-xl border border-champagne/40 bg-champagne/20 px-3 py-2 text-center text-xs text-charcoal">
+<p class="auth-dev-code">
   حالت توسعه — کد:
   <strong class="text-lg tracking-[0.35em]" dir="ltr" lang="en">{{ dev_otp_code }}</strong>
 </p>
@@ -34,7 +32,7 @@
 {% if resend_error %}
 <div class="mb-3">{% include "accounts/partials/auth_flash.html" with message=resend_error variant="error" %}</div>
 {% endif %}
-<form method="post" action="{% url 'accounts:verify' %}" class="space-y-5" id="otp-verify-form" novalidate>
+<form method="post" action="{% url 'accounts:verify' %}" class="luna-auth-phone-form auth-otp-form" id="otp-verify-form" novalidate>
   {% csrf_token %}
   {% if next_step %}<input type="hidden" name="next_step" value="{{ next_step }}">{% endif %}
   <div class="public-auth-field">
@@ -42,21 +40,16 @@
     {{ otp_form.code }}
     {% if otp_form.code.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ otp_form.code.errors.0 }}</p>{% endif %}
   </div>
-  <button type="submit" class="btn-primary min-h-[48px] w-full">تأیید و ادامه</button>
+  <button type="submit" class="btn-primary register-submit"><span>تأیید و ادامه</span><i data-lucide="arrow-left" aria-hidden="true"></i></button>
 </form>
-<div class="mt-5 flex flex-col items-center gap-3 text-sm">
-  <a href="{{ change_number_url }}" class="text-charcoal/55 hover:text-aubergine">تغییر شماره موبایل</a>
-  <form method="post" action="{% url 'accounts:verify' %}" class="text-center" id="otp-resend-form">
+<div class="register-after-form auth-otp-actions">
+  <p class="public-auth-crosslink"><a href="{{ change_number_url }}"><i data-lucide="pencil" aria-hidden="true"></i> تغییر شماره موبایل</a></p>
+  <form method="post" action="{% url 'accounts:verify' %}" id="otp-resend-form">
     {% csrf_token %}
     <input type="hidden" name="action" value="resend">
-    <button
-      type="submit"
-      class="text-accent hover:underline disabled:cursor-not-allowed disabled:text-charcoal/40"
-      id="otp-resend-btn"
-      {% if not can_resend_now %}disabled{% endif %}
-    >
-      ارسال مجدد کد
-      <span id="otp-resend-timer" class="text-charcoal/50" dir="ltr"></span>
+    <button type="submit" class="auth-resend-button" id="otp-resend-btn" {% if not can_resend_now %}disabled{% endif %}>
+      <i data-lucide="refresh-cw" aria-hidden="true"></i><span>ارسال مجدد کد</span>
+      <span id="otp-resend-timer" dir="ltr"></span>
     </button>
   </form>
 </div>
