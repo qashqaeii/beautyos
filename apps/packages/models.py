@@ -43,6 +43,8 @@ class CustomerPackage(TenantModelMixin, TimeStampedModel):
 
 class PackageSessionUse(TenantModelMixin, TimeStampedModel):
     customer_package = models.ForeignKey(CustomerPackage, on_delete=models.PROTECT, related_name="uses")
+    # Retain the immutable use event for audit when a completed visit is reversed.
+    reversed_at = models.DateTimeField(null=True, blank=True)
     appointment = models.OneToOneField(
         "appointments.Appointment",
         on_delete=models.PROTECT,

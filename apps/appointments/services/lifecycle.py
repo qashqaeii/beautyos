@@ -101,6 +101,8 @@ def cancel_appointment(*, salon, appointment_id: int) -> Appointment:
         from apps.loyalty.benefits import reverse_referral
         reverse_referral(appt)
         reverse_visit(appt)
+        from apps.packages.services import reverse_package_session
+        reverse_package_session(appointment=appt)
 
     appt.status = Appointment.Status.CANCELLED
     appt.cancelled_at = timezone.now()

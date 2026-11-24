@@ -46,6 +46,14 @@ def day_bounds(day: date) -> tuple[datetime, datetime]:
 
 
 def appointment_payment_summary(appt: Appointment) -> dict:
+    # Prepaid package uses are not cash receipts. Never create a second
+    # receivable for a service already covered by a purchased session.
+    package_use = getattr(appt, "package_use", None)
+    if package_use is not None and package_use.reversed_at is None:
+        return {
+            "label": "پوشش با پکیج", "owed_toman": 0, "paid_toman": 0,
+            "status_code": Payment.Status.PAID, "covered_by_package": True,
+        }
     payments = [
         p for p in appt.payments.all()
         if p.status != Payment.Status.REFUNDED and p.salon_id == appt.salon_id
@@ -91,6 +99,7 @@ def get_manager_financial_summary(salon, pay_start: datetime, pay_end: datetime,
         Appointment.scoped(salon)
         .filter(start_at__gte=appt_start, start_at__lt=appt_end)
         .exclude(status__in=[Appointment.Status.CANCELLED])
+        .select_related("package_use")
         .prefetch_related("payments")
     )
     receivable = 0

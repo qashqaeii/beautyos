@@ -60,7 +60,8 @@ def finance_dashboard(salon, range_ctx):
         Q(completed_at__isnull=True, start_at__gte=start, start_at__lt=end)
     ).select_related("service", "customer").prefetch_related("payments__refunds")
     package_uses = {u.appointment_id: u for u in PackageSessionUse.scoped(salon).filter(
-        appointment__in=completed.values("pk"), customer_package__salon=salon
+        appointment__in=completed.values("pk"), customer_package__salon=salon,
+        reversed_at__isnull=True,
     ).select_related("customer_package")}
     earned = 0
     service_rows = defaultdict(lambda: {"revenue": 0, "commission": 0, "count": 0})
