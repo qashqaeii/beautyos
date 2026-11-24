@@ -225,6 +225,22 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     pw.expect(caveat).to_be_visible()
                     caveat.locator("summary").click()
                     assert caveat.evaluate("(el) => el.open"), "finance explanatory note must stay accessible"
+                if name == "customer-detail":
+                    assert page.locator(".customer-detail-header__avatar--icon").count() == 1
+                    assert page.locator(".customer-detail-header img.customer-detail-header__avatar").count() == 0
+                    upcoming = page.locator(".customer-detail-workspace__primary > .customer-detail-card--main")
+                    pw.expect(upcoming).to_be_visible()
+                    assert page.locator(".customer-detail-workspace__aside .customer-detail-card--notes").count() == 1
+                    assert page.locator(".customer-detail-workspace__aside .customer-detail-card--preferences").count() == 1
+                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+                    main_box = upcoming.bounding_box()
+                    aside_box = page.locator(".customer-detail-workspace__aside").bounding_box()
+                    assert main_box and aside_box
+                    if width >= 900:
+                        assert abs(main_box["y"] - aside_box["y"]) < 8, "customer sections should share a row"
+                        assert main_box["width"] > aside_box["width"], "upcoming appointments must be the primary column"
+                    else:
+                        assert aside_box["y"] >= main_box["y"] + main_box["height"] - 4, "mobile customer cards should stack below upcoming appointments"
                 if name == "customers":
                     # Directory must never nest a vertical scroller or clip customer cards.
                     assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"
