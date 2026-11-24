@@ -534,3 +534,39 @@ body.theme-app .luna-modal .luna-modal-choice-grid span {
 @media(prefers-reduced-motion:reduce) {
   body.theme-app .luna-modal .luna-modal-choice-grid :is(.customer-form-checkbox,.service-form-checkbox) {transition:none;}
 }
+
+
+/* Final modal QA: keep the action footer within the dialog after expanding forms.
+   The scrollable content owns overflow, never the whole form or backdrop. */
+body.theme-app .luna-modal .inventory-create-modal__form {
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:0;
+  min-width:0;
+  overflow:hidden;
+}
+body.theme-app .luna-modal .inventory-create-modal__form > .inventory-create-modal__scroll {
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+}
+body.theme-app .luna-modal .inventory-create-modal__form > .inventory-create-modal__foot {
+  flex:0 0 auto;
+  position:relative;
+  z-index:1;
+  min-width:0;
+  background:#fffaf7;
+}
+@media (min-width:640px) {
+  body.theme-app .luna-modal-root .luna-modal {
+    max-height:min(84dvh,560px);
+  }
+}
+@media (max-width:639px) {
+  body.theme-app .luna-modal-root .luna-modal {
+    max-height:calc(100dvh - env(safe-area-inset-top,0px) - 8px);
+  }
+}
