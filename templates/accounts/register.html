@@ -1,36 +1,40 @@
 {% extends "layouts/public_auth.html" %}
 {% block title %}ثبت‌نام سالن · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block auth_variant %}public-auth--register{% endblock %}
 {% block auth_steps %}
-<ol class="public-auth-steps" aria-label="مراحل ثبت‌نام">
-  <li class="is-current" aria-current="step"><i data-lucide="smartphone" aria-hidden="true"></i><span>۱. تأیید موبایل</span></li>
-  <li><i data-lucide="message-square" aria-hidden="true"></i><span>۲. کد پیامکی</span></li>
-  <li><i data-lucide="user-round" aria-hidden="true"></i><span>۳. اطلاعات مالک</span></li>
-</ol>
+<div class="register-progress">
+  <div class="register-progress__caption"><span>ساخت حساب سالن</span><span>مرحله ۱ از ۳</span></div>
+  <ol class="public-auth-steps" aria-label="مراحل ثبت‌نام">
+    <li class="is-current" aria-current="step"><span class="register-step-number">۱</span><span>تأیید موبایل</span></li>
+    <li><span class="register-step-number">۲</span><span>کد پیامکی</span></li>
+    <li><span class="register-step-number">۳</span><span>اطلاعات مالک</span></li>
+  </ol>
+</div>
 {% endblock %}
-{% block auth_heading %}ثبت‌نام سالن جدید{% endblock %}
-{% block auth_subtitle %}مالک سالن با شماره موبایل خود ثبت‌نام می‌کند و پس از تأیید، سالن و پنل مدیریت ساخته می‌شود.{% endblock %}
+{% block auth_heading %}سالن زیبایی‌ات را ثبت کن{% endblock %}
+{% block auth_subtitle %}فقط شماره موبایلت را وارد کن تا حساب مدیریت سالن را در چند قدم ساده بسازیم.{% endblock %}
 {% block auth_content %}
-<form method="post" class="luna-auth-register-form luna-auth-phone-form">
+<form method="post" class="luna-auth-register-form luna-auth-phone-form" aria-label="فرم شروع ثبت‌نام سالن">
   {% csrf_token %}
   {% if phone_form.non_field_errors %}
   <div class="mb-1">{% include "accounts/partials/auth_flash.html" with message=phone_form.non_field_errors.0 variant="error" %}</div>
   {% endif %}
   <div class="public-auth-field">
-    <label for="id_phone">{{ phone_form.phone.label }}</label>
+    <label for="id_phone">شماره موبایل مالک سالن</label>
     <div class="luna-auth-phone-input">
       {{ phone_form.phone }}
       <i data-lucide="smartphone" aria-hidden="true"></i>
     </div>
-    <p class="field-hint">این شماره به‌عنوان مالک سالن ذخیره می‌شود و برای ورود بعدی استفاده می‌شود.</p>
+    <p class="field-hint" id="register-phone-hint"><i data-lucide="lock-keyhole" aria-hidden="true"></i><span>شماره‌ات فقط برای تأیید هویت و ورود امن به پنل استفاده می‌شود.</span></p>
     {% if phone_form.phone.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ phone_form.phone.errors.0 }}</p>{% endif %}
   </div>
-  <button type="submit" class="btn-primary min-h-[48px] w-full gap-2">
-    <i data-lucide="shield-check" class="h-4 w-4" aria-hidden="true"></i>
-    دریافت کد تأیید
+  <button type="submit" class="btn-primary register-submit">
+    <span>دریافت کد تأیید</span>
+    <i data-lucide="arrow-left" aria-hidden="true"></i>
   </button>
 </form>
-<p class="public-auth-crosslink">
-  قبلاً عضو یک سالن شده‌اید؟
-  <a href="{% url 'accounts:login' %}">ورود به پنل</a>
-</p>
+<div class="register-after-form">
+  <p class="register-after-form__hint"><i data-lucide="check-circle-2" aria-hidden="true"></i>در این مرحله نیازی به وارد کردن اطلاعات سالن نیست.</p>
+  <p class="public-auth-crosslink">از قبل حساب کاربری داری؟ <a href="{% url 'accounts:login' %}">ورود به پنل <i data-lucide="arrow-up-left" aria-hidden="true"></i></a></p>
+</div>
 {% endblock %}
