@@ -49,7 +49,8 @@
         {{ edit_form.avatar }}
         {% if edit_form.avatar.errors %}<p class="customer-form-field__error">{{ edit_form.avatar.errors.0 }}</p>{% endif %}
       </div>
-      <div class="customer-form-field customer-form-field--checkbox">
+      <div class="luna-modal-choice-grid">
+<div class="customer-form-field customer-form-field--checkbox">
         <label class="customer-form-checkbox">
           {{ edit_form.is_vip }}
           <span>{{ edit_form.is_vip.label }}</span>
@@ -60,6 +61,7 @@
           {{ edit_form.marketing_consent }}
           <span>{{ edit_form.marketing_consent.label }}</span>
         </label>
+      </div>
       </div>
     </div>
   </div>
