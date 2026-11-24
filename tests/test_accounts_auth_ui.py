@@ -24,7 +24,12 @@ def test_login_page_uses_public_auth_shell(client):
 def test_register_page_uses_public_auth_shell(client):
     html = client.get(reverse("accounts:register")).content.decode()
     assert "public-auth-shell" in html
-    assert "ثبت‌نام سالن جدید" in html
+    assert "سالن زیبایی‌ات را ثبت کن" in html
+    assert "public-auth--register" in html
+    assert "مرحله ۱ از ۳" in html
+    assert "register-submit" in html
+    assert "شماره موبایل مالک سالن" in html
+    assert "ورود به پنل" in html
     assert "input-field--tel" in html
     assert "luna-auth-phone-input" in html
     assert "css/luna-auth.css" in html
