@@ -293,6 +293,15 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     assert box["width"] <= limit + 2, "oversized desktop dialog"
                     assert box["height"] <= 562, "oversized desktop dialog height"
                 assert dialog.evaluate("(el) => el.scrollWidth <= el.clientWidth + 2"), "modal content has horizontal overflow"
+                if name == "مشتری جدید":
+                    advanced = dialog.locator(".customer-form-advanced__toggle")
+                    advanced.click()
+                    cards = dialog.locator(".luna-modal-choice-grid > .customer-form-field--checkbox")
+                    pw.expect(cards).to_have_count(2)
+                    first_box, second_box = cards.nth(0).bounding_box(), cards.nth(1).bounding_box()
+                    assert first_box and second_box
+                    assert abs(first_box["y"] - second_box["y"]) <= 3, "VIP and marketing choices must share a row"
+                    assert first_box["x"] + first_box["width"] <= second_box["x"] + 3 or second_box["x"] + second_box["width"] <= first_box["x"] + 3, "choice cards must not overlap"
                 footer = dialog.locator(".inventory-create-modal__foot")
                 pw.expect(footer).to_be_visible()
                 footer_box = footer.bounding_box()
