@@ -105,4 +105,5 @@ def test_auth_editorial_assets_exist():
     from django.contrib.staticfiles import finders
 
     assert finders.find("css/luna-auth.css")
+    assert finders.find("css/phase7-ui-polish.css")
     assert finders.find("images/photos/beautyos-register-hero.webp")
