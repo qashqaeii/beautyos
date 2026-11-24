@@ -126,6 +126,7 @@ def test_cancel_completed_package_visit_restores_session_and_audits(
 ):
     visit, purchase = package_visit
     use = consume_package_session(purchase, visit, actor=owner_membership.user)
+    purchase.refresh_from_db()
     assert purchase.sessions_remaining == 2
     canceled = cancel_appointment(salon=salon, appointment_id=visit.pk)
     assert canceled.status == Appointment.Status.CANCELLED
@@ -234,3 +235,28 @@ def test_material_deep_link_prefills_visit_and_records_real_stock_cost(
 
     # Materials are a separate cost ledger; they must not create payment rows.
     assert Payment.scoped(salon).filter(appointment=visit).count() == 0
+
+
+@pytest.mark.django_db
+def test_expired_package_or_already_invoiced_visit_cannot_consume(
+    salon, owner_membership, package_visit,
+):
+    visit, purchase = package_visit
+    purchase.expires_at = timezone.now() - timedelta(days=1)
+    purchase.save(update_fields=["expires_at"])
+    with pytest.raises(ValidationError, match="منقضی"):
+        consume_package_session(purchase, visit)
+    purchase.expires_at = timezone.now() + timedelta(days=10)
+    purchase.save(update_fields=["expires_at"])
+
+    issue_invoice(
+        salon=salon, customer_id=visit.customer_id,
+        appointment_ids=[visit.pk], request_key=uuid4(), discount=0,
+        amounts={"cash": 0, "card": 0, "transfer": 0},
+        actor=owner_membership.user,
+    )
+    with pytest.raises(ValidationError, match="فاکتور"):
+        consume_package_session(purchase, visit)
+    purchase.refresh_from_db()
+    assert purchase.sessions_used == 0
+    assert PackageSessionUse.scoped(salon).filter(appointment=visit).count() == 0
