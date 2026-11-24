@@ -587,3 +587,127 @@ body.theme-app .luna-modal .inventory-create-modal__form > .inventory-create-mod
     height:min(92dvh,calc(100dvh - env(safe-area-inset-top,0px) - 8px));
   }
 }
+
+
+/* Booking form / paired cards — desktop: clear two-column partitions;
+   mobile: full-width controls, same modal footer and business logic. */
+body.theme-app .luna-modal.appointment-booking-modal .inventory-create-modal__scroll {
+  display:grid;
+  gap:11px;
+  align-content:start;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:stretch;
+  gap:10px;
+  min-width:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair > .appt-booking-section--modal {
+  min-width:0;
+  margin:0;
+  padding:11px;
+  border:1px solid #e8d8d0;
+  border-radius:12px;
+  background:#fffaf7;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair .appt-booking-section__title {
+  margin-bottom:8px;
+  font-size:12px;
+  font-weight:750;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair .appt-booking-fields--staff-locked {
+  grid-template-columns:minmax(0,1fr);
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair .customer-form-field--full {
+  grid-column:auto;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-section--last {
+  display:grid;
+  gap:9px;
+  margin:0;
+  padding:11px;
+  min-width:0;
+  border:1px solid #e8d8d0;
+  border-radius:12px;
+  background:#fffaf7;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-datetime {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  min-width:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal :is(
+  .appt-booking-datetime,.appt-booking-advanced__pair
+) > * {
+  min-width:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-datetime > .customer-form-field {
+  padding:10px 11px;
+  border:1px solid #eadbd3;
+  border-radius:11px;
+  background:#fcf6f2;
+  margin:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced {
+  margin-top:0;
+  min-width:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__body {
+  display:grid;
+  gap:10px;
+  min-width:0;
+  padding:11px;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__pair {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  align-items:stretch;
+  min-width:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__pair:not(:has(.appt-booking-deposit)) {
+  grid-template-columns:minmax(0,1fr);
+}
+body.theme-app .luna-modal.appointment-booking-modal :is(
+  .appt-booking-deposit--modal,.appt-booking-status-card
+) {
+  display:grid;
+  align-content:start;
+  min-width:0;
+  gap:6px;
+  padding:10px;
+  border:1px solid #e6d4cb;
+  border-radius:11px;
+  background:#fffdfa;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-status-card > .customer-form-field {
+  margin:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__body > .customer-form-field {
+  min-width:0;
+  margin:0;
+  padding:10px;
+  border:1px solid #e6d4cb;
+  border-radius:11px;
+  background:#fffdfa;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__body textarea {
+  min-height:62px;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__pair .field-label {
+  margin:0;
+  line-height:1.5;
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair,
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-datetime,
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__pair {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-section--last,
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair > .appt-booking-section--modal {
+    padding:9px;
+  }
+}
