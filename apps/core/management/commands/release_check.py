@@ -12,12 +12,35 @@ from django.db import connections
 from django.db.migrations.executor import MigrationExecutor
 
 
+def production_host_findings():
+    """Validate externally-facing HTTPS configuration without network requests."""
+    issues = []
+    hosts = settings.ALLOWED_HOSTS
+    origins = settings.CSRF_TRUSTED_ORIGINS
+    public_hosts = [h for h in hosts if h not in (
+        "localhost", "127.0.0.1", "::1", "[::1]", "testserver",
+    )]
+    if not public_hosts or "*" in hosts or any(h.startswith(".") for h in hosts):
+        issues.append("Configure explicit production ALLOWED_HOSTS without wildcards.")
+    if not origins or any(
+        not origin.startswith("https://") or "*" in origin
+        for origin in origins
+    ):
+        issues.append("CSRF_TRUSTED_ORIGINS must contain explicit HTTPS origins without wildcards.")
+    if not settings.SECURE_SSL_REDIRECT:
+        issues.append("SECURE_SSL_REDIRECT must remain enabled for production.")
+    if not settings.SESSION_COOKIE_SECURE or not settings.CSRF_COOKIE_SECURE:
+        issues.append("Session and CSRF cookies must require HTTPS.")
+    return issues
+
+
 def release_findings():
     findings = []
     if settings.DEBUG:
         findings.append("DEBUG must be disabled.")
     if settings.SETTINGS_MODULE != "config.settings.production":
         findings.append("DJANGO_SETTINGS_MODULE must be config.settings.production.")
+    findings.extend(production_host_findings())
     # Browser HSTS preloading is an optional, domain-level commitment.
     # Do not silently force preload for every tenant/subdomain.
     findings += [
