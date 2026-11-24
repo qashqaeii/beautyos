@@ -240,6 +240,13 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
 
                     assert page.locator(".customer-detail-hero-title h1").inner_text() == "پروفایل مشتری"
                     assert page.locator(".customer-detail-header__content").is_visible()
+                    header_title = page.locator(".customer-detail-hero-title").bounding_box()
+                    identity = page.locator(".customer-detail-header__content").bounding_box()
+                    assert header_title and identity
+                    assert header_title["y"] + header_title["height"] <= identity["y"] - 2, (
+                        "customer profile title must not overlap the identity card"
+                    )
+
 
                     assert page.locator(".customer-detail-header img.customer-detail-header__avatar").count() == 0
                     upcoming = page.locator(".customer-detail-workspace__primary > .customer-detail-card--main")
