@@ -18,6 +18,11 @@ from apps.appointments.forms import AppointmentForm
 from apps.appointments.models import Appointment
 from apps.appointments.services.lifecycle import AppointmentLifecycleError, cancel_appointment, complete_appointment
 from apps.dashboard.role_services import appointment_payment_summary
+from apps.packages.models import CustomerPackage
+from apps.finance.ledger import payment_refunded
+from apps.finance.models import MaterialCost
+from django.db.models import F
+from apps.salons.permissions_policy import P_INVENTORY_MANAGE, P_PACKAGE_MANAGE
 from apps.appointments.services.scheduling import SchedulingError, create_appointment
 from apps.core.utils.dates import (
     JALALI_MONTH_NAMES_FA,
@@ -378,8 +383,9 @@ def appointment_create(request):
 @require_role(SalonMembership.Role.RECEPTIONIST)
 def appointment_detail(request, pk):
     appt = get_object_or_404(
-        _appointment_qs(request).select_related("invoice_line")
-        .prefetch_related("payments__refunds"),
+        _appointment_qs(request).select_related(
+            "invoice_line", "package_use__customer_package__package",
+        ).prefetch_related("payments__refunds"),
         pk=pk,
     )
     if request.method == "POST":
@@ -401,6 +407,30 @@ def appointment_detail(request, pk):
     payment = appointment_payment_summary(appt)
     invoice_line = getattr(appt, "invoice_line", None)
     can_payment = has_permission(request.membership, P_PAYMENT_CREATE)
+    can_inventory = has_permission(request.membership, P_INVENTORY_MANAGE)
+    can_package = has_permission(request.membership, P_PACKAGE_MANAGE)
+    package_use = getattr(appt, "package_use", None)
+    active_package_use = package_use if package_use and package_use.reversed_at is None else None
+    # A fully refunded receipt can be replaced by package coverage; any live
+    # receipt or discount must be resolved in finance first.
+    payment_activity = any(
+        int(p.discount_toman) > 0
+        or int(p.paid_amount_toman) > payment_refunded(p)
+        for p in appt.payments.all()
+    )
+    available_packages = []
+    if can_package and appt.status == Appointment.Status.COMPLETED and not invoice_line and not package_use and not payment_activity:
+        available_packages = list(
+            CustomerPackage.scoped(request.salon).filter(
+                customer_id=appt.customer_id,
+                expires_at__gt=timezone.now(),
+                sessions_used__lt=F("sessions_total"),
+            ).select_related("package").order_by("expires_at", "pk")[:25]
+        )
+    material_costs = list(
+        MaterialCost.scoped(request.salon).filter(appointment=appt)
+        .select_related("movement__item").order_by("-created_at")
+    ) if can_inventory else []
     can_cancel = (
         has_permission(request.membership, P_APPOINTMENT_CANCEL)
         and appt.status in (
@@ -418,4 +448,10 @@ def appointment_detail(request, pk):
         "can_checkin": has_permission(request.membership, P_APPOINTMENT_CHECKIN),
         "can_complete": has_permission(request.membership, P_APPOINTMENT_COMPLETE),
         "can_payment_create": can_payment,
+        "can_inventory_manage": can_inventory,
+        "can_package_manage": can_package,
+        "active_package_use": active_package_use,
+        "available_packages": available_packages,
+        "material_costs": material_costs,
+        "material_cost_total": sum(c.cost_toman for c in material_costs),
     })

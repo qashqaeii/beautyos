@@ -8,4 +8,5 @@ urlpatterns = [
     path("", views.package_list, name="list"),
     path("new/", views.package_create, name="create"),
     path("sell/", views.sell, name="sell"),
+    path("sessions/<int:appointment_id>/use/", views.use_session, name="use_session"),
 ]

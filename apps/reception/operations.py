@@ -10,7 +10,7 @@ from apps.dashboard.role_services import appointment_payment_summary
 def day_operations(*, salon, queue, limit=100):
     """Return an actionable, tenant-scoped day queue with payment visibility."""
     appointments = list(
-        queue.select_related("customer", "staff", "service", "invoice_line")
+        queue.select_related("customer", "staff", "service", "invoice_line", "package_use")
         .prefetch_related("payments__refunds")
         .order_by("start_at", "pk")[:limit]
     )
@@ -44,7 +44,7 @@ def day_operations(*, salon, queue, limit=100):
             "can_complete": appointment.status in (
                 Appointment.Status.CONFIRMED, Appointment.Status.CHECKED_IN,
             ),
-            "can_checkout": completed and invoice_line is None,
+            "can_checkout": completed and invoice_line is None and not payment.get("covered_by_package", False),
         })
     summary["truncated"] = summary["total"] > len(rows)
     return {"day_operations": rows, "day_operations_summary": summary}

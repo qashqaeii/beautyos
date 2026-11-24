@@ -1,5 +1,11 @@
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods
+
+from apps.appointments.models import Appointment
+from apps.packages.services import consume_package_session
+from apps.salons.permissions_policy import P_PACKAGE_MANAGE, require_permission
 
 from apps.packages.forms import SellPackageForm, ServicePackageForm
 from apps.packages.models import CustomerPackage, ServicePackage
@@ -40,3 +46,31 @@ def sell(request):
             return redirect("packages:sell")
         return redirect("packages:list")
     return render(request, "packages/sell.html", {"form": form})
+
+
+@salon_required
+@require_permission(P_PACKAGE_MANAGE)
+@require_http_methods(["POST"])
+def use_session(request, appointment_id):
+    """Apply one prepaid session to this customer's completed visit."""
+    appointment = get_object_or_404(
+        Appointment.scoped(request.salon), pk=appointment_id,
+    )
+    try:
+        package_id = int(request.POST.get("customer_package", ""))
+        if package_id <= 0:
+            raise ValueError
+    except (TypeError, ValueError):
+        messages.error(request, "پکیج معتبری برای این مشتری انتخاب کنید.")
+        return redirect("appointments:detail", pk=appointment.pk)
+    purchase = get_object_or_404(
+        CustomerPackage.scoped(request.salon),
+        pk=package_id, customer_id=appointment.customer_id,
+    )
+    try:
+        consume_package_session(purchase, appointment, actor=request.user)
+    except ValidationError as exc:
+        messages.error(request, exc.messages[0] if exc.messages else str(exc))
+    else:
+        messages.success(request, "یک جلسه از پکیج مشتری کسر شد؛ این خدمت دوباره در صندوق محاسبه نمی‌شود.")
+    return redirect("appointments:detail", pk=appointment.pk)
