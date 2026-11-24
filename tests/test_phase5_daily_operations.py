@@ -139,7 +139,7 @@ def test_phase5_pending_must_be_confirmed_then_checkin_then_complete_and_invoice
     response = client.get(reverse("reception:desk"), {"day": day.isoformat()})
     assert response.context["day_operations_summary"]["completed"] == 1
     assert response.context["day_operations_summary"]["outstanding_toman"] == 800_000
-    assert "رفتن به صندوق" in response.content.decode()
+    assert "صدور فاکتور و چاپ" in response.content.decode()
 
     invoice = issue_invoice(
         salon=salon, customer_id=customer.pk,
