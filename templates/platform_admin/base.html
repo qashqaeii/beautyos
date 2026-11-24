@@ -16,6 +16,7 @@
       <a href="{% url 'platform_admin:overview' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'overview' %}is-active{% endif %}"><i data-lucide="layout-dashboard"></i><span>نمای کلی</span></a>
       <a href="{% url 'platform_admin:salons' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'salons' or request.resolver_match.url_name == 'salon_detail' %}is-active{% endif %}"><i data-lucide="store"></i><span>سالن‌ها</span></a>
       <a href="{% url 'platform_admin:users' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'users' or request.resolver_match.url_name == 'user_detail' %}is-active{% endif %}"><i data-lucide="users-round"></i><span>کاربران</span></a>
+      <a href="{% url 'platform_admin:subscriptions' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'subscriptions' %}is-active{% endif %}"><i data-lucide="credit-card"></i><span>اشتراک‌ها و پلن‌ها</span></a>
       <a href="{% url 'platform_admin:reports' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'reports' %}is-active{% endif %}"><i data-lucide="chart-no-axes-combined"></i><span>گزارش‌ها</span></a>
       <a href="{% url 'platform_admin:support' %}" class="pc-nav-item {% if request.resolver_match.url_name == 'support' or request.resolver_match.url_name == 'ticket_detail' %}is-active{% endif %}"><i data-lucide="messages-square"></i><span>پشتیبانی</span></a>
       <p class="pc-nav-label pc-nav-label--group">محتوا و سیستم</p>
@@ -43,6 +44,7 @@
         <a href="{% url 'platform_admin:salons' %}">سالن‌ها</a>
         <a href="{% url 'platform_admin:users' %}">کاربران</a>
         <a href="{% url 'platform_admin:reports' %}">گزارش‌ها</a>
+        <a href="{% url 'platform_admin:subscriptions' %}">اشتراک‌ها و پلن‌ها</a>
         <a href="{% url 'platform_admin:support' %}">پشتیبانی</a>
         <a href="{% url 'platform_admin:inquiries' %}">پیام‌های سایت</a>
         <a href="{% url 'platform_admin:articles' %}">مقالات</a>
