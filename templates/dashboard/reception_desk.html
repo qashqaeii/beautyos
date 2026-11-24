@@ -72,13 +72,16 @@
               {{ next_payment.label }}
             </span>
             {% endif %}
-            {% if can_checkin %}
-              {% if next_appt.status == 'confirmed' or next_appt.status == 'pending' %}
+            {% if can_confirm and next_appt.status == 'pending' %}
+            <form method="post" action="{% url 'reception:confirm' pk=next_appt.pk %}" class="reception-desk-next__checkin m-0">
+              {% csrf_token %}<input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+              <button type="submit" class="btn-primary text-sm">تأیید نوبت</button>
+            </form>
+            {% elif can_checkin and next_appt.status == 'confirmed' %}
             <form method="post" action="{% url 'reception:checkin' pk=next_appt.pk %}" class="reception-desk-next__checkin m-0">
-              {% csrf_token %}
+              {% csrf_token %}<input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
               <button type="submit" class="btn-primary text-sm">ثبت ورود</button>
             </form>
-              {% endif %}
             {% endif %}
           </div>
         </div>
