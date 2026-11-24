@@ -119,11 +119,11 @@ def test_phase5_pending_must_be_confirmed_then_checkin_then_complete_and_invoice
     assert appointment.completed_at is not None
     assert client.post(route("complete", appointment), payload).status_code == 302
     assert CommissionEntry.scoped(salon).filter(appointment=appointment).count() == 1
-    assert AuditLog.scoped(salon).filter(
+    assert AuditLog.objects.filter(salon=salon, 
         entity_type="appointment", entity_id=str(appointment.pk),
         message="تکمیل مراجعه در پذیرش",
     ).count() == 1
-    assert AuditLog.scoped(salon).filter(
+    assert AuditLog.objects.filter(salon=salon, 
         entity_type="appointment", entity_id=str(appointment.pk),
         message="ثبت ورود مشتری در پذیرش",
     ).count() == 1
