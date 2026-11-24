@@ -2,7 +2,19 @@
 {% block booking_content %}
 {% include "partials/booking_progress.html" with step=3 %}
 <h1 class="display-editorial text-xl font-semibold text-espresso">{{ day_jalali }}</h1>
-<p class="mt-1 text-sm text-ink-secondary">یکی از ساعت‌های آزاد را برای نوبت خود انتخاب کنید.</p>
+<p class="mt-1 text-sm text-ink-secondary">ابتدا روز موردنظر را انتخاب کنید، سپس از ساعت‌های آزاد نوبت بگیرید.</p>
+<nav aria-label="انتخاب روز رزرو" class="mt-5 rounded-xl border border-line bg-surface-elevated p-3">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    {% if previous_week %}<a class="btn-secondary min-h-[40px] px-3 text-xs" href="?staff={{ staff.pk }}&day={{ previous_week|date:'Y-m-d' }}">۷ روز قبل</a>{% else %}<span></span>{% endif %}
+    <strong class="text-xs text-ink-secondary">روزهای قابل رزرو</strong>
+    {% if next_week %}<a class="btn-secondary min-h-[40px] px-3 text-xs" href="?staff={{ staff.pk }}&day={{ next_week|date:'Y-m-d' }}">۷ روز بعد</a>{% else %}<span></span>{% endif %}
+  </div>
+  <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+    {% for option in day_choices %}
+    <a href="?staff={{ staff.pk }}&day={{ option.value|date:'Y-m-d' }}" aria-current="{% if option.selected %}date{% else %}false{% endif %}" class="min-h-[42px] rounded-lg border px-2 py-3 text-center text-xs {% if option.selected %}border-accent bg-accent/10 font-bold text-accent{% else %}border-line bg-surface text-ink-secondary hover:border-accent{% endif %}">{{ option.label|fa_num }}</a>
+    {% endfor %}
+  </div>
+</nav>
 <form method="post" action="{% url 'salons_public:booking_pick_slot' slug=salon.slug %}" class="mt-6">
   {% csrf_token %}
   <div class="editorial-booking-slots grid grid-cols-3 gap-2 sm:grid-cols-4">

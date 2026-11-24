@@ -264,3 +264,31 @@ def test_booking_otp_purpose_is_not_interchangeable_with_portal_otp(
     assert OTPChallenge.objects.get(pk=booked.challenge.pk).consumed_at is None
     assert OTPChallenge.objects.get(pk=booked.challenge.pk).expires_at > timezone.now()
     assert customer_otp["purpose"] == OTPChallenge.Purpose.CUSTOMER_PORTAL
+
+@pytest.mark.django_db
+def test_booking_day_navigation_lets_customer_select_another_day(client, salon, public_booking_setup):
+    data = public_booking_setup
+    session = client.session
+    session["booking"] = {"salon_id": str(salon.pk), "service_id": data["service"].pk}
+    session.save()
+    booking_page = url(salon, "booking_datetime")
+    target = data["day"]
+    response = client.get(booking_page, {
+        "staff": data["staff"].pk,
+        "day": target.isoformat(),
+    })
+    assert response.status_code == 200
+    assert "روزهای قابل رزرو" in response.content.decode()
+    assert len(response.context["day_choices"]) == 7
+    assert response.context["next_week"] == target + timedelta(days=7)
+    assert target.isoformat() in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_customer_reschedule_has_weekly_day_navigation(client, salon, booked_customer, customer_otp):
+    customer, appointment = booked_customer
+    portal_login(client, salon, customer.phone, customer_otp)
+    response = client.get(url(salon, "customer_reschedule", appointment_id=appointment.pk))
+    assert response.status_code == 200
+    assert "روزهای پیشنهادی" in response.content.decode()
+    assert len(response.context["day_choices"]) == 7

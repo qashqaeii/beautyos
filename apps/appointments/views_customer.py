@@ -240,11 +240,17 @@ def customer_reschedule(request, slug, appointment_id):
                 appointment.staff, day, appointment.service.duration_minutes,
             ) if slot >= earliest and slot != appointment.start_at
         ]
+    last_day = today + timedelta(days=365)
+    day_choices = [
+        {"value": day + timedelta(days=offset), "label": to_jalali(day + timedelta(days=offset)),
+         "selected": offset == 0}
+        for offset in range(7) if day + timedelta(days=offset) <= last_day
+    ]
     return render(request, "public/customer/reschedule.html", _context(
         salon, appointment=appointment, can_manage=allowed, restriction=reason,
-        day=day, day_jalali=to_jalali(day), slots=slots,
-        previous_day=day - timedelta(days=1) if day > today else None,
-        next_day=day + timedelta(days=1) if day < today + timedelta(days=365) else None,
+        day=day, day_jalali=to_jalali(day), slots=slots, day_choices=day_choices,
+        previous_week=max(today, day - timedelta(days=7)) if day > today else None,
+        next_week=day + timedelta(days=7) if day + timedelta(days=7) <= last_day else None,
     ))
 
 

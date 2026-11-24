@@ -112,6 +112,14 @@ def booking_datetime(request, slug):
         day = today
     earliest = timezone.now() + timedelta(minutes=getattr(getattr(salon, "settings", None), "booking_lead_time_minutes", 60))
     slots = [slot for slot in iter_day_slots(staff, day, service.duration_minutes) if slot >= earliest]
+    last_day = today + timedelta(days=365)
+    day_choices = [
+        {"value": day + timedelta(days=offset), "label": to_jalali(day + timedelta(days=offset)),
+         "selected": offset == 0}
+        for offset in range(7) if day + timedelta(days=offset) <= last_day
+    ]
+    previous_week = max(today, day - timedelta(days=7)) if day > today else None
+    next_week = day + timedelta(days=7) if day + timedelta(days=7) <= last_day else None
     return render(
         request,
         "public/booking/step_datetime.html",
@@ -121,6 +129,7 @@ def booking_datetime(request, slug):
             staff=staff,
             day=day,
             day_jalali=to_jalali(day),
+            day_choices=day_choices, previous_week=previous_week, next_week=next_week,
             slots=slots,
         ),
     )

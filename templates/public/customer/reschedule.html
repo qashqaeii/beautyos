@@ -6,10 +6,15 @@
 <section class="cp-card cp-day-picker">
   {% if can_manage %}
   <div class="cp-day-nav">
-    {% if previous_day %}<a href="?day={{ previous_day|date:'Y-m-d' }}" class="cp-btn cp-btn--quiet"><i data-lucide="chevron-right"></i> روز قبل</a>{% else %}<span></span>{% endif %}
+    {% if previous_week %}<a href="?day={{ previous_week|date:'Y-m-d' }}" class="cp-btn cp-btn--quiet"><i data-lucide="chevron-right"></i> ۷ روز قبل</a>{% else %}<span></span>{% endif %}
     <div><small>تاریخ انتخابی</small><strong>{{ day_jalali|fa_num }}</strong></div>
-    {% if next_day %}<a href="?day={{ next_day|date:'Y-m-d' }}" class="cp-btn cp-btn--quiet">روز بعد <i data-lucide="chevron-left"></i></a>{% else %}<span></span>{% endif %}
+    {% if next_week %}<a href="?day={{ next_week|date:'Y-m-d' }}" class="cp-btn cp-btn--quiet">۷ روز بعد <i data-lucide="chevron-left"></i></a>{% else %}<span></span>{% endif %}
   </div>
+  <nav class="cp-date-options" aria-label="روزهای پیشنهادی">
+    {% for option in day_choices %}
+    <a href="?day={{ option.value|date:'Y-m-d' }}" {% if option.selected %}aria-current="date"{% endif %} class="cp-btn cp-btn--date {% if option.selected %}is-selected{% endif %}">{{ option.label|fa_num }}</a>
+    {% endfor %}
+  </nav>
   <p class="cp-help"><i data-lucide="info"></i> پس از انتخاب، زمان جدید برای تأیید مجدد سالن در وضعیت «در انتظار» قرار می‌گیرد.</p>
   <form method="post">{% csrf_token %}<div class="cp-slots">
     {% for slot in slots %}<button class="cp-btn cp-btn--slot" type="submit" name="start_iso" value="{{ slot.isoformat }}">{{ slot|time:"H:i"|fa_num }}</button>
