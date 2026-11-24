@@ -203,6 +203,8 @@ def _beautyos_asset_version() -> str:
         "static/images/photos/beautyos-management-floral.webp",
         "static/css/luna-responsive.css",
         "static/css/phase7-ui-polish.css",
+        "static/css/beautyos-motion.css",
+        "static/js/beautyos-motion.js",
         "static/css/luna-modals.css",
         "static/js/luna-modals.js",
         "static/images/photos/beautyos-modal-salon.webp",
