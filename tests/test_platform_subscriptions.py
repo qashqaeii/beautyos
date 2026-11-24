@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from apps.platform_admin.models import SalonSubscription, SubscriptionPlan
 from apps.salons.models import Salon
+from tests.test_platform_admin import platform_operator, platform_client  # noqa: F401
 
 
 @pytest.mark.django_db
@@ -72,7 +73,7 @@ def test_subscription_cannot_have_invalid_interval_or_missing_trial_end(salon):
 
 
 @pytest.mark.django_db
-def test_one_subscription_per_salon_and_invalid_status_cannot_be_saved(salon):
+def test_one_subscription_per_salon(salon):
     from django.db import IntegrityError, transaction
     now = timezone.now()
     plan = SubscriptionPlan.objects.create(code="basic", name="پایه")
