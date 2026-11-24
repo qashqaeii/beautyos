@@ -3,6 +3,8 @@
 Reuses the appointment, invoice and payment sources of truth. No derived
 financial amount is persisted in reception.
 """
+from uuid import uuid4
+
 from apps.appointments.models import Appointment
 from apps.dashboard.role_services import appointment_payment_summary
 
@@ -45,6 +47,7 @@ def day_operations(*, salon, queue, limit=100):
                 Appointment.Status.CONFIRMED, Appointment.Status.CHECKED_IN,
             ),
             "can_checkout": completed and invoice_line is None and not payment.get("covered_by_package", False),
+            "invoice_key": str(uuid4()) if completed and invoice_line is None else None,
         })
     summary["truncated"] = summary["total"] > len(rows)
     return {"day_operations": rows, "day_operations_summary": summary}
