@@ -75,7 +75,7 @@ def test_phase5_day_queue_shows_actions_real_payment_and_tenant_data(
     assert "جریان کار امروز سالن" in text
     assert "تأیید نوبت" in text
     assert "نرگس امینی" in text
-    assert "800,000" in text or "۸۰۰٬۰۰۰" in text or "۸۰۰,۰۰۰" in text
+    assert "۸۰۰.۰۰۰" in text  # fa_money uses Persian digits and dot grouping
     assert "مشتری خصوصی بتا" not in text
     assert response.context["day_operations_summary"]["total"] == 1
     assert response.context["day_operations_summary"]["pending"] == 1
