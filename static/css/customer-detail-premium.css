@@ -1491,3 +1491,20 @@
 @media (prefers-reduced-motion:reduce) {
   .maison-app.management-suite .customer-detail-page .customer-detail-appt-row:hover {transform:none;}
 }
+
+/* Keep expandable notes and customer details reachable inside the desktop viewport. */
+@media (min-width:1180px) and (min-height:560px) {
+  .maison-app.management-suite .customer-detail-page .customer-detail-card--notes,
+  .maison-app.management-suite .customer-detail-page .customer-detail-card--preferences {
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-width:thin;
+    scrollbar-color:#d8beb4 transparent;
+  }
+  .maison-app.management-suite .customer-detail-page .customer-detail-history .customer-detail-card {
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-width:thin;
+    scrollbar-color:#d8beb4 transparent;
+  }
+}
