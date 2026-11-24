@@ -24,3 +24,22 @@ Note: Development Compose uses the named `beautyos_media` volume. When reusing a
 4. Verify backups, a restore rehearsal, domain/HTTPS, OTP vendor credentials and an isolated staging smoke test before any production rollout.
 
 Production remains opt-in. Do **not** use `docker-compose.yml` for a production deployment; it intentionally loads local settings.
+
+## 0D — Repeatable salon seeding (2026-11-24)
+
+The current quality gate found a reproducible violation of the **no duplicate appointments** invariant when `seed_demo_salon` was run twice without `--reset`: the second pass increased the seeded appointment count (131 → 133). The code path that tops up today's reception calendar used `create_appointment()` before checking the original customer/start identity. Since a paid/complete visit need not conflict with a new bookable slot, a duplicate could be inserted on a subsequent pass.
+
+Changes:
+- Resolve the existing appointment by `(salon, customer, start_at)` before attempting to create today's supplemental appointments.
+- Keep the existing completed appointment and its linked receipts untouched.
+- Strengthen the PostgreSQL regression to require *exactly the same appointment primary keys* and no duplicate customer/start pairs after the second seed pass.
+
+Acceptance gate:
+1. `pytest tests/test_seed_demo_salon.py tests/test_demo_seed_guard.py` succeeds under PostgreSQL.
+2. Full Django/PostgreSQL and Chromium regression suites both pass.
+3. Docker image isolation job passes.
+4. No demo seeding against production or any real salon database; demo seed remains opt-in and demo-salon-a scoped.
+
+## Phase zero status and remaining release gates
+
+The regression and its test are committed on `main`; final confirmation is GitHub Actions on the latest commit, **not** successful git push alone. A successful CI run is necessary but not sufficient for public release. Branch protection/ruleset, restore rehearsal, real OTP provider, staging smoke tests and device review remain deployment prerequisites. **Production deployment is not authorized.**
