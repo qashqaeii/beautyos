@@ -827,3 +827,16 @@
     min-height:0;
   }
 }
+
+
+/* Content-safe balanced grid: grow to fill spare room but never flex-shrink
+   tracks below their actual content, which clipped the bottom row in Chromium. */
+@media (min-width:1200px) and (min-height:590px) {
+  .maison-app.management-suite .customers-list-page--balanced .customers-list-grid {
+    flex:1 0 auto;
+    height:auto;
+    grid-template-rows:repeat(2,minmax(max-content,1fr));
+    grid-auto-rows:minmax(max-content,auto);
+    min-height:max-content;
+  }
+}
