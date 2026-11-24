@@ -97,7 +97,8 @@
             {{ edit_form.sort_order }}
             {% if edit_form.sort_order.errors %}<p class="service-form-field__error">{{ edit_form.sort_order.errors.0 }}</p>{% endif %}
           </div>
-          <div class="service-form-field service-form-field--checkbox">
+          <div class="luna-modal-choice-grid">
+<div class="service-form-field service-form-field--checkbox">
             <label class="service-form-checkbox">
               {{ edit_form.is_active }}
               <span>{{ edit_form.is_active.label }}</span>
@@ -110,6 +111,7 @@
               <span>{{ edit_form.is_public.label }}</span>
             </label>
             {% if edit_form.is_public.errors %}<p class="service-form-field__error">{{ edit_form.is_public.errors.0 }}</p>{% endif %}
+          </div>
           </div>
           <div class="service-form-field">
             <span class="field-label" id="service-edit-image-label">{{ edit_form.image.label }}</span>
