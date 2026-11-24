@@ -9,6 +9,11 @@ def test_login_page_uses_public_auth_shell(client):
     html = client.get(reverse("accounts:login")).content.decode()
     assert "public-auth-shell" in html
     assert "public-auth-steps" in html
+    assert "public-auth--login" in html
+    assert "register-progress__caption" not in html
+    assert "register-submit" in html
+    assert "register-step-number" in html
+    assert html.count('aria-current="step"') == 1
     assert "public-auth-card" in html
     assert "btn-primary" in html
     assert "input-field" in html
