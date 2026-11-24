@@ -83,7 +83,7 @@ def test_platform_control_center_responsive_and_private(
         assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
         card = page.locator(".pc-kpi").first
         if card.count():
-            assert card.evaluate("(el) => getComputedStyle(el).translate === 'none' or getComputedStyle(el).translate === '0px'")
+            assert card.evaluate("(el) => getComputedStyle(el).translate === 'none' || getComputedStyle(el).translate === '0px'")
             before = card.locator("strong").first.inner_text()
             page.wait_for_timeout(100)
             assert card.locator("strong").first.inner_text() == before
