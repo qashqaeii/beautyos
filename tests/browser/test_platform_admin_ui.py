@@ -54,6 +54,7 @@ def test_platform_control_center_responsive_and_private(
             reverse("platform_admin:salons"),
             reverse("platform_admin:users"),
             reverse("platform_admin:reports"),
+            reverse("platform_admin:subscriptions"),
             reverse("platform_admin:support"),
             reverse("platform_admin:articles"),
             reverse("platform_admin:article_new"),
@@ -68,6 +69,11 @@ def test_platform_control_center_responsive_and_private(
             assert page.locator(".pc-heading h1").count() == 1, route
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3"), route
             assert page.locator("html").get_attribute("dir") == "rtl"
+            assert page.locator('link[href*="phase7-ui-polish.css"]').count() == 1
+        page.goto(live_server.url + reverse("platform_admin:subscriptions"), wait_until="load")
+        assert page.locator(".pc-subscriptions__filter select").count() == 1
+        assert page.locator(".pc-subscriptions__filter label").is_visible()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
         page.goto(live_server.url + reverse("platform_admin:overview"), wait_until="load")
         if width < 960:
             page.locator(".pc-mobile-menu summary").click()
