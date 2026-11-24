@@ -3,7 +3,7 @@
 {% else %}
 <div class="maison-kpi maison-kpi--compact maison-kpi--motion {% if variant == 'primary' or featured %}kpi-primary{% elif variant == 'positive' or sage %}kpi-positive{% else %}kpi-standard{% endif %}">
 {% endif %}
-  <div class="flex items-start justify-between gap-2">
+  <div class="flex items-start justify-between gap-1.5">
     <div class="min-w-0 flex-1">
       <p class="kpi-label">{{ label }}</p>
       {% if suffix %}
@@ -15,7 +15,7 @@
     </div>
     {% if icon %}
     <span class="maison-kpi__icon {% if variant == 'primary' or featured %}maison-kpi__icon--accent{% else %}maison-kpi__icon--plain{% endif %}">
-      <i data-lucide="{{ icon }}" class="{% if variant == 'primary' or featured %}h-5 w-5{% else %}h-4 w-4{% endif %}"></i>
+      <i data-lucide="{{ icon }}" class="{% if variant == 'primary' or featured %}h-4 w-4{% else %}h-3.5 w-3.5{% endif %}"></i>
     </span>
     {% endif %}
   </div>

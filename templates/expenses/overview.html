@@ -3,7 +3,7 @@
 {% block page_title %}هزینه‌های سالن{% endblock %}
 {% block page_subtitle %}گزارش ماه جاری{% endblock %}
 {% block content %}
-<div class="grid gap-4 sm:grid-cols-3 mb-6">
+<div class="grid gap-2.5 sm:grid-cols-3 sm:gap-3 mb-5">
   {% include "partials/stat_card.html" with label="دریافتی ماه" value=revenue_total|fa_money suffix="تومان" icon="wallet" variant="primary" %}
   {% include "partials/stat_card.html" with label="هزینه ماه" value=expense_total|fa_money suffix="تومان" icon="receipt" %}
   {% include "partials/stat_card.html" with label="دریافتی منهای هزینه" value=operating_estimate|fa_money suffix="تومان" hint="جریان ثبت‌شده؛ نه سود خالص" icon="chart-no-axes-column-increasing" %}
