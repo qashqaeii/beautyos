@@ -296,6 +296,38 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
 
                     else:
                         assert aside_box["y"] >= main_box["y"] + main_box["height"] - 4, "mobile customer cards should stack below upcoming appointments"
+                if name == "staff-detail":
+                    book_link = page.locator('.staff-profile-header__actions a[href*="book=1"]').first
+                    if book_link.count():
+                        book_link.click()
+                        modal = page.locator(".appointment-booking-modal")
+                        pw.expect(modal).to_be_visible()
+                        pair = modal.locator(".appt-booking-modal__primary-pair > .appt-booking-section--modal")
+                        pw.expect(pair).to_have_count(2)
+                        box_a = pair.nth(0).bounding_box()
+                        box_b = pair.nth(1).bounding_box()
+                        assert box_a and box_b
+                        if width >= 640:
+                            assert abs(box_a["y"] - box_b["y"]) <= 3, "customer and service cards must share a row"
+                        else:
+                            assert box_b["y"] >= box_a["y"] + box_a["height"] - 2, "mobile cards must stack"
+                        dates = modal.locator(".appt-booking-datetime > .customer-form-field")
+                        pw.expect(dates).to_have_count(2)
+                        modal.locator(".appt-booking-advanced__toggle").click()
+                        pw.expect(modal.locator(".appt-booking-status-card")).to_be_visible()
+                        if modal.locator(".appt-booking-deposit--modal").count():
+                            deposit = modal.locator(".appt-booking-deposit--modal").bounding_box()
+                            status = modal.locator(".appt-booking-status-card").bounding_box()
+                            assert deposit and status
+                            if width >= 640:
+                                assert abs(deposit["y"] - status["y"]) <= 3, "deposit and status must share a row"
+                        footer = modal.locator(".inventory-create-modal__foot")
+                        current_box = modal.bounding_box()
+                        footer_box = footer.bounding_box()
+                        assert current_box and footer_box
+                        assert footer_box["y"] + footer_box["height"] <= current_box["y"] + current_box["height"] + 3, "booking actions must stay inside the modal"
+                        modal.locator(".inventory-create-modal__close").click()
+                        pw.expect(modal).not_to_be_visible()
                 if name == "customers":
                     # Directory must never nest a vertical scroller or clip customer cards.
                     assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"
