@@ -9,7 +9,9 @@
     ".public-contact-card", ".booking-card", ".checkout-workspace__panel"
   ].join(",");
   // Existing overview counters have their own animation: never touch them.
-  const NUMBERS = ".pc-kpi > strong,.pc-alert-strip strong,.overview-customer-grid strong";
+  const NUMBERS = ".pc-kpi > strong,.pc-alert-strip strong,.overview-customer-grid strong," +
+    ".finance-stat-card strong,.fin-balance-item strong,.reception-flow__metrics strong," +
+    ".dashboard-mgmt-card strong,.inventory-card strong";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
   const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
