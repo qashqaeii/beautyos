@@ -1,0 +1,43 @@
+/* BeautyOS shared subtle motion — avoids layout shifts and keeps the UI calm. */
+:root {
+  --bo-motion-duration:260ms;
+  --bo-motion-ease:cubic-bezier(.22,1,.36,1);
+}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  :is(.maison-app,.pc-shell,.public-site)
+  :is(.pc-kpi,.pc-panel,.dashboard-stat-mini__surface,.overview-panel,
+      .dashboard-mgmt-card,.customers-list-card,.staff-team-card,.maison-service-card,
+      .finance-stat-card,.fin-panel,.inventory-card,.reception-flow__item,
+      .public-home-feature-card,.public-home-step-card,.public-contact-card,
+      .public-auth-card,.booking-card,.checkout-workspace__panel) {
+    transition:translate var(--bo-motion-duration) var(--bo-motion-ease),
+      box-shadow var(--bo-motion-duration) var(--bo-motion-ease),
+      border-color var(--bo-motion-duration) var(--bo-motion-ease);
+  }
+  :is(.maison-app,.pc-shell,.public-site)
+  :is(.pc-kpi,.pc-panel,.dashboard-stat-mini__surface,.overview-panel,
+      .dashboard-mgmt-card,.customers-list-card,.staff-team-card,.maison-service-card,
+      .finance-stat-card,.fin-panel,.inventory-card,.reception-flow__item,
+      .public-home-feature-card,.public-home-step-card,.public-contact-card,
+      .public-auth-card,.booking-card,.checkout-workspace__panel):hover {
+    translate:0 -3px;
+  }
+  :is(.maison-app,.pc-shell,.public-site)
+  :is(.pc-kpi,.dashboard-stat-mini__surface,.overview-panel,.dashboard-mgmt-card,
+      .customers-list-card,.staff-team-card,.maison-service-card,.finance-stat-card,
+      .inventory-card,.public-home-feature-card,.public-home-step-card):hover {
+    box-shadow:0 11px 24px rgba(77,55,70,.095);
+  }
+}
+@media(prefers-reduced-motion:no-preference) {
+  .bo-motion-in {
+    animation:bo-motion-rise 390ms var(--bo-motion-ease) both;
+  }
+  @keyframes bo-motion-rise {
+    from { opacity:.82; translate:0 7px; }
+    to { opacity:1; translate:0 0; }
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .bo-motion-in { animation:none!important; translate:none!important; opacity:1!important; }
+}
