@@ -3,7 +3,7 @@
 {% block auth_variant %}public-auth--verify{% endblock %}
 {% block auth_steps %}
 <div class="register-progress">
-  <ol class="public-auth-steps" aria-label="مراحل تأیید">
+  <ol class="public-auth-steps {% if purpose != 'register' %}auth-steps--two{% endif %}" aria-label="مراحل تأیید">
     <li class="is-done"><span class="register-step-number"><i data-lucide="check" aria-hidden="true"></i></span><span>شماره موبایل</span></li>
     <li class="is-current" aria-current="step"><span class="register-step-number">۲</span><span>کد تأیید</span></li>
     {% if purpose == "register" %}<li><span class="register-step-number">۳</span><span>اطلاعات مالک</span></li>{% endif %}
