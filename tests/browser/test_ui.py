@@ -149,7 +149,16 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     if width >= 1024:
                         pw.expect(page.locator(".luna-active-salon")).to_have_text(salon.name)
                         assert page.locator(".maison-sidebar .luna-salon-switch-list").count() == 0
-                        assert page.evaluate("getComputedStyle(document.querySelector('#workspace-sidebar-nav')).overflowY === 'visible'"), "nested sidebar scroll"
+                        assert page.evaluate("getComputedStyle(document.querySelector('#workspace-sidebar-nav')).overflowY === 'auto'"), "desktop sidebar should scroll its own navigation"
+                        assert page.evaluate("getComputedStyle(document.querySelector('.maison-sidebar--premium')).position === 'sticky'"), "desktop sidebar must remain sticky"
+                        if name == "reception":
+                            before = page.locator(".maison-sidebar--premium").bounding_box()
+                            page.evaluate("window.scrollTo(0, 450)")
+                            page.wait_for_timeout(100)
+                            after = page.locator(".maison-sidebar--premium").bounding_box()
+                            assert before and after and abs(before["y"] - after["y"]) < 3, "desktop sidebar moved while reception content scrolled"
+                            assert page.evaluate("window.scrollY > 0"), "reception content must still scroll"
+                            page.evaluate("window.scrollTo(0, 0)")
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 2"), "horizontal page overflow"
                 assert page.locator('link[href*="phase7-ui-polish.css"]').count() == 1, "phase 7 styling missing"
                 if width <= 639 and name == "reception":
