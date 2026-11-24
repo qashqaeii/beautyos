@@ -553,6 +553,18 @@ class DemoSalonSeedEngine:
             key = (staff.pk, start)
             if key in used:
                 continue
+            # A previous seed run may have completed (and paid) this visit.
+            # Scheduling conflict checks ignore some terminal statuses, so
+            # calling create_appointment first could insert it a second time.
+            # Always resolve the deterministic customer/time identity before
+            # trying to schedule another appointment.
+            prior = Appointment.scoped(salon).filter(
+                customer=customer, start_at=start
+            ).first()
+            if prior is not None:
+                used.add(key)
+                extra.append(prior)
+                continue
             status = (
                 Appointment.Status.CHECKED_IN
                 if n % 4 == 0
