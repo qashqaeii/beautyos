@@ -26,7 +26,8 @@ def test_register_page_uses_public_auth_shell(client):
     assert "public-auth-shell" in html
     assert "سالن زیبایی‌ات را ثبت کن" in html
     assert "public-auth--register" in html
-    assert "مرحله ۱ از ۳" in html
+    assert "register-progress__caption" not in html
+    assert "aria-label=\"مراحل ثبت‌نام\"" in html
     assert "register-submit" in html
     assert "شماره موبایل مالک سالن" in html
     assert "ورود به پنل" in html
