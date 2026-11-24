@@ -341,3 +341,34 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
     border-radius:13px;
   }
 }
+
+
+/* Directory header specificity: these modules have more-specific legacy rules. */
+@media (min-width:1024px) {
+  .maison-app.management-suite .customers-list-page .customers-list-page__header,
+  .maison-app.management-suite .staff-board-v2 .staff-team-page__header,
+  .maison-app.management-suite .inventory-page .inventory-page__header {
+    height:var(--bo-page-header-height);
+    min-height:var(--bo-page-header-height);
+    padding:12px 16px;
+    margin-block-end:10px;
+  }
+  .maison-app.management-suite .customers-list-page .editorial-directory-copy > h1,
+  .maison-app.management-suite .staff-board-v2 .staff-team-page__title,
+  .maison-app.management-suite .inventory-page .inventory-page__title,
+  .luna-finance-shell .finance-page .finance-page__header--premium .finance-page__title {
+    font-size:var(--bo-page-header-title-size);
+    line-height:1.45;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-page__head-icon,
+  .maison-app.management-suite .staff-board-v2 .staff-team-page__head-icon,
+  .luna-finance-shell .finance-page .finance-page__header--premium .finance-page__head-icon {
+    width:var(--bo-page-header-icon-size);
+    height:var(--bo-page-header-icon-size);
+    border-radius:11px;
+  }
+  .maison-app.management-suite .staff-board-v2 .staff-team-page__head-icon svg,
+  .luna-finance-shell .finance-page .finance-page__header--premium .finance-page__head-icon svg {
+    width:20px;height:20px;
+  }
+}
