@@ -148,7 +148,7 @@
   min-inline-size:0;
 }
 body.theme-app .luna-modal-root .luna-modal {
-  max-inline-size:calc(100vw - 16px);
+  max-inline-size:min(calc(100vw - 16px),var(--modal-max-width,520px));
 }
 body.theme-app .luna-modal .inventory-create-modal__scroll {
   scrollbar-width:thin;
