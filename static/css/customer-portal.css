@@ -97,8 +97,11 @@
 .cp-day-nav>div{text-align:center}
 .cp-day-nav small{display:block;color:#97899f;font-size:.72rem;margin-bottom:5px}
 .cp-day-nav strong{display:block;font-size:1rem}
+.cp-date-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 18px}
+.cp-btn--date{padding:10px 7px;min-width:0;font-size:.71rem;background:#f8f5fa;white-space:normal;line-height:1.6}
+.cp-btn--date.is-selected{border-color:#a793be;background:#f0e8f6;color:#6d5487;font-weight:830}
 .cp-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-top:19px}
 .cp-btn--slot{font-variant-numeric:tabular-nums;direction:ltr}
-@media(max-width:700px){.cp-header__inner{min-height:70px}.cp-container{width:calc(100% - 24px)}.cp-content{padding-block:22px 55px}.cp-nav{gap:8px}.cp-nav a{font-size:.7rem}.cp-nav a:last-child{display:none}.cp-auth{margin:17px auto;padding:25px 18px}.cp-appointment{grid-template-columns:1fr auto;gap:10px;padding:17px}.cp-appointment__details{grid-row:1;grid-column:1}.cp-appointment__date{grid-row:2;grid-column:1}.cp-appointment .cp-pill{grid-row:1;grid-column:2}.cp-appointment__arrow{display:none}.cp-section__title{padding:16px;flex-wrap:wrap}.cp-detail,.cp-day-picker{padding:17px}.cp-facts>div{flex-wrap:wrap}.cp-slots{grid-template-columns:repeat(3,minmax(0,1fr))}.cp-day-nav .cp-btn{padding:8px}.cp-day-nav strong{font-size:.85rem}}
+@media(max-width:700px){.cp-header__inner{min-height:70px}.cp-container{width:calc(100% - 24px)}.cp-content{padding-block:22px 55px}.cp-nav{gap:8px}.cp-nav a{font-size:.7rem}.cp-nav a:last-child{display:none}.cp-auth{margin:17px auto;padding:25px 18px}.cp-appointment{grid-template-columns:1fr auto;gap:10px;padding:17px}.cp-appointment__details{grid-row:1;grid-column:1}.cp-appointment__date{grid-row:2;grid-column:1}.cp-appointment .cp-pill{grid-row:1;grid-column:2}.cp-appointment__arrow{display:none}.cp-section__title{padding:16px;flex-wrap:wrap}.cp-detail,.cp-day-picker{padding:17px}.cp-facts>div{flex-wrap:wrap}.cp-date-options{grid-template-columns:repeat(2,minmax(0,1fr))}.cp-slots{grid-template-columns:repeat(3,minmax(0,1fr))}.cp-day-nav .cp-btn{padding:8px}.cp-day-nav strong{font-size:.85rem}}
 @media(max-width:370px){.cp-slots{grid-template-columns:repeat(2,minmax(0,1fr))}.cp-brand small{display:none}}
 @media(prefers-reduced-motion:reduce){.cp-app *{animation:none!important;transition:none!important}}
