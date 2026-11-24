@@ -27,6 +27,7 @@ from apps.salons.permissions_policy import (
     P_APPOINTMENT_CREATE,
     P_APPOINTMENT_UPDATE,
     P_PAYMENT_CREATE,
+    P_PAYMENT_VIEW,
     P_STAFF_MANAGE,
     has_permission,
 )
@@ -62,6 +63,11 @@ def desk(request):
             "can_confirm": has_permission(membership, P_APPOINTMENT_UPDATE),
             "can_complete": has_permission(membership, P_APPOINTMENT_COMPLETE),
             "can_payment_create": has_permission(membership, P_PAYMENT_CREATE),
+            "can_view_invoices": has_permission(membership, P_PAYMENT_VIEW),
+            "can_issue_invoice": (
+                has_permission(membership, P_PAYMENT_CREATE)
+                and has_permission(membership, P_PAYMENT_VIEW)
+            ),
             "can_checkin": has_permission(membership, P_APPOINTMENT_CHECKIN),
             "can_manage_staff": has_permission(membership, P_STAFF_MANAGE),
             "prev_day": (day - timedelta(days=1)).isoformat(),
