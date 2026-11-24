@@ -41,6 +41,8 @@
       <div class="ops-appt__checkout">
         {% if invoice_id %}
         <a class="ops-appt__btn ops-appt__btn--primary" href="{% url 'finance:invoice_detail' invoice_id=invoice_id %}"><i data-lucide="receipt" aria-hidden="true"></i> مشاهده فاکتور</a>
+        {% elif active_package_use %}
+        <p class="ops-appt__note ops-appt__note--inline"><i data-lucide="badge-check" aria-hidden="true"></i> هزینه این خدمت از پکیج {{ active_package_use.customer_package.package.name }} پوشش داده شده است؛ دریافت مجدد لازم نیست.</p>
         {% else %}
         <a class="ops-appt__btn ops-appt__btn--primary" href="{% url 'finance:checkout' appointment.customer_id %}?appointment={{ appointment.pk|unlocalize }}"><i data-lucide="wallet" aria-hidden="true"></i> صدور فاکتور و تسویه</a>
         {% endif %}
@@ -52,6 +54,39 @@
       {% endif %}
     </section>
   </div>
+  {% if can_package_manage and available_packages %}
+  <section class="ops-appt__card ops-appt__package" aria-labelledby="ops-package-title">
+    <div class="ops-appt__card-title"><i data-lucide="ticket-check" aria-hidden="true"></i><h2 id="ops-package-title">استفاده از پکیج مشتری</h2></div>
+    <p class="ops-appt__note">این مراجعه انجام شده است. اگر مشتری پکیج معتبری دارد، یک جلسه از آن کسر کنید؛ این خدمت در صندوق دوباره محاسبه نمی‌شود.</p>
+    <form method="post" action="{% url 'packages:use_session' appointment_id=appointment.pk %}" class="ops-appt__package-form">
+      {% csrf_token %}
+      <label for="ops-package-select">پکیج فعال</label>
+      <select id="ops-package-select" name="customer_package" required class="input-field">
+        <option value="">انتخاب پکیج مشتری</option>
+        {% for purchase in available_packages %}
+        <option value="{{ purchase.pk }}">{{ purchase.package.name }} · {{ purchase.sessions_remaining|fa_num }} جلسه باقیمانده · اعتبار تا {{ purchase.expires_at|fa_jalali }}</option>
+        {% endfor %}
+      </select>
+      <button class="ops-appt__btn ops-appt__btn--soft" type="submit"><i data-lucide="check-circle" aria-hidden="true"></i> ثبت مصرف یک جلسه</button>
+    </form>
+  </section>
+  {% endif %}
+  {% if can_inventory_manage and appointment.status == 'completed' or can_inventory_manage and appointment.status == 'checked_in' %}
+  <section class="ops-appt__card ops-appt__materials" aria-labelledby="ops-material-title">
+    <div class="ops-appt__card-title"><i data-lucide="package-check" aria-hidden="true"></i><h2 id="ops-material-title">مواد مصرفی این خدمت</h2></div>
+    {% if material_costs %}
+    <div class="ops-appt__materials-list">
+      {% for cost in material_costs %}
+      <div><span>{{ cost.item_name }} · {{ cost.movement.quantity|fa_num }} {{ cost.movement.item.unit }}</span><strong>{{ cost.cost_toman|fa_money }} تومان</strong></div>
+      {% endfor %}
+    </div>
+    <div class="ops-appt__materials-total"><span>بهای مواد ثبت‌شده</span><strong>{{ material_cost_total|fa_money }} تومان</strong></div>
+    {% else %}
+    <p class="ops-appt__note">هنوز مصرف موادی برای این مراجعه ثبت نشده است.</p>
+    {% endif %}
+    <a class="ops-appt__btn ops-appt__btn--soft" href="{% url 'finance:materials' %}?appointment={{ appointment.pk|unlocalize }}"><i data-lucide="plus" aria-hidden="true"></i> ثبت مصرف مواد برای این نوبت</a>
+  </section>
+  {% endif %}
   <section class="ops-appt__card ops-appt__actions" aria-labelledby="ops-actions-title">
     <div class="ops-appt__card-title"><i data-lucide="workflow" aria-hidden="true"></i><h2 id="ops-actions-title">اقدامات نوبت</h2></div>
     <div class="ops-appt__action-row">
