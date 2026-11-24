@@ -59,3 +59,72 @@ class SupportMessage(TimeStampedModel):
 
     def __str__(self):
         return f"پیام {self.pk} در درخواست {self.ticket_id}"
+
+
+class SubscriptionPlan(TimeStampedModel):
+    """Commercial offering of BeautyOS, unrelated to salon service prices."""
+
+    code = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=100)
+    price_toman = models.PositiveBigIntegerField(default=0)
+    period_days = models.PositiveSmallIntegerField(default=30)
+    trial_days = models.PositiveSmallIntegerField(default=0)
+    is_active = models.BooleanField(default=False, db_index=True)
+    description = models.CharField(max_length=300, blank=True)
+
+    class Meta:
+        ordering = ["price_toman", "pk"]
+        verbose_name = "پلن اشتراک پلتفرم"
+        verbose_name_plural = "پلن‌های اشتراک پلتفرم"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.period_days < 1:
+            raise ValidationError({"period_days": "دوره پلن باید حداقل یک روز باشد."})
+
+    def __str__(self):
+        return self.name
+
+
+class SalonSubscription(TimeStampedModel):
+    """One subscription state per salon. This model does not charge money."""
+
+    class Status(models.TextChoices):
+        TRIAL = "trial", "آزمایشی"
+        ACTIVE = "active", "فعال"
+        PAST_DUE = "past_due", "در انتظار پرداخت"
+        EXPIRED = "expired", "منقضی"
+        CANCELED = "canceled", "لغوشده"
+
+    salon = models.OneToOneField(
+        "salons.Salon", on_delete=models.CASCADE, related_name="platform_subscription",
+    )
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.PROTECT, related_name="subscriptions")
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.TRIAL, db_index=True)
+    starts_at = models.DateTimeField()
+    ends_at = models.DateTimeField()
+    trial_ends_at = models.DateTimeField(null=True, blank=True)
+    canceled_at = models.DateTimeField(null=True, blank=True)
+    # No payment status or entitlement gate until provider-verification is implemented.
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "اشتراک سالن در BeautyOS"
+        verbose_name_plural = "اشتراک سالن‌ها در BeautyOS"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        errors = {}
+        if self.starts_at and self.ends_at and self.ends_at <= self.starts_at:
+            errors["ends_at"] = "زمان پایان باید بعد از شروع اشتراک باشد."
+        if self.trial_ends_at and self.starts_at and self.trial_ends_at <= self.starts_at:
+            errors["trial_ends_at"] = "پایان دوره آزمایشی باید بعد از شروع باشد."
+        if self.trial_ends_at and self.ends_at and self.trial_ends_at > self.ends_at:
+            errors["trial_ends_at"] = "پایان دوره آزمایشی نباید پس از پایان اشتراک باشد."
+        if self.status == self.Status.TRIAL and not self.trial_ends_at:
+            errors["trial_ends_at"] = "برای وضعیت آزمایشی تاریخ پایان دوره لازم است."
+        if errors:
+            raise ValidationError(errors)
+
+    def __str__(self):
+        return f"{self.salon} — {self.plan}"
