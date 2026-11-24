@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% block customer_title %}حساب مشتری{% endblock %} | {{ salon.name }}{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/customer-portal.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
+{% block body %}
+<div class="cp-app" data-theme="luna_signature">
+  <header class="cp-header">
+    <div class="cp-container cp-header__inner">
+      <a class="cp-brand" href="{% url 'salons_public:landing' slug=salon.slug %}" aria-label="صفحه سالن">
+        <span class="cp-brand__mark"><i data-lucide="flower-2" aria-hidden="true"></i></span>
+        <span><strong>{{ salon.name }}</strong><small>حساب مشتری · BeautyOS</small></span>
+      </a>
+      <nav class="cp-nav" aria-label="ناوبری مشتری">
+        <a href="{% url 'salons_public:customer_home' slug=salon.slug %}"><i data-lucide="calendar-days" aria-hidden="true"></i> نوبت‌های من</a>
+        <a href="{% url 'salons_public:landing' slug=salon.slug %}">صفحه سالن</a>
+      </nav>
+    </div>
+  </header>
+  <main class="cp-container cp-content">
+    {% block customer_content %}{% endblock %}
+  </main>
+  <footer class="cp-footer">مدیریت نوبت‌های شما با <strong>BeautyOS</strong> · دسترسی فقط با تأیید شماره موبایل</footer>
+</div>
+<script>document.addEventListener("DOMContentLoaded", function(){if(window.beautyosInitIcons) window.beautyosInitIcons();});</script>
+{% endblock %}

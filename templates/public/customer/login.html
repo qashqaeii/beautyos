@@ -1,0 +1,19 @@
+{% extends "public/customer/base.html" %}
+{% block customer_title %}ورود مشتری{% endblock %}
+{% block customer_content %}
+<section class="cp-auth cp-card" aria-labelledby="cp-login-title">
+  <span class="cp-auth__icon"><i data-lucide="shield-check" aria-hidden="true"></i></span>
+  <p class="cp-eyebrow">MY APPOINTMENTS</p>
+  <h1 id="cp-login-title">نوبت‌ها همیشه در دسترس شما</h1>
+  <p class="cp-subtitle">با شماره موبایلی که هنگام رزرو داده‌اید وارد شوید. برای امنیت اطلاعات، یک کد یک‌بارمصرف می‌فرستیم.</p>
+  <form method="post" class="cp-form">{% csrf_token %}
+    {% if form.non_field_errors %}<div class="cp-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <label for="{{ form.phone.id_for_label }}">شماره موبایل</label>
+    {{ form.phone }}
+    {% if form.phone.errors %}<p class="cp-error" role="alert">{{ form.phone.errors.0 }}</p>{% endif %}
+    <button class="cp-btn cp-btn--primary" type="submit">دریافت کد تأیید <i data-lucide="arrow-left" aria-hidden="true"></i></button>
+  </form>
+  <p class="cp-help"><i data-lucide="lock-keyhole" aria-hidden="true"></i> نیازی به ثبت‌نام یا ساخت حساب مدیریتی سالن نیست.</p>
+  <a class="cp-link" href="{% url 'salons_public:landing' slug=salon.slug %}">بازگشت به صفحه سالن</a>
+</section>
+{% endblock %}

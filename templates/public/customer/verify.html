@@ -1,0 +1,21 @@
+{% extends "public/customer/base.html" %}
+{% block customer_title %}تأیید شماره موبایل{% endblock %}
+{% block customer_content %}
+<section class="cp-auth cp-card" aria-labelledby="cp-verify-title">
+  <span class="cp-auth__icon"><i data-lucide="smartphone" aria-hidden="true"></i></span>
+  <p class="cp-eyebrow">SECURE ACCESS</p>
+  <h1 id="cp-verify-title">تأیید شماره موبایل</h1>
+  <p class="cp-subtitle">کد شش‌رقمی ارسال‌شده به <strong dir="ltr">{{ phone_hint }}</strong> را وارد کنید.</p>
+  <form method="post" class="cp-form">{% csrf_token %}
+    {% if form.non_field_errors %}<div class="cp-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <label for="{{ form.code.id_for_label }}">کد تأیید</label>
+    {{ form.code }}
+    {% if form.code.errors %}<p class="cp-error" role="alert">{{ form.code.errors.0 }}</p>{% endif %}
+    <button class="cp-btn cp-btn--primary" type="submit">تأیید و مشاهده نوبت‌ها <i data-lucide="arrow-left" aria-hidden="true"></i></button>
+  </form>
+  <div class="cp-verify-actions">
+    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="resend"><button class="cp-btn cp-btn--text" type="submit">ارسال دوباره کد</button></form>
+    <a href="{% url 'salons_public:customer_login' slug=salon.slug %}" class="cp-link">تغییر شماره</a>
+  </div>
+</section>
+{% endblock %}

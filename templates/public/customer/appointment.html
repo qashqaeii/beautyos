@@ -1,0 +1,25 @@
+{% extends "public/customer/base.html" %}
+{% block customer_title %}جزئیات نوبت{% endblock %}
+{% block customer_content %}
+<a class="cp-back" href="{% url 'salons_public:customer_home' slug=salon.slug %}"><i data-lucide="arrow-right"></i> بازگشت به نوبت‌های من</a>
+<div class="cp-intro"><div><span class="cp-eyebrow">APPOINTMENT DETAILS</span><h1>جزئیات نوبت</h1><p>کد پیگیری <b dir="ltr">{{ appointment.tracking_code }}</b></p></div><span class="cp-pill {% if appointment.status == 'confirmed' %}cp-pill--good{% elif appointment.status == 'pending' %}cp-pill--pending{% endif %}">{{ appointment.get_status_display }}</span></div>
+<section class="cp-card cp-detail">
+  <div class="cp-detail__hero"><span><i data-lucide="sparkles"></i></span><div><small>خدمت انتخاب‌شده</small><h2>{{ appointment.service.name }}</h2></div></div>
+  <dl class="cp-facts">
+    <div><dt><i data-lucide="calendar-days"></i> تاریخ و ساعت</dt><dd>{{ appointment.start_at|fa_jalali_datetime }}</dd></div>
+    <div><dt><i data-lucide="user-round"></i> متخصص</dt><dd>{{ appointment.staff.display_name }}</dd></div>
+    <div><dt><i data-lucide="hourglass"></i> مدت خدمت</dt><dd>{{ appointment.service.duration_minutes|fa_num }} دقیقه</dd></div>
+    <div><dt><i data-lucide="wallet"></i> هزینه ثبت‌شده</dt><dd>{{ appointment.price_toman|fa_money }} تومان</dd></div>
+    <div><dt><i data-lucide="bookmark"></i> نحوه ثبت</dt><dd>{{ appointment.get_source_display }}</dd></div>
+  </dl>
+  {% if can_manage %}
+  <div class="cp-actions">
+    <a class="cp-btn cp-btn--primary" href="{% url 'salons_public:customer_reschedule' slug=salon.slug appointment_id=appointment.pk %}"><i data-lucide="calendar-clock"></i> تغییر زمان نوبت</a>
+    <form method="post" action="{% url 'salons_public:customer_cancel' slug=salon.slug appointment_id=appointment.pk %}" onsubmit="return confirm('از لغو این نوبت مطمئن هستید؟');">{% csrf_token %}<button class="cp-btn cp-btn--danger" type="submit"><i data-lucide="x-circle"></i> لغو نوبت</button></form>
+  </div>
+  {% else %}
+  <p class="cp-help"><i data-lucide="info"></i> {{ restriction }}</p>
+  {% endif %}
+</section>
+<p class="cp-footnote">برای نوبت‌های پرداخت‌شده یا درخواست‌های خارج از مهلت لغو، با پذیرش سالن هماهنگ کنید.</p>
+{% endblock %}

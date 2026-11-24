@@ -1,0 +1,23 @@
+{% extends "public/customer/base.html" %}
+{% block customer_title %}نوبت‌های من{% endblock %}
+{% block customer_content %}
+<div class="cp-intro">
+  <div><span class="cp-eyebrow">MY BEAUTY APPOINTMENTS</span><h1>نوبت‌های من</h1><p>زمان‌های رزرو، جزئیات و پیگیری مراجعه به {{ salon.name }}</p></div>
+  <form method="post" action="{% url 'salons_public:customer_logout' slug=salon.slug %}">{% csrf_token %}<button type="submit" class="cp-btn cp-btn--quiet"><i data-lucide="log-out" aria-hidden="true"></i> خروج امن</button></form>
+</div>
+<div class="cp-identity"><span class="cp-avatar">{{ customer.full_name|slice:":1"|default:"م" }}</span><div><strong>{{ customer.full_name|default:"مراجعه‌کننده سالن" }}</strong><span dir="ltr">{{ phone }}</span></div><i data-lucide="shield-check" aria-hidden="true"></i></div>
+<section class="cp-section" aria-labelledby="cp-next"><div class="cp-section__title"><span class="cp-section__icon"><i data-lucide="calendar-check"></i></span><div><h2 id="cp-next">نوبت‌های پیش رو</h2><p>زمان‌هایی که برای شما ثبت شده‌اند</p></div><a href="{% url 'salons_public:landing' slug=salon.slug %}" class="cp-btn cp-btn--quiet">مشاهده سالن</a></div>
+<div class="cp-appointments">
+  {% for item in upcoming %}
+  <a class="cp-appointment" href="{% url 'salons_public:customer_appointment' slug=salon.slug appointment_id=item.pk %}">
+    <span class="cp-appointment__date"><i data-lucide="calendar-days"></i>{{ item.start_at|fa_jalali_datetime }}</span>
+    <span class="cp-appointment__details"><strong>{{ item.service.name }}</strong><small>{{ item.staff.display_name }} · کد {{ item.tracking_code }}</small></span>
+    <span class="cp-pill {% if item.status == 'confirmed' %}cp-pill--good{% else %}cp-pill--pending{% endif %}">{{ item.get_status_display }}</span>
+    <i data-lucide="chevron-left" class="cp-appointment__arrow" aria-hidden="true"></i>
+  </a>
+  {% empty %}<div class="cp-empty"><i data-lucide="calendar-plus"></i><strong>نوبت آینده‌ای ندارید</strong><p>از صفحه سالن می‌توانید یک نوبت تازه رزرو کنید.</p>{% if salon.is_accepting_bookings %}<a class="cp-btn cp-btn--primary" href="{% url 'salons_public:booking_start' slug=salon.slug %}">رزرو نوبت</a>{% endif %}</div>{% endfor %}
+</div></section>
+<section class="cp-section" aria-labelledby="cp-history"><div class="cp-section__title"><span class="cp-section__icon"><i data-lucide="history"></i></span><div><h2 id="cp-history">سوابق نوبت‌ها</h2><p>نوبت‌های گذشته، لغوشده یا انجام‌شده</p></div></div>
+<div class="cp-appointments">{% for item in history %}<a class="cp-appointment cp-appointment--history" href="{% url 'salons_public:customer_appointment' slug=salon.slug appointment_id=item.pk %}"><span class="cp-appointment__date">{{ item.start_at|fa_jalali_datetime }}</span><span class="cp-appointment__details"><strong>{{ item.service.name }}</strong><small>{{ item.staff.display_name }} · کد {{ item.tracking_code }}</small></span><span class="cp-pill">{{ item.get_status_display }}</span><i data-lucide="chevron-left" class="cp-appointment__arrow"></i></a>{% empty %}<div class="cp-empty cp-empty--small">هنوز سابقه نوبتی برای این شماره ثبت نشده است.</div>{% endfor %}</div>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "public/customer/base.html" %}
+{% block customer_title %}تغییر زمان نوبت{% endblock %}
+{% block customer_content %}
+<a class="cp-back" href="{% url 'salons_public:customer_appointment' slug=salon.slug appointment_id=appointment.pk %}"><i data-lucide="arrow-right"></i> بازگشت به جزئیات نوبت</a>
+<div class="cp-intro"><div><span class="cp-eyebrow">CHANGE APPOINTMENT</span><h1>انتخاب زمان جدید</h1><p>{{ appointment.service.name }} · {{ appointment.staff.display_name }}</p></div></div>
+<section class="cp-card cp-day-picker">
+  {% if can_manage %}
+  <div class="cp-day-nav">
+    {% if previous_day %}<a href="?day={{ previous_day|date:'Y-m-d' }}" class="cp-btn cp-btn--quiet"><i data-lucide="chevron-right"></i> روز قبل</a>{% else %}<span></span>{% endif %}
+    <div><small>تاریخ انتخابی</small><strong>{{ day_jalali|fa_num }}</strong></div>
+    {% if next_day %}<a href="?day={{ next_day|date:'Y-m-d' }}" class="cp-btn cp-btn--quiet">روز بعد <i data-lucide="chevron-left"></i></a>{% else %}<span></span>{% endif %}
+  </div>
+  <p class="cp-help"><i data-lucide="info"></i> پس از انتخاب، زمان جدید برای تأیید مجدد سالن در وضعیت «در انتظار» قرار می‌گیرد.</p>
+  <form method="post">{% csrf_token %}<div class="cp-slots">
+    {% for slot in slots %}<button class="cp-btn cp-btn--slot" type="submit" name="start_iso" value="{{ slot.isoformat }}">{{ slot|time:"H:i"|fa_num }}</button>
+    {% empty %}<div class="cp-empty">برای این روز زمانی قابل رزرو نیست. روز دیگری را انتخاب کنید.</div>{% endfor %}
+  </div></form>
+  {% else %}<div class="cp-empty"><i data-lucide="lock-keyhole"></i><p>{{ restriction }}</p></div>{% endif %}
+</section>
+{% endblock %}
