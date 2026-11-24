@@ -151,6 +151,13 @@ def test_customer_detail_premium_profile_uses_real_customer_attributes(client, s
     assert response.status_code == 200
     body = response.content.decode()
     assert 'customer-detail-premium.css' in body
+    assert 'customer-detail-hero-title' in body
+    assert 'customer-detail-header__avatar--icon' in body
+    assert 'customer-detail-header__avatar--initials' not in body
+    assert 'customer-detail-workspace__primary' in body
+    assert 'customer-detail-workspace__aside' in body
+    assert 'customer-detail-history' in body
+
     assert 'customer-detail-breadcrumbs' in body
     assert "مشتری ویژه" in body
     assert "خدمات پرتکرار" in body
