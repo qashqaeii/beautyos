@@ -314,6 +314,8 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     advanced.click()
                     cards = dialog.locator(".luna-modal-choice-grid > .customer-form-field--checkbox")
                     pw.expect(cards).to_have_count(2)
+                    pw.expect(cards.nth(0)).to_be_visible()
+                    pw.expect(cards.nth(1)).to_be_visible()
                     first_box, second_box = cards.nth(0).bounding_box(), cards.nth(1).bounding_box()
                     assert first_box and second_box
                     assert abs(first_box["y"] - second_box["y"]) <= 3, "VIP and marketing choices must share a row"
