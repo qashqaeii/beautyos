@@ -87,9 +87,25 @@ def product_return(request,sale_id):
 def materials(request):
     salon=request.salon
     action=request.POST.get("action")
+    raw_id = request.GET.get("appointment", "")
+    try:
+        appointment_id = int(raw_id)
+        if appointment_id <= 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        appointment_id = None
+    selected_appointment = (
+        Appointment.scoped(salon).filter(
+            pk=appointment_id, status__in=(
+                Appointment.Status.CHECKED_IN, Appointment.Status.COMPLETED,
+            ),
+        ).select_related("customer", "service").first()
+        if appointment_id else None
+    )
     cost=CostForm(request.POST if action=="cost" else None,salon=salon,auto_id="cost_%s")
     consume=ConsumeForm(request.POST if action=="consume" else None,salon=salon,
-        initial={"request_key":uuid4()},auto_id="consume_%s")
+        initial={"request_key":uuid4(), "appointment": selected_appointment.pk if selected_appointment else None},
+        auto_id="consume_%s")
     if request.method=="POST":
         form={"cost":cost,"consume":consume}.get(action)
         if form and form.is_valid():
@@ -98,7 +114,11 @@ def materials(request):
                 if action=="cost":set_unit_cost(salon=salon,item_id=d["item"].pk,unit_cost=d["unit_cost"],actor=request.user)
                 else:consume_material(salon=salon,appointment_id=d["appointment"].pk,item_id=d["item"].pk,quantity=d["quantity"],request_key=d["request_key"],actor=request.user)
             except ValidationError as exc:form.add_error(None,exc)
-            else:return redirect("finance:materials")
+            else:
+                if action == "consume" and selected_appointment and selected_appointment.pk == d["appointment"].pk:
+                    return redirect("appointments:detail", pk=selected_appointment.pk)
+                return redirect("finance:materials")
     return render(request,"finance/materials.html",{"cost_form":cost,"consume_form":consume,
+        "selected_appointment": selected_appointment,
         "items":InventoryItem.scoped(salon).order_by("name")[:50],
         "costs":MaterialCost.scoped(salon).select_related("appointment__service","movement").order_by("-pk")[:40]})

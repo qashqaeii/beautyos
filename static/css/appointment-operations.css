@@ -52,3 +52,18 @@
 @media(max-width:780px){.ops-appt__grid{grid-template-columns:1fr}.ops-appt__heading h2{font-size:1.24rem}.ops-appt__card{padding:18px}.ops-appt__actions{margin-top:11px}}
 @media(max-width:420px){.ops-appt__facts>div{flex-wrap:wrap}.ops-appt__money strong{font-size:.99rem}.ops-appt__action-row .ops-appt__btn{width:100%}.ops-appt__action-row form{width:100%}}
 @media(prefers-reduced-motion:reduce){.ops-appt *{transition:none!important}}
+
+/* Phase 5: prepaid sessions and traceable material costs. */
+.ops-appt__package,.ops-appt__materials{margin-top:14px}
+.ops-appt__package .ops-appt__note,.ops-appt__materials .ops-appt__note{margin:13px 0}
+.ops-appt__package-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin-top:15px}
+.ops-appt__package-form label{font-size:.74rem;color:#766b80;font-weight:770}
+.ops-appt__package-form select{min-width:200px;flex:1 1 270px;min-height:42px;border-color:#e6deeb;border-radius:9px}
+.ops-appt__package-form button{flex-shrink:0}
+.ops-appt__materials-list{margin:15px 0 10px}
+.ops-appt__materials-list>div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #f1ebf4;padding:10px 0;color:#756984;font-size:.76rem}
+.ops-appt__materials-list>div strong{font-weight:800;color:#51415f;white-space:nowrap}
+.ops-appt__materials-total{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:#f5f0f8;color:#745c86;font-size:.77rem;margin-bottom:14px}
+.ops-appt__materials-total strong{font-weight:890;color:#5c4772}
+.ops-appt__materials .ops-appt__btn{margin-top:12px}
+@media(max-width:620px){.ops-appt__package-form{align-items:stretch}.ops-appt__package-form select{flex-basis:100%;min-width:0}.ops-appt__package-form button{width:100%}}
