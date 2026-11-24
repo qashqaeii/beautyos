@@ -230,3 +230,114 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
     flex-shrink:0;
   }
 }
+
+
+/* Shared desktop page-header scale across BeautyOS workspaces.
+   Avoid overriding profile identity panels, card headings and modal headers. */
+@media (min-width:1024px) {
+  .maison-app {
+    --bo-page-header-height:88px;
+    --bo-page-header-title-size:20px;
+    --bo-page-header-subtitle-size:11px;
+    --bo-page-header-icon-size:40px;
+  }
+  .maison-app :is(
+    .maison-unified-header,
+    .customers-list-page .customers-list-page__header,
+    .staff-board-v2 .staff-team-page__header,
+    .inventory-page .inventory-page__header,
+    .finance-page .finance-page__header--premium,
+    .reception-desk-page .reception-desk-header,
+    .retention-page .retention-page__hero,
+    .waitlist-page .waitlist-page__hero,
+    .dashboard-mgmt-page .dash-page-header--mgmt
+  ) {
+    box-sizing:border-box;
+    height:var(--bo-page-header-height);
+    min-height:var(--bo-page-header-height);
+    max-height:none;
+    padding-block:12px;
+    padding-inline:16px;
+    align-content:center;
+    border-radius:14px;
+    margin-block-start:0;
+    margin-block-end:10px;
+  }
+  .maison-app :is(
+    .maison-page-title,
+    .customers-list-page .customers-list-page__title,
+    .staff-board-v2 .staff-team-page__title,
+    .finance-page .finance-page__title,
+    .reception-desk-page .reception-desk-header__title,
+    .inventory-page .inventory-page__title
+  ) {
+    font-size:var(--bo-page-header-title-size);
+    line-height:1.45;
+    font-weight:750;
+  }
+  .maison-app :is(
+    .maison-page-subtitle,
+    .customers-list-page .editorial-directory-copy > p,
+    .staff-board-v2 .editorial-directory-copy > p,
+    .finance-page .luna-finance-subtitle
+  ) {
+    font-size:var(--bo-page-header-subtitle-size);
+    line-height:1.55;
+  }
+  .maison-app :is(
+    .customers-list-page .customers-list-page__head-icon,
+    .staff-board-v2 .staff-team-page__head-icon,
+    .finance-page .finance-page__head-icon,
+    .inventory-page .inventory-page__head-icon
+  ) {
+    width:var(--bo-page-header-icon-size);
+    height:var(--bo-page-header-icon-size);
+    border-radius:11px;
+    flex-shrink:0;
+  }
+  .maison-app :is(
+    .customers-list-page .customers-list-page__head-icon,
+    .staff-board-v2 .staff-team-page__head-icon,
+    .finance-page .finance-page__head-icon,
+    .inventory-page .inventory-page__head-icon
+  ) svg {
+    width:20px;
+    height:20px;
+  }
+  .maison-app .reception-desk-page .reception-desk-header__brand > svg {
+    width:25px;height:25px;
+  }
+  .maison-app .reception-desk-page .reception-desk-header__bar {
+    min-height:0;
+  }
+}
+/* Tablet and mobile headers can wrap, but share typography and spacing. */
+@media (min-width:640px) and (max-width:1023px) {
+  .maison-app :is(
+    .maison-unified-header,
+    .customers-list-page .customers-list-page__header,
+    .staff-board-v2 .staff-team-page__header,
+    .inventory-page .inventory-page__header,
+    .finance-page .finance-page__header--premium,
+    .reception-desk-page .reception-desk-header
+  ) {
+    min-height:88px;
+    height:auto;
+    padding:12px 14px;
+  }
+}
+@media(max-width:639px) {
+  .maison-app :is(
+    .maison-unified-header,
+    .customers-list-page .customers-list-page__header,
+    .staff-board-v2 .staff-team-page__header,
+    .inventory-page .inventory-page__header,
+    .finance-page .finance-page__header--premium,
+    .reception-desk-page .reception-desk-header
+  ) {
+    height:auto;
+    min-height:88px;
+    padding:12px;
+    border-radius:13px;
+  }
+}
