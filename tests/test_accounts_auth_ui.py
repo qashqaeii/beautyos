@@ -54,7 +54,13 @@ def test_verify_page_login_steps(client, settings):
     html = client.get(reverse("accounts:verify")).content.decode()
     assert "public-auth-shell" in html
     assert "کد ورود" in html
-    assert "۱. شماره موبایل" in html
+    assert "شماره موبایل" in html
+    assert "public-auth--verify" in html
+    assert "auth-steps--two" in html
+    assert "auth-otp-form" in html
+    assert "otp-resend-btn" in html
+    assert "register-submit" in html
+    assert "register-progress__caption" not in html
 
 
 @pytest.mark.django_db
@@ -65,6 +71,9 @@ def test_verify_page_register_steps(client, settings):
     html = client.get(reverse("accounts:verify")).content.decode()
     assert "اطلاعات مالک" in html
     assert "تکمیل ثبت‌نام" in html
+    assert "public-auth--verify" in html
+    assert "auth-steps--two" not in html
+    assert html.count('class="register-step-number"') == 3
 
 
 @pytest.mark.django_db
@@ -87,6 +96,10 @@ def test_register_profile_page_shell(client, settings, monkeypatch):
     assert response.status_code == 200
     assert "public-auth-shell" in html
     assert "اطلاعات مالک سالن" in html
+    assert "public-auth--profile" in html
+    assert "register-progress__caption" not in html
+    assert "register-submit" in html
+    assert html.count('aria-current="step"') == 1
 
 def test_auth_editorial_assets_exist():
     from django.contrib.staticfiles import finders
