@@ -474,3 +474,63 @@ body.theme-app .luna-modal .finance-payment-form--modal .finance-payment-form__e
   outline: 2px solid #9d726e;
   outline-offset: 3px;
 }
+
+
+/* Paired boolean choices in modal forms: one tidy row on desktop and mobile. */
+body.theme-app .luna-modal .luna-modal-choice-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  min-width:0;
+  grid-column:1/-1;
+  align-items:stretch;
+}
+body.theme-app .luna-modal .luna-modal-choice-grid > :is(.customer-form-field,.service-form-field) {
+  min-width:0;
+  margin:0;
+}
+body.theme-app .luna-modal .luna-modal-choice-grid :is(.customer-form-checkbox,.service-form-checkbox) {
+  display:flex;
+  width:100%;
+  height:100%;
+  min-height:47px;
+  align-items:center;
+  justify-content:flex-start;
+  gap:9px;
+  border-radius:10px;
+  padding:9px 11px;
+  background:#fffaf7;
+  border:1px solid #e7d6cc;
+  line-height:1.55;
+  cursor:pointer;
+  transition:border-color .18s ease,background .18s ease,box-shadow .18s ease;
+}
+body.theme-app .luna-modal .luna-modal-choice-grid :is(.customer-form-checkbox,.service-form-checkbox):hover {
+  background:#f8eee8;
+  border-color:#cdb0a4;
+}
+body.theme-app .luna-modal .luna-modal-choice-grid :is(.customer-form-checkbox,.service-form-checkbox):has(input:checked) {
+  background:#f1e3dd;
+  border-color:#b58e81;
+}
+body.theme-app .luna-modal .luna-modal-choice-grid :is(.customer-form-checkbox,.service-form-checkbox):has(input:focus-visible) {
+  outline:2px solid #9d726e;
+  outline-offset:2px;
+}
+body.theme-app .luna-modal .luna-modal-choice-grid input[type="checkbox"] {
+  flex:none;
+  width:17px;
+  height:17px;
+}
+body.theme-app .luna-modal .luna-modal-choice-grid span {
+  min-width:0;
+  overflow-wrap:anywhere;
+  font-size:clamp(.69rem,1.45vw,.79rem);
+}
+@media(max-width:360px) {
+  body.theme-app .luna-modal .luna-modal-choice-grid {gap:6px;}
+  body.theme-app .luna-modal .luna-modal-choice-grid :is(.customer-form-checkbox,.service-form-checkbox) {padding:8px 7px;gap:6px;}
+}
+@media(prefers-reduced-motion:reduce) {
+  body.theme-app .luna-modal .luna-modal-choice-grid :is(.customer-form-checkbox,.service-form-checkbox) {transition:none;}
+}
