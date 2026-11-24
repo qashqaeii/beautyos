@@ -1,7 +1,7 @@
 from datetime import date, datetime, time, timedelta
 
 from django.contrib import messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -17,6 +17,7 @@ from apps.appointments.booking import (
 from apps.appointments.forms import AppointmentForm
 from apps.appointments.models import Appointment
 from apps.appointments.services.lifecycle import AppointmentLifecycleError, cancel_appointment, complete_appointment
+from apps.dashboard.role_services import appointment_payment_summary
 from apps.appointments.services.scheduling import SchedulingError, create_appointment
 from apps.core.utils.dates import (
     JALALI_MONTH_NAMES_FA,
@@ -34,8 +35,13 @@ from apps.staff.models import StaffProfile
 from apps.salons.permissions import require_role
 from apps.finance.services import create_appointment_deposit
 from apps.salons.permissions_policy import (
+    P_APPOINTMENT_CANCEL,
+    P_APPOINTMENT_CHECKIN,
+    P_APPOINTMENT_COMPLETE,
     P_APPOINTMENT_CREATE,
+    P_APPOINTMENT_UPDATE,
     P_APPOINTMENT_VIEW,
+    P_PAYMENT_CREATE,
     has_permission,
     require_permission,
 )
@@ -371,9 +377,17 @@ def appointment_create(request):
 @salon_required
 @require_role(SalonMembership.Role.RECEPTIONIST)
 def appointment_detail(request, pk):
-    appt = get_object_or_404(_appointment_qs(request), pk=pk)
+    appt = get_object_or_404(
+        _appointment_qs(request).select_related("invoice_line")
+        .prefetch_related("payments__refunds"),
+        pk=pk,
+    )
     if request.method == "POST":
         action = request.POST.get("action")
+        if action == "cancel" and not has_permission(request.membership, P_APPOINTMENT_CANCEL):
+            raise PermissionDenied
+        if action == "complete" and not has_permission(request.membership, P_APPOINTMENT_COMPLETE):
+            raise PermissionDenied
         try:
             if action == "cancel":
                 cancel_appointment(salon=request.salon, appointment_id=appt.pk)
@@ -384,4 +398,24 @@ def appointment_detail(request, pk):
         except (AppointmentLifecycleError, ValidationError) as exc:
             messages.error(request, exc.messages[0] if isinstance(exc, ValidationError) else str(exc))
         return redirect("appointments:detail", pk=pk)
-    return render(request, "appointments/detail.html", {"appointment": appt})
+    payment = appointment_payment_summary(appt)
+    invoice_line = getattr(appt, "invoice_line", None)
+    can_payment = has_permission(request.membership, P_PAYMENT_CREATE)
+    can_cancel = (
+        has_permission(request.membership, P_APPOINTMENT_CANCEL)
+        and appt.status in (
+            Appointment.Status.PENDING, Appointment.Status.CONFIRMED,
+            Appointment.Status.CHECKED_IN,
+        )
+        and not invoice_line and payment["paid_toman"] == 0
+    )
+    return render(request, "appointments/detail.html", {
+        "appointment": appt,
+        "payment_summary": payment,
+        "invoice_id": invoice_line.invoice_id if invoice_line else None,
+        "can_cancel": can_cancel,
+        "can_confirm": has_permission(request.membership, P_APPOINTMENT_UPDATE),
+        "can_checkin": has_permission(request.membership, P_APPOINTMENT_CHECKIN),
+        "can_complete": has_permission(request.membership, P_APPOINTMENT_COMPLETE),
+        "can_payment_create": can_payment,
+    })
