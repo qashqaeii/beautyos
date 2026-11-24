@@ -199,7 +199,7 @@ def test_other_salon_invoice_cannot_be_printed_by_reception(
     )
     invoice = Invoice.objects.create(
         salon=salon_b, customer=other_customer, customer_name=other_customer.full_name,
-        request_key=uuid4(), request_digest="not-an-issue-result",
+        request_key=uuid4(), request_digest="not-an-issue-result", gross_toman=0,
     )
     sign_in(client, owner_membership)
     url = reverse("finance:invoice_detail", args=[invoice.pk]) + "?print=1"
