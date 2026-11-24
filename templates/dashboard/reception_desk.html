@@ -86,7 +86,7 @@
           </div>
         </div>
         <a href="{% url 'appointments:detail' pk=next_appt.pk %}" class="reception-desk-next__detail">جزئیات نوبت</a>
-        {% if can_payment_create %}<a href="{% url 'finance:checkout' next_appt.customer_id %}?appointment={{ next_appt.pk|unlocalize }}" class="reception-desk-next__detail">صندوق مشتری</a>{% endif %}
+        {% if can_issue_invoice and next_appt.status == 'completed' %}<a href="{% url 'finance:checkout' next_appt.customer_id %}?appointment={{ next_appt.pk|unlocalize }}" class="reception-desk-next__detail">صدور فاکتور</a>{% endif %}
         {% else %}
         <p class="reception-desk-empty reception-desk-empty--inline">نوبت فعالی در صف نیست.</p>
         <img class="luna-reception-empty-art" src="{% static 'images/photos/beautyos-reception-next.webp' %}" width="228" height="140" alt="" decoding="async">
@@ -174,15 +174,39 @@
             <button type="submit" class="reception-flow__button reception-flow__button--primary">تکمیل خدمت</button>
           </form>
           {% endif %}
-          {% if can_payment_create and item.appointment.status == 'completed' %}
-            {% if item.invoice_id %}
+          {% if can_view_invoices and item.invoice_id %}
             <a class="reception-flow__button reception-flow__button--soft" href="{% url 'finance:invoice_detail' invoice_id=item.invoice_id %}">مشاهده فاکتور</a>
-            {% elif item.can_checkout %}
-            <a class="reception-flow__button reception-flow__button--soft" href="{% url 'finance:checkout' item.appointment.customer_id %}?appointment={{ item.appointment.pk|unlocalize }}">رفتن به صندوق</a>
-            {% endif %}
+            <a class="reception-flow__button reception-flow__button--print" href="{% url 'finance:invoice_detail' invoice_id=item.invoice_id %}?print=1" target="_blank" rel="noopener" aria-label="چاپ فاکتور {{ item.appointment.customer.full_name }}"><i data-lucide="printer" aria-hidden="true"></i> چاپ فاکتور</a>
+          {% elif can_issue_invoice and item.can_checkout %}
+            <a class="reception-flow__button reception-flow__button--soft" href="{% url 'finance:checkout' item.appointment.customer_id %}?appointment={{ item.appointment.pk|unlocalize }}">صندوق کامل</a>
           {% endif %}
           <a class="reception-flow__details" href="{% url 'appointments:detail' pk=item.appointment.pk %}" aria-label="جزئیات نوبت {{ item.appointment.customer.full_name }}"><i data-lucide="arrow-up-left" aria-hidden="true"></i><span>جزئیات</span></a>
         </div>
+        {% if can_issue_invoice and item.can_checkout %}
+        <details class="reception-flow__invoice-panel">
+          <summary><i data-lucide="receipt-text" aria-hidden="true"></i><span>صدور فاکتور و چاپ برای {{ item.appointment.customer.full_name }}</span><i data-lucide="chevron-down" aria-hidden="true"></i></summary>
+          <form method="post" action="{% url 'reception:issue_invoice' appointment_id=item.appointment.pk %}" class="reception-flow__invoice-form">
+            {% csrf_token %}
+            <input type="hidden" name="request_key" value="{{ item.invoice_key }}">
+            <div class="reception-flow__invoice-intro">
+              <strong>{{ item.appointment.service.name }}</strong>
+              <span>مبلغ خدمت: {{ item.appointment.price_toman|fa_money }} تومان · پرداخت قبلی: {{ item.payment.paid_toman|fa_money }} تومان · مانده: {{ item.payment.owed_toman|fa_money }} تومان</span>
+            </div>
+            <div class="reception-flow__invoice-fields">
+              <label>تخفیف (تومان)<input type="number" name="discount" min="0" step="1" value="0" inputmode="numeric"></label>
+              <label>نقدی (تومان)<input type="number" name="cash" min="0" step="1" value="0" inputmode="numeric"></label>
+              <label>کارت‌خوان (تومان)<input type="number" name="card" min="0" step="1" value="0" inputmode="numeric"></label>
+              <label>انتقال بانکی (تومان)<input type="number" name="transfer" min="0" step="1" value="0" inputmode="numeric"></label>
+            </div>
+            <p class="reception-flow__invoice-hint">اگر مبلغی دریافت نشده، همه مبالغ را صفر بگذارید؛ فاکتور صادر می‌شود و مانده در حساب مشتری باقی می‌ماند. مبالغ بیش از مانده پذیرفته نمی‌شوند.</p>
+            <div class="reception-flow__invoice-controls">
+              <button type="submit" name="print" value="1" class="reception-flow__button reception-flow__button--primary"><i data-lucide="printer" aria-hidden="true"></i> ثبت و چاپ فاکتور</button>
+              <button type="submit" name="print" value="0" class="reception-flow__button reception-flow__button--soft">فقط ثبت فاکتور</button>
+              <a href="{% url 'finance:checkout' item.appointment.customer_id %}?appointment={{ item.appointment.pk|unlocalize }}">تخفیف باشگاه و صدور چندخدمتی</a>
+            </div>
+          </form>
+        </details>
+        {% endif %}
       </article>
       {% empty %}
       <div class="reception-flow__empty"><i data-lucide="calendar-days" aria-hidden="true"></i><strong>برای این روز نوبتی ثبت نشده است.</strong><p>برای شروع می‌توانید از دکمه «ثبت نوبت» استفاده کنید.</p></div>
