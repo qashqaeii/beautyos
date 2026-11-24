@@ -69,12 +69,25 @@ def test_platform_control_center_responsive_and_private(
             assert page.locator(".pc-heading h1").count() == 1, route
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3"), route
             assert page.locator("html").get_attribute("dir") == "rtl"
+            assert page.locator('link[href*="beautyos-motion.css"]').count() == 1
+            assert page.locator('script[src*="beautyos-motion.js"]').count() == 1
+            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+
             assert page.locator('link[href*="phase7-ui-polish.css"]').count() == 1
         page.goto(live_server.url + reverse("platform_admin:subscriptions"), wait_until="load")
         assert page.locator(".pc-subscriptions__filter select").count() == 1
         assert page.locator(".pc-subscriptions__filter label").is_visible()
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
         page.goto(live_server.url + reverse("platform_admin:overview"), wait_until="load")
+        # CI normally requests reduced motion; no movement or counter rewrite is allowed.
+        assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
+        card = page.locator(".pc-kpi").first
+        if card.count():
+            assert card.evaluate("(el) => getComputedStyle(el).translate === 'none' or getComputedStyle(el).translate === '0px'")
+            before = card.locator("strong").first.inner_text()
+            page.wait_for_timeout(100)
+            assert card.locator("strong").first.inner_text() == before
+
         if width < 960:
             page.locator(".pc-mobile-menu summary").click()
             assert page.locator(".pc-mobile-menu nav").is_visible()
