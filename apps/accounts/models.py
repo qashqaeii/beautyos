@@ -36,6 +36,7 @@ class OTPChallenge(TimeStampedModel):
         LOGIN = "login", "ورود"
         REGISTER = "register", "ثبت‌نام"
         BOOKING_VERIFY = "booking_verify", "تأیید رزرو"
+        CUSTOMER_PORTAL = "customer_portal", "ورود مشتری"
 
     phone = models.CharField(max_length=16, db_index=True)
     purpose = models.CharField(max_length=32, choices=Purpose.choices)

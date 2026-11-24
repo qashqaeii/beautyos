@@ -8,6 +8,13 @@
       </span>
     </a>
   </div>
+  {% if salon %}
+  <nav class="mb-6 flex justify-center gap-3 text-xs text-ink-secondary" aria-label="دسترسی مشتری">
+    <a href="{% url 'salons_public:landing' slug=salon.slug %}" class="hover:underline">صفحه سالن</a>
+    <span aria-hidden="true">·</span>
+    <a href="{% url 'salons_public:customer_home' slug=salon.slug %}" class="hover:underline">نوبت‌های من</a>
+  </nav>
+  {% endif %}
   {% block booking_content %}{% endblock %}
 </div>
 <script>

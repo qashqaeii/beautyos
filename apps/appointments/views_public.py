@@ -285,6 +285,10 @@ def booking_confirm(request, slug):
                     start=start,
                 )
             request.session.pop("booking", None)
+            # A completed booking has already verified the customer's phone.
+            # Grant a separate short-lived customer session without a second OTP.
+            from apps.appointments.customer_portal import grant_customer_access
+            grant_customer_access(request, salon=salon, phone=booking["phone"])
             return render(request, "public/booking/success.html", _booking_context(salon, appointment=appt))
         except BookingVerificationError:
             messages.error(request, "تأیید موبایل معتبر نیست. لطفاً دوباره کد را وارد کنید.")

@@ -20,6 +20,7 @@
           {% if staff_list %}<a href="#team">متخصصان</a>{% endif %}
           {% if portfolio %}<a href="#portfolio">نمونه‌کارها</a>{% endif %}
           <a href="#contact">ارتباط و ساعات</a>
+          <a href="{% url 'salons_public:customer_home' slug=salon.slug %}">نوبت‌های من</a>
         </nav>
         {% if salon.is_accepting_bookings %}
           <a class="pub3-salon__nav-cta" href="{% url 'salons_public:booking_start' slug=salon.slug %}">رزرو آنلاین</a>
@@ -44,6 +45,7 @@
               <span class="pub3-button pub3-button--soft" aria-disabled="true">رزرو آنلاین در حال حاضر غیرفعال است</span>
             {% endif %}
             {% if services %}<a class="pub3-button pub3-button--soft" href="#services">مشاهده خدمات <i data-lucide="arrow-down-left"></i></a>{% endif %}
+            <a class="pub3-button pub3-button--soft" href="{% url 'salons_public:customer_home' slug=salon.slug %}"><i data-lucide="calendar-days" aria-hidden="true"></i> پیگیری نوبت‌های من</a>
           </div>
           {% if salon.is_accepting_bookings %}<span class="pub3-salon__hero-note">انتخاب خدمت، متخصص و زمان از میان ظرفیت‌های قابل رزرو سالن</span>{% endif %}
         </div>

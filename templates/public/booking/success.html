@@ -7,6 +7,9 @@
   <h1 class="display-editorial mt-6 text-2xl font-semibold text-espresso">نوبت شما ثبت شد</h1>
   <p class="mt-3 text-sm text-ink-secondary">کد پیگیری:</p>
   <p class="mt-1 text-lg font-semibold tracking-wide text-espresso" dir="ltr">{{ appointment.tracking_code }}</p>
-  <a href="{% url 'salons_public:landing' slug=salon.slug %}" class="btn-secondary mt-8 inline-flex">بازگشت به صفحه سالن</a>
+  <div class="mt-7 flex flex-wrap justify-center gap-3">
+    <a href="{% url 'salons_public:customer_home' slug=salon.slug %}" class="btn-primary inline-flex items-center gap-2"><i data-lucide="calendar-check"></i> مشاهده نوبت‌های من</a>
+    <a href="{% url 'salons_public:landing' slug=salon.slug %}" class="btn-secondary inline-flex">بازگشت به سالن</a>
+  </div>
 </div>
 {% endblock %}
