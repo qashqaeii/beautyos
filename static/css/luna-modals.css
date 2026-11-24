@@ -570,3 +570,20 @@ body.theme-app .luna-modal .inventory-create-modal__form > .inventory-create-mod
     max-height:calc(100dvh - env(safe-area-inset-top,0px) - 8px);
   }
 }
+
+/* Expanded customer form gets a definite flex height so its scroll pane,
+   not its footer, absorbs additional fields. Keep the normal compact size closed. */
+@media(min-width:640px) {
+  body.theme-app .luna-modal-root .luna-modal:has(#customer-create-modal-title):has(.customer-form-advanced__toggle[aria-expanded="true"]) {
+    height:min(84dvh,560px);
+    max-height:min(84dvh,560px);
+  }
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal-root .luna-modal {
+    max-height:min(92dvh,calc(100dvh - env(safe-area-inset-top,0px) - 8px));
+  }
+  body.theme-app .luna-modal-root .luna-modal:has(#customer-create-modal-title):has(.customer-form-advanced__toggle[aria-expanded="true"]) {
+    height:min(92dvh,calc(100dvh - env(safe-area-inset-top,0px) - 8px));
+  }
+}
