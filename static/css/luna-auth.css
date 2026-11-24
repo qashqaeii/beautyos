@@ -306,3 +306,28 @@ body.beautyos-main-bg .public-site.luna-auth {
   .luna-auth.public-auth--register .register-step-number { width:24px; height:24px; }
   .luna-auth.public-auth--register .public-auth-card__head { margin-bottom:23px; }
 }
+
+
+/* Keep registration steps secondary to the primary signup form. */
+.luna-auth.public-auth--register .register-progress { margin-bottom:9px; }
+.luna-auth.public-auth--register .public-auth-steps { gap:4px; }
+.luna-auth.public-auth--register .public-auth-steps li {
+  min-height:29px; padding:3px 2px; gap:5px;
+  font-size:.68rem; font-weight:500; color:#8d7d77;
+}
+.luna-auth.public-auth--register .public-auth-steps li.is-current { font-weight:700; }
+.luna-auth.public-auth--register .register-step-number {
+  width:21px; height:21px; font-size:.67rem;
+}
+.luna-auth.public-auth--register .is-current .register-step-number {
+  box-shadow:0 0 0 2px rgba(157,114,110,.08);
+}
+@media (max-width:480px) {
+  .luna-auth.public-auth--register .register-progress { margin-bottom:7px; }
+  .luna-auth.public-auth--register .public-auth-steps li {
+    min-height:26px; padding:2px 1px; gap:4px; font-size:.63rem;
+  }
+  .luna-auth.public-auth--register .register-step-number {
+    width:19px; height:19px; font-size:.61rem;
+  }
+}
