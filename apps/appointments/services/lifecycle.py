@@ -16,7 +16,6 @@ CANCELLED_CANNOT_COMPLETE_MSG = "نوبت لغوشده را نمی‌توان ا
 
 
 _COMPLETABLE = {
-    Appointment.Status.PENDING,
     Appointment.Status.CONFIRMED,
     Appointment.Status.CHECKED_IN,
 }
@@ -41,6 +40,8 @@ def complete_appointment(*, salon, appointment_id: int) -> Appointment:
         return appt
     if appt.status == Appointment.Status.CANCELLED:
         raise AppointmentLifecycleError(CANCELLED_CANNOT_COMPLETE_MSG)
+    if appt.status == Appointment.Status.PENDING:
+        raise AppointmentLifecycleError("ابتدا رزرو را تأیید کنید، سپس مراجعه را تکمیل کنید.")
     if appt.status not in _COMPLETABLE:
         raise AppointmentLifecycleError("این نوبت در وضعیت قابل تکمیل نیست.")
 
@@ -62,6 +63,25 @@ def cancel_appointment(*, salon, appointment_id: int) -> Appointment:
     appt = _locked_appointment(salon=salon, appointment_id=appointment_id)
     if appt.status == Appointment.Status.CANCELLED:
         return appt
+
+    # A cancellation must not silently leave money collected for a
+    # cancelled service or invalidate an immutable issued invoice.
+    # Refund funds explicitly first; invoiced corrections require a
+    # separate accounting adjustment instead of deleting history.
+    from apps.finance.models import InvoiceLine, Payment
+    from apps.finance.ledger import payment_refunded
+
+    if InvoiceLine.objects.filter(salon=salon, appointment=appt).exists():
+        raise AppointmentLifecycleError(
+            "برای این نوبت فاکتور صادر شده است؛ اصلاح سند باید از بخش مالی انجام شود."
+        )
+    payments = Payment.scoped(salon).filter(
+        appointment=appt, paid_amount_toman__gt=0,
+    ).exclude(status=Payment.Status.REFUNDED).prefetch_related("refunds")
+    if any(int(payment.paid_amount_toman) > payment_refunded(payment) for payment in payments):
+        raise AppointmentLifecycleError(
+            "این نوبت پرداخت یا بیعانه دارد؛ ابتدا مبلغ را در بخش مالی مسترد کنید."
+        )
 
     from apps.customers.models import Customer
     Customer.scoped(salon).select_for_update(no_key=True).get(pk=appt.customer_id)
