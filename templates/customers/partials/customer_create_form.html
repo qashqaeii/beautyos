@@ -70,7 +70,8 @@
             />
             {% if form.avatar.errors %}<p class="customer-form-field__error">{{ form.avatar.errors.0 }}</p>{% endif %}
           </div>
-          <div class="customer-form-field customer-form-field--checkbox">
+          <div class="luna-modal-choice-grid">
+<div class="customer-form-field customer-form-field--checkbox">
             <label class="customer-form-checkbox">
               {{ form.is_vip }}
               <span>{{ form.is_vip.label }}</span>
@@ -83,6 +84,7 @@
               <span>{{ form.marketing_consent.label }}</span>
             </label>
             {% if form.marketing_consent.errors %}<p class="customer-form-field__error">{{ form.marketing_consent.errors.0 }}</p>{% endif %}
+          </div>
           </div>
         </div>
       </div>
