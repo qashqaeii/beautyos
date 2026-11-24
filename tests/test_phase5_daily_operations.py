@@ -63,7 +63,15 @@ def test_phase5_day_queue_shows_actions_real_payment_and_tenant_data(
     customer, staff, service, appointment, day = day_case
     other_customer = Customer.objects.create(salon=salon_b, phone="+989121111445", full_name="مشتری خصوصی بتا")
     other_service = Service.objects.create(salon=salon_b, name="خدمت خصوصی", price_toman=400_000)
-    other_staff = StaffProfile.objects.create(salon=salon_b, display_name="متخصص بتا")
+    other_user = User.objects.create_user(
+        phone="+989121111446", full_name="متخصص بتا",
+    )
+    other_member = SalonMembership.objects.create(
+        user=other_user, salon=salon_b, role=SalonMembership.Role.SPECIALIST,
+    )
+    other_staff = StaffProfile.objects.create(
+        salon=salon_b, membership=other_member, display_name="متخصص بتا",
+    )
     Appointment.objects.create(
         salon=salon_b, customer=other_customer, staff=other_staff, service=other_service,
         start_at=appointment.start_at, end_at=appointment.end_at, status=Appointment.Status.CONFIRMED,

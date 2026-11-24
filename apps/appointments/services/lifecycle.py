@@ -71,17 +71,26 @@ def cancel_appointment(*, salon, appointment_id: int) -> Appointment:
     from apps.finance.models import InvoiceLine, Payment
     from apps.finance.ledger import payment_refunded
 
-    if InvoiceLine.objects.filter(salon=salon, appointment=appt).exists():
-        raise AppointmentLifecycleError(
-            "برای این نوبت فاکتور صادر شده است؛ اصلاح سند باید از بخش مالی انجام شود."
-        )
+    invoice_line = InvoiceLine.objects.filter(salon=salon, appointment=appt).first()
     payments = Payment.scoped(salon).filter(
         appointment=appt, paid_amount_toman__gt=0,
     ).exclude(status=Payment.Status.REFUNDED).prefetch_related("refunds")
-    if any(int(payment.paid_amount_toman) > payment_refunded(payment) for payment in payments):
-        raise AppointmentLifecycleError(
-            "این نوبت پرداخت یا بیعانه دارد؛ ابتدا مبلغ را در بخش مالی مسترد کنید."
-        )
+    outstanding_receipts = sum(
+        max(0, int(payment.paid_amount_toman) - payment_refunded(payment))
+        for payment in payments
+    )
+    # Before delivery, a paid booking must be refunded before it is cancelled.
+    # Completed visits already support legitimate commission and referral
+    # reversals; keep that workflow and flag its receipts for finance review.
+    if appt.status != Appointment.Status.COMPLETED:
+        if invoice_line is not None:
+            raise AppointmentLifecycleError(
+                "برای این نوبت فاکتور صادر شده است؛ اصلاح سند باید از بخش مالی انجام شود."
+            )
+        if outstanding_receipts:
+            raise AppointmentLifecycleError(
+                "این نوبت پرداخت یا بیعانه دارد؛ ابتدا مبلغ را در بخش مالی مسترد کنید."
+            )
 
     from apps.customers.models import Customer
     Customer.scoped(salon).select_for_update(no_key=True).get(pk=appt.customer_id)
@@ -101,4 +110,17 @@ def cancel_appointment(*, salon, appointment_id: int) -> Appointment:
     from apps.retention.automation import queue_appointment_event
     queue_appointment_event(appt, "cancellation")
     refresh_customer_stats(appt.customer)
+    if had_completed and (invoice_line is not None or outstanding_receipts):
+        from apps.audit.models import AuditLog
+        AuditLog.objects.create(
+            salon=salon, action=AuditLog.Action.UPDATE,
+            entity_type="appointment_finance_review", entity_id=str(appt.pk),
+            message="لغو مراجعه تکمیل‌شده؛ بررسی و تطبیق اسناد مالی الزامی است",
+            metadata={
+                "appointment_id": appt.pk,
+                "invoice_id": invoice_line.invoice_id if invoice_line else None,
+                "unrefunded_receipts_toman": outstanding_receipts,
+                "review_required": True,
+            },
+        )
     return appt

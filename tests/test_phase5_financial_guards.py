@@ -78,7 +78,7 @@ def test_cannot_cancel_collected_deposit_until_refunded(
 
 
 @pytest.mark.django_db
-def test_issued_invoice_cannot_be_orphaned_by_late_cancellation(
+def test_cancellation_after_invoice_keeps_snapshot_and_flags_finance_review(
     salon, owner_membership, pending_visit
 ):
     visit = pending_visit
@@ -91,11 +91,18 @@ def test_issued_invoice_cannot_be_orphaned_by_late_cancellation(
         actor=owner_membership.user,
     )
     assert Invoice.scoped(salon).filter(pk=invoice.pk).exists()
-    with pytest.raises(AppointmentLifecycleError, match="فاکتور"):
-        cancel_appointment(salon=salon, appointment_id=visit.pk)
+    canceled = cancel_appointment(salon=salon, appointment_id=visit.pk)
+    assert canceled.status == Appointment.Status.CANCELLED
     visit.refresh_from_db()
-    assert visit.status == Appointment.Status.COMPLETED
+    assert visit.status == Appointment.Status.CANCELLED
     assert Invoice.scoped(salon).get(pk=invoice.pk).lines.count() == 1
+    from apps.audit.models import AuditLog
+    review = AuditLog.objects.get(
+        salon=salon, entity_type="appointment_finance_review",
+        entity_id=str(visit.pk),
+    )
+    assert review.metadata["review_required"] is True
+    assert review.metadata["invoice_id"] == invoice.pk
 
 
 @pytest.mark.django_db
