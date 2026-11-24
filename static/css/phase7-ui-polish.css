@@ -1,0 +1,103 @@
+/* BeautyOS — Phase 7 UI polish.
+   Safe shared finishing layer: no new colors or layout frameworks; page-level designs remain authoritative. */
+:root {
+  --beautyos-focus-ring:rgba(125,94,140,.25);
+}
+:is(.maison-app,.public-site,.pc-shell) :is(button,a,input,select,textarea,summary):focus-visible {
+  outline:2px solid #82658e;
+  outline-offset:3px;
+}
+:is(.maison-app,.public-site,.pc-shell) :is(button,a,[role="button"]):disabled,
+:is(.maison-app,.public-site,.pc-shell) :is(button,a,[role="button"])[aria-disabled="true"] {
+  cursor:not-allowed;
+}
+:is(.maison-app,.public-site,.pc-shell) :is(input,textarea,select)[aria-invalid="true"] {
+  border-color:#b65b59;
+}
+:is(.maison-app,.public-site,.pc-shell) :is(.field-hint,.pc-subtle) {
+  overflow-wrap:anywhere;
+}
+.maison-app :is(.maison-content,.maison-page-actions,.editorial-module-toolbar,.maison-unified-header__actions) {
+  min-width:0;
+}
+.maison-app :is(.maison-content,.editorial-module-card) :is(input,textarea,select) {
+  max-inline-size:100%;
+}
+.public-site :is(.public-auth-card,.public-auth-card-wrap) {
+  max-inline-size:100%;
+}
+@media(max-width:639px) {
+  /* Prevent iOS focus zoom and ensure form actions are comfortably tappable. */
+  :is(.maison-app,.public-site,.pc-shell) :is(input,textarea,select) {
+    font-size:max(16px,1em);
+  }
+  .maison-app :is(.maison-page-actions,.editorial-module-actions) {
+    flex-wrap:wrap;
+    min-width:0;
+  }
+  .maison-app :is(.maison-page-actions,.editorial-module-actions) > :is(button,a) {
+    min-height:42px;
+  }
+  .public-site .public-auth-card :is(button[type="submit"],input,select) {
+    min-height:48px;
+  }
+  .pc-shell .pc-content,.pc-shell .pc-panel,.pc-shell .pc-list-row {
+    min-width:0;
+  }
+  .pc-shell .pc-list-row {
+    flex-wrap:wrap;
+    gap:9px;
+  }
+  .pc-shell .pc-list-main {
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+}
+/* Phase-six subscription inventory uses the existing lavender operator palette. */
+.pc-shell .pc-subscriptions__heading { align-items:flex-end; }
+.pc-shell .pc-subscriptions__kpis { margin:0; }
+.pc-shell .pc-subscriptions__plans { margin:0; }
+.pc-shell .pc-subscriptions__list { margin:0; }
+.pc-shell .pc-subscriptions__filter {
+  display:flex; align-items:center; flex-wrap:wrap; gap:10px;
+  padding:15px 20px; border-bottom:1px solid var(--pc-border,#ece8f0);
+}
+.pc-shell .pc-subscriptions__filter label {
+  font-size:.78rem; font-weight:700; color:var(--pc-ink,#302a37);
+}
+.pc-shell .pc-subscriptions__filter select {
+  width:min(100%,250px); min-width:0; min-height:43px;
+  padding:9px 12px; border:1px solid var(--pc-border,#ece8f0);
+  border-radius:10px; background:#fff; color:var(--pc-ink,#302a37);
+  cursor:pointer; font-size:.82rem;
+}
+.pc-shell .pc-subscriptions__filter select:focus-visible {
+  outline:2px solid #82658e; outline-offset:2px;
+}
+.pc-shell .pc-subscriptions__disclaimer {
+  margin-top:0; padding:0 2px; line-height:1.9;
+}
+.pc-shell .pc-subscriptions__list .pc-list-row {
+  gap:12px;
+}
+.pc-shell .pc-subscriptions__list .pc-list-row .pc-date {
+  white-space:normal; overflow-wrap:anywhere;
+}
+@media(max-width:639px) {
+  .pc-shell .pc-subscriptions__filter {
+    display:grid; grid-template-columns:minmax(0,1fr); padding:12px 14px; gap:8px;
+  }
+  .pc-shell .pc-subscriptions__filter select { width:100%; font-size:16px; }
+  .pc-shell .pc-subscriptions__plans .pc-list-row,
+  .pc-shell .pc-subscriptions__list .pc-list-row {
+    display:flex; flex-wrap:wrap; align-items:center; gap:9px 12px;
+  }
+  .pc-shell .pc-subscriptions__plans .pc-list-main,
+  .pc-shell .pc-subscriptions__list .pc-list-main { flex:1 1 145px; }
+  .pc-shell .pc-subscriptions__disclaimer { font-size:.72rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+  :is(.maison-app,.public-site,.pc-shell) :is(button,a,input,select,textarea) {
+    scroll-behavior:auto;
+  }
+}
