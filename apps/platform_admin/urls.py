@@ -1,12 +1,13 @@
 from django.urls import path
 
-from apps.platform_admin import views
+from apps.platform_admin import views, subscription_views
 
 app_name = "platform_admin"
 
 urlpatterns = [
     path("", views.overview, name="overview"),
     path("salons/", views.salons, name="salons"),
+    path("subscriptions/", subscription_views.subscriptions, name="subscriptions"),
     path("salons/<uuid:salon_id>/", views.salon_detail, name="salon_detail"),
     path("salons/<uuid:salon_id>/status/", views.salon_status, name="salon_status"),
     path("users/", views.users, name="users"),
