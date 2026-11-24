@@ -49,3 +49,31 @@
 @media(max-width:1024px){.reception-flow__item{grid-template-columns:65px minmax(120px,1.4fr) minmax(105px,1fr);gap:9px}.reception-flow__actions{grid-column:2/-1;justify-content:flex-start}.reception-flow__metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.reception-flow{margin:13px 0;padding:15px;border-radius:15px}.reception-flow__heading h2{font-size:1rem}.reception-flow__heading p{font-size:.7rem}.reception-flow__metrics{gap:7px}.reception-flow__metrics>div{padding:10px;display:flex;flex-wrap:wrap}.reception-flow__metrics strong{font-size:.91rem}.reception-flow__metrics span{font-size:.67rem}.reception-flow__item{grid-template-columns:65px minmax(0,1fr);padding:12px;gap:9px}.reception-flow__time{grid-column:1;grid-row:1;justify-content:flex-start}.reception-flow__person{grid-column:2;grid-row:1}.reception-flow__indicators{grid-column:1/-1;grid-row:2}.reception-flow__actions{grid-column:1/-1;grid-row:3;justify-content:flex-start;flex-wrap:wrap}.reception-flow__button{min-height:37px}.reception-flow__details{min-height:37px}}
 @media(prefers-reduced-motion:reduce){.reception-flow *{transition:none!important}}
+
+
+/* Reception invoice: inline workflow, accessible and responsive. */
+.reception-desk-header__actions--billing{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.reception-desk-header__invoice-link{display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border:1px solid #ded3e6;border-radius:10px;background:#faf7fc;color:#725789!important;font-weight:760;font-size:.72rem;text-decoration:none!important;min-height:38px}
+.reception-desk-header__invoice-link svg{width:16px;height:16px}
+.reception-desk-header__invoice-link--primary{background:#efe6f5;border-color:#d6c7e0;color:#674e82!important}
+.reception-flow__button--print{color:#634b7c!important;background:#ede6f4;border-color:#ded1e8}
+.reception-flow__button svg{width:15px;height:15px}
+.reception-flow__invoice-panel{grid-column:1/-1;min-width:0;border:1px solid #e5d9ed;border-radius:12px;background:#fcfafe;margin-top:5px}
+.reception-flow__invoice-panel[open]{padding-bottom:13px}
+.reception-flow__invoice-panel summary{list-style:none;display:flex;align-items:center;gap:9px;cursor:pointer;padding:11px 13px;color:#725887;font-weight:790;font-size:.76rem}
+.reception-flow__invoice-panel summary::-webkit-details-marker{display:none}
+.reception-flow__invoice-panel summary svg{width:16px;height:16px}
+.reception-flow__invoice-panel summary svg:last-child{margin-inline-start:auto;transition:transform .18s}
+.reception-flow__invoice-panel[open] summary svg:last-child{transform:rotate(180deg)}
+.reception-flow__invoice-form{padding:3px 14px 0}
+.reception-flow__invoice-intro{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:12px;font-size:.75rem;color:#7b6e87}
+.reception-flow__invoice-intro strong{color:#58436d}
+.reception-flow__invoice-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.reception-flow__invoice-fields label{display:flex;flex-direction:column;gap:5px;font-size:.71rem;font-weight:700;color:#756780}
+.reception-flow__invoice-fields input{width:100%;height:39px;border:1px solid #dfd4e6;border-radius:9px;background:#fff;padding:8px 10px;font:inherit;color:#4b3d57;direction:ltr;text-align:right}
+.reception-flow__invoice-hint{font-size:.69rem;color:#908498;margin:10px 0;line-height:1.8}
+.reception-flow__invoice-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.reception-flow__invoice-controls>a{font-size:.71rem;color:#786188;text-decoration:underline}
+.reception-flow__invoice-fields input:focus-visible,.reception-flow__invoice-panel summary:focus-visible{outline:3px solid #c5b2d8;outline-offset:2px}
+@media(max-width:950px){.reception-flow__invoice-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.reception-desk-header__actions--billing{width:100%;gap:6px}.reception-desk-header__invoice-link{flex:1 1 auto;justify-content:center}.reception-flow__invoice-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.reception-flow__invoice-form{padding-inline:10px}.reception-flow__invoice-controls .reception-flow__button{flex:1 1 45%}}
