@@ -14,7 +14,7 @@
         <div class="checkout-workspace__invoice-brand"><i data-lucide="flower-2" aria-hidden="true"></i><strong>{{ active_salon.name }}</strong><small>فاکتور خدمات زیبایی</small></div>
         <span class="checkout-workspace__invoice-status">ثبت‌شده</span>
       </div>
-      <div class="checkout-workspace__issued-customer"><i data-lucide="user-round" aria-hidden="true"></i><span>مشتری</span><strong>{{ invoice.customer_name }}</strong></div>
+      <div class="checkout-workspace__issued-customer"><i data-lucide="user-round" aria-hidden="true"></i><span>مشتری</span><strong>{{ invoice.customer_name }}</strong><small dir="ltr">{{ invoice.customer.phone }}</small></div>
       <section class="checkout-workspace__services" aria-label="خدمات فاکتور">
         <div class="checkout-workspace__table-wrap">
           <table class="checkout-workspace__table checkout-workspace__table--issued">
@@ -54,6 +54,7 @@
       </section>
       {% endif %}
       <div class="checkout-workspace__invoice-actions checkout-workspace__invoice-actions--issued">
+        <a href="{% url 'reception:desk' %}" class="checkout-workspace__btn checkout-workspace__btn--outline"><i data-lucide="arrow-right" aria-hidden="true"></i> میز پذیرش</a>
         <a href="{% url 'finance:invoices' %}" class="checkout-workspace__btn checkout-workspace__btn--outline"><i data-lucide="files" aria-hidden="true"></i>فهرست فاکتورها</a>
         <button type="button" class="checkout-workspace__btn checkout-workspace__btn--primary" onclick="window.print()"><i data-lucide="printer" aria-hidden="true"></i>چاپ / ذخیره PDF</button>
       </div>
@@ -62,4 +63,10 @@
     {% include "finance/partials/checkout_sidebar.html" %}
   </div>
 </div>
+{% if auto_print %}
+<script>
+// Requested by the authenticated receptionist. Normal invoice visits never auto-print.
+window.addEventListener("load", function () { window.print(); }, { once: true });
+</script>
+{% endif %}
 {% endblock %}
