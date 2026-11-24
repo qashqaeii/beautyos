@@ -211,137 +211,137 @@ body.beautyos-main-bg .public-site.luna-auth {
 
 
 /* Registration — focused, calm three-step onboarding. Scoped: login remains unchanged. */
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card-wrap { max-width:450px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-progress { margin-bottom:17px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-progress__caption {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card-wrap { max-width:450px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-progress { margin-bottom:17px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-progress__caption {
   display:flex; justify-content:space-between; align-items:center; gap:12px;
   margin-bottom:12px; padding-inline:2px; font-size:.78rem; line-height:1.6;
   font-weight:650; color:var(--auth-muted);
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-progress__caption span:last-child { color:var(--auth-rose-dark); }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-steps {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-progress__caption span:last-child { color:var(--auth-rose-dark); }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-steps {
   position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
   grid-auto-flow:unset; gap:7px; margin:0;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-steps li {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-steps li {
   position:relative; display:flex; flex-direction:row; gap:7px;
   border:0; background:transparent; border-radius:9px;
   padding:7px 2px; min-height:41px; color:#857670;
   font-size:.76rem; font-weight:550; white-space:nowrap;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-steps li.is-current {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-steps li.is-current {
   color:var(--auth-rose-dark); background:transparent; font-weight:750;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-step-number {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-step-number {
   display:grid; place-items:center; flex:none; width:27px; height:27px;
   border:1px solid #ded0ca; border-radius:50%; background:#fffaf7;
   font-size:.77rem; color:#91817a; font-weight:700;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .is-current .register-step-number {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .is-current .register-step-number {
   background:var(--auth-rose-dark); color:white; border-color:var(--auth-rose-dark);
   box-shadow:0 0 0 4px rgba(157,114,110,.10);
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card {
   padding:clamp(24px,2.7vw,36px);
   border-radius:19px; background:#fffdfb;
   border:1px solid #eaded8; box-shadow:0 18px 44px rgba(81,68,63,.07);
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card__head { margin-bottom:27px; text-align:start; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card__title {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card__head { margin-bottom:27px; text-align:start; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card__title {
   justify-content:flex-start; gap:9px; font-size:clamp(1.5rem,2vw,1.85rem);
   letter-spacing:-.025em; line-height:1.5;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card__subtitle {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card__subtitle {
   max-width:100%; margin:9px 0 0; line-height:1.95; font-size:.87rem;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .luna-auth-phone-form { gap:20px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-field label {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .luna-auth-phone-form { gap:20px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-field label {
   margin-bottom:10px; font-size:.88rem; font-weight:700;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .luna-auth-phone-input .input-field {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .luna-auth-phone-input .input-field {
   min-height:56px; border-radius:12px; border-color:#dfcfc8;
   background:#fff; padding-inline:16px 48px; font-size:1.03rem;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .luna-auth-phone-input svg { width:19px; height:19px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-field .field-hint {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .luna-auth-phone-input svg { width:19px; height:19px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-field .field-hint {
   display:flex; gap:6px; align-items:flex-start; margin-top:10px;
   line-height:1.85; font-size:.74rem;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-field .field-hint svg {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-field .field-hint svg {
   width:15px; height:15px; margin-top:3px; flex:none; color:var(--auth-rose-dark);
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card .register-submit {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card .register-submit {
   display:flex; justify-content:center; gap:11px; min-height:54px;
   border-radius:12px; font-size:.95rem; font-weight:750;
   background:var(--auth-rose-dark); box-shadow:0 5px 13px rgba(138,99,95,.14);
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-submit svg { width:19px; height:19px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-after-form { margin-top:20px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-after-form__hint {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-submit svg { width:19px; height:19px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-after-form { margin-top:20px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-after-form__hint {
   display:flex; align-items:center; justify-content:center; gap:7px; margin:0;
   font-size:.75rem; color:var(--auth-muted); text-align:center; line-height:1.8;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-after-form__hint svg {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-after-form__hint svg {
   width:16px; height:16px; flex:none; color:#749780;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-crosslink {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-crosslink {
   margin:20px 0 0; padding:19px 0 0; text-align:center; font-size:.83rem;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-crosslink a {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-crosslink a {
   display:inline-flex; align-items:center; gap:4px; font-weight:750;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-crosslink a svg { width:14px; height:14px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-legal { margin-top:17px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-crosslink a svg { width:14px; height:14px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-legal { margin-top:17px; }
 @media (min-width:1024px) and (max-height:760px) {
-  .luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card { padding:21px 26px; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card__head { margin-bottom:16px; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .luna-auth-phone-form { gap:13px; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .register-after-form { margin-top:13px; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-crosslink { margin-top:12px; padding-top:12px; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .register-progress { margin-bottom:9px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card { padding:21px 26px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card__head { margin-bottom:16px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .luna-auth-phone-form { gap:13px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-after-form { margin-top:13px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-crosslink { margin-top:12px; padding-top:12px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-progress { margin-bottom:9px; }
 }
 @media (max-width:480px) {
-  .luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card { padding:24px 20px; border-radius:17px; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-steps li { gap:5px; font-size:.69rem; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .register-step-number { width:24px; height:24px; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-card__head { margin-bottom:23px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card { padding:24px 20px; border-radius:17px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-steps li { gap:5px; font-size:.69rem; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-step-number { width:24px; height:24px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-card__head { margin-bottom:23px; }
 }
 
 
 /* Keep registration steps secondary to the primary signup form. */
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-progress { margin-bottom:9px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-steps { gap:4px; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-steps li {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-progress { margin-bottom:9px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-steps { gap:4px; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-steps li {
   min-height:29px; padding:3px 2px; gap:5px;
   font-size:.68rem; font-weight:500; color:#8d7d77;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-steps li.is-current { font-weight:700; }
-.luna-auth:is(.public-auth--register,.public-auth--login) .register-step-number {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-steps li.is-current { font-weight:700; }
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-step-number {
   width:21px; height:21px; font-size:.67rem;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .is-current .register-step-number {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .is-current .register-step-number {
   box-shadow:0 0 0 2px rgba(157,114,110,.08);
 }
 @media (max-width:480px) {
-  .luna-auth:is(.public-auth--register,.public-auth--login) .register-progress { margin-bottom:7px; }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .public-auth-steps li {
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-progress { margin-bottom:7px; }
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .public-auth-steps li {
     min-height:26px; padding:2px 1px; gap:4px; font-size:.63rem;
   }
-  .luna-auth:is(.public-auth--register,.public-auth--login) .register-step-number {
+  .luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .register-step-number {
     width:19px; height:19px; font-size:.61rem;
   }
 }
 
 
 /* Phone numbers are LTR: reserve a fixed icon gutter on the left. */
-.luna-auth:is(.public-auth--register,.public-auth--login) .luna-auth-phone-input input.input-field {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .luna-auth-phone-input input.input-field {
   direction:ltr;
   text-align:left;
   padding-left:49px;
   padding-right:16px;
   unicode-bidi:plaintext;
 }
-.luna-auth:is(.public-auth--register,.public-auth--login) .luna-auth-phone-input > svg {
+.luna-auth:is(.public-auth--register,.public-auth--login,.public-auth--verify,.public-auth--profile) .luna-auth-phone-input > svg {
   left:15px;
   right:auto;
   pointer-events:none;
@@ -353,4 +353,68 @@ body.beautyos-main-bg .public-site.luna-auth {
 }
 .luna-auth.public-auth--login .luna-auth-dev-note {
   margin-top:14px; text-align:center;
+}
+
+/* Shared verification/profile details: same hierarchy as salon registration. */
+.luna-auth.public-auth--verify .public-auth-steps.auth-steps--two {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.luna-auth:is(.public-auth--verify,.public-auth--profile) .public-auth-steps li.is-done {
+  color:#76665f; font-weight:600;
+}
+.luna-auth:is(.public-auth--verify,.public-auth--profile) .public-auth-steps li.is-done .register-step-number {
+  color:#597d63; background:#eef4ee; border-color:#d8e6da;
+}
+.luna-auth:is(.public-auth--verify,.public-auth--profile) .public-auth-steps li.is-done .register-step-number svg {
+  width:12px; height:12px; stroke-width:2;
+}
+.luna-auth.public-auth--verify #id_code {
+  display:block; width:100%; direction:ltr; text-align:center;
+  font-variant-numeric:tabular-nums; letter-spacing:.4em;
+  min-height:56px; border-radius:12px; border:1px solid #dfcfc8;
+  background:#fff; color:var(--auth-ink); font-size:1.35rem;
+  padding:10px 14px; box-shadow:none;
+}
+.luna-auth.public-auth--verify #id_code:focus {
+  outline:0; border-color:var(--auth-rose);
+  box-shadow:0 0 0 3px rgba(157,114,110,.13);
+}
+.luna-auth.public-auth--verify .auth-dev-code {
+  margin:0 0 18px; padding:11px 14px;
+  border:1px dashed #e1d2cb; border-radius:11px; background:#faf5f1;
+  font-size:.76rem; color:var(--auth-muted); text-align:center; line-height:1.8;
+}
+.luna-auth.public-auth--verify .auth-dev-code strong {
+  color:var(--auth-ink); font-size:1.12rem; letter-spacing:.16em;
+}
+.luna-auth.public-auth--verify .auth-otp-actions .public-auth-crosslink {
+  margin-top:18px; padding-top:15px;
+}
+.luna-auth.public-auth--verify .auth-otp-actions .public-auth-crosslink a {
+  display:inline-flex; justify-content:center; align-items:center; gap:5px;
+}
+.luna-auth.public-auth--verify .auth-otp-actions .public-auth-crosslink svg {
+  width:15px; height:15px;
+}
+.luna-auth.public-auth--verify #otp-resend-form {
+  margin:13px 0 0; text-align:center;
+}
+.luna-auth.public-auth--verify .auth-resend-button {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  min-height:35px; border:0; background:transparent; color:var(--auth-rose-dark);
+  font-size:.82rem; font-weight:650; cursor:pointer;
+}
+.luna-auth.public-auth--verify .auth-resend-button svg {width:15px; height:15px;}
+.luna-auth.public-auth--verify .auth-resend-button:disabled {
+  cursor:not-allowed; color:#ab9b94;
+}
+.luna-auth.public-auth--verify .auth-resend-button:focus-visible {
+  outline:2px solid var(--auth-rose-dark); outline-offset:3px;
+}
+.luna-auth.public-auth--profile #id_full_name {min-height:56px;}
+@media(max-width:480px) {
+  .luna-auth.public-auth--verify #id_code {font-size:1.22rem; letter-spacing:.3em;}
+  .luna-auth:is(.public-auth--verify,.public-auth--profile) .public-auth-card__subtitle {
+    overflow-wrap:anywhere;
+  }
 }
