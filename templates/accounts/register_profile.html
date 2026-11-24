@@ -1,16 +1,19 @@
 {% extends "layouts/public_auth.html" %}
 {% block title %}اطلاعات شما · {{ BEAUTYOS_PRODUCT_NAME }}{% endblock %}
+{% block auth_variant %}public-auth--profile{% endblock %}
 {% block auth_steps %}
-<ol class="public-auth-steps" aria-label="مراحل ثبت‌نام">
-  <li class="is-done"><i data-lucide="check" aria-hidden="true"></i><span>۱. تأیید موبایل</span></li>
-  <li class="is-done"><i data-lucide="check" aria-hidden="true"></i><span>۲. کد پیامکی</span></li>
-  <li class="is-current" aria-current="step"><i data-lucide="user-round" aria-hidden="true"></i><span>۳. اطلاعات مالک</span></li>
-</ol>
+<div class="register-progress">
+  <ol class="public-auth-steps" aria-label="مراحل ثبت‌نام">
+    <li class="is-done"><span class="register-step-number"><i data-lucide="check" aria-hidden="true"></i></span><span>تأیید موبایل</span></li>
+    <li class="is-done"><span class="register-step-number"><i data-lucide="check" aria-hidden="true"></i></span><span>کد پیامکی</span></li>
+    <li class="is-current" aria-current="step"><span class="register-step-number">۳</span><span>اطلاعات مالک</span></li>
+  </ol>
+</div>
 {% endblock %}
 {% block auth_heading %}اطلاعات مالک سالن{% endblock %}
-{% block auth_subtitle %}شماره <span dir="ltr" lang="en" class="font-medium text-aubergine">{{ phone_display }}</span> تأیید شد. نام نمایشی را وارد کنید تا سالن شما ساخته شود.{% endblock %}
+{% block auth_subtitle %}شماره <span dir="ltr" lang="en" class="font-medium text-aubergine">{{ phone_display }}</span> تأیید شد. نام و نام خانوادگی‌ات را وارد کن تا حساب سالن آماده شود.{% endblock %}
 {% block auth_content %}
-<form method="post" action="{% url 'accounts:register_profile' %}" class="space-y-5">
+<form method="post" action="{% url 'accounts:register_profile' %}" class="luna-auth-phone-form auth-profile-form">
   {% csrf_token %}
   {% if profile_form.non_field_errors %}
   <div class="mb-1">{% include "accounts/partials/auth_flash.html" with message=profile_form.non_field_errors.0 variant="error" %}</div>
@@ -21,6 +24,6 @@
     <p class="field-hint">این نام در پنل و برای اعضای تیم نمایش داده می‌شود.</p>
     {% if profile_form.full_name.errors %}<p class="mt-1.5 text-xs text-coral" role="alert">{{ profile_form.full_name.errors.0 }}</p>{% endif %}
   </div>
-  <button type="submit" class="btn-primary min-h-[48px] w-full">ادامه و ساخت سالن</button>
+  <button type="submit" class="btn-primary register-submit"><span>ادامه و ساخت سالن</span><i data-lucide="arrow-left" aria-hidden="true"></i></button>
 </form>
 {% endblock %}
