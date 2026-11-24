@@ -4,6 +4,7 @@
 {% block shell_modifier %}luna-reception-shell{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/luna-reception.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/reception-flow.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 {% if can_book_appointment and appointment_form %}
 <script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 <script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
@@ -111,6 +112,82 @@
         {% endif %}
       </div>
     </div>
+  </section>
+
+  <section class="reception-flow dashboard-enter" aria-labelledby="reception-flow-title">
+    <div class="reception-flow__heading">
+      <div>
+        <span class="reception-flow__eyebrow">DAILY OPERATIONS</span>
+        <h2 id="reception-flow-title">جریان کار امروز سالن</h2>
+        <p>تمام نوبت‌های روز انتخاب‌شده؛ از تأیید و پذیرش تا تکمیل خدمت و صندوق.</p>
+      </div>
+      <span class="reception-flow__total">{{ day_operations_summary.total|fa_num }} نوبت</span>
+    </div>
+    <div class="reception-flow__metrics" aria-label="وضعیت عملیات روز">
+      <div><span>منتظر تأیید</span><strong>{{ day_operations_summary.pending|fa_num }}</strong></div>
+      <div><span>پذیرش‌شده</span><strong>{{ day_operations_summary.checked_in|fa_num }}</strong></div>
+      <div><span>خدمات تکمیل‌شده</span><strong>{{ day_operations_summary.completed|fa_num }}</strong></div>
+      {% if can_payment_create %}
+      <div class="reception-flow__metric--money"><span>مانده خدمات تکمیل‌شده</span><strong>{{ day_operations_summary.outstanding_toman|fa_money }} <small>تومان</small></strong></div>
+      {% endif %}
+    </div>
+    <div class="reception-flow__list">
+      {% for item in day_operations %}
+      <article class="reception-flow__item" aria-label="نوبت {{ item.appointment.customer.full_name }}">
+        <div class="reception-flow__time">
+          <i data-lucide="clock-3" aria-hidden="true"></i>
+          <time datetime="{{ item.appointment.start_at|date:'c' }}">{{ item.appointment.start_at|fa_time }}</time>
+        </div>
+        <div class="reception-flow__person">
+          <strong>{{ item.appointment.customer.full_name }}</strong>
+          <span>{{ item.appointment.service.name }} <span aria-hidden="true">·</span> {{ item.appointment.staff.full_display_name }}</span>
+        </div>
+        <div class="reception-flow__indicators">
+          <span class="reception-flow__status reception-flow__status--{{ item.appointment.status }}">{{ item.appointment.get_status_display }}</span>
+          {% if can_payment_create and item.appointment.status != 'cancelled' and item.appointment.status != 'no_show' %}
+          <span class="reception-flow__money">
+            {% if item.payment.owed_toman > 0 %}
+              مانده {{ item.payment.owed_toman|fa_money }} تومان
+            {% else %}
+              تسویه‌شده
+            {% endif %}
+          </span>
+          {% endif %}
+        </div>
+        <div class="reception-flow__actions">
+          {% if can_confirm and item.can_confirm %}
+          <form method="post" action="{% url 'reception:confirm' pk=item.appointment.pk %}">
+            {% csrf_token %}<input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+            <button type="submit" class="reception-flow__button reception-flow__button--primary">تأیید نوبت</button>
+          </form>
+          {% elif can_checkin and item.can_checkin %}
+          <form method="post" action="{% url 'reception:checkin' pk=item.appointment.pk %}">
+            {% csrf_token %}<input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+            <button type="submit" class="reception-flow__button reception-flow__button--primary">ثبت ورود</button>
+          </form>
+          {% elif can_complete and item.can_complete %}
+          <form method="post" action="{% url 'reception:complete' pk=item.appointment.pk %}">
+            {% csrf_token %}<input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+            <button type="submit" class="reception-flow__button reception-flow__button--primary">تکمیل خدمت</button>
+          </form>
+          {% endif %}
+          {% if can_payment_create and item.appointment.status == 'completed' %}
+            {% if item.invoice_id %}
+            <a class="reception-flow__button reception-flow__button--soft" href="{% url 'finance:invoice_detail' invoice_id=item.invoice_id %}">مشاهده فاکتور</a>
+            {% elif item.can_checkout %}
+            <a class="reception-flow__button reception-flow__button--soft" href="{% url 'finance:checkout' item.appointment.customer_id %}?appointment={{ item.appointment.pk|unlocalize }}">رفتن به صندوق</a>
+            {% endif %}
+          {% endif %}
+          <a class="reception-flow__details" href="{% url 'appointments:detail' pk=item.appointment.pk %}" aria-label="جزئیات نوبت {{ item.appointment.customer.full_name }}"><i data-lucide="arrow-up-left" aria-hidden="true"></i><span>جزئیات</span></a>
+        </div>
+      </article>
+      {% empty %}
+      <div class="reception-flow__empty"><i data-lucide="calendar-days" aria-hidden="true"></i><strong>برای این روز نوبتی ثبت نشده است.</strong><p>برای شروع می‌توانید از دکمه «ثبت نوبت» استفاده کنید.</p></div>
+      {% endfor %}
+    </div>
+    {% if day_operations_summary.truncated %}
+      <p class="reception-flow__more">این فهرست حداکثر ۱۰۰ نوبت اول روز را نمایش می‌دهد. برای بررسی سایر نوبت‌ها به تقویم مراجعه کنید.</p>
+    {% endif %}
   </section>
 
   <section class="reception-desk-workspace dashboard-enter" aria-label="وقت آزاد و تیم">
