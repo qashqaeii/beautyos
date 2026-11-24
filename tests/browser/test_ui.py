@@ -151,6 +151,19 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                         assert page.locator(".maison-sidebar .luna-salon-switch-list").count() == 0
                         assert page.evaluate("getComputedStyle(document.querySelector('#workspace-sidebar-nav')).overflowY === 'visible'"), "nested sidebar scroll"
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 2"), "horizontal page overflow"
+                assert page.locator('link[href*="phase7-ui-polish.css"]').count() == 1, "phase 7 styling missing"
+                if width <= 639 and name == "reception":
+                    invoice_inputs = page.locator(".reception-flow__invoice-fields input")
+                    if invoice_inputs.count():
+                        assert invoice_inputs.first.evaluate(
+                            "(el) => el.getBoundingClientRect().width <= el.parentElement.getBoundingClientRect().width + 2"
+                        ), "reception invoice amount extends outside its field"
+                    actions = page.locator(".reception-flow__invoice-controls > button")
+                    if actions.count():
+                        assert actions.first.evaluate(
+                            "(el) => el.getBoundingClientRect().height >= 42"
+                        ), "reception invoice actions are too small to tap"
+
                 assert not external, f"external runtime requests {external}"
                 assert not broken, f"broken static assets {broken}"
                 assert not js_errors, f"JavaScript exceptions {js_errors}"
@@ -279,6 +292,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     limit = dialog.evaluate("(el) => el.classList.contains('luna-modal--extended') ? 620 : el.classList.contains('luna-modal--compact') ? 420 : 520")
                     assert box["width"] <= limit + 2, "oversized desktop dialog"
                     assert box["height"] <= 562, "oversized desktop dialog height"
+                assert dialog.evaluate("(el) => el.scrollWidth <= el.clientWidth + 2"), "modal content has horizontal overflow"
                 footer = dialog.locator(".inventory-create-modal__foot")
                 pw.expect(footer).to_be_visible()
                 footer_box = footer.bounding_box()
