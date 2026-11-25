@@ -868,3 +868,20 @@ body.theme-app .luna-reception-shell .reception-desk-slot-filters select.input-f
 body.theme-app .luna-reception-shell .reception-desk-slot-filters select.input-field:focus-visible{
   outline:2px solid #987068;outline-offset:1px;
 }
+
+/* Keep the header track and the actual header height identical even when
+   shared theme rules enforce the standard 88px header. */
+@media(min-width:1180px) and (min-height:560px) and (max-height:799px){
+  body.theme-app .luna-reception-shell .reception-desk-page{
+    grid-template-rows:88px 66px auto minmax(0,1fr);
+  }
+  body.theme-app .luna-reception-shell .reception-desk-page:not(:has(>.reception-desk-quick)){
+    grid-template-rows:88px 66px minmax(0,1fr);
+  }
+  body.theme-app .luna-reception-shell .reception-desk-page > .reception-desk-header{
+    box-sizing:border-box;height:88px;min-height:88px;max-height:88px;margin-block:0;
+  }
+  body.theme-app .luna-reception-shell .reception-desk-page > .reception-overview-kpis{
+    min-height:0;margin-block:0;
+  }
+}
