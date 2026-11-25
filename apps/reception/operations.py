@@ -20,6 +20,7 @@ def day_operations(*, salon, queue, limit=100):
     summary = {
         "total": queue.count(),
         "pending": 0,
+        "confirmed": 0,
         "checked_in": 0,
         "completed": 0,
         "outstanding_toman": 0,
@@ -33,6 +34,7 @@ def day_operations(*, salon, queue, limit=100):
         invoice_line = getattr(appointment, "invoice_line", None)
         completed = appointment.status == Appointment.Status.COMPLETED
         summary["pending"] += appointment.status == Appointment.Status.PENDING
+        summary["confirmed"] += appointment.status == Appointment.Status.CONFIRMED
         summary["checked_in"] += appointment.status == Appointment.Status.CHECKED_IN
         summary["completed"] += completed
         if completed:
