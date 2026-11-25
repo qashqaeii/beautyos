@@ -1892,3 +1892,35 @@
   .maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-timeline__body:has(.customer-detail-timeline__item){justify-content:flex-start;}
 }
 @media(max-width:850px){.customer-detail-header__ornament{display:none;}}
+
+/* Customer hero: a single editorial banner with integrated salon portrait art.
+   The illustration follows the existing theme instead of recoloring the workspace. */
+.maison-app.management-suite .customer-detail-page .customer-detail-header {
+  background:linear-gradient(105deg,var(--cp-paper) 0%,var(--cp-tint) 47%,var(--cp-paper) 73%,var(--cp-tint) 100%);
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-header::before,
+.maison-app.management-suite .customer-detail-page .customer-detail-header::after {display:none;}
+.customer-detail-header__ornament {
+  position:absolute;inset:0;width:100%;height:100%;opacity:1;display:block;
+  color:var(--cp-accent);pointer-events:none;z-index:-1;
+}
+.customer-detail-header__ornament svg {display:block;width:100%;height:100%;transform:none;}
+.customer-detail-header__illustration {
+  position:absolute;inset-block:0;inset-inline-start:0;width:116px;pointer-events:none;z-index:0;
+}
+.customer-detail-header__illustration svg {width:100%;height:100%;display:block;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__content {z-index:1;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:107px;gap:8px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__avatar--icon:not(:has(img)) {display:none;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__name {font-size:21px;font-weight:800;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__phone {font-size:12px;padding:2px 8px;border-radius:7px;background:color-mix(in srgb,var(--cp-paper) 78%,transparent);}
+@media(max-width:850px){
+  .customer-detail-header__illustration {width:90px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:78px;}
+}
+@media(max-width:580px){
+  .customer-detail-header__illustration {width:86px;height:74px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:74px;min-height:55px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__name {font-size:17px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__avatar--icon:has(img) {width:36px;height:36px;}
+}

@@ -152,6 +152,7 @@ def test_customer_detail_premium_profile_uses_real_customer_attributes(client, s
     body = response.content.decode()
     assert 'customer-detail-premium.css' in body
     assert 'customer-detail-header__ornament' in body
+    assert 'customer-detail-header__illustration' in body
     header = body.split('<header class="customer-detail-header"', 1)[1].split('</header>', 1)[0]
     assert 'مشتری ویژه تست' in header
     assert 'ویرایش اطلاعات' in header
