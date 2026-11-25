@@ -38,21 +38,32 @@
 
   <header class="customer-detail-header" aria-label="پروفایل مشتری">
     <div class="customer-detail-header__ornament" aria-hidden="true">
-      <svg viewBox="0 0 1000 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 56C195 8 296 106 488 53S769 12 1000 53V100H0Z" fill="currentColor" opacity=".10"/>
-        <path d="M0 75C216 18 334 118 537 66S800 36 1000 78V100H0Z" fill="currentColor" opacity=".09"/>
-        <path d="M0 56C195 8 296 106 488 53S769 12 1000 53" fill="none" stroke="white" stroke-opacity=".85" stroke-width="1.2"/>
+      <svg viewBox="0 0 1000 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M350 100C530 98 590 5 790 15S956 66 1000 0V100Z" fill="currentColor" opacity=".045"/>
+        <path d="M405 100C620 91 616 25 805 36S934 79 1000 29" fill="none" stroke="currentColor" stroke-opacity=".09"/>
+        <path d="M480 100C655 92 683 48 836 56S950 94 1000 63" fill="none" stroke="white" stroke-opacity=".8"/>
       </svg>
     </div>
     <div class="customer-detail-header__illustration" aria-hidden="true">
-      <svg viewBox="0 0 132 100" xmlns="http://www.w3.org/2000/svg">
-        <defs><linearGradient id="customer-hero-hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="var(--cp-accent)"/><stop offset="1" stop-color="var(--cp-accent-deep)"/></linearGradient><linearGradient id="customer-hero-petal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="white"/><stop offset="1" stop-color="var(--cp-tint)"/></linearGradient></defs>
-        <circle cx="73" cy="49" r="43" fill="white" opacity=".48"/>
-        <circle cx="73" cy="49" r="42" fill="none" stroke="white" stroke-opacity=".9"/>
-        <path d="M81 14C61 4 42 17 40 36c-1 7 1 10-4 16l-5 6 8 3c0 11 5 15 17 14l-1 11-12 14h54L83 78c14-10 18-28 13-43C94 25 89 18 81 14Z" fill="var(--cp-accent)" opacity=".74"/>
-        <path d="M47 25C53 6 83 4 95 21c17 20 2 42 12 62l9 17H66c13-16 12-28 7-42C69 43 72 28 47 25Z" fill="url(#customer-hero-hair)"/>
-        <path d="M56 17c22-6 37 12 33 34-3 18 3 33 15 42M67 13c23 5 29 23 25 43" fill="none" stroke="white" stroke-opacity=".37" stroke-width="1.5" stroke-linecap="round"/>
-        <g transform="translate(104 76)"><path d="M0 0C-23-3-23-17-11-13L0 0C-6-22 6-23 10-12L0 0C19-15 28-4 17 4L0 0C10 19-4 25-7 12Z" fill="url(#customer-hero-petal)" stroke="var(--cp-accent)" stroke-opacity=".3"/><circle r="3" fill="var(--cp-accent)"/></g>
+      <svg viewBox="0 0 170 88" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="customer-hero-hair" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#bd9489"/><stop offset=".48" stop-color="#93665e"/><stop offset="1" stop-color="#69433f"/></linearGradient>
+          <linearGradient id="customer-hero-skin" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#fff9f1"/><stop offset="1" stop-color="#e9c2ae"/></linearGradient>
+          <radialGradient id="customer-hero-light"><stop stop-color="#fffaf5"/><stop offset="1" stop-color="#edd8cc" stop-opacity=".2"/></radialGradient>
+        </defs>
+        <ellipse cx="99" cy="44" rx="62" ry="41" fill="url(#customer-hero-light)"/>
+        <ellipse cx="101" cy="44" rx="45" ry="40" fill="none" stroke="#c5a196" stroke-opacity=".35" stroke-width=".7"/>
+        <path d="M51 74Q31 48 42 24M47 60Q22 54 27 42Q43 42 47 60M42 43Q24 33 34 25Q44 29 42 43M42 28Q36 12 48 10Q53 19 42 28" stroke="#b48b77" stroke-width=".8" fill="#dfc7b5" fill-opacity=".55"/>
+        <path d="M133 75Q151 54 145 30M144 57Q164 47 159 38Q146 42 144 57M146 40Q157 25 149 20Q139 25 146 40" fill="#dfc7b5" fill-opacity=".55" stroke="#b48b77" stroke-width=".8"/>
+        <path d="M78 76C82 69 84 62 81 55C66 53 61 37 69 24C77 9 104 6 118 20C132 34 127 53 116 64L119 72Q137 77 142 84H59Q64 79 78 76Z" fill="url(#customer-hero-hair)"/>
+        <path d="M93 18C78 18 72 28 73 38L68 45Q66 48 72 49L74 56Q78 62 88 59L89 69Q91 75 83 80L110 84Q109 74 102 68L102 55Q114 46 111 30Z" fill="url(#customer-hero-skin)"/>
+        <path d="M72 34C66 19 83 8 101 11C121 12 133 27 126 47C122 60 112 66 124 77C102 74 96 64 103 47C109 32 100 21 92 21Q83 30 72 34Z" fill="url(#customer-hero-hair)"/>
+        <path d="M77 24Q87 10 107 16Q128 24 117 49Q108 64 119 73M89 15Q116 11 122 35M102 25Q112 35 106 49" fill="none" stroke="#f8e0d3" stroke-opacity=".55" stroke-width="1" stroke-linecap="round"/>
+        <path d="M75 40q5 3 10-1M74 53q4 1 7-1" fill="none" stroke="#98665b" stroke-width=".8" stroke-linecap="round"/>
+        <circle cx="103" cy="53" r="2.4" fill="#f6dfb5" stroke="#b18b62" stroke-width=".5"/>
+        <path d="M59 84Q65 71 87 70Q93 82 106 72Q125 74 142 84Z" fill="#ad8176"/>
+        <g transform="translate(127 67)"><path d="M0 0Q-14-1-12-9Q-7-13 0 0Q-5-15 3-15Q10-13 0 0Q13-10 16-3Q17 5 0 0Q11 10 4 14Q-3 16 0 0Q-12 12-16 4Q-16-2 0 0Z" fill="#fff7ed" stroke="#d5b6a5" stroke-width=".6"/><circle r="2.4" fill="#be986e"/></g>
+        <path d="M59 16v8m-4-4h8M142 10v6m-3-3h6" stroke="#bd9a83" stroke-width=".9" stroke-linecap="round"/>
       </svg>
     </div>
     <div class="customer-detail-header__content">
