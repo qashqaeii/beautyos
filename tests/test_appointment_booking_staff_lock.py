@@ -215,3 +215,22 @@ def test_booking_return_path_rejects_unsafe_urls(value):
     if value.endswith("\r\n"):
         value = "/x\r\ny"
     assert safe_booking_return_path(value) is None
+
+
+@pytest.mark.django_db
+def test_general_booking_staff_options_include_service_assignments(salon, owner_membership):
+    a = Service.objects.create(salon=salon, name="ناخن")
+    b = Service.objects.create(salon=salon, name="رنگ مو")
+    staff, _ = StaffProfile.objects.get_or_create(
+        salon=salon, membership=owner_membership,
+        defaults={"display_name": "متخصص ناخن", "is_active": True, "is_bookable": True},
+    )
+    staff.services.set([a])
+    form = AppointmentForm(salon=salon, membership=owner_membership)
+    html = str(form["staff"])
+    assert f'data-service-ids="{a.pk}"' in html
+    assert f'data-service-ids="{b.pk}"' not in html
+    assert 'data-booking-staff-filter="true"' in html
+    invalid = AppointmentForm({"service": b.pk, "staff": staff.pk}, salon=salon, membership=owner_membership)
+    assert not invalid.is_valid()
+    assert "staff" in invalid.errors

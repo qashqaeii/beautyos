@@ -24,6 +24,18 @@ def _combine_full_name(first: str, last: str) -> str:
     return f"{first.strip()} {last.strip()}".strip()
 
 
+class ServiceStaffSelect(forms.Select):
+    """Expose only active, salon-scoped service assignments for each option."""
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        staff = getattr(value, "instance", None)
+        if staff is not None:
+            option["attrs"]["data-service-ids"] = ",".join(
+                str(pk) for pk in self.service_ids_by_staff.get(staff.pk, ())
+            )
+        return option
+
+
 class AppointmentForm(PersianModelForm):
     customer_search = forms.CharField(
         label="جست‌وجوی مشتری",
@@ -106,9 +118,20 @@ class AppointmentForm(PersianModelForm):
                 if not self.is_bound:
                     self.initial.setdefault("staff", self.locked_staff.pk)
             else:
-                self.fields["staff"].queryset = staff_qs
+                from collections import defaultdict
+                assignments = defaultdict(list)
+                for staff_id, service_id in staff_qs.filter(
+                    services__in=service_qs
+                ).values_list("pk", "services__pk"):
+                    assignments[staff_id].append(service_id)
+                staff_field = self.fields["staff"]
+                staff_field.queryset = staff_qs.filter(pk__in=assignments)
+                staff_field.widget = ServiceStaffSelect(attrs={"class": "input-field", "data-booking-staff-filter": "true"})
+                staff_field.widget.service_ids_by_staff = assignments
+                staff_field.empty_label = "ابتدا خدمت را انتخاب کنید"
                 self.fields["staff"].label_from_instance = lambda obj: obj.full_display_name
             self.fields["service"].queryset = service_qs
+            self.fields["service"].empty_label = "انتخاب خدمت"
         self.fields["customer"].required = False
 
         start_at = self.initial.get("start_at")
@@ -199,7 +222,7 @@ class AppointmentForm(PersianModelForm):
         staff = cleaned.get("staff")
         service = cleaned.get("service")
         if staff and service and not staff.services.filter(pk=service.pk).exists():
-            self.add_error("service", "این خدمت توسط متخصص انتخاب‌شده ارائه نمی‌شود.")
+            self.add_error("staff", "متخصص انتخاب‌شده این خدمت را ارائه نمی‌دهد.")
         customer = cleaned.get("customer")
         new_mode = cleaned.get("new_customer_mode")
         first = (cleaned.get("new_customer_first_name") or "").strip()
