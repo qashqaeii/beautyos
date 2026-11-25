@@ -71,19 +71,36 @@
   box-shadow: 0 6px 22px #51443f16;
   color: #51443f;
 }
-.jalali-date__popover--compact .jalali-date__popover-head--direct {
-  gap: 4px; margin-bottom: 5px; padding-bottom: 7px; border-color: #f0e5df;
+.jalali-date__popover--compact .jalali-date__popover-head--compact-nav {
+  gap: 2px;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-color: #f0e5df;
 }
-.jalali-date__direct-selects {
-  display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr); gap: 5px; flex: 1; min-width: 0;
+.jalali-date__popover--compact .jalali-date__popover-head--compact-nav .jalali-date__month-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25;
 }
-.jalali-date__direct-select {
-  min-width: 0; width: 100%; min-height: 32px; padding: 3px 6px; border: 1px solid #eadbd4;
-  border-radius: 8px; background: #f9f1ec; color: #51443f; font: inherit; font-size: .8rem; font-weight: 650;
+.jalali-date__popover--compact .jalali-date__nav {
+  width: 24px;
+  height: 28px;
+  border-radius: 7px;
+  border: 0;
+  background: transparent;
+  color: #7c6960;
 }
-.jalali-date__direct-select:focus-visible { outline: 2px solid #9d726e; outline-offset: 1px; }
-.jalali-date__popover--compact .jalali-date__nav { width: 25px; height: 32px; border-radius: 8px; }
-.jalali-date__popover-head--direct .jalali-date__nav:disabled { opacity: .35; cursor: default; }
+.jalali-date__popover--compact .jalali-date__nav:hover:not(:disabled) {
+  background: #f4e7e1;
+  color: #5c4840;
+}
+.jalali-date__popover-head--compact-nav .jalali-date__nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.jalali-date__popover--compact .jalali-date__nav-icon {
+  font-size: 0.9rem;
+}
 .jalali-date__popover--compact .jalali-date__weekdays {
   margin: 0 0 4px; gap: 2px; font-size: .68rem; color: #77655e; line-height: 1.6;
 }
@@ -103,13 +120,12 @@
 .jalali-date__popover--compact .jalali-date__today-link:hover { background: #efdfd7; }
 @media(max-width:639px) {
   .jalali-date__popover--compact { --jalali-day-size: 34px; }
-  .jalali-date__direct-select { min-height: 36px; font-size: 1rem; }
-  .jalali-date__popover--compact .jalali-date__nav { height: 36px; }
+  .jalali-date__popover--compact .jalali-date__nav { height: 30px; width: 28px; }
   .jalali-date__popover--compact .jalali-date__today-link { min-height: 34px; }
 }
 @media(max-height:380px) {
   .jalali-date__popover--compact { --jalali-day-size: 26px; padding: 6px; }
-  .jalali-date__popover--compact .jalali-date__popover-head--direct { margin-bottom: 3px; padding-bottom: 4px; }
+  .jalali-date__popover--compact .jalali-date__popover-head--compact-nav { margin-bottom: 2px; padding-bottom: 3px; }
   .jalali-date__popover--compact .jalali-date__popover-foot { margin-top: 3px; padding-top: 3px; }
 }
 
@@ -140,14 +156,6 @@
   align-items:stretch;
   gap:8px;
   border-bottom:1px solid #eee1db;
-}
-.theme-app .jalali-date__direct-selects.jalali-date__period-controls {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  align-items:stretch;
-  gap:6px;
-  min-width:0;
-  flex:1 1 auto;
 }
 .theme-app .jalali-date__popover--portal .jalali-date__period-control,
 .theme-app .jalali-date__popover--portal .jalali-date__year-input.input-field {
@@ -291,11 +299,29 @@
 }
 .theme-app .jalali-date__popover--compact { --jalali-day-size:30px; padding:9px; }
 .theme-app .jalali-date__popover--compact .jalali-date__popover-head {
-  gap:5px;
-  margin-bottom:6px;
-  padding-bottom:6px;
+  gap:3px;
+  margin-bottom:5px;
+  padding-bottom:5px;
 }
-.theme-app .jalali-date__popover--compact .jalali-date__nav { flex-basis:26px; width:26px; }
+.theme-app .jalali-date__popover--compact .jalali-date__popover-head--compact-nav {
+  border-bottom:0;
+  margin-bottom:4px;
+  padding-bottom:0;
+}
+.theme-app .jalali-date__popover--compact .jalali-date__popover-head--compact-nav .jalali-date__month-label {
+  font-size:11px;
+  font-weight:720;
+}
+.theme-app .jalali-date__popover--compact .jalali-date__nav {
+  flex-basis:26px;
+  width:26px;
+  height:28px;
+  border:0;
+  background:transparent;
+}
+.theme-app .jalali-date__popover--compact .jalali-date__nav:hover:not(:disabled) {
+  background:#f3e6e0;
+}
 .theme-app .jalali-date__popover--compact .jalali-date__popover-foot {
   margin-top:5px;
   padding-top:5px;
