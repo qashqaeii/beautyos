@@ -55,6 +55,7 @@ def test_reception_creates_invoice_and_exposes_print_on_same_day(
         assert response and response.status == 200
         assert page.get_by_role("heading", name="میز پذیرش").is_visible()
         assert page.get_by_role("link", name="فاکتورهای صادرشده").is_visible()
+        page.locator(".reception-operations-disclosure > summary").click()
         invoice = page.locator(".reception-flow__invoice-panel")
         assert invoice.count() == 1
         invoice.locator("summary").click()
@@ -67,6 +68,7 @@ def test_reception_creates_invoice_and_exposes_print_on_same_day(
         assert page.get_by_role("button", name="چاپ / ذخیره PDF").is_visible()
 
         page.goto(live_server.url + desk, wait_until="load")
+        page.locator(".reception-operations-disclosure > summary").click()
         assert page.get_by_role("link", name="چاپ فاکتور " + customer.full_name).is_visible()
         assert page.locator(".reception-flow__invoice-panel").count() == 0
         print_link = page.get_by_role("link", name="چاپ فاکتور " + customer.full_name)
