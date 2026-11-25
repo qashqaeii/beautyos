@@ -23,6 +23,7 @@ def day_operations(*, salon, queue, limit=100):
         "confirmed": 0,
         "checked_in": 0,
         "completed": 0,
+        "settled": 0,
         "outstanding_toman": 0,
     }
     for appointment in appointments:
@@ -37,6 +38,7 @@ def day_operations(*, salon, queue, limit=100):
         summary["confirmed"] += appointment.status == Appointment.Status.CONFIRMED
         summary["checked_in"] += appointment.status == Appointment.Status.CHECKED_IN
         summary["completed"] += completed
+        summary["settled"] += completed and payment["owed_toman"] <= 0
         if completed:
             summary["outstanding_toman"] += payment["owed_toman"]
         rows.append({
