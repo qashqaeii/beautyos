@@ -198,6 +198,8 @@ def _beautyos_asset_version() -> str:
         "static/js/loyalty-overview.js",
         "static/css/luna-reception.css",
         "static/css/reception-dashboard-v3.css",
+        "static/js/reception-dashboard-v4.js",
+        "static/images/reception-desk-hero.svg",
         "static/images/photos/beautyos-reception-next.webp",
         "static/images/photos/beautyos-reception-pending.webp",
         "static/images/photos/beautyos-finance-hero.webp",
