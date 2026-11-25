@@ -370,6 +370,7 @@
       display: config.display ? toFa(config.display) : "",
       maxIso: config.maxIso || "",
       birthPicker: Boolean(config.birthPicker),
+      directNavigation: !config.birthPicker,
       monthsFaList: MONTHS_FA,
       open: false,
       viewJy: 1403,
@@ -461,6 +462,35 @@
           this.setIso("");
         }
       },
+      get yearOptions() {
+        // Keep existing typed dates and any configured upper bound available.
+        const current = jalaliFromIso(todayIso()).jy;
+        const selected = jalaliFromIso(this.iso);
+        const max = this.maxIso ? jalaliFromIso(this.maxIso) : null;
+        const first = Math.min(1278, selected?.jy ?? current, this.viewJy, max?.jy ?? current);
+        const last = max ? max.jy : Math.max(1579, selected?.jy ?? current, this.viewJy);
+        return Array.from({length: Math.max(0, last-first+1)}, (_, i) => ({value:first+i,label:toFa(first+i)}));
+      },
+      get monthOptions() {
+        return MONTHS_FA.map((label,i) => ({value:i+1,label,disabled:!this.monthInBounds(this.viewJy,i+1)}));
+      },
+      monthInBounds(jy,jm) {
+        return !this.maxIso || isoFromJalali(jy,jm,1) <= this.maxIso;
+      },
+      setViewYear(year) {
+        if (!Number.isInteger(year) || !this.yearOptions.some(y => y.value === year)) return;
+        this.viewJy = year;
+        const max = this.maxIso ? jalaliFromIso(this.maxIso) : null;
+        if (max && year === max.jy) this.viewJm = Math.min(this.viewJm,max.jm);
+      },
+      setViewMonth(month) {
+        if (Number.isInteger(month) && month >= 1 && month <= 12 && this.monthInBounds(this.viewJy,month)) this.viewJm = month;
+      },
+      canMoveMonth(delta) {
+        const index = this.viewJy * 12 + this.viewJm - 1 + delta;
+        const year = Math.floor(index / 12), month = ((index % 12) + 12) % 12 + 1;
+        return this.monthInBounds(year,month);
+      },
       get monthLabelFa() {
         return `${MONTHS_FA[this.viewJm - 1]} ${toFa(this.viewJy)}`;
       },
@@ -493,12 +523,14 @@
         return cells;
       },
       prevMonth() {
+        if (!this.canMoveMonth(-1)) return;
         if (this.viewJm === 1) {
           this.viewJm = 12;
           this.viewJy -= 1;
         } else this.viewJm -= 1;
       },
       nextMonth() {
+        if (!this.canMoveMonth(1)) return;
         if (this.viewJm === 12) {
           this.viewJm = 1;
           this.viewJy += 1;
