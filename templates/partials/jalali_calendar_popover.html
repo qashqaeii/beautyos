@@ -52,9 +52,16 @@
             <select class="jalali-date__period-control" aria-label="انتخاب ماه" :value="viewJm" @change="setViewMonth(Number($event.target.value))">
               <template x-for="month in monthOptions" :key="month.value"><option :value="month.value" :disabled="month.disabled" :selected="month.value === viewJm" x-text="month.label"></option></template>
             </select>
-            <select class="jalali-date__period-control" aria-label="انتخاب سال" :value="viewJy" @change="setViewYear(Number($event.target.value))">
-              <template x-for="year in yearOptions" :key="year.value"><option :value="year.value" :selected="year.value === viewJy" x-text="year.label"></option></template>
-            </select>
+            <div class="jalali-date__year-menu" x-data="{ expanded: false }" @click.outside="expanded = false" @keydown.escape.stop="if (expanded) { expanded = false; $refs.yearTrigger.focus(); } else { closeCalendar(); }">
+              <button type="button" class="jalali-date__period-control jalali-date__year-trigger" x-ref="yearTrigger" aria-label="انتخاب سال" :aria-expanded="expanded" @click="expanded = !expanded; if (expanded) $nextTick(() => $refs.yearList.querySelector('[aria-current=true]')?.scrollIntoView({block:'center'}))">
+                <span x-text="yearOptions.find(y => y.value === viewJy)?.label"></span><span aria-hidden="true">⌄</span>
+              </button>
+              <div class="jalali-date__year-list" x-ref="yearList" x-show="expanded" x-cloak>
+                <template x-for="year in yearOptions" :key="year.value">
+                  <button type="button" :aria-current="year.value === viewJy ? 'true' : null" :data-year="year.value" @click="setViewYear(year.value); expanded = false; $refs.yearTrigger.focus()" x-text="year.label"></button>
+                </template>
+              </div>
+            </div>
           </div>
         </template>
         <template x-if="!directNavigation">

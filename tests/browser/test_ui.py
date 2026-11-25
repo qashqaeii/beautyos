@@ -707,7 +707,7 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         trigger.click()
         calendar=page.locator(".jalali-date__popover--portal:visible")
         pw.expect(calendar.get_by_role("gridcell",name="۲۹",exact=True)).to_have_attribute("aria-current","date")
-        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_value("1405")
+        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_text("۱۴۰۵⌄")
         pw.expect(calendar.get_by_label("انتخاب ماه",exact=True)).to_have_value("8")
 
         def assert_compact():
@@ -738,7 +738,7 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         calendar.get_by_label("انتخاب سال",exact=True).select_option("1404")
         pw.expect(calendar.get_by_role("gridcell",name="۳۰",exact=True)).to_have_count(0)
         calendar.get_by_role("button",name="ماه بعد",exact=True).click()
-        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_value("1405")
+        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_text("۱۴۰۵⌄")
         pw.expect(calendar.get_by_label("انتخاب ماه",exact=True)).to_have_value("1")
         with page.expect_navigation(wait_until="load"):
             calendar.get_by_role("gridcell",name="۱",exact=True).click()
@@ -1492,7 +1492,7 @@ def test_shared_jalali_direct_selects_have_identical_card_geometry(
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+3")
         calendar.get_by_role("button",name="ماه قبل").click()
         pw.expect(month).to_have_value("7")
-        pw.expect(year).to_have_value("1405")
+        pw.expect(year).to_contain_text("۱۴۰۵")
         context.close()
         browser.close()
 

@@ -262,7 +262,7 @@
         if (!pop || !pop.getClientRects().length) return;
         const edge = POPOVER_EDGE;
         const gap = 6;
-        const width = Math.min(344, window.innerWidth - edge * 2);
+        const width = Math.min(window.innerWidth < 640 ? 320 : 300, window.innerWidth - edge * 2);
         const available = Math.max(1, window.innerHeight - edge * 2);
         // Give the actual month's grid room first, instead of clipping it to a fixed estimate.
         Object.assign(pop.style, {width: `${width}px`, maxHeight: "none", overflowY: "visible"});

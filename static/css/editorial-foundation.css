@@ -449,3 +449,49 @@ body .jalali-date__popover--portal :is(button,select,input):focus-visible {
 @media(prefers-reduced-motion:no-preference){
   body .jalali-date__popover--portal :is(button,select,input){transition:background-color .15s ease,color .15s ease,border-color .15s ease;}
 }
+
+/* Compact approved calendar: preserve the full year range in a bounded menu. */
+body .jalali-date__popover.jalali-date__popover--portal {
+  --jalali-day-size:32px;padding:9px;border-radius:12px;
+  --picker-period-bg:#946b65;--picker-period-ink:#fff;
+}
+body.theme-app .jalali-date__popover--portal .jalali-date__popover-head,
+body .jalali-date__popover--portal .jalali-date__popover-head {
+  margin-bottom:6px;padding-bottom:0;gap:5px;
+}
+body .jalali-date__popover--portal .jalali-date__period-pair {gap:5px;}
+body .jalali-date__popover--portal :is(.jalali-date__period-control,.jalali-date__year-input.input-field,.jalali-date__today-link),
+body.theme-app .jalali-date__popover--portal :is(.jalali-date__period-control,.jalali-date__year-input.input-field,.jalali-date__today-link) {
+  background-color:var(--picker-period-bg);color:var(--picker-period-ink);
+  border-color:var(--picker-period-bg);font-weight:650;
+}
+body .jalali-date__popover--portal select.jalali-date__period-control option {background:var(--picker-surface);color:var(--picker-ink);}
+body .jalali-date__popover--portal .jalali-date__year-menu {position:relative;min-width:0;}
+body .jalali-date__popover--portal .jalali-date__year-trigger {display:flex;align-items:center;justify-content:space-between;padding-inline:8px;}
+body .jalali-date__popover--portal .jalali-date__year-list {
+  position:absolute;inset-inline:0;top:calc(100% + 4px);z-index:5;
+  max-height:166px;overflow-y:auto;overscroll-behavior:contain;
+  padding:4px;background:var(--picker-surface);border:1px solid var(--picker-line);
+  border-radius:9px;box-shadow:0 6px 18px rgba(65,42,38,.16);
+  scrollbar-width:thin;scrollbar-color:#c5a49b transparent;
+}
+body .jalali-date__popover--portal .jalali-date__year-list button {
+  display:block;width:100%;height:30px;border:0;border-radius:5px;
+  background:transparent;color:var(--picker-ink);font:inherit;text-align:center;
+}
+body .jalali-date__popover--portal .jalali-date__year-list button:hover,
+body .jalali-date__popover--portal .jalali-date__year-list button[aria-current=true] {
+  background:var(--picker-soft);color:var(--picker-accent);font-weight:700;
+}
+body .jalali-date__popover--portal .jalali-date__period-control:hover,
+body.theme-app .jalali-date__popover--portal .jalali-date__period-control:hover,
+body.theme-app .jalali-date__popover--portal .jalali-date__today-link:hover {
+  background-color:#805a55;color:#fff;
+}
+body .jalali-date__popover--portal .jalali-date__popover-foot {margin-top:6px;padding-top:6px;}
+@media(max-width:639px){
+  body .jalali-date__popover.jalali-date__popover--portal {--jalali-day-size:39px;}
+}
+@media(max-height:420px){
+  body .jalali-date__popover.jalali-date__popover--portal {--jalali-day-size:26px;}
+}
