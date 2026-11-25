@@ -100,18 +100,19 @@
         </header>
         {% if next_appt %}
         <div class="reception-desk-next__row">
-          <time class="reception-desk-next__time tabular-nums" datetime="{{ next_appt.start_at|date:'c' }}">{{ next_appt.start_at|fa_time }}</time>
+          <div class="reception-next-timebox"><span>ساعت نوبت</span><time class="reception-desk-next__time tabular-nums" datetime="{{ next_appt.start_at|date:'c' }}">{{ next_appt.start_at|fa_time }}</time></div>
           <div class="reception-desk-next__copy min-w-0">
             <p class="reception-desk-next__name">{{ next_appt.customer.full_name }}</p>
             <p class="reception-desk-next__meta">
               <span class="reception-desk-next__service">{{ next_appt.service.name }}</span>
               {% if next_appt.staff %}
-              <span class="reception-desk-next__dot" aria-hidden="true">·</span>
+              
               <span class="reception-desk-next__staff">{{ next_appt.staff.full_display_name }}</span>
               {% endif %}
             </p>
           </div>
-          <div class="reception-desk-next__tail">
+          </div>
+        <div class="reception-desk-next__tail">
             {% if next_payment %}
             <span class="reception-desk-pay-chip reception-desk-pay-chip--{{ next_payment.status_code|default:'none' }}">
               {{ next_payment.label }}
@@ -129,7 +130,6 @@
             </form>
             {% endif %}
           </div>
-        </div>
         <a href="{% url 'appointments:detail' pk=next_appt.pk %}" class="reception-desk-next__detail">جزئیات نوبت</a>
         {% if can_issue_invoice and next_appt.status == 'completed' %}<a href="{% url 'finance:checkout' next_appt.customer_id %}?appointment={{ next_appt.pk|unlocalize }}" class="reception-desk-next__detail">صدور فاکتور</a>{% endif %}
         {% else %}
@@ -297,7 +297,7 @@
   <section class="reception-desk-workspace dashboard-enter" aria-label="وقت آزاد و تیم">
     <div class="reception-desk-workspace__grid">
       <div class="reception-desk-workspace__slots">
-        <h2 class="reception-desk-workspace__title"><i data-lucide="calendar-days" aria-hidden="true"></i>اولین وقت آزاد</h2>
+        <h2 class="reception-desk-workspace__title">اولین وقت آزاد</h2>
         <form method="get" action="{% url 'reception:desk' %}" class="reception-desk-slot-filters">
           <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
           <div class="reception-desk-slot-filters__field">
@@ -355,7 +355,6 @@
         </div>
         {% else %}
         <div class="reception-desk-empty reception-desk-empty--block">
-          <i data-lucide="calendar-days" class="luna-reception-slot-empty-icon" aria-hidden="true"></i>
           <p>{% if not selected_service %}
           برای دیدن وقت‌ها یک خدمت انتخاب کنید.
           {% elif slot_staff_no_availability %}
