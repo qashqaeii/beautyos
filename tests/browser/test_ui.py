@@ -345,6 +345,17 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     header = page.locator(".reception-desk-header").bounding_box()
                     kpi_box = page.locator(".reception-overview-kpis").bounding_box()
                     assert header and kpi_box and kpi_box["y"] >= header["y"] + header["height"] - 2
+                    if width >= 800:
+                        day_picker = page.locator(".reception-desk-header__date").bounding_box()
+                        heading = page.locator(".reception-desk-header__brand").bounding_box()
+                        assert day_picker and heading
+                        assert day_picker["y"] >= header["y"] - 2
+                        assert day_picker["y"] + day_picker["height"] <= header["y"] + header["height"] + 2, (
+                            "date picker must remain inside the shared-height reception header"
+                        )
+                        assert heading["y"] + heading["height"] <= header["y"] + header["height"] + 2
+                        assert day_picker["x"] + day_picker["width"] <= header["x"] + header["width"] + 2
+
                     buttons = page.locator(".reception-overview-actions")
                     if buttons.count():
                         action_box = buttons.bounding_box()
@@ -361,6 +372,12 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                         assert flow_box["width"] > next_box["width"], "today operations must be the main panel"
                         assert abs(flow_box["y"] - next_box["y"]) <= 3, "today and next appointment must share a row"
                         assert team_box["y"] >= flow_box["y"] + flow_box["height"] - 2, "team and free slots belong below operations"
+                        next_card = page.locator(".reception-desk-priority__next").bounding_box()
+                        pending_card = page.locator(".reception-desk-priority__pending").bounding_box()
+                        assert next_card and pending_card
+                        assert next_card["height"] >= 85 and pending_card["height"] >= 85, "priority cards became too short"
+                        assert pending_card["y"] >= next_card["y"] + next_card["height"] - 2
+
                         assert page.locator(".reception-desk-page").evaluate(
                             "(el) => el.getBoundingClientRect().bottom <= innerHeight + 3"
                         ), "reception desk must fit the standard desktop viewport"
