@@ -17,14 +17,28 @@
       x-data="{
         selected: [], discount: '', cash: '', card: '', transfer: '', voucherAmount: 0,
         number(v) { return Math.max(0, Number(v || 0)); },
+        digits(v) { return String(v ?? '').replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^0-9]/g, ''); },
+        moneyDisplay(v) { return this.digits(v).replace(/\B(?=(\d{3})+(?!\d))/g, '٬').replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]); },
+        editMoney(key, event) {
+          const el = event.target;
+          const before = this.digits(el.value.slice(0, el.selectionStart ?? el.value.length)).length;
+          this[key] = this.digits(el.value);
+          el.value = this.moneyDisplay(this[key]);
+          let pos = 0, count = 0;
+          while (pos < el.value.length && count < before) {
+            if (/[۰-۹]/.test(el.value[pos])) count++;
+            pos++;
+          }
+          el.setSelectionRange(pos, pos);
+        },
         get owed() { return this.selected.reduce((total, key) => total + this.number(this.$refs.rows?.querySelector('[data-key=a'+key+']')?.dataset.owed), 0); },
         get received() { return this.number(this.cash) + this.number(this.card) + this.number(this.transfer); },
         get remaining() { return Math.max(0, this.owed - this.number(this.discount) - this.voucherAmount - this.received); },
         format(v) { return Number(v).toLocaleString('fa-IR'); }
       }" x-init="$nextTick(() => {
         selected = Array.from($refs.rows.querySelectorAll('input:checked')).map(el => el.value);
-        discount = $refs.discount.dataset.initial; cash = $refs.cash.dataset.initial;
-        card = $refs.card.dataset.initial; transfer = $refs.transfer.dataset.initial;
+        discount = digits($refs.discount.dataset.initial); cash = digits($refs.cash.dataset.initial);
+        card = digits($refs.card.dataset.initial); transfer = digits($refs.transfer.dataset.initial);
         voucherAmount = Number($refs.voucher?.selectedOptions[0]?.dataset.amount || 0);
       })">
       {% csrf_token %}{{ form.request_key }}
@@ -73,7 +87,8 @@
           <div class="checkout-workspace__payment-fields">
             {% for field in form.visible_fields %}{% if field.name != "voucher" %}
             <label class="checkout-workspace__field"><span>{{ field.label }}</span>
-              <input type="number" min="0" step="1" name="{{ field.name }}" class="input-field" x-ref="{{ field.name }}" x-model="{{ field.name }}" value="{{ field.value|default_if_none:''|unlocalize }}" data-initial="{{ field.value|default_if_none:''|unlocalize }}" inputmode="numeric" placeholder="۰">
+              <input type="hidden" name="{{ field.name }}" x-ref="{{ field.name }}" :value="{{ field.name }}" value="{{ field.value|default_if_none:''|unlocalize }}" data-initial="{{ field.value|default_if_none:''|unlocalize }}">
+              <input type="text" class="input-field" :value="moneyDisplay({{ field.name }})" @input="editMoney('{{ field.name }}', $event)" inputmode="numeric" autocomplete="off" dir="ltr" placeholder="۰">
             </label>
             {% endif %}{% endfor %}
           </div>
