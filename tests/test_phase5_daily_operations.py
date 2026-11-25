@@ -139,6 +139,7 @@ def test_phase5_pending_must_be_confirmed_then_checkin_then_complete_and_invoice
     response = client.get(reverse("reception:desk"), {"day": day.isoformat()})
     assert response.context["day_operations_summary"]["completed"] == 1
     assert response.context["day_operations_summary"]["outstanding_toman"] == 800_000
+    assert response.context["day_operations_summary"]["settled"] == 0
     assert "صدور فاکتور و چاپ" in response.content.decode()
 
     invoice = issue_invoice(
@@ -157,6 +158,7 @@ def test_phase5_pending_must_be_confirmed_then_checkin_then_complete_and_invoice
     assert "مشاهده فاکتور" in response.content.decode()
     assert "رفتن به صندوق" not in response.content.decode()
     assert response.context["day_operations_summary"]["outstanding_toman"] == 0
+    assert response.context["day_operations_summary"]["settled"] == 1
 
 
 @pytest.mark.django_db
