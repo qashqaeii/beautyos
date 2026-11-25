@@ -1,0 +1,136 @@
+/* Customer profile header — shared BeautyOS page-header scale (phase7). */
+.maison-app.management-suite .customer-detail-page .customer-detail-header {
+  box-sizing: border-box;
+  margin-block-end: 10px;
+  border-radius: 14px;
+  gap: 0;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+}
+
+.customer-detail-header__illustration,
+.customer-detail-header__ornament {
+  display: none;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__content {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__identity {
+  padding-inline-start: 0;
+  min-height: 0;
+  gap: 10px;
+  flex: 1 1 auto;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__avatar--icon {
+  width: var(--bo-page-header-icon-size, 40px);
+  height: var(--bo-page-header-icon-size, 40px);
+  border-radius: 11px;
+  border-width: 1px;
+  box-shadow: none;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__avatar--icon:not(:has(img)) {
+  display: grid;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__name {
+  font-size: var(--bo-page-header-title-size, 20px);
+  line-height: 1.45;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__phone {
+  font-size: var(--bo-page-header-subtitle-size, 11px);
+  line-height: 1.55;
+  padding: 0;
+  background: none;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__vip {
+  padding: 2px 7px;
+  font-size: 10px;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+}
+
+.maison-app.management-suite .customer-detail-page .customer-detail-header__btn {
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+
+.customer-detail-header__back {
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 9px;
+  flex: none;
+}
+
+@media (min-width: 1024px) {
+  .maison-app.management-suite .customer-detail-page .customer-detail-header {
+    height: var(--bo-page-header-height, 88px);
+    min-height: var(--bo-page-header-height, 88px);
+    max-height: var(--bo-page-header-height, 88px);
+    padding: 12px 16px;
+  }
+}
+
+@media (max-width: 639px) {
+  .maison-app.management-suite .customer-detail-page .customer-detail-header {
+    min-height: var(--bo-page-header-height, 88px);
+    padding: 12px;
+  }
+
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__content {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 46%;
+    gap: 5px;
+  }
+
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__btn {
+    min-height: 36px;
+    padding-inline: 8px;
+    white-space: nowrap;
+  }
+
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__btn span {
+    display: none;
+  }
+
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__btn svg {
+    margin: 0;
+  }
+}
+
+@media (max-width: 399px) {
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__vip {
+    display: none;
+  }
+}

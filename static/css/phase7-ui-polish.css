@@ -250,7 +250,9 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
     .reception-desk-page .reception-desk-header,
     .retention-page .retention-page__hero,
     .waitlist-page .waitlist-page__hero,
-    .dashboard-mgmt-page .dash-page-header--mgmt
+    .dashboard-mgmt-page .dash-page-header--mgmt,
+    .luna-overview-shell .dash-page-header--overview,
+    .customer-detail-page .customer-detail-header
   ) {
     box-sizing:border-box;
     height:var(--bo-page-header-height);
@@ -269,7 +271,9 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
     .staff-board-v2 .staff-team-page__title,
     .finance-page .finance-page__title,
     .reception-desk-page .reception-desk-header__title,
-    .inventory-page .inventory-page__title
+    .inventory-page .inventory-page__title,
+    .luna-overview-shell .dash-page-header__title,
+    .customer-detail-page .customer-detail-header__name
   ) {
     font-size:var(--bo-page-header-title-size);
     line-height:1.45;
@@ -279,7 +283,9 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
     .maison-page-subtitle,
     .customers-list-page .editorial-directory-copy > p,
     .staff-board-v2 .editorial-directory-copy > p,
-    .finance-page .luna-finance-subtitle
+    .finance-page .luna-finance-subtitle,
+    .luna-overview-shell .dash-page-header__subtitle,
+    .customer-detail-page .customer-detail-header__phone
   ) {
     font-size:var(--bo-page-header-subtitle-size);
     line-height:1.55;
@@ -319,7 +325,9 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
     .staff-board-v2 .staff-team-page__header,
     .inventory-page .inventory-page__header,
     .finance-page .finance-page__header--premium,
-    .reception-desk-page .reception-desk-header
+    .reception-desk-page .reception-desk-header,
+    .luna-overview-shell .dash-page-header--overview,
+    .customer-detail-page .customer-detail-header
   ) {
     min-height:88px;
     height:auto;
@@ -333,7 +341,9 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
     .staff-board-v2 .staff-team-page__header,
     .inventory-page .inventory-page__header,
     .finance-page .finance-page__header--premium,
-    .reception-desk-page .reception-desk-header
+    .reception-desk-page .reception-desk-header,
+    .luna-overview-shell .dash-page-header--overview,
+    .customer-detail-page .customer-detail-header
   ) {
     height:auto;
     min-height:88px;
@@ -347,11 +357,17 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
 @media (min-width:1024px) {
   .maison-app.management-suite .customers-list-page .customers-list-page__header,
   .maison-app.management-suite .staff-board-v2 .staff-team-page__header,
-  .maison-app.management-suite .inventory-page .inventory-page__header {
+  .maison-app.management-suite .inventory-page .inventory-page__header,
+  .maison-app.management-suite .maison-unified-header,
+  .maison-app.management-suite .customer-detail-page .customer-detail-header,
+  .luna-overview-shell .dash-page-header--overview {
     height:var(--bo-page-header-height);
     min-height:var(--bo-page-header-height);
     padding:12px 16px;
     margin-block-end:10px;
+    box-sizing:border-box;
+    align-content:center;
+    overflow:hidden;
   }
   .maison-app.management-suite .customers-list-page .editorial-directory-copy > h1,
   .maison-app.management-suite .staff-board-v2 .staff-team-page__title,

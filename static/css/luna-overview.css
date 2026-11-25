@@ -2,7 +2,7 @@
 .luna-overview-shell .maison-unified-header.dashboard-lite-app-header { display:none; }
 .luna-overview-shell .maison-content { padding:14px 12px 22px; max-width:100rem; }
 .luna-overview-shell .dashboard-overview { display:grid; gap:15px; min-width:0; --overview-border:#e5d6cf; --overview-paper:#fffaf7; --overview-ink:#51443f; }
-.luna-overview-shell .dash-page-header--overview { position:relative; isolation:isolate; display:flex; flex-direction:column; align-items:stretch; gap:13px; min-height:0; max-height:none; padding:16px; border:1px solid var(--overview-border); border-radius:18px; background:#fff7f3; box-shadow:0 4px 18px rgba(81,68,63,.05); }
+.luna-overview-shell .dash-page-header--overview { position:relative; isolation:isolate; display:flex; flex-direction:column; align-items:stretch; gap:10px; min-height:0; max-height:none; padding:12px 16px; border:1px solid var(--overview-border); border-radius:14px; background:#fff7f3; box-shadow:0 4px 18px rgba(81,68,63,.05); box-sizing:border-box; }
 .overview-hero-art { display:none; pointer-events:none; position:absolute; inset:0; z-index:-1; border-radius:inherit; overflow:hidden; }
 .luna-overview-shell .dash-page-header__copy { text-align:start; width:auto; min-width:0; }
 .overview-eyebrow { display:flex; align-items:center; gap:6px; margin:0 0 4px; color:#8a635f; font-size:.73rem; font-weight:600; }
@@ -254,4 +254,38 @@
   .overview-staff-list:has(>li:nth-child(4)) li{min-width:0}
   .overview-staff-list:has(>li:nth-child(4)) li>div:first-child{flex-wrap:nowrap;align-items:baseline}
  }
+}
+
+/* Match shared phase7 page-header scale (88px). */
+@media (min-width:640px) {
+  .luna-overview-shell .dash-page-header--overview {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+}
+@media (min-width:1024px) {
+  .luna-overview-shell .dash-page-header--overview {
+    height: var(--bo-page-header-height, 88px);
+    min-height: var(--bo-page-header-height, 88px);
+    padding: 12px 16px;
+    flex-wrap: nowrap;
+  }
+  .luna-overview-shell .dash-page-header__title {
+    font-size: var(--bo-page-header-title-size, 20px);
+    line-height: 1.45;
+  }
+  .luna-overview-shell .dash-page-header__subtitle {
+    font-size: var(--bo-page-header-subtitle-size, 11px);
+    line-height: 1.55;
+  }
+}
+@media (min-width:1024px) and (max-height:760px) {
+  .luna-overview-shell .dash-page-header--overview {
+    min-height: var(--bo-page-header-height, 88px);
+    height: var(--bo-page-header-height, 88px);
+    padding-block: 12px;
+  }
 }

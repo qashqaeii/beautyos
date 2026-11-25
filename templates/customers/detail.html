@@ -7,6 +7,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/customer-detail-premium.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/customer-detail-header-scale.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 {% if can_book_appointment %}
 <script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 <script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
