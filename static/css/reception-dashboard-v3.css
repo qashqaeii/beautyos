@@ -831,7 +831,7 @@ body.theme-app .maison-app.luna-reception-shell {
   .luna-reception-shell .reception-journey__icon svg{width:23px;height:23px;}
   .luna-reception-shell .reception-journey::before{top:calc(50% - 26px);}
   .luna-reception-shell .reception-desk-workspace__slots{padding:8px 10px;}
-  .luna-reception-shell .reception-desk-slot-filters select{height:34px;min-height:34px;}
+  .luna-reception-shell .reception-desk-slot-filters select{height:42px;min-height:42px;}
 }
 @media(min-width:1180px) and (min-height:800px){
   .luna-reception-shell .reception-desk-page{grid-template-rows:88px 74px auto minmax(0,1fr);}
@@ -848,4 +848,23 @@ body.theme-app .maison-app.luna-reception-shell {
 @media(max-width:540px){
   .luna-reception-shell .reception-desk-quick__row{grid-template-columns:repeat(2,minmax(0,1fr));}
   .luna-reception-shell .reception-desk-quick__link{min-height:44px;}
+}
+
+/* Keep native select text vertically centered: shared input padding must not
+   consume the content area of the compact reception controls. */
+body.theme-app .luna-reception-shell .reception-desk-slot-filters__field{
+  display:flex;flex-direction:column;gap:4px;min-width:0;
+}
+body.theme-app .luna-reception-shell .reception-desk-service-form__label{
+  display:block;margin:0;line-height:1.5;font-size:11px;
+}
+body.theme-app .luna-reception-shell .reception-desk-slot-filters select.input-field{
+  box-sizing:border-box;width:100%;min-width:0;
+  height:42px;min-height:42px;max-height:none;
+  padding-block:0;padding-inline-start:10px;padding-inline-end:30px;
+  font-size:12px;line-height:normal;direction:rtl;text-align:start;
+  background-position:left 10px center;
+}
+body.theme-app .luna-reception-shell .reception-desk-slot-filters select.input-field:focus-visible{
+  outline:2px solid #987068;outline-offset:1px;
 }
