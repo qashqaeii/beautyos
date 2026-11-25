@@ -406,8 +406,20 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 pw.expect(first).to_be_in_viewport(ratio=.25)
                 assert page.evaluate("window.scrollY")==0
                 page.screenshot(path=str(ARTIFACT/"1366-loyalty-compact.png"),animations="disabled")
+                page.goto(live_server.url + "/reception/", wait_until="load")
+                page.evaluate("document.fonts.ready")
+                page.evaluate("window.scrollTo(0,0)")
+                reception_page = page.locator(".reception-desk-page")
+                pw.expect(reception_page).to_be_visible()
+                assert reception_page.evaluate(
+                    "(el) => el.getBoundingClientRect().bottom <= innerHeight + 3"
+                ), "reception should fit the 1366x640 laptop content viewport"
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
+                assert page.evaluate("document.documentElement.scrollHeight <= innerHeight + 3")
+                page.screenshot(path=str(ARTIFACT/"1366-reception-compact.png"),animations="disabled")
+
             except Exception as exc:
-                errors.append(f"1366/overview or loyalty first viewport: {exc}")
+                errors.append(f"1366/overview, loyalty or reception first viewport: {exc}")
             finally:
                 page.set_viewport_size({"width":width,"height":height})
 
