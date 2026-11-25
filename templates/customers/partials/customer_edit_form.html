@@ -2,7 +2,7 @@
   method="post"
   action="{% url 'customers:edit' pk=customer.pk %}"
   enctype="multipart/form-data"
-  class="inventory-create-modal__form customer-form customer-form--edit"
+  class="inventory-create-modal__form customer-form customer-form--edit luna-profile-form"
   id="customer-edit-form"
   autocomplete="off"
 >
@@ -11,7 +11,7 @@
     <p class="customer-form-field__error inventory-create-modal__form-error">{{ edit_form.non_field_errors.0 }}</p>
   {% endif %}
 
-  <div class="inventory-create-modal__scroll maison-scroll-themed">
+  <div class="inventory-create-modal__scroll maison-scroll-themed luna-profile-body">
     <div class="customer-form__fields customer-form__fields--modal luna-customer-edit-grid">
       <div class="customer-form-field">
         <label class="field-label" for="{{ edit_form.phone_input.id_for_label }}">{{ edit_form.phone_input.label }}</label>
@@ -22,11 +22,6 @@
         <label class="field-label" for="{{ edit_form.full_name.id_for_label }}">{{ edit_form.full_name.label }}</label>
         {{ edit_form.full_name }}
         {% if edit_form.full_name.errors %}<p class="customer-form-field__error">{{ edit_form.full_name.errors.0 }}</p>{% endif %}
-      </div>
-      <div class="customer-form-field">
-        <label class="field-label" for="{{ edit_form.email.id_for_label }}">{{ edit_form.email.label }}</label>
-        {{ edit_form.email }}
-        {% if edit_form.email.errors %}<p class="customer-form-field__error">{{ edit_form.email.errors.0 }}</p>{% endif %}
       </div>
       <div class="customer-form__primary-grid customer-form__primary-grid--modal luna-field--full">
         <div class="customer-form-field">
@@ -40,11 +35,11 @@
           {% if edit_form.status.errors %}<p class="customer-form-field__error">{{ edit_form.status.errors.0 }}</p>{% endif %}
         </div>
       </div>
-      <div class="customer-form-field luna-field--full">
-        <label class="field-label" for="{{ edit_form.tags.id_for_label }}">{{ edit_form.tags.label }}</label>
-        {{ edit_form.tags }}
+      <fieldset class="customer-form-field luna-field--full luna-customer-tags-field">
+        <legend class="field-label">{{ edit_form.tags.label }}</legend>
+        {% if edit_form.tags.field.queryset.exists %}{{ edit_form.tags }}{% else %}<p class="luna-section-hint">هنوز برچسبی تعریف نشده است.</p>{% endif %}
         {% if edit_form.tags.errors %}<p class="customer-form-field__error">{{ edit_form.tags.errors.0 }}</p>{% endif %}
-      </div>
+      </fieldset>
       <div class="customer-form-field luna-field--full">
         {{ edit_form.avatar }}
         {% if edit_form.avatar.errors %}<p class="customer-form-field__error">{{ edit_form.avatar.errors.0 }}</p>{% endif %}
@@ -67,7 +62,7 @@
   </div>
 
   <footer class="inventory-create-modal__foot">
-    <button type="submit" class="btn-primary customer-form__submit-modal">ذخیره تغییرات</button>
+    <button type="submit" class="btn-primary customer-form__submit-modal"><i data-lucide="check" aria-hidden="true"></i>ذخیره تغییرات</button>
     <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-modal')">
       انصراف
     </button>

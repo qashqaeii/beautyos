@@ -92,7 +92,6 @@ class CustomerForm(PersianModelForm):
         model = Customer
         fields = [
             "full_name",
-            "email",
             "birth_date",
             "is_vip",
             "status",
@@ -102,10 +101,9 @@ class CustomerForm(PersianModelForm):
         ]
         widgets = {
             "full_name": forms.TextInput(attrs={"class": "input-field"}),
-            "email": forms.EmailInput(attrs={"class": "input-field"}),
             "birth_date": forms.DateInput(attrs={"class": "input-field"}),
             "status": forms.Select(attrs={"class": "input-field"}),
-            "tags": forms.SelectMultiple(attrs={"class": "input-field"}),
+            "tags": forms.CheckboxSelectMultiple(attrs={"class": "luna-customer-tags"}),
             "avatar": ProfileImageWidget(attrs={"accept": "image/*"}),
             "marketing_consent": forms.CheckboxInput(attrs={"class": "rounded border-aubergine/20"}),
             "is_vip": forms.CheckboxInput(attrs={"class": "rounded border-aubergine/20"}),

@@ -266,3 +266,17 @@ def test_customer_detail_booking_cta_loads_modal_with_customer_locked(client, sa
     assert 'name="from_customer_detail"' in body
     assert f'value="{customer.pk}"' in body
     assert 'customer-detail-booking-lock' in body
+
+
+@pytest.mark.django_db
+def test_customer_edit_compact_tags_preserve_existing_email(salon):
+    from apps.customers.forms import CustomerForm
+    customer = Customer.objects.create(salon=salon, full_name="مشتری", phone="+989121555564", email="customer@example.com")
+    tag = CustomerTag.objects.create(salon=salon, name="ویژه")
+    form = CustomerForm(data={"full_name": "مشتری ویرایش شده", "phone_input": "09121555564", "status": customer.status, "tags": [tag.pk], "email": "ignored@example.com"}, instance=customer, salon=salon)
+    assert "email" not in form.fields
+    assert form.is_valid(), form.errors
+    form.save()
+    customer.refresh_from_db()
+    assert customer.email == "customer@example.com"
+    assert list(customer.tags.all()) == [tag]
