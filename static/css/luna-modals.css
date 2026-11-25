@@ -804,3 +804,9 @@ body.theme-app .luna-modal--service .luna-service-field-card .toman-amount__disp
 
 body.theme-app .finance-payment-form--modal .finance-payment-picker-hint{font-size:11px;color:#806961;margin:0;line-height:1.5;}
 body.theme-app .finance-payment-form--modal [data-payment-money]{font-variant-numeric:tabular-nums;}
+
+/* Expense entry follows the paired service modal and shared Jalali control. */
+body.theme-app .luna-modal--expense .luna-service-field-card{min-width:0}
+body.theme-app .luna-modal--expense .luna-service-field-card > :is(div,input,select){min-width:0;max-width:100%}
+body.theme-app .luna-modal--expense .luna-service-field-card .field-label{white-space:normal}
+body.theme-app .luna-modal--expense .inventory-create-modal__foot .btn-primary{display:inline-flex;align-items:center;gap:6px}

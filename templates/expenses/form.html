@@ -1,9 +1,1 @@
-{% extends "layouts/app_shell.html" %}
-{% block page_title %}ثبت هزینه{% endblock %}
-{% block content %}
-<form method="post" class="card max-w-lg space-y-4">
-  {% csrf_token %}
-  {% for field in form %}<div><label class="text-sm">{{ field.label }}</label>{{ field }}</div>{% endfor %}
-  <button class="btn-primary">ذخیره</button>
-</form>
-{% endblock %}
+{% extends "expenses/overview.html" %}

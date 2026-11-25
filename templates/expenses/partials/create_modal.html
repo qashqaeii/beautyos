@@ -1,0 +1,36 @@
+{% if expense_form %}
+<template x-teleport="body">
+  <div class="inventory-create-modal-root luna-modal-root" x-cloak x-show="expenseOpen" x-transition.opacity role="presentation">
+    <button type="button" class="inventory-create-modal__backdrop" tabindex="-1" aria-label="بستن" @click="expenseOpen=false"></button>
+    <div class="inventory-create-modal inventory-create-modal--wide luna-modal luna-modal--service luna-modal--expense" role="dialog" aria-modal="true" aria-labelledby="expense-modal-title" @click.stop>
+      <header class="inventory-create-modal__head">
+        <div class="luna-modal-heading">
+          <span class="luna-modal-emblem" aria-hidden="true"><i data-lucide="receipt"></i></span>
+          <div class="luna-modal-heading__copy"><h2 id="expense-modal-title" class="inventory-create-modal__title">ثبت هزینه</h2><p class="luna-modal-subtitle">مشخصات هزینه سالن را وارد کنید.</p></div>
+        </div>
+        <button type="button" class="inventory-create-modal__close" aria-label="بستن" @click="expenseOpen=false"><i data-lucide="x" aria-hidden="true"></i></button>
+      </header>
+      <form method="post" action="{% url 'expenses:create' %}" class="inventory-create-modal__form" id="expense-create-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ expense_return_url }}">
+        <div class="inventory-create-modal__scroll maison-scroll-themed">
+          {% if expense_form.non_field_errors %}<div role="alert">{{ expense_form.non_field_errors }}</div>{% endif %}
+          <div class="luna-service-paired-grid">
+          {% for field in expense_form %}
+            <div class="luna-service-field-card">
+              <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<div class="service-form-field__error" role="alert">{{ field.errors }}</div>{% endif %}
+            </div>
+          {% endfor %}
+          </div>
+        </div>
+        <footer class="inventory-create-modal__foot">
+          <button type="submit" class="btn-primary"><i data-lucide="check" aria-hidden="true"></i>ذخیره هزینه</button>
+          <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="expenseOpen=false">انصراف</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+</template>
+{% endif %}

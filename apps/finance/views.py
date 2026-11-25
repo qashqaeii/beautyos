@@ -162,8 +162,13 @@ def _finance_overview_context(
         commissions["settled_staff_count"] = len(commissions["settled_rows"])
         commissions["need_payment_staff_count"] = len(commissions["pending_rows"])
 
+    from apps.expenses.forms import ExpenseForm
+    from django.utils import timezone
     return {
         **range_ctx,
+        "expense_form": ExpenseForm(initial={"expense_date": timezone.localdate()}) if has_permission(membership, P_EXPENSE_MANAGE) and tab in ("cash", "income") else None,
+        "expense_modal_open": False,
+        "expense_return_url": _finance_return_url(get_query),
         "tab": tab,
         "income": income,
         "dashboard": finance_dashboard(request.salon, range_ctx) if tab in ("income", "cash", "debts", "reports") else None,

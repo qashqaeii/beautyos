@@ -12,6 +12,7 @@
 <div
   class="finance-page{% if tab == 'income' %} finance-page--dashboard{% elif tab == 'commissions' %} finance-page--commissions{% elif tab == 'cash' %} finance-page--cash{% endif %}"
   x-data="{
+    expenseOpen: {{ expense_modal_open|default:False|yesno:'true,false' }},
     showDebtForm: {{ debt_form_open|default:False|yesno:'true,false' }},
     paymentOpen: {{ payment_modal_open|default:False|yesno:'true,false' }},
     closePayment() {
@@ -25,9 +26,9 @@
       }
     }
   }"
-  x-effect="document.documentElement.classList.toggle('app-modal-open', paymentOpen)"
+  x-effect="document.documentElement.classList.toggle('app-modal-open', paymentOpen || expenseOpen)"
   @beautyos-close-create-modal.window="paymentOpen ? closePayment() : null"
-  @keydown.escape.window="paymentOpen && !window.__beautyosJalaliCalendarOpen ? closePayment() : null"
+  @keydown.escape.window="if (!window.__beautyosJalaliCalendarOpen) { if (expenseOpen) expenseOpen=false; else if (paymentOpen) closePayment() }"
 >
   <header class="finance-page__header finance-page__header--premium">
     <div class="luna-finance-hero-art" aria-hidden="true">
@@ -362,6 +363,7 @@
   {% endif %}
 
   {% include "finance/partials/payment_create_modal.html" %}
+  {% include "expenses/partials/create_modal.html" %}
 </div>
 <script>
   document.addEventListener("alpine:initialized", function () {
