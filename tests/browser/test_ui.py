@@ -196,16 +196,25 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 2"), "horizontal page overflow"
                 assert page.locator('link[href*="phase7-ui-polish.css"]').count() == 1, "phase 7 styling missing"
                 if width <= 639 and name == "reception":
-                    invoice_inputs = page.locator(".reception-flow__invoice-fields input")
-                    if invoice_inputs.count():
-                        assert invoice_inputs.first.evaluate(
-                            "(el) => el.getBoundingClientRect().width <= el.parentElement.getBoundingClientRect().width + 2"
-                        ), "reception invoice amount extends outside its field"
-                    actions = page.locator(".reception-flow__invoice-controls > button")
-                    if actions.count():
-                        assert actions.first.evaluate(
-                            "(el) => el.getBoundingClientRect().height >= 42"
-                        ), "reception invoice actions are too small to tap"
+                    invoice_panel = page.locator(".reception-flow__invoice-panel").first
+                    if invoice_panel.count():
+                        disclosure_toggle = page.locator(".reception-operations-disclosure > summary")
+                        disclosure_toggle.click()
+                        invoice_panel.locator("summary").click()
+                        invoice_inputs = invoice_panel.locator(".reception-flow__invoice-fields input")
+                        if invoice_inputs.count():
+                            pw.expect(invoice_inputs.first).to_be_visible()
+                            assert invoice_inputs.first.evaluate(
+                                "(el) => el.getBoundingClientRect().width <= el.parentElement.getBoundingClientRect().width + 2"
+                            ), "reception invoice amount extends outside its field"
+                        actions = invoice_panel.locator(".reception-flow__invoice-controls > button")
+                        if actions.count():
+                            pw.expect(actions.first).to_be_visible()
+                            assert actions.first.evaluate(
+                                "(el) => el.getBoundingClientRect().height >= 42"
+                            ), "reception invoice actions are too small to tap"
+                        invoice_panel.locator("summary").click()
+                        disclosure_toggle.click()
 
                 assert not external, f"external runtime requests {external}"
                 assert not broken, f"broken static assets {broken}"
