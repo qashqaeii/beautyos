@@ -74,6 +74,33 @@
   </article>
 </section>
 
+{% if quick_access_links or can_book_appointment or can_issue_invoice or can_view_invoices %}
+  <section class="reception-desk-quick dashboard-enter">
+    <h2 class="reception-desk-quick__title"><i data-lucide="zap" aria-hidden="true"></i>دسترسی سریع</h2>
+    <div class="reception-desk-quick__row">
+  {% if can_book_appointment %}
+  <a class="reception-desk-quick__link reception-desk-quick__link--primary" href="{% url 'reception:desk' %}?book=1&amp;day={{ selected_day|date:'Y-m-d' }}{% if selected_service %}&amp;service={{ selected_service.pk }}{% endif %}{% if selected_slot_staff_id %}&amp;staff={{ selected_slot_staff_id }}{% endif %}"><i data-lucide="calendar-plus" aria-hidden="true"></i><span>ثبت نوبت جدید</span></a>
+  {% endif %}
+  {% if can_issue_invoice %}
+  <a class="reception-desk-quick__link" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>فاکتور</span></a>
+  {% elif can_view_invoices %}
+  <a class="reception-desk-quick__link" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورها</span></a>
+  {% endif %}
+  {% if can_view_invoices and can_issue_invoice %}
+  <a class="reception-desk-quick__link" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورهای صادرشده</span></a>
+  {% endif %}
+
+      {% for link in quick_access_links %}
+      <a href="{{ link.url }}" class="reception-desk-quick__link">
+        <span class="luna-reception-quick-icon" aria-hidden="true"><i data-lucide="{{ link.icon }}" class="reception-desk-quick__icon"></i></span>
+        <span class="reception-desk-quick__label">{{ link.title }}</span>
+        <i data-lucide="chevron-left" class="reception-desk-quick__arrow" aria-hidden="true"></i>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
 <div class="reception-desk-layout">
   <section class="reception-desk-priority dashboard-enter" aria-label="نوبت بعدی و تأییدها">
     <div class="reception-desk-priority__grid">
@@ -88,10 +115,10 @@
           <div class="reception-desk-next__copy min-w-0">
             <p class="reception-desk-next__name">{{ next_appt.customer.full_name }}</p>
             <p class="reception-desk-next__meta">
-              <span class="reception-desk-next__service">{{ next_appt.service.name }}</span>
+              <span class="reception-desk-next__service"><i data-lucide="scissors" aria-hidden="true"></i>{{ next_appt.service.name }}</span>
               {% if next_appt.staff %}
               
-              <span class="reception-desk-next__staff">{{ next_appt.staff.full_display_name }}</span>
+              <span class="reception-desk-next__staff"><i data-lucide="user-round" aria-hidden="true"></i>{{ next_appt.staff.full_display_name }}</span>
               {% endif %}
             </p>
           </div>
@@ -379,34 +406,7 @@
     </div>
   </section>
 
-  {% if quick_access_links or can_book_appointment or can_issue_invoice or can_view_invoices %}
-  <section class="reception-desk-quick dashboard-enter">
-    <h2 class="reception-desk-quick__title"><i data-lucide="zap" aria-hidden="true"></i>دسترسی سریع</h2>
-    <div class="reception-desk-quick__row">
-  {% if can_book_appointment %}
-  <a class="reception-desk-quick__link reception-desk-quick__link--primary" href="{% url 'reception:desk' %}?book=1&amp;day={{ selected_day|date:'Y-m-d' }}{% if selected_service %}&amp;service={{ selected_service.pk }}{% endif %}{% if selected_slot_staff_id %}&amp;staff={{ selected_slot_staff_id }}{% endif %}"><i data-lucide="calendar-plus" aria-hidden="true"></i><span>ثبت نوبت جدید</span></a>
-  {% endif %}
-  {% if can_issue_invoice %}
-  <a class="reception-desk-quick__link" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>فاکتور</span></a>
-  {% elif can_view_invoices %}
-  <a class="reception-desk-quick__link" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورها</span></a>
-  {% endif %}
-  {% if can_view_invoices %}
-  <a class="reception-desk-quick__link" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورهای صادرشده</span></a>
-  {% endif %}
-
-      {% for link in quick_access_links %}
-      <a href="{{ link.url }}" class="reception-desk-quick__link">
-        <span class="luna-reception-quick-icon" aria-hidden="true"><i data-lucide="{{ link.icon }}" class="reception-desk-quick__icon"></i></span>
-        <span class="reception-desk-quick__label">{{ link.title }}</span>
-        <i data-lucide="chevron-left" class="reception-desk-quick__arrow" aria-hidden="true"></i>
-      </a>
-      {% endfor %}
-    </div>
-  </section>
-  {% endif %}
-
-  {% if can_book_appointment and appointment_form %}
+    {% if can_book_appointment and appointment_form %}
   {% include "appointments/partials/appointment_booking_modal.html" %}
   {% endif %}
 </div>
