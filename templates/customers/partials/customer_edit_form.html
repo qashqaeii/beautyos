@@ -35,11 +35,6 @@
           {% if edit_form.status.errors %}<p class="customer-form-field__error">{{ edit_form.status.errors.0 }}</p>{% endif %}
         </div>
       </div>
-      <fieldset class="customer-form-field luna-field--full luna-customer-tags-field">
-        <legend class="field-label">{{ edit_form.tags.label }}</legend>
-        {% if edit_form.tags.field.queryset.exists %}{{ edit_form.tags }}{% else %}<p class="luna-section-hint">هنوز برچسبی تعریف نشده است.</p>{% endif %}
-        {% if edit_form.tags.errors %}<p class="customer-form-field__error">{{ edit_form.tags.errors.0 }}</p>{% endif %}
-      </fieldset>
       <div class="customer-form-field luna-field--full">
         {{ edit_form.avatar }}
         {% if edit_form.avatar.errors %}<p class="customer-form-field__error">{{ edit_form.avatar.errors.0 }}</p>{% endif %}

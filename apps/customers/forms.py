@@ -95,7 +95,6 @@ class CustomerForm(PersianModelForm):
             "birth_date",
             "is_vip",
             "status",
-            "tags",
             "marketing_consent",
             "avatar",
         ]
@@ -103,7 +102,6 @@ class CustomerForm(PersianModelForm):
             "full_name": forms.TextInput(attrs={"class": "input-field"}),
             "birth_date": forms.DateInput(attrs={"class": "input-field"}),
             "status": forms.Select(attrs={"class": "input-field"}),
-            "tags": forms.CheckboxSelectMultiple(attrs={"class": "luna-customer-tags"}),
             "avatar": ProfileImageWidget(attrs={"accept": "image/*"}),
             "marketing_consent": forms.CheckboxInput(attrs={"class": "rounded border-aubergine/20"}),
             "is_vip": forms.CheckboxInput(attrs={"class": "rounded border-aubergine/20"}),
@@ -112,8 +110,6 @@ class CustomerForm(PersianModelForm):
     def __init__(self, *args, salon=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.salon = salon
-        if salon:
-            self.fields["tags"].queryset = CustomerTag.objects.filter(salon=salon)
         if self.instance.pk:
             from apps.core.utils.phone import display_iran_mobile
 
