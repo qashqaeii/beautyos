@@ -45,6 +45,46 @@
 >
 {% include "partials/reception_desk_header.html" %}
 
+<section class="reception-overview-kpis" aria-label="آمار پذیرش">
+  <article class="reception-overview-kpi">
+    <span class="reception-overview-kpi__icon"><i data-lucide="calendar-days" aria-hidden="true"></i></span>
+    <div><span class="reception-overview-kpi__label">نوبت‌های روز</span><strong class="tabular-nums">{{ day_operations_summary.total|fa_num }}</strong></div>
+  </article>
+  <article class="reception-overview-kpi">
+    <span class="reception-overview-kpi__icon"><i data-lucide="hourglass" aria-hidden="true"></i></span>
+    <div><span class="reception-overview-kpi__label">در انتظار تأیید</span><strong class="tabular-nums">{{ day_operations_summary.pending|fa_num }}</strong></div>
+  </article>
+  <article class="reception-overview-kpi">
+    <span class="reception-overview-kpi__icon"><i data-lucide="check-circle-2" aria-hidden="true"></i></span>
+    <div><span class="reception-overview-kpi__label">پذیرش‌شده</span><strong class="tabular-nums">{{ day_operations_summary.checked_in|fa_num }}</strong></div>
+  </article>
+  <article class="reception-overview-kpi">
+    <span class="reception-overview-kpi__icon"><i data-lucide="{% if can_payment_create %}wallet{% else %}badge-check{% endif %}" aria-hidden="true"></i></span>
+    <div>
+      {% if can_payment_create %}
+      <span class="reception-overview-kpi__label">مانده خدمات تکمیل‌شده</span>
+      <strong class="tabular-nums">{{ day_operations_summary.outstanding_toman|fa_money }} <small>تومان</small></strong>
+      {% else %}
+      <span class="reception-overview-kpi__label">خدمات تکمیل‌شده</span>
+      <strong class="tabular-nums">{{ day_operations_summary.completed|fa_num }}</strong>
+      {% endif %}
+    </div>
+  </article>
+</section>
+
+{% if can_book_appointment or can_issue_invoice or can_view_invoices %}
+<nav class="reception-overview-actions" aria-label="اقدامات اصلی پذیرش">
+  {% if can_book_appointment %}
+  <a class="reception-overview-actions__button reception-overview-actions__button--primary" href="{% url 'reception:desk' %}?book=1&amp;day={{ selected_day|date:'Y-m-d' }}{% if selected_service %}&amp;service={{ selected_service.pk }}{% endif %}{% if selected_slot_staff_id %}&amp;staff={{ selected_slot_staff_id }}{% endif %}"><i data-lucide="calendar-plus" aria-hidden="true"></i><span>ثبت نوبت جدید</span></a>
+  {% endif %}
+  {% if can_issue_invoice %}
+  <a class="reception-overview-actions__button" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>فاکتور</span></a>
+  {% elif can_view_invoices %}
+  <a class="reception-overview-actions__button" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورها</span></a>
+  {% endif %}
+</nav>
+{% endif %}
+
 <div class="reception-desk-layout">
   <section class="reception-desk-priority dashboard-enter" aria-label="نوبت بعدی و تأییدها">
     <div class="reception-desk-priority__grid">
@@ -120,13 +160,13 @@
   <section class="reception-flow dashboard-enter" aria-labelledby="reception-flow-title">
     <div class="reception-flow__heading">
       <div>
-        <span class="reception-flow__eyebrow">DAILY OPERATIONS</span>
-        <h2 id="reception-flow-title">جریان کار امروز سالن</h2>
+        
+        <h2 id="reception-flow-title">نوبت‌های امروز سالن</h2>
         <p>تمام نوبت‌های روز انتخاب‌شده؛ از تأیید و پذیرش تا تکمیل خدمت و صندوق.</p>
       </div>
       <span class="reception-flow__total">{{ day_operations_summary.total|fa_num }} نوبت</span>
     </div>
-    <div class="reception-flow__metrics" aria-label="وضعیت عملیات روز">
+    <div class="reception-flow__metrics reception-flow__metrics--secondary" aria-label="وضعیت عملیات روز">
       <div><span>منتظر تأیید</span><strong>{{ day_operations_summary.pending|fa_num }}</strong></div>
       <div><span>پذیرش‌شده</span><strong>{{ day_operations_summary.checked_in|fa_num }}</strong></div>
       <div><span>خدمات تکمیل‌شده</span><strong>{{ day_operations_summary.completed|fa_num }}</strong></div>
