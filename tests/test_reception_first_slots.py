@@ -131,7 +131,9 @@ def test_reception_editorial_layout_preserves_booking_and_single_header(client, 
     assert 'class="maison-unified-header ' not in html
     assert "luna-reception-shell" in html
     assert "luna-reception.css" in html
-    assert "reception-desk-header__cta" in html
+    assert "reception-overview-actions__button--primary" in html
+    assert "ثبت نوبت جدید" in html
+    assert "reception-overview-kpis" in html
     assert "reception-desk-service" in html
     assert "reception-desk-staff" in html
     for name in ("next", "pending"):
