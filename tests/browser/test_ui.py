@@ -145,7 +145,14 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 if workspace:
                     assert page.locator("#workspace-content").is_visible()
                     assert page.locator("h1:visible").count()==1, "missing/duplicate page heading"
-                    assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"
+                    if name == "reception" and width >= 1180 and height >= 560:
+                        assert page.evaluate(
+                            "getComputedStyle(document.querySelector('.maison-main')).overflowY === 'hidden'"
+                        ), "viewport-fit reception must not create a nested workspace scrollbar"
+                    else:
+                        assert page.evaluate(
+                            "getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"
+                        ), "nested workspace scroll"
                     if width >= 1024:
                         pw.expect(page.locator(".luna-active-salon")).to_have_text(salon.name)
                         assert page.locator(".maison-sidebar .luna-salon-switch-list").count() == 0
