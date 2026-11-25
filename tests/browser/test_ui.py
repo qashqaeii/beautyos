@@ -361,9 +361,13 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     assert kpis.first.evaluate(
                         "(el) => getComputedStyle(el).backgroundImage.includes('linear-gradient')"
                     ), "the leading KPI must carry the warm rose highlight"
-                    assert page.locator(".reception-desk-header").evaluate(
-                        "(el) => getComputedStyle(el).backgroundImage.includes('reception-desk-hero.svg')"
-                    ), "illustrated reception hero must be present"
+                    header_art = page.locator(".reception-desk-header").evaluate(
+                        "(el) => getComputedStyle(el).backgroundImage"
+                    )
+                    if width > 640:
+                        assert "reception-desk-hero.svg" in header_art, "desktop reception illustration is missing"
+                    else:
+                        assert "linear-gradient" in header_art, "mobile reception must retain its simplified gradient"
                     journey_steps = page.locator(".reception-journey__step")
                     pw.expect(journey_steps).to_have_count(4)
                     disclosure = page.locator(".reception-operations-disclosure")
