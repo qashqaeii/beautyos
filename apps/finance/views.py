@@ -143,6 +143,15 @@ def _finance_overview_context(
         get_query["page"] = str(payment_page.number)
     debts = open_debts_summary(request.salon) if tab == "debts" else {}
     commissions = commission_day_overview(request.salon, range_ctx["selected_day"]) if tab == "commissions" else None
+    commission_query = get_query.get("q", "").strip()[:100] if commissions is not None else ""
+    if commission_query:
+        def normalize_name(value):
+            return " ".join(str(value).translate(str.maketrans("ييك", "ییک")).casefold().split())
+        needle = normalize_name(commission_query)
+        for key in ("staff_rows", "pending_rows", "settled_rows"):
+            commissions[key] = [row for row in commissions[key] if needle in normalize_name(row["staff"].full_display_name)]
+        commissions["settled_staff_count"] = len(commissions["settled_rows"])
+        commissions["need_payment_staff_count"] = len(commissions["pending_rows"])
 
     return {
         **range_ctx,
@@ -157,6 +166,7 @@ def _finance_overview_context(
         "debt_form_open": debt_form_open,
         **debts,
         "commissions": commissions,
+        "commission_query": commission_query,
         "can_manage_debt": can_manage_debt,
         "can_manage_expenses": has_permission(membership, P_EXPENSE_MANAGE),
         "can_settle_commission": can_settle_commission,

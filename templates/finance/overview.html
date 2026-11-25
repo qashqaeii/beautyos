@@ -10,7 +10,7 @@
 
 {% block content %}
 <div
-  class="finance-page{% if tab == 'income' %} finance-page--dashboard{% endif %}"
+  class="finance-page{% if tab == 'income' %} finance-page--dashboard{% elif tab == 'commissions' %} finance-page--commissions{% endif %}"
   x-data="{
     showDebtForm: {{ debt_form_open|default:False|yesno:'true,false' }},
     paymentOpen: {{ payment_modal_open|default:False|yesno:'true,false' }},
@@ -50,7 +50,26 @@
     <a href="{% url 'finance:accounts' %}" class="finance-page__tab"><i data-lucide="landmark" aria-hidden="true"></i><span>حساب‌ها</span></a>
     <a href="{% url 'finance:overview' %}?tab=reports" class="finance-page__tab {% if tab == 'reports' %}is-active{% endif %}" {% if tab == 'reports' %}aria-current="page"{% endif %}><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i><span>گزارش‌ها</span></a>
   </nav>
-  {% if tab != 'debts' %}
+  {% if tab == 'commissions' %}
+  <section class="finance-page__range-bar finance-comm-filter" aria-label="جستجو و تاریخ تسویه">
+    <form method="get" class="suite-filter-form finance-comm-search" role="search">
+      <input type="hidden" name="tab" value="commissions">
+      <input type="hidden" name="range" value="{{ range_key }}">
+      <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+      <label class="sr-only" for="commission-search">جستجوی نام متخصص</label>
+      <div class="finance-comm-search__wrap"><i data-lucide="search" aria-hidden="true"></i><input type="search" id="commission-search" name="q" value="{{ commission_query }}" class="input-field" placeholder="جستجوی نام متخصص..."></div>
+      <button type="submit" class="btn-secondary">جستجو</button>
+      {% if commission_query %}<a class="finance-comm-clear" href="?tab=commissions&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}" aria-label="پاک کردن جستجو"><i data-lucide="x" aria-hidden="true"></i></a>{% endif %}
+    </form>
+    <div class="finance-comm-date">
+      <a href="?tab=commissions&amp;range=today&amp;q={{ commission_query|urlencode }}" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}">امروز</a>
+      <form method="get" class="finance-page__day-picker">
+        <input type="hidden" name="tab" value="commissions"><input type="hidden" name="range" value="day"><input type="hidden" name="q" value="{{ commission_query }}">
+        {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
+      </form>
+    </div>
+  </section>
+  {% elif tab != 'debts' %}
   <section class="finance-page__range-bar" aria-label="بازه گزارش">
     <div class="finance-page__range-pills" role="group" aria-label="بازه زمانی">
       <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=today" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}" {% if range_key == 'today' %}aria-current="true"{% endif %}>امروز</a>
@@ -254,7 +273,7 @@
 
   {% if tab == 'commissions' %}
   <section
-    class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="تسویه متخصص‌ها"
+    class="finance-page__panel luna-finance-layout dashboard-enter finance-comm-workspace" aria-label="تسویه متخصص‌ها"
     x-data="{ commPanel: '{% if commissions.pending_rows %}pending{% elif commissions.settled_rows %}settled{% else %}pending{% endif %}' }"
   >
     <header class="finance-section-head finance-comm-heading">
@@ -301,13 +320,15 @@
         class="finance-comm-panel finance-comm-panel--settled"
         aria-labelledby="finance-comm-settled-title"
       >
-        <h3 id="finance-comm-settled-title" class="finance-comm-panel__title">متخصص‌های تسویه‌شده</h3>
+        <h3 id="finance-comm-settled-title" class="finance-comm-panel__title"><i data-lucide="circle-check" aria-hidden="true"></i>متخصص‌های تسویه‌شده</h3>
         {% if commissions.settled_rows %}
         <ul class="finance-comm-list">
           {% for row in commissions.settled_rows %}
           {% include "finance/partials/commission_settled_row.html" %}
           {% endfor %}
         </ul>
+        {% elif commission_query %}
+        <div class="luna-finance-empty"><strong>نتیجه‌ای برای این نام یافت نشد</strong><p>نام متخصص دیگری را جستجو کنید.</p></div>
         {% else %}
         <div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="circle-check"></i></span><strong>تسویه‌ای ثبت نشده است</strong><p>تسویه متخصصان در روز انتخاب‌شده اینجا نمایش داده می‌شود.</p></div>
         {% endif %}
@@ -320,22 +341,24 @@
         class="finance-comm-panel finance-comm-panel--pending"
         aria-labelledby="finance-comm-pending-title"
       >
-        <h3 id="finance-comm-pending-title" class="finance-comm-panel__title">نیازمند پرداخت سهم</h3>
+        <h3 id="finance-comm-pending-title" class="finance-comm-panel__title"><i data-lucide="layers" aria-hidden="true"></i>نیازمند پرداخت سهم</h3>
         {% if commissions.pending_rows %}
         <ul class="finance-comm-list">
           {% for row in commissions.pending_rows %}
           {% include "finance/partials/commission_settle_row.html" %}
           {% endfor %}
         </ul>
+        {% elif commission_query %}
+        <div class="luna-finance-empty"><strong>نتیجه‌ای برای این نام یافت نشد</strong><p>نام متخصص دیگری را جستجو کنید.</p></div>
         {% elif commissions.staff_rows %}
         <div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="circle-check"></i></span><strong>همه سهم‌ها تسویه شده‌اند</strong><p>در این روز متخصصی نیازمند پرداخت نیست.</p></div>
         {% else %}
-        <div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="users-round"></i></span><strong>هنوز سهم پورسانتی ثبت نشده است</strong><p>پس از تکمیل نوبت‌ها، سهم متخصصان نمایش داده می‌شود.</p></div>
+        <div class="finance-comm-empty-layout"><div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="users-round"></i></span><strong>هنوز سهم پورسانتی ثبت نشده است</strong><p>پس از تکمیل نوبت‌ها، سهم متخصصان نمایش داده می‌شود.</p></div><img class="finance-comm-empty-art" src="{% static 'images/commission-empty-editorial.svg' %}" alt="" width="200" height="150"></div>
         {% endif %}
       </section>
     </div>
   </section>
-  <section class="fin-panel"><header class="fin-panel-head"><h2>مدل همکاری و حقوق</h2>{% if can_settle_commission %}<a class="btn-primary" href="{% url 'finance:staff_finance' %}">حقوق، مساعده و اجاره جایگاه</a>{% endif %}</header><p class="fin-muted">پورسانت خدمات در همین بخش و قراردادهای ماهانه در پرونده همکاری ثبت می‌شوند.</p></section>
+  <section class="fin-panel finance-comm-cooperation"><div><h2><i data-lucide="handshake" aria-hidden="true"></i>مدل همکاری و حقوق</h2><p class="fin-muted">پورسانت خدمات در همین بخش و قراردادهای ماهانه در پرونده همکاری ثبت می‌شوند.</p></div>{% if can_settle_commission %}<a class="btn-primary" href="{% url 'finance:staff_finance' %}"><i data-lucide="wallet" aria-hidden="true"></i>حقوق، مساعده و اجاره جایگاه</a>{% endif %}</section>
   {% endif %}
 
   {% include "finance/partials/payment_create_modal.html" %}

@@ -16,15 +16,13 @@
       <input type="hidden" name="staff_id" value="{{ row.staff.pk }}">
       <label class="finance-comm-settle-form__label" for="settle-amount-{{ row.staff.pk }}">مبلغ تسویه (تومان)</label>
       <input
-        type="number"
+        type="text"
+        data-grouped-toman="true"
         inputmode="numeric"
-        step="1"
         name="amount_toman"
         id="settle-amount-{{ row.staff.pk }}"
         class="input-field finance-comm-settle-form__amount"
-        min="1"
-        max="{{ row.remainder_total|unlocalize }}"
-        value="{{ row.remainder_total|unlocalize }}"
+        value="{{ row.remainder_total|fa_money }}"
         required
       />
       <label class="finance-comm-settle-form__label" for="settle-note-{{ row.staff.pk }}">یادداشت</label>

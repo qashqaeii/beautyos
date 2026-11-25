@@ -311,3 +311,17 @@ def test_commission_destination_hierarchy_and_accessible_panels(client, owner_me
         assert f'aria-controls="finance-comm-{panel}-panel"' in html
         assert f'id="finance-comm-{panel}-panel"' in html
     assert "تسویه متخصصان</h2>" in html
+
+
+@pytest.mark.django_db
+def test_commission_workspace_search_and_calendar(client, owner_membership):
+    client.force_login(owner_membership.user)
+    response = client.get(reverse("finance:overview"), {"tab": "commissions", "q": "نام آزمایشی"})
+    assert response.status_code == 200
+    assert response.context["commission_query"] == "نام آزمایشی"
+    html = response.content.decode()
+    assert "finance-page--commissions" in html
+    assert 'id="commission-search"' in html
+    assert "finance-comm-date" in html
+    assert "finance-comm-cooperation" in html
+    assert "نام آزمایشی" in html
