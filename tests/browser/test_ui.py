@@ -153,11 +153,15 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                         assert page.evaluate("getComputedStyle(document.querySelector('.maison-sidebar--premium')).position === 'sticky'"), "desktop sidebar must remain sticky"
                         if name == "reception":
                             before = page.locator(".maison-sidebar--premium").bounding_box()
+                            max_scroll = page.evaluate("document.documentElement.scrollHeight - innerHeight")
                             page.evaluate("window.scrollTo(0, 450)")
                             page.wait_for_timeout(100)
                             after = page.locator(".maison-sidebar--premium").bounding_box()
                             assert before and after and abs(before["y"] - after["y"]) < 3, "desktop sidebar moved while reception content scrolled"
-                            assert page.evaluate("window.scrollY > 0"), "reception content must still scroll"
+                            if max_scroll > 3:
+                                assert page.evaluate("window.scrollY > 0"), "long reception pages must remain scrollable"
+                            else:
+                                assert page.evaluate("window.scrollY === 0"), "compact reception should fit without page scroll"
                             page.evaluate("window.scrollTo(0, 0)")
                 if workspace and width >= 1024:
                     standardized_headers = {
@@ -328,6 +332,31 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                         assert footer_box["y"] + footer_box["height"] <= current_box["y"] + current_box["height"] + 3, "booking actions must stay inside the modal"
                         modal.locator(".inventory-create-modal__close").click()
                         pw.expect(modal).not_to_be_visible()
+                if name == "reception":
+                    kpis = page.locator(".reception-overview-kpis > .reception-overview-kpi")
+                    pw.expect(kpis).to_have_count(4)
+                    header = page.locator(".reception-desk-header").bounding_box()
+                    kpi_box = page.locator(".reception-overview-kpis").bounding_box()
+                    assert header and kpi_box and kpi_box["y"] >= header["y"] + header["height"] - 2
+                    buttons = page.locator(".reception-overview-actions")
+                    if buttons.count():
+                        action_box = buttons.bounding_box()
+                        assert action_box and action_box["y"] >= kpi_box["y"] + kpi_box["height"] - 2
+                    assert page.locator('link[href*="reception-dashboard-v3.css"]').count() == 1
+                    flow = page.locator(".reception-flow")
+                    pw.expect(flow).to_be_visible()
+                    if width >= 1180 and height >= 650:
+                        layout = page.locator(".reception-desk-layout").bounding_box()
+                        flow_box = flow.bounding_box()
+                        next_box = page.locator(".reception-desk-priority").bounding_box()
+                        team_box = page.locator(".reception-desk-workspace__team").bounding_box()
+                        assert layout and flow_box and next_box and team_box
+                        assert flow_box["width"] > next_box["width"], "today operations must be the main panel"
+                        assert abs(flow_box["y"] - next_box["y"]) <= 3, "today and next appointment must share a row"
+                        assert team_box["y"] >= flow_box["y"] + flow_box["height"] - 2, "team and free slots belong below operations"
+                        assert page.locator(".reception-desk-page").evaluate(
+                            "(el) => el.getBoundingClientRect().bottom <= innerHeight + 3"
+                        ), "reception desk must fit the standard desktop viewport"
                 if name == "customers":
                     # Directory must never nest a vertical scroller or clip customer cards.
                     assert page.evaluate("getComputedStyle(document.querySelector('.maison-main')).overflowY === 'visible'"), "nested workspace scroll"
