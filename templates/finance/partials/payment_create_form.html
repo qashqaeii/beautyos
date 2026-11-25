@@ -15,9 +15,16 @@
   {% endif %}
 
   <input type="hidden" name="entry_mode" value="deposit">
-  <input type="hidden" name="payment_kind" value="deposit">
+
   <div class="inventory-create-modal__scroll maison-scroll-themed">
     {% if payment_form.non_field_errors %}<div role="alert" class="finance-payment-form__error">{{ payment_form.non_field_errors }}</div>{% endif %}
+    <fieldset class="finance-payment-form__section" style="margin-bottom:10px">
+      <legend class="field-label">نوع دریافت</legend>
+      <div class="luna-service-paired-grid">
+        {% for choice in payment_form.payment_kind %}<label class="luna-service-field-card" style="flex-direction:row;align-items:center;gap:8px">{{ choice.tag }} {{ choice.choice_label }}</label>{% endfor %}
+      </div>
+      {% if payment_form.payment_kind.errors %}<div role="alert">{{ payment_form.payment_kind.errors }}</div>{% endif %}
+    </fieldset>
     <div class="luna-service-paired-grid">
       {% for field in payment_form.visible_fields %}
       {% if field.name == 'customer' or field.name == 'paid_amount_toman' or field.name == 'method' or field.name == 'notes' %}
@@ -29,11 +36,11 @@
       {% endif %}
       {% endfor %}
     </div>
-    <p class="finance-payment-picker-hint">برای تسویه هزینه خدمات از بخش صدور فاکتور استفاده کنید. این مبلغ به‌عنوان بیعانه مستقل ثبت می‌شود.</p>
+    <p class="finance-payment-picker-hint">بیعانه به‌صورت مستقل ثبت می‌شود. در حالت تسویه کامل، مبلغ دریافتی باید برابر مجموع مانده خدمات انجام‌شده مشتری باشد.</p>
   </div>
 
   <footer class="inventory-create-modal__foot">
-    <button type="submit" class="btn-primary finance-payment-form__submit"><i data-lucide="check" aria-hidden="true"></i>ثبت بیعانه</button>
+    <button type="submit" class="btn-primary finance-payment-form__submit"><i data-lucide="check" aria-hidden="true"></i>ثبت پرداخت</button>
     <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-create-modal')">انصراف</button>
   </footer>
 </form>

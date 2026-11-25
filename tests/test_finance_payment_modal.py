@@ -19,7 +19,7 @@ def test_finance_list_payment_query_opens_modal(client, owner_membership, salon)
     assert "finance-payment-create-form" in html
     assert "luna-modal--service" in html
     assert 'aria-describedby="finance-payment-modal-title-description"' in html
-    assert "ثبت بیعانه مشتری" in html
+    assert "ثبت پرداخت مشتری" in html
     assert "paymentOpen: true" in html
 
 
@@ -172,10 +172,23 @@ def test_deposit_modal_saves_only_received_amount(client, owner_membership, salo
         "entry_mode": "deposit", "customer": customer.pk,
         "paid_amount_toman": "۵۰۰.۰۰۰", "method": "cash",
         "total_amount_toman": "999999", "discount_toman": "100",
-        "status": "pending", "payment_kind": "service",
+        "status": "pending", "payment_kind": "deposit",
     })
     assert response.status_code == 302
     payment = Payment.objects.get(customer=customer)
     assert payment.is_deposit and payment.appointment_id is None
     assert payment.total_amount_toman == payment.paid_amount_toman == 500000
     assert payment.discount_toman == 0 and payment.status == Payment.Status.PAID
+
+
+@pytest.mark.django_db
+def test_full_settlement_requires_real_outstanding_balance(client, owner_membership, salon):
+    client.force_login(owner_membership.user)
+    customer = Customer.objects.create(salon=salon, full_name="مشتری تسویه", phone="+989121277797")
+    response = client.post(reverse("finance:payment_create"), {
+        "entry_mode": "deposit", "payment_kind": "settlement", "customer": customer.pk,
+        "paid_amount_toman": "۵۰۰.۰۰۰", "method": "cash",
+    })
+    assert response.status_code == 200
+    assert not Payment.objects.filter(customer=customer).exists()
+    assert "مانده خدمات انجام‌شده ندارد" in response.content.decode()

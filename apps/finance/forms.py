@@ -109,7 +109,7 @@ class PaymentForm(PersianModelForm):
 
 class DepositEntryForm(PersianModelForm):
     """Unallocated deposit receipt; the invoice checkout handles service payments."""
-    payment_kind = forms.CharField(required=False, widget=forms.HiddenInput, initial="deposit")
+    payment_kind = forms.ChoiceField(choices=[("deposit", "بیعانه"), ("settlement", "تسویه کامل")], initial="deposit", required=False, widget=forms.RadioSelect)
 
     class Meta:
         model = Payment
@@ -125,10 +125,10 @@ class DepositEntryForm(PersianModelForm):
         super().__init__(*args, **kwargs)
         self.fields["customer"].queryset = Customer.scoped(salon).filter(is_deleted=False) if salon else Customer.objects.none()
         self.fields["customer"].empty_label = "انتخاب مشتری"
-        self.fields["paid_amount_toman"].label = "مبلغ بیعانه (تومان)"
+        self.fields["paid_amount_toman"].label = "مبلغ دریافتی (تومان)"
 
     def clean_payment_kind(self):
-        return "deposit"
+        return self.cleaned_data.get("payment_kind") or "deposit"
 
     def clean_paid_amount_toman(self):
         amount = self.cleaned_data["paid_amount_toman"]
@@ -142,7 +142,7 @@ class DepositEntryForm(PersianModelForm):
         payment.total_amount_toman = payment.paid_amount_toman
         payment.discount_toman = 0
         payment.status = Payment.Status.PAID
-        payment.is_deposit = True
+        payment.is_deposit = self.cleaned_data["payment_kind"] == "deposit"
         if commit:
             payment.save()
         return payment

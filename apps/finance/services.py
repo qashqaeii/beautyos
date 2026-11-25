@@ -331,6 +331,36 @@ def record_customer_payment(*, salon, form, actor):
     payment.salon = salon
     if payment.customer.salon_id != salon.pk:
         raise ValidationError("مشتری متعلق به این سالن نیست.")
+    if form.cleaned_data.get("payment_kind") == "settlement":
+        # Settle completed services only, with the same lock order as checkout.
+        appointments = list(Appointment.scoped(salon).select_for_update().filter(
+            customer_id=payment.customer_id, status=Appointment.Status.COMPLETED
+        ).order_by("pk"))
+        balances = [(a, appointment_payment_summary(a)["owed_toman"]) for a in appointments]
+        balances = [(a, amount) for a, amount in balances if amount > 0]
+        total = sum(amount for _, amount in balances)
+        if not total:
+            raise ValidationError("این مشتری مانده خدمات انجام‌شده ندارد.")
+        if payment.paid_amount_toman != total:
+            raise ValidationError(f"برای تسویه کامل، مبلغ دریافتی باید برابر مانده کل مشتری باشد: {total:,} تومان.")
+        from apps.finance.models import InvoiceLine
+        from apps.loyalty.automation import award_payment
+        receipts = []
+        for appointment, amount in balances:
+            line = InvoiceLine.scoped(salon).filter(appointment=appointment).first()
+            receipt = Payment.objects.create(
+                salon=salon, customer=payment.customer, appointment=appointment,
+                invoice_id=line.invoice_id if line else None, total_amount_toman=amount,
+                paid_amount_toman=amount, discount_toman=0, status=Payment.Status.PAID,
+                method=payment.method, notes=payment.notes, is_deposit=False,
+            )
+            award_payment(receipt)
+            AuditLog.objects.create(salon=salon, actor=actor, action=AuditLog.Action.CREATE,
+                entity_type="payment", entity_id=str(receipt.pk), message="تسویه کامل مشتری",
+                metadata={"paid_amount_toman": amount, "appointment_id": appointment.pk})
+            receipts.append(receipt)
+        refresh_customer_stats(payment.customer)
+        return receipts[0]
     if payment.appointment_id:
         appointment = Appointment.scoped(salon).select_for_update().filter(pk=payment.appointment_id).first()
         if appointment is None or appointment.customer_id != payment.customer_id:
