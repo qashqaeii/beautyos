@@ -55,17 +55,8 @@
   </article>
 </section>
 {% endif %}
-{% if tab == 'income' or tab == 'cash' %}
+{% if tab == 'income' %}
 <section class="fin-quick-grid fin-quick-grid--compact" aria-label="دسترسی‌های مالی و مانده‌ها">
-  <article class="fin-panel fin-quick-actions-panel">
-    <header class="fin-panel-head"><h2><i data-lucide="zap" aria-hidden="true"></i>دسترسی سریع</h2></header>
-    <nav class="fin-actions" aria-label="عملیات مالی">
-      {% if can_payment_create %}<a class="fin-action fin-action--primary" href="{{ payment_return_url }}&amp;payment=1"><i data-lucide="credit-card" aria-hidden="true"></i><span>دریافت پرداخت</span></a>{% endif %}
-      {% if can_payment_create %}<a class="fin-action" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>صدور فاکتور</span></a>{% else %}<a class="fin-action" href="{% url 'finance:invoices' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>فاکتورها</span></a>{% endif %}
-      {% if can_settle_commission %}<a class="fin-action" href="{% url 'finance:overview' %}?tab=commissions"><i data-lucide="users-round" aria-hidden="true"></i><span>تسویه متخصص</span></a>{% endif %}
-      {% if can_manage_expenses %}<button type="button" class="fin-action" @click="expenseOpen=true"><i data-lucide="layers" aria-hidden="true"></i><span>ثبت هزینه</span></button>{% endif %}
-    </nav>
-  </article>
   {% if tab != 'cash' %}<article class="fin-panel fin-balances-panel">
     <header class="fin-panel-head">
       <h2><i data-lucide="arrow-left-right" aria-hidden="true"></i>مانده‌ها و گردش ثبت‌شده</h2>
@@ -74,7 +65,7 @@
     <div class="fin-balance-grid">
       <div class="fin-line fin-balance-item"><span>مطالبات خدمات انجام‌شده</span><bdi>{{ dashboard.receivable_total|fa_money }} تومان</bdi></div>
       <div class="fin-line fin-balance-item"><span>بدهی باز سالن</span><bdi>{{ dashboard.debt_total|fa_money }} تومان</bdi></div>
-      <div class="fin-line fin-balance-item"><span>مانده سهم متخصصان</span><bdi>{{ dashboard.staff_due_total|fa_money }} تومان</bdi></div>
+      <div class="fin-line fin-balance-item">{% if can_settle_commission %}<a href="{% url 'finance:overview' %}?tab=commissions">مانده سهم متخصصان</a>{% else %}<span>مانده سهم متخصصان</span>{% endif %}<bdi>{{ dashboard.staff_due_total|fa_money }} تومان</bdi></div>
       <div class="fin-line fin-balance-item"><span>حقوق ثبت‌شده در بازه</span><bdi>{{ dashboard.salary_total|fa_money }} تومان</bdi></div>
       <div class="fin-line fin-balance-item"><span>اجاره جایگاه ثبت‌شده</span><bdi>{{ dashboard.rent_total|fa_money }} تومان</bdi></div>
       {% if can_manage_expenses %}<div class="fin-line fin-balance-item fin-balance-item--link"><a href="{% url 'finance:recurring' %}">هزینه‌های دوره‌ای سررسیدشده</a><bdi>{{ dashboard.recurring_due|fa_num }}</bdi></div>{% endif %}

@@ -807,3 +807,8 @@
  .luna-finance-shell .finance-page--receipts .finance-receipt-kpis{grid-template-columns:1fr}
  .finance-receipt-hero img{display:none}
 }
+
+/* No quick action panel: keep the remaining balances full width. */
+.luna-finance-shell .finance-page .fin-quick-grid--compact{grid-template-columns:minmax(0,1fr)}
+.luna-finance-shell .finance-page .fin-quick-grid--compact>.fin-balances-panel{grid-column:1/-1}
+@media(min-width:1100px) and (min-height:580px){.luna-finance-shell .finance-page--cash{grid-template-rows:auto auto auto minmax(min-content,1fr)}}
