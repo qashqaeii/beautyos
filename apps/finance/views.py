@@ -10,7 +10,7 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from apps.commissions.services import create_settlement
 from apps.finance.dashboard import finance_dashboard
-from apps.finance.forms import PaymentForm, SalonDebtForm, SalonDebtPaymentForm
+from apps.finance.forms import DepositEntryForm, PaymentForm, SalonDebtForm, SalonDebtPaymentForm
 from apps.finance.models import Invoice, Payment, SalonDebt
 from apps.finance.services import (
     commission_day_overview,
@@ -121,7 +121,7 @@ def _finance_overview_context(
     can_payment_create = has_permission(membership, P_PAYMENT_CREATE)
 
     if payment_modal_open and can_payment_create and payment_form is None:
-        payment_form = PaymentForm(salon=request.salon)
+        payment_form = DepositEntryForm(salon=request.salon)
 
     if debt_form is None:
         debt_form = SalonDebtForm()
@@ -319,13 +319,14 @@ def payment_create(request):
             request,
             "finance/payment_modal_page.html",
             {
-                "payment_form": PaymentForm(salon=request.salon),
+                "payment_form": DepositEntryForm(salon=request.salon),
                 "payment_modal_open": True,
                 "payment_return_url": next_url,
             },
         )
 
-    form = PaymentForm(request.POST, salon=request.salon)
+    form_class = DepositEntryForm if request.POST.get('entry_mode') == 'deposit' else PaymentForm
+    form = form_class(request.POST, salon=request.salon)
     if form.is_valid():
         try:
             record_customer_payment(salon=request.salon, form=form, actor=request.user)

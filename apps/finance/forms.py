@@ -107,6 +107,47 @@ class PaymentForm(PersianModelForm):
         return data
 
 
+class DepositEntryForm(PersianModelForm):
+    """Unallocated deposit receipt; the invoice checkout handles service payments."""
+    payment_kind = forms.CharField(required=False, widget=forms.HiddenInput, initial="deposit")
+
+    class Meta:
+        model = Payment
+        fields = ["customer", "paid_amount_toman", "method", "notes"]
+        widgets = {
+            "customer": forms.Select(attrs={"class": "input-field"}),
+            "paid_amount_toman": forms.TextInput(attrs={"class": "input-field", "inputmode": "numeric"}),
+            "method": forms.Select(attrs={"class": "input-field"}),
+            "notes": forms.Textarea(attrs={"class": "input-field", "rows": 2}),
+        }
+
+    def __init__(self, *args, salon=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["customer"].queryset = Customer.scoped(salon).filter(is_deleted=False) if salon else Customer.objects.none()
+        self.fields["customer"].empty_label = "انتخاب مشتری"
+        self.fields["paid_amount_toman"].label = "مبلغ بیعانه (تومان)"
+
+    def clean_payment_kind(self):
+        return "deposit"
+
+    def clean_paid_amount_toman(self):
+        amount = self.cleaned_data["paid_amount_toman"]
+        if amount <= 0:
+            raise forms.ValidationError("مبلغ بیعانه باید بزرگ‌تر از صفر باشد.")
+        return amount
+
+    def save(self, commit=True):
+        payment = super().save(commit=False)
+        payment.appointment = None
+        payment.total_amount_toman = payment.paid_amount_toman
+        payment.discount_toman = 0
+        payment.status = Payment.Status.PAID
+        payment.is_deposit = True
+        if commit:
+            payment.save()
+        return payment
+
+
 class SalonDebtForm(PersianModelForm):
     class Meta:
         model = SalonDebt
