@@ -37,32 +37,14 @@
 >
 
   <header class="customer-detail-header" aria-label="پروفایل مشتری">
-    <div class="customer-detail-header__top">
-      <nav class="customer-detail-breadcrumbs" aria-label="مسیر صفحه">
-        <a href="{% url 'customers:list' %}"><i data-lucide="users" aria-hidden="true"></i> مشتریان</a>
-        <i data-lucide="chevron-left" aria-hidden="true"></i>
-        <span aria-current="page">پروفایل مشتری</span>
-      </nav>
-      <span class="customer-detail-header__eyebrow"><i data-lucide="contact-round" aria-hidden="true"></i> پرونده مشتری</span>
-    </div>
-    <div class="customer-detail-hero-art" aria-hidden="true">
-      <div class="customer-detail-hero-art__halo"></div>
-      <div class="customer-detail-hero-art__glass"><i data-lucide="users-round"></i></div>
-      <div class="customer-detail-hero-art__heart"><i data-lucide="heart"></i></div>
-    </div>
-    <div class="customer-detail-hero-title">
-      <span class="customer-detail-hero-title__icon" aria-hidden="true"><i data-lucide="users-round"></i></span>
-      <div class="customer-detail-hero-title__text">
-        <h1>پروفایل مشتری</h1>
-        <p>اطلاعات، نوبت‌ها و سوابق ارتباط با مشتری</p>
-      </div>
-    </div>
+    <div class="customer-detail-header__ornament" aria-hidden="true"><i data-lucide="flower-2"></i></div>
     <div class="customer-detail-header__content">
       <div class="customer-detail-header__identity">
-        <span class="customer-detail-header__avatar customer-detail-header__avatar--icon" aria-hidden="true"><i data-lucide="user-round" aria-hidden="true"></i></span>
+        <span class="customer-detail-header__avatar customer-detail-header__avatar--icon">{% if customer.avatar %}<img src="{{ customer.avatar.url }}" alt="">{% else %}<i data-lucide="user-round" aria-hidden="true"></i>{% endif %}</span>
         <div class="customer-detail-header__copy">
+          <nav class="customer-detail-breadcrumbs" aria-label="مسیر صفحه"><a href="{% url 'customers:list' %}">مشتریان</a><i data-lucide="chevron-left" aria-hidden="true"></i><span aria-current="page">پروفایل مشتری</span></nav>
           <div class="customer-detail-header__name-row">
-            <h2 class="customer-detail-header__name">{{ customer.full_name }}</h2>
+            <h1 class="customer-detail-header__name">{{ customer.full_name }}</h1>
             {% if customer.is_vip or customer.status == 'vip' %}
             <span class="customer-detail-header__vip"><i data-lucide="crown" aria-hidden="true"></i> مشتری ویژه</span>
             {% endif %}
@@ -85,6 +67,7 @@
           <i data-lucide="pencil" class="customer-detail-header__icon" aria-hidden="true"></i>
           <span>ویرایش اطلاعات</span>
         </button>
+        <a class="customer-detail-header__back" href="{% url 'customers:list' %}" aria-label="بازگشت به مشتریان"><i data-lucide="arrow-left" aria-hidden="true"></i></a>
       </div>
     </div>
   </header>
@@ -122,7 +105,7 @@
     </div>
   </section>
 
-  <div class="customer-detail-workspace">
+  <div class="customer-detail-workspace{% if 'finance.reports' not in membership_permissions %} customer-detail-workspace--no-finance{% endif %}">
     <div class="customer-detail-workspace__primary">
     <section class="customer-detail-card customer-detail-card--main" aria-labelledby="customer-upcoming-heading" x-data="{ showAllUpcoming: false }">
       <div class="customer-detail-card__head">
@@ -157,7 +140,7 @@
       {% endif %}
       {% else %}
       <div class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="calendar-x-2" aria-hidden="true"></i><p>هنوز نوبتی برای روزهای آینده ثبت نشده است.</p>
-        {% if can_book_appointment %}<a href="{% url 'customers:detail' pk=customer.pk %}?book=1" aria-haspopup="dialog">ثبت اولین نوبت</a>{% endif %}
+        {% if can_book_appointment %}<a href="{% url 'customers:detail' pk=customer.pk %}?book=1" aria-haspopup="dialog"><i data-lucide="plus" aria-hidden="true"></i>ثبت اولین نوبت</a>{% endif %}
       </div>
       {% endif %}
     </section>
@@ -203,7 +186,7 @@
               {% if act.description %}<p class="customer-detail-timeline__description">{{ act.description }}</p>{% endif %}
             </li>
             {% empty %}
-            <li class="customer-detail-empty">فعالیتی ثبت نشده است.</li>
+            <li class="customer-detail-empty customer-detail-empty--illustrated"><i data-lucide="list-checks" aria-hidden="true"></i><p>فعالیتی ثبت نشده است.</p></li>
             {% endfor %}
           </ol>
           {% if activities|length > 2 %}

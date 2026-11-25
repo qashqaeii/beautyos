@@ -1793,3 +1793,75 @@
     gap:9px;
   }
 }
+
+/* Single-header customer profile — approved composition, active salon palette. */
+.maison-app.management-suite .customer-detail-page .customer-detail-header {
+  display:flex;align-items:center;min-height:78px;height:auto;padding:9px 13px;
+  border-radius:14px;gap:0;isolation:isolate;
+  background:linear-gradient(110deg,var(--cp-tint),var(--cp-paper) 67%);
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__content {
+  position:relative;inset:auto;display:flex;align-items:center;justify-content:space-between;
+  width:100%;min-height:0;padding:0;gap:12px;border:0;background:none;box-shadow:none;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__identity {
+  flex:1 1 auto;display:flex;align-items:center;gap:9px;min-width:0;
+}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__avatar--icon {
+  display:grid;place-items:center;flex:none;width:49px;height:49px;
+  border-radius:12px;background:var(--cp-tint);color:var(--cp-accent);overflow:hidden;
+}
+.customer-detail-header__avatar img {width:100%;height:100%;object-fit:cover;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__copy {min-width:0;gap:1px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__name {font-size:16px;margin:0;line-height:1.4;overflow-wrap:anywhere;}
+.maison-app.management-suite .customer-detail-page .customer-detail-breadcrumbs {display:flex;align-items:center;gap:4px;font-size:9px;line-height:1.35;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__phone {font-size:11px;line-height:1.4;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__since {font-size:9px;line-height:1.4;margin:0;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__actions {display:flex;flex:none;align-items:center;gap:7px;width:auto;margin:0;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__btn {min-height:37px;padding:6px 11px;border-radius:9px;white-space:nowrap;}
+.customer-detail-header__back {display:grid;place-items:center;width:36px;height:37px;border:1px solid var(--cp-line);border-radius:9px;color:var(--cp-accent);background:var(--cp-paper);}
+.customer-detail-header__back svg {width:17px;height:17px;}
+.customer-detail-header__ornament {position:absolute;inset-block:0;inset-inline-start:40%;width:20%;display:grid;place-items:center;pointer-events:none;z-index:-1;color:var(--cp-accent);opacity:.13;}
+.customer-detail-header__ornament svg {width:82px;height:82px;stroke-width:.65;transform:rotate(-22deg);}
+.maison-app.management-suite .customer-detail-page .customer-detail-workspace {
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto auto;gap:10px;align-items:stretch;
+}
+.maison-app.management-suite .customer-detail-page :is(.customer-detail-workspace__primary,.customer-detail-workspace__aside,.customer-detail-history) {display:contents;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--main {grid-column:1/3;grid-row:1;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--preferences {grid-column:3;grid-row:1;}
+.maison-app.management-suite .customer-detail-page .customer-detail-payments {grid-column:1;grid-row:2;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity {grid-column:2;grid-row:2;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--notes {grid-column:3;grid-row:2;}
+.maison-app.management-suite .customer-detail-page .customer-detail-workspace--no-finance .customer-detail-card--activity {grid-column:1/3;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card {height:auto;min-width:0;min-height:145px;padding:12px 14px;overflow:visible;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--main {min-height:178px;background:radial-gradient(ellipse at 12% 100%,var(--cp-tint),transparent 65%),var(--cp-paper);}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--main .customer-detail-empty {min-height:112px;gap:8px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--main .customer-detail-empty a {display:inline-flex;align-items:center;gap:6px;background:var(--cp-accent);color:white;border-radius:9px;padding:7px 14px;text-decoration:none;}
+.customer-detail-empty a svg {width:15px;height:15px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card__title {font-size:13px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-timeline__body {overflow:visible;}
+.maison-app.management-suite .customer-detail-page .customer-detail-timeline__list:has(>.customer-detail-empty:only-child) {border:0;padding:0;}
+.maison-app.management-suite .customer-detail-page .customer-detail-card--activity .customer-detail-empty {min-height:90px;}
+.maison-app.management-suite .customer-detail-page :is(.customer-detail-appt-list,.customer-detail-notes-list,.customer-detail-pay-list,.customer-detail-timeline__list) {overflow:visible;max-height:none;}
+@media(min-width:1180px) and (min-height:560px){
+  .maison-app.management-suite .customer-detail-page {height:auto;min-height:0;overflow:visible;grid-template-rows:auto auto auto;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header {height:78px;min-height:78px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-workspace {grid-template-rows:minmax(180px,auto) minmax(150px,auto);}
+}
+@media(min-width:1180px) and (max-height:760px){
+  .maison-app.management-suite .customer-detail-page .customer-detail-header {height:76px;min-height:76px;padding-block:6px;}
+}
+@media(max-width:850px){
+  .maison-app.management-suite .customer-detail-page .customer-detail-workspace {grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-workspace .customer-detail-card {grid-column:auto;grid-row:auto;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-card--main {grid-column:1/-1;}
+}
+@media(max-width:580px){
+  .maison-app.management-suite .customer-detail-page .customer-detail-header {height:auto;min-height:0;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__content {flex-direction:column;align-items:stretch;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) 40px;width:100%;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__btn {min-height:44px;white-space:normal;}
+  .customer-detail-header__back {height:44px;width:40px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-workspace {grid-template-columns:minmax(0,1fr);}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__ornament {display:none;}
+}
