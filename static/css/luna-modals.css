@@ -750,3 +750,49 @@ body.theme-app .luna-modal #customer-edit-form .luna-customer-tags input {width:
 body.theme-app .luna-modal #customer-edit-form .luna-modal-choice-grid {grid-column:1/-1;}
 body.theme-app .luna-modal #customer-edit-form .customer-form__primary-grid {gap:10px;}
 @media(max-width:639px){body.theme-app .luna-modal #customer-edit-form .luna-customer-tags label {min-height:36px;}}
+
+/* Shared service create/edit: paired field cards, aligned controls and compact
+   advanced settings. Keep category creation and file inputs in their own flow. */
+body.theme-app .luna-modal--service .inventory-create-modal__scroll {
+  padding:12px 16px;min-width:0;
+}
+body.theme-app .luna-modal--service :is(.luna-service-paired-grid,.luna-service-advanced-grid) {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;align-items:stretch;min-width:0;
+}
+body.theme-app .luna-modal--service .luna-service-paired-grid {padding:0;margin:0;}
+body.theme-app .luna-modal--service .luna-service-field-card {
+  box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start;
+  gap:6px;min-width:0;margin:0;padding:9px 10px;
+  border:1px solid var(--color-border,#e8d8d0);border-radius:11px;
+  background:var(--color-surface,#fffaf7);
+}
+body.theme-app .luna-modal--service .luna-service-field-card .field-label {
+  margin:0;font-size:12px;line-height:1.5;
+}
+body.theme-app .luna-modal--service .luna-service-field-card > :is(input,select,textarea) {
+  box-sizing:border-box;width:100%;min-width:0;min-height:40px;margin:0;
+}
+body.theme-app .luna-modal--service .luna-service-field-card > :is(input,select) {height:40px;}
+body.theme-app .luna-modal--service .luna-service-field-card > textarea {
+  height:40px;resize:vertical;padding-block:9px;
+}
+body.theme-app .luna-modal--service .service-form-field__category-head {
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  min-height:18px;gap:3px 6px;margin:0;
+}
+body.theme-app .luna-modal--service .service-form__add-category-btn {
+  font-size:10px;line-height:1.4;padding:2px 5px;margin:0;white-space:normal;
+}
+body.theme-app .luna-modal--service .service-form-field--category:has(.service-form-category-panel) {grid-column:1/-1;}
+body.theme-app .luna-modal--service .service-form-category-panel {min-width:0;margin-top:4px;}
+body.theme-app .luna-modal--service .service-form-advanced {grid-column:1/-1;margin:0;min-width:0;}
+body.theme-app .luna-modal--service .luna-service-advanced-grid {padding:10px;}
+body.theme-app .luna-modal--service .luna-service-advanced-grid[x-cloak] {display:none;}
+body.theme-app .luna-modal--service .luna-modal-choice-grid {grid-column:1/-1;margin:0;}
+body.theme-app .luna-modal--service .service-form__intro--edit {margin:0 0 10px;}
+@media(max-width:639px){
+  body.theme-app .luna-modal--service .inventory-create-modal__scroll {padding:10px;}
+  body.theme-app .luna-modal--service :is(.luna-service-paired-grid,.luna-service-advanced-grid) {grid-template-columns:minmax(0,1fr);gap:8px;}
+  body.theme-app .luna-modal--service .luna-service-field-card > :is(input,select,textarea) {min-height:44px;}
+}

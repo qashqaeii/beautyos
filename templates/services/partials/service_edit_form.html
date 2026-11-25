@@ -13,14 +13,14 @@
       <span class="service-form__intro-name">{{ edit_service.name }}</span>
     </div>
 
-    <div class="service-form__fields service-form__fields--modal">
-      <div class="service-form-field">
+    <div class="service-form__fields service-form__fields--modal luna-service-paired-grid">
+      <div class="service-form-field luna-service-field-card">
         <label class="field-label" for="{{ edit_form.name.id_for_label }}">{{ edit_form.name.label }}</label>
         {{ edit_form.name }}
         {% if edit_form.name.errors %}<p class="service-form-field__error">{{ edit_form.name.errors.0 }}</p>{% endif %}
       </div>
 
-      <div class="service-form-field service-form-field--category">
+      <div class="service-form-field service-form-field--category luna-service-field-card">
         <div class="service-form-field__category-head">
           <label class="field-label mb-0" for="{{ edit_form.category.id_for_label }}">{{ edit_form.category.label }}</label>
           <button
@@ -59,19 +59,19 @@
         </template>
       </div>
 
-      <div class="service-form-field">
+      <div class="service-form-field luna-service-field-card">
         <label class="field-label" for="{{ edit_form.price_toman.id_for_label }}">{{ edit_form.price_toman.label }}</label>
         {{ edit_form.price_toman }}
         {% if edit_form.price_toman.errors %}<p class="service-form-field__error">{{ edit_form.price_toman.errors.0 }}</p>{% endif %}
       </div>
 
-      <div class="service-form-field">
+      <div class="service-form-field luna-service-field-card">
         <label class="field-label" for="{{ edit_form.description.id_for_label }}">{{ edit_form.description.label }}</label>
         {{ edit_form.description }}
         {% if edit_form.description.errors %}<p class="service-form-field__error">{{ edit_form.description.errors.0 }}</p>{% endif %}
       </div>
 
-      <div class="service-form-advanced">
+      <div class="service-form-advanced luna-field--full">
         <button
           type="button"
           class="service-form-advanced__toggle"
@@ -82,22 +82,22 @@
           <i data-lucide="chevron-down" class="h-4 w-4 transition" :class="showEditAdvanced && 'rotate-180'"></i>
         </button>
         <div
-          class="service-form-advanced__body"
+          class="service-form-advanced__body luna-service-advanced-grid"
           x-show="showEditAdvanced"
           x-cloak
           x-transition.opacity.duration.200ms
         >
-          <div class="service-form-field">
+          <div class="service-form-field luna-service-field-card">
             <label class="field-label" for="{{ edit_form.duration_minutes.id_for_label }}">{{ edit_form.duration_minutes.label }}</label>
             {{ edit_form.duration_minutes }}
             {% if edit_form.duration_minutes.errors %}<p class="service-form-field__error">{{ edit_form.duration_minutes.errors.0 }}</p>{% endif %}
           </div>
-          <div class="service-form-field">
+          <div class="service-form-field luna-service-field-card">
             <label class="field-label" for="{{ edit_form.sort_order.id_for_label }}">{{ edit_form.sort_order.label }}</label>
             {{ edit_form.sort_order }}
             {% if edit_form.sort_order.errors %}<p class="service-form-field__error">{{ edit_form.sort_order.errors.0 }}</p>{% endif %}
           </div>
-          <div class="luna-modal-choice-grid">
+          <div class="luna-modal-choice-grid luna-field--full">
 <div class="service-form-field service-form-field--checkbox">
             <label class="service-form-checkbox">
               {{ edit_form.is_active }}
@@ -113,7 +113,7 @@
             {% if edit_form.is_public.errors %}<p class="service-form-field__error">{{ edit_form.is_public.errors.0 }}</p>{% endif %}
           </div>
           </div>
-          <div class="service-form-field">
+          <div class="service-form-field luna-field--full">
             <span class="field-label" id="service-edit-image-label">{{ edit_form.image.label }}</span>
             <div class="service-form-file">
               <label class="service-form-file__btn">
@@ -133,7 +133,7 @@
   </div>
 
   <footer class="inventory-create-modal__foot">
-    <button type="submit" name="intent" value="save_service" class="btn-primary service-form__submit">ذخیره تغییرات</button>
+    <button type="submit" name="intent" value="save_service" class="btn-primary service-form__submit"><i data-lucide="check" aria-hidden="true"></i>ذخیره تغییرات</button>
     <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-edit-modal')">انصراف</button>
   </footer>
 </form>

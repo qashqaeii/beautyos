@@ -76,6 +76,8 @@ def test_service_directory_uses_premium_hero_and_preserves_modal_actions(client,
     assert "services-page--full-grid" in html
     assert html.count('class="maison-service-card suite-service-card services-card"') == 9
     assert 'service-create-modal-title' in html
+    assert 'luna-service-paired-grid' in html
+    assert 'luna-modal--service' in html
     assert 'service-edit-form' in client.get(reverse("services:list")+"?edit="+str(Service.objects.filter(salon=salon).first().pk)).content.decode()
     css_path=finders.find("css/services-premium.css")
     illustration_path=finders.find("images/services-catalog-hero.svg")

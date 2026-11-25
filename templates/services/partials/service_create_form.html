@@ -8,14 +8,14 @@
   {% csrf_token %}
 
   <div class="inventory-create-modal__scroll maison-scroll-themed">
-  <div class="service-form__fields service-form__fields--modal">
-    <div class="service-form-field">
+  <div class="service-form__fields service-form__fields--modal luna-service-paired-grid">
+    <div class="service-form-field luna-service-field-card">
       <label class="field-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
       {{ form.name }}
       {% if form.name.errors %}<p class="service-form-field__error">{{ form.name.errors.0 }}</p>{% endif %}
     </div>
 
-    <div class="service-form-field service-form-field--category">
+    <div class="service-form-field service-form-field--category luna-service-field-card">
       <div class="service-form-field__category-head">
         <label class="field-label mb-0" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
         <button
@@ -54,19 +54,19 @@
       </template>
     </div>
 
-    <div class="service-form-field">
+    <div class="service-form-field luna-service-field-card">
       <label class="field-label" for="{{ form.price_toman.id_for_label }}">{{ form.price_toman.label }}</label>
       {{ form.price_toman }}
       {% if form.price_toman.errors %}<p class="service-form-field__error">{{ form.price_toman.errors.0 }}</p>{% endif %}
     </div>
 
-    <div class="service-form-field">
+    <div class="service-form-field luna-service-field-card">
       <label class="field-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
       {{ form.description }}
       {% if form.description.errors %}<p class="service-form-field__error">{{ form.description.errors.0 }}</p>{% endif %}
     </div>
 
-    <div class="service-form-advanced">
+    <div class="service-form-advanced luna-field--full">
       <button
         type="button"
         class="service-form-advanced__toggle"
@@ -77,12 +77,12 @@
         <i data-lucide="chevron-down" class="h-4 w-4 transition" :class="showAdvanced && 'rotate-180'"></i>
       </button>
       <div
-        class="service-form-advanced__body"
+        class="service-form-advanced__body luna-service-advanced-grid"
         x-show="showAdvanced"
         x-cloak
         x-transition.opacity.duration.200ms
       >
-        <div class="luna-modal-choice-grid">
+        <div class="luna-modal-choice-grid luna-field--full">
 <div class="service-form-field service-form-field--checkbox">
           <label class="service-form-checkbox">
             {{ form.is_active }}
@@ -98,7 +98,7 @@
           {% if form.is_public.errors %}<p class="service-form-field__error">{{ form.is_public.errors.0 }}</p>{% endif %}
         </div>
         </div>
-        <div class="service-form-field">
+        <div class="service-form-field luna-field--full">
           <span class="field-label" id="service-image-label">{{ form.image.label }}</span>
           <div class="service-form-file">
             <label class="service-form-file__btn">
@@ -115,7 +115,7 @@
   </div>
 
   <footer class="inventory-create-modal__foot">
-    <button type="submit" name="intent" value="save_service" class="btn-primary service-form__submit">ذخیره خدمت</button>
+    <button type="submit" name="intent" value="save_service" class="btn-primary service-form__submit"><i data-lucide="check" aria-hidden="true"></i>ذخیره خدمت</button>
     <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-create-modal')">انصراف</button>
   </footer>
 </form>

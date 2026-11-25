@@ -32,6 +32,8 @@ def test_service_list_edit_query_opens_modal(client, owner_membership, salon):
     html = response.content.decode()
     assert "service-edit-form" in html
     assert "ویرایش خدمت" in html
+    assert "luna-service-paired-grid" in html
+    assert "luna-service-advanced-grid" in html
     assert "editOpen: true" in html
 
 
