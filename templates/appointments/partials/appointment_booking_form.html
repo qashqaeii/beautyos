@@ -89,7 +89,6 @@
             class="appt-booking-deposit appt-booking-deposit--modal"
             x-data="appointmentDepositSection({ prices: JSON.parse(document.getElementById('appt-service-prices-booking').textContent), serviceSelectId: '{{ appointment_form.service.id_for_label }}' })"
           >
-            <p class="field-label mb-2">بیعانه (اختیاری)</p>
             <div class="customer-form-field">
               <label class="field-label" for="{{ appointment_form.deposit_amount_toman.id_for_label }}">{{ appointment_form.deposit_amount_toman.label }}</label>
               {{ appointment_form.deposit_amount_toman }}

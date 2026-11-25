@@ -711,3 +711,29 @@ body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__pai
     padding:9px;
   }
 }
+
+/* Booking details: equal partitions and aligned amount/status controls. */
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__body {
+  display:grid;gap:10px;padding:10px;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__body > * {
+  margin-block:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__pair {
+  grid-auto-rows:1fr;align-items:stretch;gap:10px;
+}
+body.theme-app .luna-modal.appointment-booking-modal :is(.appt-booking-deposit--modal,.appt-booking-status-card) {
+  box-sizing:border-box;margin:0;padding:10px;min-width:0;align-content:start;
+}
+body.theme-app .luna-modal.appointment-booking-modal :is(.appt-booking-deposit--modal,.appt-booking-status-card) > .customer-form-field:first-child {
+  display:grid;gap:5px;margin:0;min-width:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__pair :is(input:not([type=hidden]),select) {
+  box-sizing:border-box;height:40px;min-height:40px;max-width:100%;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__body > .customer-form-field {
+  margin:0;
+}
+@media(max-width:639px){
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__pair {grid-auto-rows:auto;}
+}
