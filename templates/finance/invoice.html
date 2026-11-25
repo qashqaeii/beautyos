@@ -18,7 +18,7 @@
       <section class="checkout-workspace__services" aria-label="خدمات فاکتور">
         <div class="checkout-workspace__table-wrap">
           <table class="checkout-workspace__table checkout-workspace__table--issued">
-            <thead><tr><th scope="col">ردیف</th><th scope="col">خدمت و متخصص</th><th scope="col">مبلغ خدمت</th><th scope="col">پرداخت قبلی</th><th scope="col">مانده هنگام صدور</th></tr></thead>
+            <thead><tr><th scope="col">ردیف</th><th scope="col">خدمت و متخصص</th><th scope="col">مبلغ خدمت</th><th scope="col">پرداخت قبلی</th></tr></thead>
             <tbody>
               {% for line in lines %}
               <tr>
@@ -26,7 +26,6 @@
                 <td><strong>{{ line.service_name }}</strong><small>{{ line.staff_name }}{% if line.appointment.status == 'cancelled' %} · لغوشده{% endif %}</small></td>
                 <td data-label="مبلغ خدمت"><bdi>{{ line.gross_toman|fa_money }}</bdi></td>
                 <td data-label="پرداخت قبلی"><bdi>{{ line.prior_paid_toman|fa_money }}</bdi></td>
-                <td data-label="مانده هنگام صدور" class="checkout-workspace__due"><bdi>{{ line.balance_at_issue_toman|fa_money }}</bdi></td>
               </tr>
               {% endfor %}
             </tbody>
@@ -43,9 +42,8 @@
           <div><span>دریافتی هنگام صدور</span><bdi>{{ invoice.received_toman|fa_money }} تومان</bdi></div>
         </div>
         <div class="checkout-workspace__totals">
-          <div><span>مانده هنگام صدور</span><bdi>{{ invoice.balance_at_issue_toman|fa_money }} تومان</bdi></div>
           <div class="checkout-workspace__balance"><span>مانده فعلی خدمات فعال</span><strong>{{ current_balance|fa_money }} تومان</strong></div>
-          <small>مبالغ هنگام صدور ثابت هستند و پرداخت‌های بعدی در مانده فعلی منعکس می‌شوند.</small>
+          <small>پرداخت‌های بعدی در مانده فعلی منعکس می‌شوند.</small>
         </div>
       </div>
       {% if receipts %}
