@@ -201,19 +201,24 @@
       birthPicker: false,
       directNavigation: false,
       bindCalendarDays(pop) {
-        // Bind to the actual teleported DOM, keeping the original Alpine field scope.
-        if (pop.__beautyosDaysBound) return;
-        pop.__beautyosDaysBound = true;
+        if (!pop) return;
         const picker = this;
-        pop.addEventListener("click", event => {
-          const day = event.target.closest?.("[data-jalali-day]");
+        if (pop.__beautyosDaysHandler) {
+          pop.removeEventListener("click", pop.__beautyosDaysHandler, true);
+        }
+        const handler = (event) => {
+          const day = event.target.closest?.("button[data-jalali-day]");
           if (!day || !pop.contains(day) || day.disabled || !picker.open) return;
+          const raw = day.dataset.jalaliDay;
+          if (!raw) return;
           event.preventDefault();
           event.stopPropagation();
-          const [jy,jm,jd] = day.dataset.jalaliDay.split("-").map(Number);
+          const [jy, jm, jd] = raw.split("-").map(Number);
           if (!jy || !jm || !jd) return;
-          picker.pick({inMonth:true, disabled:false, jy, jm, jd});
-        }, true);
+          picker.pick({ inMonth: true, disabled: false, jy, jm, jd });
+        };
+        pop.__beautyosDaysHandler = handler;
+        pop.addEventListener("click", handler, true);
       },
       popoverStyle: {},
       popoverPlacement: "below",
@@ -342,6 +347,8 @@
           return ready;
         };
         this.$nextTick(() => {
+          const pop = this.$refs.popover;
+          if (pop) this.bindCalendarDays(pop);
           if (finalizeOpen()) return;
           requestAnimationFrame(() => {
             if (!this.open) return;

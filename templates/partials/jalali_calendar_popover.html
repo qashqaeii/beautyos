@@ -13,7 +13,6 @@
     aria-modal="true"
     aria-label="تقویم شمسی"
     @click.stop
-    @pointerdown.stop
     @keydown.escape.stop="closeCalendar()"
     dir="rtl"
   >
@@ -82,6 +81,7 @@
           :aria-current="cell.selected ? 'date' : false"
           :aria-selected="Boolean(cell.selected)"
           :data-jalali-day="cell.inMonth ? `${cell.jy}-${cell.jm}-${cell.jd}` : null"
+          @click.stop="pick(cell)"
           x-text="cell.label"
         ></button>
       </template>
