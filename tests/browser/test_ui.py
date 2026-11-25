@@ -1487,6 +1487,8 @@ def test_shared_jalali_direct_selects_have_identical_card_geometry(
         assert abs(mb["height"]-yb["height"])<=1
         assert 38<=mb["height"]<=42
         assert calendar.evaluate("(el) => el.scrollHeight <= el.clientHeight+2")
+        assert calendar.evaluate("(el) => el.getBoundingClientRect().width <= innerWidth - 15")
+        pw.expect(calendar.get_by_role("button",name="بستن",exact=True)).to_be_visible()
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+3")
         calendar.get_by_role("button",name="ماه قبل").click()
         pw.expect(month).to_have_value("7")

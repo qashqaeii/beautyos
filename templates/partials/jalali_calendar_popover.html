@@ -47,7 +47,19 @@
         >
           <span class="jalali-date__nav-icon" aria-hidden="true">›</span>
         </button>
-        <p class="jalali-date__month-label" x-text="monthLabelFa"></p>
+        <template x-if="directNavigation">
+          <div class="jalali-date__period-pair">
+            <select class="jalali-date__period-control" aria-label="انتخاب ماه" :value="viewJm" @change="setViewMonth(Number($event.target.value))">
+              <template x-for="month in monthOptions" :key="month.value"><option :value="month.value" :disabled="month.disabled" :selected="month.value === viewJm" x-text="month.label"></option></template>
+            </select>
+            <select class="jalali-date__period-control" aria-label="انتخاب سال" :value="viewJy" @change="setViewYear(Number($event.target.value))">
+              <template x-for="year in yearOptions" :key="year.value"><option :value="year.value" :selected="year.value === viewJy" x-text="year.label"></option></template>
+            </select>
+          </div>
+        </template>
+        <template x-if="!directNavigation">
+          <p class="jalali-date__month-label" x-text="monthLabelFa"></p>
+        </template>
         <button
           type="button"
           class="jalali-date__nav"
@@ -77,6 +89,7 @@
           :disabled="!cell.inMonth || cell.disabled"
           :aria-label="cell.inMonth ? cell.label : null"
           :aria-current="cell.selected ? 'date' : false"
+          :aria-selected="Boolean(cell.selected)"
           @click.stop="pick(cell)"
           x-text="cell.label"
         ></button>
@@ -84,6 +97,7 @@
     </div>
     <footer class="jalali-date__popover-foot" x-show="!birthPicker">
       <button type="button" class="jalali-date__today-link" @click.stop="pickToday()">امروز</button>
+      <button type="button" class="jalali-date__dismiss" @click.stop="closeCalendar()">بستن</button>
     </footer>
   </div>
 </template>

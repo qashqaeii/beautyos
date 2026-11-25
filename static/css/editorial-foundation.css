@@ -354,3 +354,98 @@
     padding-top:3px;
   }
 }
+
+/* Shared Shadcn-inspired Jalali date picker. One restrained surface and
+   consistent period controls, independent of the originating page or modal. */
+body .jalali-date__popover.jalali-date__popover--portal {
+  --picker-surface:var(--color-surface,#fffdfa);
+  --picker-ink:var(--color-text-primary,#51443f);
+  --picker-muted:var(--color-text-secondary,#796760);
+  --picker-line:var(--color-border,#e7d7cf);
+  --picker-accent:var(--color-primary-hover,#865d55);
+  --picker-soft:var(--color-surface-muted,#f5ebe7);
+  --jalali-day-size:38px;
+  box-sizing:border-box;padding:12px;border:1px solid var(--picker-line);
+  border-radius:14px;background:var(--picker-surface);color:var(--picker-ink);
+  box-shadow:0 12px 32px rgba(65,42,38,.14),0 2px 6px rgba(65,42,38,.06);
+  font-size:13px;
+}
+body .jalali-date__popover--portal .jalali-date__popover-head {
+  display:grid;grid-template-columns:32px minmax(0,1fr) 32px;
+  align-items:center;gap:7px;margin:0 0 9px;padding:0;border:0;
+}
+body .jalali-date__popover--portal .jalali-date__popover-head--birth {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+body .jalali-date__popover--portal .jalali-date__period-pair {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;min-width:0;
+}
+body .jalali-date__popover--portal :is(.jalali-date__period-control,.jalali-date__year-input.input-field) {
+  box-sizing:border-box;width:100%;min-width:0;height:40px;min-height:40px;max-height:40px;
+  padding-block:0;padding-inline:8px 22px;border:1px solid var(--picker-line);
+  border-radius:8px;background-color:var(--picker-surface);color:var(--picker-ink);
+  font-family:inherit;font-size:12px;font-weight:600;line-height:normal;
+}
+body .jalali-date__popover--portal .jalali-date__year-input.input-field {
+  padding-inline:8px;text-align:center;appearance:textfield;
+}
+body .jalali-date__popover--portal .jalali-date__nav {
+  display:grid;place-items:center;width:32px;height:32px;padding:0;
+  border:1px solid var(--picker-line);border-radius:8px;
+  background:transparent;color:var(--picker-ink);
+}
+body .jalali-date__popover--portal .jalali-date__nav-icon {font-size:21px;line-height:1;}
+body .jalali-date__popover--portal .jalali-date__month-label {
+  margin:0;text-align:center;font-size:14px;font-weight:700;line-height:1.5;
+}
+body .jalali-date__popover--portal :is(.jalali-date__weekdays,.jalali-date__grid) {
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;
+}
+body .jalali-date__popover--portal .jalali-date__weekdays {
+  margin:0 0 5px;padding:4px 0;color:var(--picker-muted);text-align:center;
+  font-size:11px;font-weight:500;line-height:1.6;
+}
+body .jalali-date__popover--portal .jalali-date__day {
+  display:grid;place-items:center;width:100%;min-width:0;
+  height:var(--jalali-day-size);min-height:0;padding:0;border:0;border-radius:8px;
+  background:transparent;color:var(--picker-ink);font-size:13px;font-weight:500;
+  line-height:1;font-variant-numeric:tabular-nums;
+}
+body .jalali-date__popover--portal .jalali-date__day--muted {visibility:hidden;}
+body .jalali-date__popover--portal .jalali-date__day--disabled {opacity:.45;cursor:not-allowed;}
+body .jalali-date__popover--portal .jalali-date__day--today:not(.jalali-date__day--selected) {
+  box-shadow:inset 0 0 0 1px var(--picker-accent);color:var(--picker-accent);
+}
+body .jalali-date__popover--portal .jalali-date__day--selected,
+body .jalali-date__popover--portal .jalali-date__day--selected:hover {
+  background:var(--picker-accent);color:#fff;font-weight:700;box-shadow:none;
+}
+body .jalali-date__popover--portal .jalali-date__day:hover:not(:disabled):not(.jalali-date__day--selected),
+body .jalali-date__popover--portal .jalali-date__nav:hover:not(:disabled) {
+  background:var(--picker-soft);color:var(--picker-ink);
+}
+body .jalali-date__popover--portal .jalali-date__popover-foot {
+  display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;padding-top:9px;
+  border-top:1px solid var(--picker-line);
+}
+body .jalali-date__popover--portal :is(.jalali-date__today-link,.jalali-date__dismiss) {
+  width:100%;min-height:34px;padding:5px 8px;border-radius:8px;
+  border:1px solid var(--picker-line);font:inherit;font-weight:600;text-decoration:none;
+  background:transparent;color:var(--picker-ink);
+}
+body .jalali-date__popover--portal .jalali-date__today-link {
+  background:var(--picker-soft);color:var(--picker-accent);
+}
+body .jalali-date__popover--portal :is(button,select,input):focus-visible {
+  outline:2px solid var(--picker-accent);outline-offset:1px;
+}
+@media(max-width:639px){
+  body .jalali-date__popover.jalali-date__popover--portal {--jalali-day-size:42px;padding:10px;}
+  body .jalali-date__popover--portal :is(.jalali-date__today-link,.jalali-date__dismiss){min-height:40px;}
+}
+@media(max-height:420px){
+  body .jalali-date__popover.jalali-date__popover--portal {--jalali-day-size:28px;padding:8px;}
+}
+@media(prefers-reduced-motion:no-preference){
+  body .jalali-date__popover--portal :is(button,select,input){transition:background-color .15s ease,color .15s ease,border-color .15s ease;}
+}

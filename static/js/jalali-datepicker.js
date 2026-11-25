@@ -178,9 +178,7 @@
     }
   }
 
-  const POPOVER_WIDTH = 288;
-  const POPOVER_EDGE = 8;
-  const POPOVER_EST_HEIGHT = 328;
+    const POPOVER_EDGE = 8;
   const POPOVER_Z_INDEX = 280;
 
   function popoverAnchorEl(root, refs) {
@@ -257,48 +255,14 @@
           }
         }
         const r = anchor.getBoundingClientRect();
-        if (this.directNavigation) {
-          this.positionCompactPopover(r);
-          return;
-        }
-        const width = Math.min(POPOVER_WIDTH, window.innerWidth - POPOVER_EDGE * 2);
-        const gap = 6;
-        let top = r.bottom + gap;
-        let placement = "below";
-        const spaceBelow = window.innerHeight - r.bottom - gap;
-        const spaceAbove = r.top - gap;
-        const viewportPad = POPOVER_EDGE;
-        if (spaceBelow < POPOVER_EST_HEIGHT && spaceAbove > spaceBelow) {
-          placement = "above";
-          top = Math.max(viewportPad, r.top - gap - POPOVER_EST_HEIGHT);
-        } else {
-          top = Math.min(top, window.innerHeight - POPOVER_EST_HEIGHT - viewportPad);
-        }
-        const anchorCenter = r.left + r.width / 2;
-        let left = anchorCenter - width / 2;
-        left = Math.max(
-          viewportPad,
-          Math.min(left, window.innerWidth - width - viewportPad)
-        );
-        this.popoverPlacement = placement;
-        this.popoverStyle = {
-          position: "fixed",
-          top: `${Math.max(viewportPad, top)}px`,
-          left: `${left}px`,
-          width: `${width}px`,
-          maxWidth: `calc(100vw - ${POPOVER_EDGE * 2}px)`,
-          maxHeight: `${Math.min(POPOVER_EST_HEIGHT, window.innerHeight - viewportPad * 2)}px`,
-          overflowY: "auto",
-          zIndex: String(POPOVER_Z_INDEX),
-        };
-        this._applyPopoverStyle();
+        this.positionCompactPopover(r);
       },
       positionCompactPopover(r) {
         const pop = this.$refs.popover;
         if (!pop || !pop.getClientRects().length) return;
         const edge = POPOVER_EDGE;
         const gap = 6;
-        const width = Math.min(272, window.innerWidth - edge * 2);
+        const width = Math.min(344, window.innerWidth - edge * 2);
         const available = Math.max(1, window.innerHeight - edge * 2);
         // Give the actual month's grid room first, instead of clipping it to a fixed estimate.
         Object.assign(pop.style, {width: `${width}px`, maxHeight: "none", overflowY: "visible"});
