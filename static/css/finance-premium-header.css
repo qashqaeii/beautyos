@@ -654,7 +654,7 @@
 .luna-finance-shell .finance-page--commissions .finance-comm-cooperation .btn-primary{display:inline-flex;align-items:center;gap:7px;flex:none;background:#9d726e;color:white;border-color:#9d726e;min-height:38px;padding:7px 14px;border-radius:9px;font-size:12px}
 .finance-comm-cooperation .btn-primary svg{width:17px;height:17px}
 @media(min-width:1100px) and (min-height:580px){
-  .luna-finance-shell .finance-page--commissions{min-height:calc(100dvh - 36px);grid-template-rows:auto auto auto minmax(0,1fr) auto;box-sizing:border-box}
+  .luna-finance-shell .finance-page--commissions{min-height:calc(100dvh - 30px);grid-template-rows:auto auto auto minmax(min-content,1fr) auto;box-sizing:border-box}
   .luna-finance-shell .finance-page--commissions .finance-page__header--premium{min-height:78px;height:78px;padding:9px 15px}
   .luna-finance-shell .finance-page--commissions .finance-phase2-tabs .finance-page__tab{min-height:36px}
   .luna-finance-shell .finance-page--commissions .finance-comm-panel:has(.finance-comm-list){min-height:180px}
@@ -669,4 +669,40 @@
  .luna-finance-shell .finance-page--commissions .finance-comm-cooperation .btn-primary{justify-content:center}
  .luna-finance-shell .finance-page--commissions .finance-comm-stat-grid .finance-stat-card{padding:10px;min-height:105px;padding-inline-end:36px}
  .luna-finance-shell .finance-page--commissions .finance-stat-card .luna-finance-stat-icon{width:28px;height:28px;inset-inline-end:6px;inset-block-start:9px}
+}
+
+/* Commission viewport fit and directory-style search. Scoped to this tab. */
+.luna-finance-shell .finance-comm-search__wrap .input-field {
+  box-sizing:border-box; height:36px; min-height:36px; margin:0;
+  padding:0 12px 0 40px; direction:rtl;text-align:right;
+  font-size:11px;line-height:34px;border:1px solid #e5d5ce;border-radius:9px;
+  background:#fffaf7;color:var(--fin-ink);box-shadow:0 1px 3px #57423709;
+}
+.luna-finance-shell .finance-comm-search__wrap .input-field:focus {
+  border-color:#b48a7e;outline:none;box-shadow:0 0 0 3px #a67e7330;
+}
+.luna-finance-shell .finance-comm-search__wrap .staff-board-search__submit {
+  position:absolute;inset-inline-end:3px;top:50%;transform:translateY(-50%);
+  width:32px;height:32px;display:grid;place-items:center;border:0;
+  border-radius:7px;color:#92675f;background:transparent;cursor:pointer;
+}
+.luna-finance-shell .finance-comm-search__wrap .staff-board-search__submit:hover{background:#f0e0d9}
+.luna-finance-shell .finance-comm-search__wrap .staff-board-search__submit svg{width:17px;height:17px;pointer-events:none}
+@media(min-width:1100px) and (min-height:580px){
+  .luna-finance-shell .maison-content:has(.finance-page--commissions){padding:12px 15px 18px;box-sizing:border-box}
+  .luna-finance-shell .finance-page--commissions{gap:8px}
+  .luna-finance-shell .finance-page--commissions .finance-page__header--premium{box-sizing:border-box;height:76px;min-height:76px}
+  .luna-finance-shell .finance-page--commissions .finance-page__tabs{padding:4px}
+  .luna-finance-shell .finance-page--commissions .finance-comm-filter{padding:5px 9px}
+  .luna-finance-shell .finance-page--commissions .finance-comm-workspace{gap:8px;grid-template-rows:auto auto minmax(min-content,1fr)}
+  .luna-finance-shell .finance-page--commissions .finance-comm-heading{min-height:36px}
+  .luna-finance-shell .finance-page--commissions .finance-comm-stat-grid .finance-stat-card{box-sizing:border-box;min-height:84px;padding-block:8px}
+  .luna-finance-shell .finance-page--commissions .finance-comm-panel{padding:10px 12px;gap:6px}
+  .luna-finance-shell .finance-page--commissions .luna-finance-empty{min-height:90px;padding:4px;gap:4px}
+  .luna-finance-shell .finance-page--commissions .finance-comm-cooperation{box-sizing:border-box;min-height:58px;padding:8px 12px}
+  .luna-finance-shell .finance-page--commissions .finance-comm-panel:has(.finance-comm-list){min-height:0}
+}
+@media(max-width:720px){
+  .luna-finance-shell .finance-comm-search__wrap .input-field{height:44px;min-height:44px;line-height:42px}
+  .luna-finance-shell .finance-comm-search__wrap .staff-board-search__submit{width:36px;height:36px}
 }

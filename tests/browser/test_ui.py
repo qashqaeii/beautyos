@@ -236,6 +236,15 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 if name == "finance-commissions":
                     pw.expect(page.locator(".finance-comm-heading")).to_be_visible()
                     pw.expect(page.locator(".finance-comm-back")).to_be_visible()
+                    search = page.locator("#commission-search")
+                    pw.expect(search).to_be_visible()
+                    pw.expect(page.locator(".finance-comm-search .staff-board-search__submit")).to_be_visible()
+                    assert page.locator(".finance-comm-search button").count() == 1
+                    if width >= 1100 and height >= 580:
+                        search_box = search.bounding_box()
+                        date_box = page.locator(".finance-comm-date").bounding_box()
+                        assert search_box and date_box and search_box["x"] > date_box["x"]
+                        assert abs(search_box["y"] - date_box["y"]) < 10
                     page.locator('[aria-controls="finance-comm-settled-panel"]').click()
                     pw.expect(page.locator("#finance-comm-settled-panel")).to_be_visible()
                     pw.expect(page.locator("#finance-comm-pending-panel")).not_to_be_visible()

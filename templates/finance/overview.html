@@ -57,8 +57,7 @@
       <input type="hidden" name="range" value="{{ range_key }}">
       <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
       <label class="sr-only" for="commission-search">جستجوی نام متخصص</label>
-      <div class="finance-comm-search__wrap"><i data-lucide="search" aria-hidden="true"></i><input type="search" id="commission-search" name="q" value="{{ commission_query }}" class="input-field" placeholder="جستجوی نام متخصص..."></div>
-      <button type="submit" class="btn-secondary">جستجو</button>
+      <div class="suite-search staff-board-search finance-comm-search__wrap"><input type="search" id="commission-search" name="q" value="{{ commission_query }}" class="input-field" placeholder="جست‌وجوی نام متخصص..." autocomplete="off"><button type="submit" class="staff-board-search__submit" aria-label="جست‌وجو" title="جست‌وجو"><i data-lucide="search" aria-hidden="true"></i></button></div>
       {% if commission_query %}<a class="finance-comm-clear" href="?tab=commissions&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}" aria-label="پاک کردن جستجو"><i data-lucide="x" aria-hidden="true"></i></a>{% endif %}
     </form>
     <div class="finance-comm-date">
