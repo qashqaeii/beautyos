@@ -641,3 +641,27 @@ body.theme-app .maison-app.luna-reception-shell {
     to{opacity:1;transform:translateY(0);}
   }
 }
+
+
+/* Laptop-height polish: prioritize the next appointment without sacrificing
+   the lower cards. No blank area, no clipped card-level actions. */
+@media(min-width:1180px) and (min-height:560px) and (max-height:750px){
+  .luna-reception-shell .reception-desk-layout{
+    grid-template-rows:minmax(0,1.52fr) minmax(0,1fr);
+  }
+  .luna-reception-shell .reception-desk-priority__grid{
+    grid-template-rows:minmax(0,1.18fr) minmax(0,.82fr);
+  }
+  .luna-reception-shell :is(
+    .reception-desk-priority__next,.reception-desk-priority__pending,
+    .reception-desk-workspace__slots,.reception-desk-workspace__team,
+    .reception-desk-quick
+  ){padding:9px 10px;}
+  .luna-reception-shell .reception-desk-empty--block{
+    min-height:42px;padding:5px;
+  }
+  .luna-reception-shell .reception-desk-next__detail{min-height:17px;}
+  .luna-reception-shell .reception-desk-quick__link{min-height:39px;}
+  .luna-reception-shell .reception-desk-workspace__head{margin-bottom:5px;padding-bottom:4px;}
+  .luna-reception-shell .reception-desk-slot-filters{margin-bottom:5px;}
+}
