@@ -589,3 +589,44 @@
   .hours-workspace--editorial .hours-day {min-height:46px;padding-inline:4px;}
   .hours-workspace--editorial .hours-edit-action {width:25px;height:28px;}
 }
+
+/* Week toolbar: keep the entire date and calendar button inside the panel. */
+.maison-app.management-suite .hours-workspace--editorial .staff-hours-surface__toolbar {
+  display:grid;grid-template-columns:minmax(0,1fr) 158px;align-items:center;
+  gap:10px;min-width:0;
+}
+.maison-app.management-suite .hours-workspace--editorial .hours-week-nav {
+  display:grid;grid-template-columns:34px minmax(0,1fr) 34px;gap:5px;
+}
+.maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker {
+  display:block;width:100%;min-width:0;max-width:none;margin:0;padding:0;
+}
+.maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker__label {display:none;}
+.maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker .jalali-date {
+  display:block;width:100%;min-width:0;max-width:none;
+}
+.maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker .jalali-date__control {
+  display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:0;
+  width:100%;min-width:0;max-width:none;overflow:visible;align-items:stretch;
+}
+.maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker .jalali-date__display.input-field {
+  box-sizing:border-box;width:100%;min-width:0;max-width:none;
+  height:38px;min-height:38px;padding:0 5px;line-height:normal;text-align:center;
+  font-size:12px;border-radius:0 8px 8px 0;
+}
+.maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker .jalali-date__calendar-btn {
+  box-sizing:border-box;width:36px;min-width:36px;max-width:36px;
+  height:38px;min-height:38px;padding:0;margin:0;border-radius:8px 0 0 8px;
+  display:grid;place-items:center;
+}
+.maison-app.management-suite .hours-workspace--editorial .staff-hours-week-range {
+  font-size:11px;line-height:1.5;margin:0;white-space:normal;overflow-wrap:normal;
+}
+@media(max-width:639px){
+  .maison-app.management-suite .hours-workspace--editorial .staff-hours-surface__toolbar {
+    grid-template-columns:minmax(0,1fr);gap:7px;
+  }
+  .maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker .jalali-date__control {grid-template-columns:minmax(0,1fr) 44px;}
+  .maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker .jalali-date__display.input-field {height:44px;min-height:44px;font-size:16px;}
+  .maison-app.management-suite .hours-workspace--editorial .staff-hours-week-picker .jalali-date__calendar-btn {width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;}
+}
