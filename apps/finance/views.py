@@ -107,7 +107,7 @@ def _finance_overview_context(
     tab = get_query.get("tab", "income")
     if tab not in ("income", "cash", "debts", "commissions", "reports", "receipts"):
         tab = "income"
-    if tab == "commissions" and get_query.get("range", "today") not in ("today", "day"):
+    if tab in ("commissions", "cash") and get_query.get("range", "today") not in ("today", "day"):
         get_query["range"] = "day"
     range_ctx = parse_finance_range(_FinanceGetRequest(request, get_query))
 

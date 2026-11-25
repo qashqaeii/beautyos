@@ -68,9 +68,29 @@
       </form>
     </div>
   </section>
+  {% elif tab == 'cash' %}
+  <section class="finance-page__range-bar finance-comm-filter finance-cash-filter" aria-label="جستجو و تاریخ صندوق">
+    <form method="get" class="suite-filter-form finance-comm-search finance-cash-search" role="search">
+      <input type="hidden" name="tab" value="cash">
+      <input type="hidden" name="range" value="{{ range_key }}">
+      <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+      <label class="sr-only" for="cash-search">جست‌وجوی نام مشتری</label>
+      <div class="suite-search staff-board-search finance-comm-search__wrap">
+        <input id="cash-search" type="search" name="q" value="{{ cash_query }}" class="input-field" placeholder="جست‌وجوی نام مشتری..." autocomplete="off">
+        <button type="submit" class="staff-board-search__submit" aria-label="جست‌وجو" title="جست‌وجو"><i data-lucide="search" aria-hidden="true"></i></button>
+      </div>
+      {% if cash_query %}<a class="finance-comm-clear" href="?tab=cash&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}" aria-label="پاک کردن جستجو"><i data-lucide="x" aria-hidden="true"></i></a>{% endif %}
+    </form>
+    <div class="finance-comm-date">
+      <a href="?tab=cash&amp;range=today&amp;q={{ cash_query|urlencode }}" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}" {% if range_key == 'today' %}aria-current="true"{% endif %}>امروز</a>
+      <form method="get" action="{% url 'finance:overview' %}" class="finance-page__day-picker">
+        <input type="hidden" name="tab" value="cash"><input type="hidden" name="range" value="day"><input type="hidden" name="q" value="{{ cash_query }}">
+        {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
+      </form>
+    </div>
+  </section>
   {% elif tab != 'debts' %}
   <section class="finance-page__range-bar" aria-label="بازه گزارش">
-    {% if tab == 'cash' %}<form method="get" class="finance-comm-search finance-cash-search" role="search"><input type="hidden" name="tab" value="cash"><input type="hidden" name="range" value="{{ range_key }}"><input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}"><div class="finance-comm-search__wrap"><input type="search" name="q" value="{{ cash_query }}" class="input-field" placeholder="جست‌وجوی نام مشتری..." aria-label="جست‌وجوی نام مشتری" autocomplete="off"><button type="submit" class="staff-board-search__submit" aria-label="جست‌وجو"><i data-lucide="search" aria-hidden="true"></i></button></div></form>{% endif %}
     <div class="finance-page__range-pills" role="group" aria-label="بازه زمانی">
       <a href="{% url 'finance:overview' %}?tab={{ tab }}&amp;range=today" class="finance-page__range-pill {% if range_key == 'today' %}is-active{% endif %}" {% if range_key == 'today' %}aria-current="true"{% endif %}>امروز</a>
       {% if tab != 'commissions' %}
@@ -84,7 +104,6 @@
     <div class="luna-finance-date-group">
       <form method="get" action="{% url 'finance:overview' %}" class="finance-page__day-picker">
         <input type="hidden" name="tab" value="{{ tab }}">
-        {% if tab == 'cash' %}<input type="hidden" name="q" value="{{ cash_query }}">{% endif %}
         <input type="hidden" name="range" value="day">
         {% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}
       </form>

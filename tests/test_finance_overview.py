@@ -342,3 +342,20 @@ def test_cash_dashboard_compact_cards_and_customer_search(client, owner_membersh
     empty = client.get(reverse("finance:overview"), {"tab": "cash", "q": "نام ناموجود"})
     assert empty.context["payment_page"].paginator.count == 0
     assert empty.context["cash_paid_total"] == 500000
+
+
+@pytest.mark.django_db
+def test_cash_filter_has_only_today_and_calendar(client, owner_membership):
+    client.force_login(owner_membership.user)
+    response = client.get(reverse("finance:overview"), {"tab": "cash", "q": "مریم"})
+    assert response.status_code == 200
+    html = response.content.decode().split('class="finance-page__range-bar finance-comm-filter finance-cash-filter"', 1)[1].split("</section>", 1)[0]
+    assert 'id="cash-search"' in html
+    assert 'staff-board-search__submit' in html
+    assert 'finance-page__day-picker' in html
+    assert 'range=today' in html
+    assert 'value="مریم"' in html
+    for other in ("range=yesterday", "range=week", "range=month", "range=quarter", "انتخاب روز"):
+        assert other not in html
+    legacy = client.get(reverse("finance:overview"), {"tab": "cash", "range": "month"})
+    assert legacy.context["range_key"] == "day"
