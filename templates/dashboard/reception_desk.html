@@ -189,8 +189,13 @@
       </div>
       <div class="reception-journey__step">
         <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="circle-check-big"></i></span>
+        {% if can_payment_create %}
         <span class="reception-journey__name">تکمیل و تسویه</span>
         <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.settled }}">{{ day_operations_summary.settled|fa_num }}</strong>
+        {% else %}
+        <span class="reception-journey__name">خدمت تکمیل‌شده</span>
+        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.completed }}">{{ day_operations_summary.completed|fa_num }}</strong>
+        {% endif %}
       </div>
     </div>
     <details class="reception-operations-disclosure">
