@@ -179,13 +179,13 @@
       </div>
       <div class="reception-journey__step">
         <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="user-round-check"></i></span>
-        <span class="reception-journey__name">در حال پذیرش</span>
-        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.checked_in }}">{{ day_operations_summary.checked_in|fa_num }}</strong>
+        <span class="reception-journey__name">در انتظار پذیرش</span>
+        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.confirmed }}">{{ day_operations_summary.confirmed|fa_num }}</strong>
       </div>
       <div class="reception-journey__step">
         <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="scissors"></i></span>
-        <span class="reception-journey__name">تأییدشده، آماده خدمت</span>
-        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.confirmed }}">{{ day_operations_summary.confirmed|fa_num }}</strong>
+        <span class="reception-journey__name">در حال انجام خدمت</span>
+        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.checked_in }}">{{ day_operations_summary.checked_in|fa_num }}</strong>
       </div>
       <div class="reception-journey__step">
         <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="circle-check-big"></i></span>
