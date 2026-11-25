@@ -16,12 +16,12 @@
     <input
       type="text"
       class="jalali-date__display {{ widget.attrs.class }}"
-      {% for name, value in widget.attrs.items %}{% if name != 'class' and name != 'type' and name != 'portal_target' %} {{ name }}="{{ value }}"{% endif %}{% endfor %}
+      {% for name, value in widget.attrs.items %}{% if name != 'class' and name != 'type' and name != 'portal_target' and name != 'name' %} {{ name }}="{{ value }}"{% endif %}{% endfor %}
       x-model="display"
       x-ref="displayInput"
       @input="onDisplayInput($event)"
       @keydown.enter.prevent="commitTyped()"
-      @blur="commitTyped()"
+      @blur="commitOnBlur($event)"
       @paste="onDisplayPaste($event)"
       @click.stop="openCalendar()"
       inputmode="numeric"
@@ -46,6 +46,6 @@
     </button>
     {% endif %}
   </div>
-  <input type="hidden" name="{{ widget.name }}" x-model="iso" id="{{ widget.attrs.id|default:widget.name }}" />
+  <input type="hidden" data-jalali-iso name="{{ widget.name }}" x-model="iso" />
   {% include "partials/jalali_calendar_popover.html" with portal_target=widget.attrs.portal_target %}
 </div>

@@ -375,6 +375,7 @@
         return j ? j.jy : 1450;
       },
       init() {
+        this._fieldRoot = this.$el;
         if (this.iso) {
           const j = jalaliFromIso(this.iso);
           if (j) {
@@ -391,13 +392,26 @@
       },
       setIso(iso) {
         const next = iso || "";
-        if (this.iso !== next) {
-          this.iso = next;
-          emitJalaliChange(this.$el, this.name, next);
-        } else if (!next) {
-          this.iso = "";
-          emitJalaliChange(this.$el, this.name, "");
-        }
+        const changed = this.iso !== next;
+        this.iso = next;
+        const root = this._fieldRoot || this.$el;
+        const hidden = root.querySelector("[data-jalali-iso]");
+        if (hidden) hidden.value = next;
+        if (changed || !next) emitJalaliChange(root, this.name, next);
+      },
+      applyPickedDate(iso) {
+        if (this.isIsoDisabled(iso)) return;
+        this.display = displayFromIso(iso);
+        const root = this._fieldRoot || this.$el;
+        const input = root.querySelector(".jalali-date__display");
+        if (input) input.value = this.display;
+        this.setIso(iso);
+        this.closeCalendar();
+      },
+      commitOnBlur(event) {
+        if (this.open) return;
+        if (event.relatedTarget?.closest(".jalali-date__popover--portal")) return;
+        this.commitTyped();
       },
       onDisplayPaste(event) {
         event.preventDefault();
@@ -533,21 +547,17 @@
         if (!cell.inMonth || cell.disabled) return;
         const iso = isoFromJalali(cell.jy, cell.jm, cell.jd);
         if (this.isIsoDisabled(iso)) return;
-        this.display = displayFromIso(iso);
-        this.setIso(iso);
-        this.closeCalendar();
+        this.applyPickedDate(iso);
       },
       pickToday() {
         const iso = this.birthPicker && this.maxIso ? this.maxIso : todayIso();
         if (this.isIsoDisabled(iso)) return;
-        this.setIso(iso);
-        this.display = displayFromIso(iso);
         const j = jalaliFromIso(iso);
         if (j) {
           this.viewJy = j.jy;
           this.viewJm = j.jm;
         }
-        this.closeCalendar();
+        this.applyPickedDate(iso);
       },
       commitTyped() {
         const digits = extractDateDigits(this.display);

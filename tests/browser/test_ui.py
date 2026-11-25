@@ -1458,6 +1458,8 @@ def test_shared_jalali_birth_picker_has_equal_month_year_cards_and_working_days(
         pw.expect(calendar.get_by_role("gridcell",name="۱۵",exact=True)).to_have_attribute("aria-selected","true")
         calendar.get_by_role("gridcell",name="۱۶",exact=True).click()
         pw.expect(selected).to_have_value(jdatetime.date(1403,7,16).togregorian().isoformat())
+        pw.expect(form.get_by_label("تاریخ تولد",exact=True)).to_have_value("۱۴۰۳/۰۷/۱۶")
+        assert form.evaluate("(el) => new FormData(el).get('birth_date')") == jdatetime.date(1403,7,16).togregorian().isoformat()
         pw.expect(calendar).not_to_be_visible()
         assert not errors, errors
         context.close()
