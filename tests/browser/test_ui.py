@@ -707,7 +707,7 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         trigger.click()
         calendar=page.locator(".jalali-date__popover--portal:visible")
         pw.expect(calendar.get_by_role("gridcell",name="۲۹",exact=True)).to_have_attribute("aria-current","date")
-        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_text("۱۴۰۵⌄")
+        pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_contain_text("۱۴۰۵")
         pw.expect(calendar.get_by_label("انتخاب ماه",exact=True)).to_have_value("8")
 
         def assert_compact():
@@ -724,7 +724,9 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         pw.expect(calendar.locator(".jalali-date__grid > button")).to_have_count(42)
         pw.expect(calendar.get_by_label("انتخاب ماه", exact=True)).to_have_value(str(month))
         assert_compact()
-        calendar.get_by_label("انتخاب سال",exact=True).select_option("1403")
+        calendar.get_by_label("انتخاب سال",exact=True).click()
+        assert calendar.locator(".jalali-date__year-list").bounding_box()["height"] <= 168
+        calendar.locator('[data-year="1403"]').click()
         calendar.get_by_label("انتخاب ماه",exact=True).select_option("12")
         pw.expect(calendar.get_by_role("gridcell",name="۳۰",exact=True)).to_be_enabled()
         with page.expect_navigation(wait_until="load"):
@@ -735,7 +737,9 @@ def test_overview_jalali_direct_month_year_and_day(live_server, client, owner_me
         pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_value("1403")
         pw.expect(calendar.get_by_label("انتخاب ماه",exact=True)).to_have_value("12")
         assert_compact()
-        calendar.get_by_label("انتخاب سال",exact=True).select_option("1404")
+        calendar.get_by_label("انتخاب سال",exact=True).click()
+        assert calendar.locator(".jalali-date__year-list").bounding_box()["height"] <= 168
+        calendar.locator('[data-year="1404"]').click()
         pw.expect(calendar.get_by_role("gridcell",name="۳۰",exact=True)).to_have_count(0)
         calendar.get_by_role("button",name="ماه بعد",exact=True).click()
         pw.expect(calendar.get_by_label("انتخاب سال",exact=True)).to_have_text("۱۴۰۵⌄")
