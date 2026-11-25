@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
+from django.db.models import Sum
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -10,7 +11,7 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 from apps.commissions.services import create_settlement
 from apps.finance.dashboard import finance_dashboard
 from apps.finance.forms import PaymentForm, SalonDebtForm, SalonDebtPaymentForm
-from apps.finance.models import Payment, SalonDebt
+from apps.finance.models import Invoice, Payment, SalonDebt
 from apps.finance.services import (
     commission_day_overview,
     customer_payment_queryset,
@@ -128,8 +129,16 @@ def _finance_overview_context(
     payment_page = None
     payment_page_size = 50 if get_query.get("rows") == "50" else 5
     presentation = None
+    cash_query = get_query.get("q", "").strip()[:100] if tab == "cash" else ""
+    cash_partial_total = cash_paid_total = cash_invoice_total = 0
     if tab in ("income", "cash", "receipts", "reports"):
         queryset = customer_payment_queryset(request.salon, range_ctx["start_dt"], range_ctx["end_dt"])
+        if tab == "cash":
+            cash_partial_total = queryset.filter(status=Payment.Status.PARTIAL).aggregate(total=Sum("paid_amount_toman"))["total"] or 0
+            cash_paid_total = queryset.filter(status=Payment.Status.PAID).aggregate(total=Sum("paid_amount_toman"))["total"] or 0
+            cash_invoice_total = Invoice.scoped(request.salon).filter(created_at__gte=range_ctx["start_dt"], created_at__lt=range_ctx["end_dt"]).aggregate(total=Sum("gross_toman"))["total"] or 0
+            if cash_query:
+                queryset = queryset.filter(customer__full_name__icontains=cash_query)
         payment_page = Paginator(queryset, payment_page_size).get_page(get_query.get("page", 1))
         payments = payment_page.object_list
         presentation = income_presentation(request.salon, range_ctx, income)
@@ -159,6 +168,10 @@ def _finance_overview_context(
         "income": income,
         "dashboard": finance_dashboard(request.salon, range_ctx) if tab in ("income", "cash", "debts", "reports") else None,
         "payments": payments,
+        "cash_query": cash_query,
+        "cash_partial_total": cash_partial_total,
+        "cash_paid_total": cash_paid_total,
+        "cash_invoice_total": cash_invoice_total,
         "payment_page": payment_page,
         "payment_page_size": payment_page_size,
         "presentation": presentation,

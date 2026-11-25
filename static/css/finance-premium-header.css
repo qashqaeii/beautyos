@@ -706,3 +706,55 @@
   .luna-finance-shell .finance-comm-search__wrap .input-field{height:44px;min-height:44px;line-height:42px}
   .luna-finance-shell .finance-comm-search__wrap .staff-board-search__submit{width:36px;height:36px}
 }
+
+/* Cash workspace: compact dashboard, real receipt metrics, grouped actions. */
+.luna-finance-shell .finance-page--cash{gap:8px}
+.luna-finance-shell .finance-page--cash .fin-quick-grid--compact{margin:0}
+.luna-finance-shell .finance-page--cash .fin-quick-actions-panel{display:block;min-height:0;padding:6px 8px}
+.luna-finance-shell .finance-page--cash .fin-quick-actions-panel .fin-panel-head{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.luna-finance-shell .finance-page--cash .fin-quick-actions-panel .fin-action{min-height:36px;padding:5px 8px}
+.luna-finance-shell .finance-page--cash .finance-cash-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0}
+.luna-finance-shell .finance-page--cash .finance-cash-kpis .finance-stat-card{min-height:88px;padding:9px 10px;gap:4px;align-content:center;border-radius:12px}
+.luna-finance-shell .finance-page--cash .finance-cash-kpis .luna-finance-stat-icon{position:absolute;inset-inline-end:8px;inset-block-start:8px;width:28px;height:28px}
+.luna-finance-shell .finance-page--cash .finance-cash-kpis .luna-finance-stat-icon svg{width:16px;height:16px}
+.luna-finance-shell .finance-page--cash .finance-stat-card__label{padding-inline-end:30px;font-size:11px}
+.luna-finance-shell .finance-page--cash .finance-stat-card__value{font-size:clamp(13px,1.2vw,18px);line-height:1.4}
+.luna-finance-shell .finance-page--cash .finance-stat-card__unit,.luna-finance-shell .finance-page--cash .finance-stat-card__hint{font-size:10px}
+.luna-finance-shell .finance-page--cash .finance-stat-card--success{background:linear-gradient(120deg,#eaf0e8,#fffaf7)}
+.finance-cash-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;min-width:0}
+.luna-finance-shell .finance-page--cash .finance-cash-tool{display:flex;flex-direction:row-reverse;align-items:center;justify-content:space-between;min-height:90px;padding:9px 11px;gap:9px;margin:0;border-radius:12px;background:linear-gradient(120deg,#f1e0d8,#fffaf7 70%)}
+.finance-cash-tool>div{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;flex:1}
+.finance-cash-tool h2{font-size:13px;margin:0}
+.finance-cash-tool .fin-muted{font-size:10px;margin:0}
+.finance-cash-tool strong{font-size:12px}
+.finance-cash-tool a{font-size:11px;color:#875e56}
+.finance-cash-tool .btn-primary{min-height:30px;padding:5px 10px;background:#9d726e;color:white;border-radius:8px}
+.finance-cash-tool-art{width:66px;height:66px;display:grid;place-items:center;flex:none;color:#a67c72;background:radial-gradient(ellipse,#ead1c5,transparent 72%)}
+.finance-cash-tool-art svg{width:44px;height:44px;stroke-width:1.25;filter:drop-shadow(0 4px 2px #ad8a7d28)}
+.luna-finance-shell .finance-page--cash .finance-page__panel.luna-finance-layout{gap:8px}
+.luna-finance-shell .finance-page--cash .luna-finance-panel{padding:9px 11px;border-radius:12px}
+.luna-finance-shell .finance-page--cash .finance-section-head{margin:0 0 7px}
+.luna-finance-shell .finance-page--cash .finance-section-head__cta{min-height:34px;padding:5px 10px}
+.luna-finance-shell .finance-page--cash .finance-table :is(th,td){padding:6px 9px;font-size:11px}
+.luna-finance-shell .finance-page--cash .luna-finance-table-footer{padding-block:5px}
+.luna-finance-shell .finance-page--cash .finance-page__range-bar{gap:6px;padding:5px 8px}
+.finance-cash-search .finance-comm-search__wrap{width:clamp(145px,17vw,240px)}
+@media(min-width:1100px) and (min-height:580px){
+ .luna-finance-shell .maison-content:has(.finance-page--cash){padding:10px 15px 18px}
+ .luna-finance-shell .finance-page--cash{min-height:calc(100dvh - 28px);grid-template-rows:auto auto auto auto minmax(min-content,1fr)}
+ .luna-finance-shell .finance-page--cash .finance-page__header--premium{height:76px;min-height:76px;padding:9px 15px;box-sizing:border-box}
+ .luna-finance-shell .finance-page--cash .finance-phase2-tabs .finance-page__tab{min-height:36px}
+ .luna-finance-shell .finance-page--cash .finance-page__panel.luna-finance-layout{grid-template-rows:auto auto minmax(min-content,1fr)}
+ .luna-finance-shell .finance-page--cash .finance-page__range-pills{gap:3px}
+ .luna-finance-shell .finance-page--cash .finance-page__range-pill{padding-inline:7px}
+ .luna-finance-shell .finance-page--cash .luna-finance-empty{min-height:72px;padding:5px}
+ .luna-finance-shell .finance-page--cash .luna-finance-empty-icon{width:34px;height:34px;border-radius:9px}
+ .luna-finance-shell .finance-page--cash .luna-finance-empty-icon svg{width:22px;height:22px}
+}
+@media(max-width:900px){
+ .luna-finance-shell .finance-page--cash .finance-cash-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .luna-finance-shell .finance-page--cash .finance-cash-kpis .luna-finance-featured{grid-column:1/-1}
+ .finance-cash-tools{grid-template-columns:1fr}
+ .finance-cash-search{width:100%}
+ .finance-cash-search .finance-comm-search__wrap{width:100%}
+}

@@ -325,3 +325,20 @@ def test_commission_workspace_search_and_calendar(client, owner_membership):
     assert "finance-comm-date" in html
     assert "finance-comm-cooperation" in html
     assert "نام آزمایشی" in html
+
+
+@pytest.mark.django_db
+def test_cash_dashboard_compact_cards_and_customer_search(client, owner_membership, salon):
+    client.force_login(owner_membership.user)
+    customer = Customer.objects.create(salon=salon, full_name="مریم خاص", phone="+989121334455")
+    Payment.objects.create(salon=salon, customer=customer, paid_amount_toman=500000, status=Payment.Status.PAID)
+    response = client.get(reverse("finance:overview"), {"tab": "cash", "q": "مریم"})
+    assert response.status_code == 200
+    assert response.context["cash_paid_total"] == 500000
+    assert response.context["payment_page"].paginator.count == 1
+    assert "finance-cash-kpis" in response.content.decode()
+    assert "finance-cash-tools" in response.content.decode()
+    assert "fin-balances-panel" not in response.content.decode()
+    empty = client.get(reverse("finance:overview"), {"tab": "cash", "q": "نام ناموجود"})
+    assert empty.context["payment_page"].paginator.count == 0
+    assert empty.context["cash_paid_total"] == 500000

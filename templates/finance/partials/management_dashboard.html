@@ -66,7 +66,7 @@
       {% if can_manage_expenses %}<a class="fin-action" href="{% url 'expenses:create' %}"><i data-lucide="layers" aria-hidden="true"></i><span>ثبت هزینه</span></a>{% endif %}
     </nav>
   </article>
-  <article class="fin-panel fin-balances-panel">
+  {% if tab != 'cash' %}<article class="fin-panel fin-balances-panel">
     <header class="fin-panel-head">
       <h2><i data-lucide="arrow-left-right" aria-hidden="true"></i>مانده‌ها و گردش ثبت‌شده</h2>
       <a href="{% url 'finance:overview' %}?tab=debts">مشاهده جزئیات</a>
@@ -81,7 +81,7 @@
       <div class="fin-line fin-balance-item"><span>خالص فروش محصولات</span><bdi>{{ dashboard.product_revenue|fa_money }} تومان</bdi></div>
       <div class="fin-line fin-balance-item"><span>فروش پکیج ثبت‌شده در بازه</span><bdi>{{ dashboard.package_sales|fa_money }} تومان</bdi></div>
     </div>
-  </article>
+  </article>{% endif %}
 </section>
 {% endif %}
 {% if tab == 'reports' %}
