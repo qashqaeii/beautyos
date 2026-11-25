@@ -15,25 +15,7 @@
     @keydown.escape.stop="closeCalendar()"
     dir="rtl"
   >
-    <template x-if="birthPicker">
-      <header class="jalali-date__popover-head jalali-date__popover-head--birth">
-        <select class="jalali-date__month-select jalali-date__period-control" x-model.number="viewJm" aria-label="ماه">
-          <template x-for="(m, idx) in monthsFaList" :key="idx">
-            <option :value="idx + 1" x-text="m"></option>
-          </template>
-        </select>
-        <input
-          type="number"
-          class="jalali-date__year-input jalali-date__period-control input-field"
-          x-model.number="viewJy"
-          :max="maxJalaliYear"
-          min="1300"
-          inputmode="numeric"
-          aria-label="سال"
-        />
-      </header>
-    </template>
-    <template x-if="!birthPicker">
+    <template x-if="true">
       <header
         class="jalali-date__popover-head"
         :class="{ 'jalali-date__popover-head--compact-nav': directNavigation }"
@@ -102,7 +84,7 @@
         ></button>
       </template>
     </div>
-    <footer class="jalali-date__popover-foot" x-show="!birthPicker">
+    <footer class="jalali-date__popover-foot" >
       <button type="button" class="jalali-date__today-link" @click.stop="pickToday()">امروز</button>
       <button type="button" class="jalali-date__dismiss" @click.stop="closeCalendar()">بستن</button>
     </footer>

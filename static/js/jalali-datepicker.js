@@ -183,7 +183,7 @@
 
   function popoverAnchorEl(root, refs) {
     if (refs) {
-      if (refs.calendarBtn) return refs.calendarBtn;
+      if (refs.calendarBtn) return root.querySelector(".jalali-date__control") || refs.calendarBtn;
       if (refs.anchorTrigger) return refs.anchorTrigger;
       if (refs.displayInput) {
         const control = root.querySelector(".jalali-date__control");
@@ -370,7 +370,7 @@
       display: config.display ? toFa(config.display) : "",
       maxIso: config.maxIso || "",
       birthPicker: Boolean(config.birthPicker),
-      directNavigation: !config.birthPicker,
+      directNavigation: true,
       monthsFaList: MONTHS_FA,
       open: false,
       viewJy: 1403,
@@ -390,7 +390,7 @@
             this.display = displayFromIso(this.iso);
           }
         } else {
-          const j = jalaliFromIso(todayIso());
+          const j = jalaliFromIso(this.maxIso && this.maxIso < todayIso() ? this.maxIso : todayIso());
           this.viewJy = j.jy;
           this.viewJm = j.jm;
         }

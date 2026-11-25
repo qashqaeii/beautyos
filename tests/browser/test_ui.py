@@ -1418,9 +1418,10 @@ def test_shared_jalali_birth_picker_has_equal_month_year_cards_and_working_days(
         trigger.click()
         calendar=page.locator(".jalali-date__popover--portal:visible")
         pw.expect(calendar).to_be_visible()
-        pw.expect(calendar).to_have_class("jalali-date__popover jalali-date__popover--portal jalali-date__popover--birth")
-        month=calendar.get_by_label("ماه",exact=True)
-        year=calendar.get_by_label("سال",exact=True)
+        assert "jalali-date__popover--birth" in (calendar.get_attribute("class") or "")
+        assert "jalali-date__popover--compact" in (calendar.get_attribute("class") or "")
+        month=calendar.get_by_label("انتخاب ماه",exact=True)
+        year=calendar.get_by_label("انتخاب سال",exact=True)
         pw.expect(month).to_be_visible()
         pw.expect(year).to_be_visible()
         mb=month.bounding_box()
@@ -1435,11 +1436,14 @@ def test_shared_jalali_birth_picker_has_equal_month_year_cards_and_working_days(
         assert box and box["x"]>=0 and box["x"]+box["width"]<=width+1
         assert box["y"]>=0 and box["y"]+box["height"]<=height+1
 
-        year.fill("1403")
-        year.press("Tab")
+        year.click()
+        menu = calendar.locator(".jalali-date__year-list")
+        pw.expect(menu).to_be_visible()
+        assert menu.bounding_box()["height"] <= 168
+        calendar.locator('[data-year="1403"]').click()
         month.select_option("7")
         pw.expect(month).to_have_value("7")
-        pw.expect(year).to_have_value("1403")
+        pw.expect(year).to_contain_text("۱۴۰۳")
         dates=calendar.locator('.jalali-date__grid button[role="gridcell"]:not([disabled])')
         assert dates.count()==30
         dates.first.click()
