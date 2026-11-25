@@ -5,7 +5,7 @@
 {% block mobile_header %}{% endblock %}
 {% block extra_head %}<script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>{% endblock %}
 {% block content %}
-<div class="staff-hours-page hours-workspace">
+<div class="staff-hours-page hours-workspace hours-workspace--editorial">
   <header class="hours-head">
     <div class="hours-head__identity"><span class="hours-emblem"><i data-lucide="clock" aria-hidden="true"></i></span><div><h1>ساعات کاری</h1><p>{{ profile.full_display_name }}{% if profile.title %} · {{ profile.title }}{% endif %}</p></div></div>
     <a class="btn-secondary hours-back" href="{% url 'staff:detail' pk=profile.pk %}"><i data-lucide="arrow-right" aria-hidden="true"></i>پروفایل متخصص</a>
@@ -18,10 +18,10 @@
   </section>
   <div class="hours-layout">
     <section class="staff-hours-surface" aria-labelledby="hours-schedule-title">
-      <div class="hours-panel-title"><span class="hours-small-icon"><i data-lucide="calendar-days" aria-hidden="true"></i></span><h2 id="hours-schedule-title">برنامهٔ هفتگی</h2><span class="hours-recurring">تکرار هر هفته</span></div>
+      <div class="hours-panel-title"><span class="hours-small-icon"><i data-lucide="calendar-days" aria-hidden="true"></i></span><h2 id="hours-schedule-title">برنامهٔ هفتگی</h2><span class="hours-recurring"><i data-lucide="repeat-2" aria-hidden="true"></i>تکرار هر هفته</span></div>
       <div class="staff-hours-surface__toolbar">
         <div class="hours-week-nav"><a href="?week={{ previous_week|date:'Y-m-d' }}&amp;day={{ selected_day }}" aria-label="هفته قبل" title="هفته قبل"><i data-lucide="chevron-right" aria-hidden="true"></i></a><p class="staff-hours-week-range tabular-nums">{{ week_range_jalali|persian_digits }}</p><a href="?week={{ next_week|date:'Y-m-d' }}&amp;day={{ selected_day }}" aria-label="هفته بعد" title="هفته بعد"><i data-lucide="chevron-left" aria-hidden="true"></i></a></div>
-        {% include "partials/jalali_week_picker.html" with week_anchor=week_anchor %}
+        {% include "partials/jalali_week_picker.html" with week_anchor=week_anchor selected_day=selected_day %}
       </div>
       <div class="hours-table-head" aria-hidden="true"><span>روز هفته</span><span>ساعت حضور</span><span>وضعیت</span><span></span></div>
       <ol class="staff-hours-week-list">
@@ -31,7 +31,7 @@
             <span class="hours-day__name"><strong>{{ row.label }}</strong><small>{{ row.jalali|persian_digits }}</small></span>
             <span class="hours-day__time" dir="ltr">{% if row.record and not row.record.is_closed %}{{ row.record.start_time|time:"H:i"|persian_digits }} – {{ row.record.end_time|time:"H:i"|persian_digits }}{% else %}—{% endif %}</span>
             {% if not row.record %}<span class="hours-status is-neutral">تنظیم نشده</span>{% elif row.record.is_closed %}<span class="hours-status is-closed">تعطیل</span>{% else %}<span class="hours-status is-work">کاری</span>{% endif %}
-            <i data-lucide="pencil" class="hours-day__edit" aria-hidden="true"></i>
+            <span class="hours-edit-action"><i data-lucide="pencil" class="hours-day__edit" aria-hidden="true"></i></span>
           </a>
         </li>
         {% endfor %}
@@ -39,7 +39,7 @@
     </section>
     <section class="staff-hours-edit" id="hours-editor" aria-labelledby="staff-hours-form-title">
       <div class="hours-panel-title"><span class="hours-small-icon"><i data-lucide="sliders-horizontal" aria-hidden="true"></i></span><h2 id="staff-hours-form-title">ویرایش ساعات</h2></div>
-      <div class="hours-selected"><div><strong>{{ selected_row.label }}</strong><small>{{ selected_row.jalali|persian_digits }}</small></div><span>روز انتخاب‌شده</span></div>
+      <div class="hours-selected"><div><strong>{{ selected_row.label }}</strong><small>{{ selected_row.jalali|persian_digits }}</small></div><span class="hours-selected__caption"><i data-lucide="calendar-days" aria-hidden="true"></i>روز انتخاب‌شده</span></div>
       <form method="post" class="staff-hours-form staff-hours-form--compact" data-staff-hours-form>
         {% csrf_token %}
         {{ form.weekday.as_hidden }}

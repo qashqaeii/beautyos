@@ -1,11 +1,12 @@
 {# GET week anchor #}
 <form method="get" class="staff-hours-week-picker">
+  <input type="hidden" name="day" value="{{ selected_day|default_if_none:0 }}">
   <label class="staff-hours-week-picker__label text-xs text-ink-muted">هفتهٔ نمایش</label>
   <div
     class="jalali-date jalali-date--compact"
     data-jalali-date
     x-data="jalaliWeekPicker('{{ week_anchor|date:'Y-m-d' }}')"
-    @keydown.escape.window="closeCalendar()"
+    @keydown.escape.window="handleEscapeKey($event)"
     @pointerdown.window="jalaliDismissPointer($event)"
   >
     <div class="jalali-date__control">
@@ -31,6 +32,7 @@
         @pointerdown.stop
         @click.stop.prevent="toggleCalendar()"
         aria-label="باز کردن تقویم شمسی"
+        :aria-expanded="open" aria-haspopup="dialog"
       >
         <i data-lucide="calendar-days" class="jalali-date__calendar-icon" aria-hidden="true"></i>
       </button>

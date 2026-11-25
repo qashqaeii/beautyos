@@ -549,6 +549,9 @@
 
     Alpine.data("jalaliWeekPicker", (initialIso) => ({
       ...jalaliPopoverMixin(),
+      directNavigation: true,
+      minIso: "1900-01-01",
+      maxIso: "2200-12-31",
       iso: initialIso || todayIso(),
       display: displayFromIso(initialIso || todayIso()),
       open: false,
@@ -562,6 +565,45 @@
         this.viewJm = j.jm;
         this.display = displayFromIso(this.iso);
         this.$nextTick(() => lucideRefreshIn(this.$el));
+      },
+      get yearOptions() {
+        const first = jalaliFromIso(this.minIso).jy;
+        const last = jalaliFromIso(this.maxIso).jy;
+        return Array.from({ length: last-first+1 }, (_, i) => ({value:first+i,label:toFa(first+i)}));
+      },
+      get monthOptions() {
+        return MONTHS_FA.map((label,i)=>({value:i+1,label,disabled:!this.monthInBounds(this.viewJy,i+1)}));
+      },
+      monthInBounds(jy,jm) {
+        return isoFromJalali(jy,jm,1)<=this.maxIso &&
+          isoFromJalali(jy,jm,jalaliMonthLength(jy,jm))>=this.minIso;
+      },
+      isIsoDisabled(iso) {
+        return !iso || iso<this.minIso || iso>this.maxIso;
+      },
+      setViewYear(year) {
+        const first=jalaliFromIso(this.minIso),last=jalaliFromIso(this.maxIso);
+        if (!Number.isInteger(year) || year<first.jy || year>last.jy) return;
+        this.viewJy=year;
+        if (year===first.jy) this.viewJm=Math.max(first.jm,this.viewJm);
+        if (year===last.jy) this.viewJm=Math.min(last.jm,this.viewJm);
+      },
+      setViewMonth(month) {
+        if (Number.isInteger(month) && month>=1 && month<=12 && this.monthInBounds(this.viewJy,month)) this.viewJm=month;
+      },
+      shiftedMonth(delta) {
+        const index=this.viewJy*12+this.viewJm-1+delta;
+        return {jy:Math.floor(index/12),jm:index%12+1};
+      },
+      canMoveMonth(delta) {
+        const {jy,jm}=this.shiftedMonth(delta);
+        return this.monthInBounds(jy,jm);
+      },
+      moveMonth(delta) {
+        if (!this.canMoveMonth(delta)) return;
+        const {jy,jm}=this.shiftedMonth(delta);
+        this.viewJy=jy;
+        this.viewJm=jm;
       },
       get monthLabelFa() {
         return `${MONTHS_FA[this.viewJm - 1]} ${toFa(this.viewJy)}`;
@@ -582,23 +624,14 @@
             label: toFa(d),
             selected: this.iso === iso,
             today: today === iso,
+            disabled: this.isIsoDisabled(iso),
           });
         }
         while (cells.length % 7 !== 0) cells.push({ inMonth: false, label: "" });
         return cells;
       },
-      prevMonth() {
-        if (this.viewJm === 1) {
-          this.viewJm = 12;
-          this.viewJy -= 1;
-        } else this.viewJm -= 1;
-      },
-      nextMonth() {
-        if (this.viewJm === 12) {
-          this.viewJm = 1;
-          this.viewJy += 1;
-        } else this.viewJm += 1;
-      },
+      prevMonth() { this.moveMonth(-1); },
+      nextMonth() { this.moveMonth(1); },
       submitWeek() {
         const form = this.$el.closest("form");
         if (!form) return;
@@ -640,7 +673,7 @@
           return;
         }
         const parsed = parseDisplay(this.display);
-        if (!parsed) return;
+        if (!parsed || this.isIsoDisabled(parsed.iso)) return;
         this.iso = parsed.iso;
         this.display = displayFromIso(this.iso);
         this.submitWeek();
@@ -661,7 +694,7 @@
         }
       },
       pick(cell) {
-        if (!cell.inMonth) return;
+        if (!cell.inMonth || cell.disabled) return;
         this.iso = isoFromJalali(cell.jy, cell.jm, cell.jd);
         this.display = displayFromIso(this.iso);
         this.closeCalendar();
