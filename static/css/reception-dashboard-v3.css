@@ -665,3 +665,13 @@ body.theme-app .maison-app.luna-reception-shell {
   .luna-reception-shell .reception-desk-workspace__head{margin-bottom:5px;padding-bottom:4px;}
   .luna-reception-shell .reception-desk-slot-filters{margin-bottom:5px;}
 }
+
+
+/* The invoice drawer must keep full-size touch targets even when the
+   surrounding reception dashboard uses compact action buttons. */
+@media(max-width:620px){
+  .luna-reception-shell .reception-flow__invoice-controls .reception-flow__button{
+    min-height:44px;
+    padding:9px 12px;
+  }
+}
