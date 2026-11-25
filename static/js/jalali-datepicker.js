@@ -209,7 +209,7 @@
         if (target.closest && target.closest("[data-jalali-calendar-trigger]")) return;
         const pop = this.$refs.popover;
         if (this.$el.contains(target)) return;
-        if (pop && pop.contains(target)) return;
+        if ((pop && pop.contains(target)) || target.closest?.(".jalali-date__popover--portal")) return;
         this.closeCalendar();
       },
       _applyPopoverStyle() {
@@ -231,8 +231,8 @@
       _bindPopoverFollow() {
         if (this._jalaliFollowBound) return;
         this._jalaliFollowBound = true;
-        this._jalaliFollow = () => {
-          if (!this.open) return;
+        this._jalaliFollow = (event) => {
+          if (!this.open || this.$refs.popover?.contains(event.target)) return;
           this.positionPopover();
         };
         window.addEventListener("resize", this._jalaliFollow, { passive: true });
@@ -247,13 +247,6 @@
       positionPopover() {
         const anchor = popoverAnchorEl(this.$el, this.$refs);
         if (!anchor) return;
-        if (typeof anchor.scrollIntoView === "function") {
-          try {
-            anchor.scrollIntoView({ block: "nearest", inline: "nearest" });
-          } catch (_e) {
-            /* noop */
-          }
-        }
         const r = anchor.getBoundingClientRect();
         this.positionCompactPopover(r);
       },
@@ -498,7 +491,7 @@
         const len = jalaliMonthLength(this.viewJy, this.viewJm);
         const firstWd = jalaliWeekday(this.viewJy, this.viewJm, 1);
         const cells = [];
-        const today = todayIso();
+        const today = this.birthPicker && this.maxIso ? this.maxIso : todayIso();
         const sel = this.iso;
         for (let i = 0; i < firstWd; i++) {
           cells.push({ inMonth: false, label: "", selected: false, today: false });
@@ -540,12 +533,12 @@
         if (!cell.inMonth || cell.disabled) return;
         const iso = isoFromJalali(cell.jy, cell.jm, cell.jd);
         if (this.isIsoDisabled(iso)) return;
+        this.display = displayFromIso(iso);
         this.setIso(iso);
-        this.display = toFa(`${cell.jy}/${String(cell.jm).padStart(2, "0")}/${String(cell.jd).padStart(2, "0")}`);
         this.closeCalendar();
       },
       pickToday() {
-        const iso = todayIso();
+        const iso = this.birthPicker && this.maxIso ? this.maxIso : todayIso();
         if (this.isIsoDisabled(iso)) return;
         this.setIso(iso);
         this.display = displayFromIso(iso);
