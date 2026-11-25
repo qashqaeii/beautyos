@@ -388,3 +388,256 @@ body.theme-app .maison-app.luna-reception-shell {
 @media(prefers-reduced-motion:reduce){
   .luna-reception-shell .reception-overview-kpi{transition:none;}
 }
+
+
+/* Reception V4 — aligned to the approved visual reference.
+   These local overrides preserve all role/financial logic. */
+.luna-reception-shell .reception-desk-header{
+  background:
+    url("../images/reception-desk-hero.svg") 43% center / auto 100% no-repeat,
+    linear-gradient(112deg,#f3ded7 0%,#fdf3ef 54%,#fffaf7 100%);
+  border-color:#e7cfc5;
+  box-shadow:0 6px 20px rgba(115,71,62,.065);
+  overflow:visible;
+}
+.luna-reception-shell .reception-desk-header__brand>svg{
+  width:43px;height:43px;
+  padding:10px;background:#f3dfd7;
+  color:#8b5b52;border-color:rgba(255,255,255,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+}
+.luna-reception-shell .reception-desk-header__copy p{
+  color:#815e56;
+}
+.luna-reception-shell .reception-overview-kpi{
+  isolation:isolate;position:relative;overflow:hidden;
+}
+.luna-reception-shell .reception-overview-kpi--featured{
+  background:linear-gradient(118deg,#efcfc6,#f9eae4 88%);
+  border-color:#deb4a8;
+  box-shadow:0 6px 19px rgba(142,91,80,.14),inset 0 0 0 1px rgba(255,255,255,.78);
+}
+.luna-reception-shell .reception-overview-kpi--featured::before{
+  content:"";position:absolute;width:115px;height:70px;
+  inset-block-end:-37px;inset-inline-start:-18px;z-index:-1;
+  border-radius:50%;background:rgba(196,137,123,.18);
+  transform:rotate(-23deg);
+}
+.luna-reception-shell .reception-overview-kpi--featured .reception-overview-kpi__icon{
+  background:rgba(255,252,249,.54);color:#8b574b;
+}
+.luna-reception-shell .reception-overview-actions__button{
+  border-radius:12px;
+}
+.luna-reception-shell .reception-flow{
+  isolation:isolate;position:relative;
+  background:
+    radial-gradient(ellipse 70% 65% at 3% 110%,rgba(239,214,204,.29),transparent 72%),
+    linear-gradient(110deg,#fffaf7,#fff7f3);
+}
+.luna-reception-shell .reception-flow__heading{
+  position:relative;z-index:1;flex:0 0 auto;
+}
+.luna-reception-shell .reception-flow__heading h2{
+  display:flex;align-items:center;gap:8px;line-height:1.6;
+}
+.luna-reception-shell .reception-flow__heading h2 svg{
+  width:20px;height:20px;color:#94675d;stroke-width:1.6;
+}
+.luna-reception-shell .reception-journey{
+  --journey-color:#b97f76;
+  position:relative;flex:1 1 auto;min-height:0;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:center;gap:0;margin:0 8px;
+}
+.luna-reception-shell .reception-journey::before{
+  content:"";position:absolute;top:calc(50% - 31px);
+  inset-inline:11%;height:2px;
+  background:linear-gradient(90deg,#e2b8af,#cb9287,#e2b8af);
+  opacity:.78;z-index:0;
+}
+.luna-reception-shell .reception-journey__step{
+  position:relative;z-index:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:5px;text-align:center;
+  min-width:0;
+}
+.luna-reception-shell .reception-journey__icon{
+  width:55px;height:55px;border-radius:50%;
+  display:grid;place-items:center;color:#98665c;
+  background:linear-gradient(135deg,#fffaf7,#f1d9d2);
+  border:2px solid #fffdfb;
+  outline:1px solid #e4c1b6;
+  box-shadow:0 4px 12px rgba(128,77,66,.075);
+}
+.luna-reception-shell .reception-journey__icon svg{
+  width:27px;height:27px;stroke-width:1.55;
+}
+.luna-reception-shell .reception-journey__name{
+  font-size:11px;font-weight:740;line-height:1.65;
+  color:#60453d;max-width:100%;white-space:normal;
+}
+.luna-reception-shell .reception-journey__count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:36px;padding:3px 11px;line-height:1.2;
+  border-radius:999px;background:#f6e4dc;color:#88594e;
+  font-size:13px;font-weight:850;
+}
+.luna-reception-shell .reception-operations-disclosure{
+  position:relative;flex:0 0 auto;z-index:2;
+}
+.luna-reception-shell .reception-operations-disclosure>summary{
+  list-style:none;display:flex;align-items:center;
+  justify-content:center;gap:8px;cursor:pointer;
+  font-size:11px;color:#886057;font-weight:750;
+  padding:4px 10px;border-radius:9px;
+  width:max-content;max-width:100%;margin-inline:auto;
+  transition:background .2s ease;
+}
+.luna-reception-shell .reception-operations-disclosure>summary::-webkit-details-marker{display:none;}
+.luna-reception-shell .reception-operations-disclosure>summary:hover{background:#f3e5dd;}
+.luna-reception-shell .reception-operations-disclosure>summary svg{width:16px;height:16px;}
+.luna-reception-shell .reception-operations-disclosure[open]{
+  position:absolute;inset:0;z-index:5;
+  padding:12px;background:#fffaf7;
+  display:flex;flex-direction:column;min-height:0;
+}
+.luna-reception-shell .reception-operations-disclosure[open]>summary{
+  flex:0 0 auto;width:100%;max-width:none;min-height:37px;
+  margin:0 0 9px;justify-content:space-between;
+  border:1px solid #eedbd3;background:#f9efea;
+}
+.luna-reception-shell .reception-operations-disclosure[open]>summary svg:last-child{
+  transform:rotate(180deg);
+}
+.luna-reception-shell .reception-operations-disclosure__content{
+  display:none;min-height:0;flex:1 1 auto;
+}
+.luna-reception-shell .reception-operations-disclosure[open] .reception-operations-disclosure__content{
+  display:flex;flex-direction:column;
+}
+.luna-reception-shell .reception-operations-disclosure__content .reception-flow__list{
+  min-height:0;max-height:none;flex:1 1 auto;overflow:auto;
+}
+.luna-reception-shell .reception-flow__metrics--secondary{display:none;}
+.luna-reception-shell :is(.reception-desk-priority__next,.reception-desk-priority__pending){
+  background:linear-gradient(135deg,#fffaf7,#fdf6f2);
+  gap:5px;
+}
+.luna-reception-shell .reception-desk-priority__next{
+  justify-content:center;
+}
+.luna-reception-shell .reception-desk-next__row{margin:0;row-gap:4px;}
+.luna-reception-shell .reception-desk-next__time{
+  font-size:13px;min-height:30px;padding:3px 8px;
+}
+.luna-reception-shell .reception-desk-next__tail{
+  flex-basis:auto;margin-inline-start:auto;
+}
+.luna-reception-shell .reception-desk-next__checkin .btn-primary{
+  min-height:27px;padding:4px 8px;font-size:10px;
+}
+.luna-reception-shell .reception-desk-next__detail{font-size:10px;min-height:20px;}
+.luna-reception-shell .reception-desk-pending-list{
+  max-height:100%;margin-top:0;
+}
+.luna-reception-shell .reception-desk-workspace__team{
+  background:linear-gradient(115deg,#fffaf7,#fcf3ef);
+}
+.luna-reception-shell .reception-desk-workspace__slots{
+  background:linear-gradient(115deg,#fffaf7,#fdf5f1);
+}
+.luna-reception-shell .reception-desk-quick{
+  background:linear-gradient(115deg,#fffaf7,#fcf2ed);
+}
+.luna-reception-shell .reception-desk-workspace__head{
+  display:flex;align-items:center;justify-content:space-between;gap:5px;
+}
+.luna-reception-shell .reception-desk-team__row{
+  background:#faf0eb;border:1px solid #eedbd3;
+  border-radius:11px;
+}
+.luna-reception-shell .reception-desk-team__row .staff-team-avatar--placeholder{
+  color:#8c5d51;background:#f0dbd3;border-radius:10px;
+}
+.luna-reception-shell .reception-desk-quick__row{
+  align-content:start;
+}
+.luna-reception-shell .reception-desk-quick__link{
+  justify-content:center;background:#f9efea;
+}
+.luna-reception-shell .reception-desk-quick__label{font-weight:690;}
+@media(min-width:1180px) and (min-height:560px){
+  .luna-reception-shell .reception-desk-layout{
+    grid-template-rows:minmax(0,1.38fr) minmax(0,1fr);
+  }
+  .luna-reception-shell .reception-flow{
+    padding:10px 13px 8px;
+  }
+  .luna-reception-shell .reception-journey__icon{
+    width:clamp(40px,6.2vh,59px);height:clamp(40px,6.2vh,59px);
+  }
+  .luna-reception-shell .reception-journey__icon svg{
+    width:clamp(21px,3.3vh,29px);height:clamp(21px,3.3vh,29px);
+  }
+  .luna-reception-shell .reception-journey::before{
+    top:calc(50% - 29px);
+  }
+  .luna-reception-shell .reception-desk-priority__next{
+    min-height:0;
+  }
+}
+@media(min-width:1180px) and (max-height:700px){
+  .luna-reception-shell .reception-journey__step{gap:3px;}
+  .luna-reception-shell .reception-journey__name{font-size:10px;}
+  .luna-reception-shell .reception-journey__count{font-size:11px;padding:2px 8px;}
+  .luna-reception-shell .reception-desk-quick__link{min-height:40px;}
+  .luna-reception-shell .reception-desk-team__row{min-height:37px;}
+  .luna-reception-shell .reception-desk-workspace__title,
+  .luna-reception-shell .reception-desk-quick__title{margin-bottom:5px;}
+}
+@media(max-width:1179px){
+  .luna-reception-shell .reception-flow{min-height:235px;}
+  .luna-reception-shell .reception-journey{min-height:145px;}
+}
+@media(max-width:640px){
+  .luna-reception-shell .reception-desk-header{
+    background:linear-gradient(110deg,#f2ddd4,#fffaf7 85%);
+  }
+  .luna-reception-shell .reception-journey__icon{width:41px;height:41px;}
+  .luna-reception-shell .reception-journey__icon svg{width:20px;height:20px;}
+  .luna-reception-shell .reception-journey__name{font-size:9px;}
+  .luna-reception-shell .reception-journey::before{top:calc(50% - 28px);}
+  .luna-reception-shell .reception-journey__count{font-size:11px;padding:2px 7px;min-width:28px;}
+}
+@media(prefers-reduced-motion:no-preference){
+  .luna-reception-shell .reception-desk-header,
+  .luna-reception-shell .reception-overview-kpi,
+  .luna-reception-shell .reception-overview-actions,
+  .luna-reception-shell .reception-flow,
+  .luna-reception-shell .reception-desk-priority__next,
+  .luna-reception-shell .reception-desk-priority__pending,
+  .luna-reception-shell .reception-desk-workspace__team,
+  .luna-reception-shell .reception-desk-workspace__slots,
+  .luna-reception-shell .reception-desk-quick{
+    animation:reception-v4-appear .5s cubic-bezier(.2,.75,.3,1) both;
+  }
+  .luna-reception-shell .reception-overview-kpi:nth-child(2){animation-delay:.05s;}
+  .luna-reception-shell .reception-overview-kpi:nth-child(3){animation-delay:.09s;}
+  .luna-reception-shell .reception-overview-kpi:nth-child(4){animation-delay:.13s;}
+  .luna-reception-shell .reception-flow{animation-delay:.1s;}
+  .luna-reception-shell .reception-journey__step{animation:reception-v4-appear .55s ease both;}
+  .luna-reception-shell .reception-journey__step:nth-child(2){animation-delay:.12s;}
+  .luna-reception-shell .reception-journey__step:nth-child(3){animation-delay:.2s;}
+  .luna-reception-shell .reception-journey__step:nth-child(4){animation-delay:.28s;}
+  .luna-reception-shell :is(.reception-overview-kpi,.reception-desk-quick__link,.reception-overview-actions__button){
+    transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
+  }
+  .luna-reception-shell :is(.reception-overview-kpi,.reception-desk-quick__link):hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(100,69,57,.1);
+  }
+  @keyframes reception-v4-appear{
+    from{opacity:0;transform:translateY(9px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+}
