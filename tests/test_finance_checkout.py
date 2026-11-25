@@ -168,7 +168,8 @@ def test_editorial_invoice_detail_is_printable_and_keeps_issue_time_amounts(
     assert "چاپ / ذخیره PDF" in html
     assert "window.print()" in html
     assert "از اعتماد شما سپاسگزاریم" in html
-    assert "checkout-workspace__balance" in html
+    assert "checkout-workspace__balance" not in html
+    assert "مانده فعلی خدمات فعال" not in html
     invoice.refresh_from_db()
     assert invoice.gross_toman == 760000
     assert invoice.discount_toman == 60000

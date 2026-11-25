@@ -41,10 +41,6 @@
           {% if invoice.loyalty_voucher %}<div><span>شامل اعتبار {{ invoice.loyalty_voucher.title }}</span><span>{{ invoice.loyalty_voucher.amount_toman|fa_money }} تومان</span></div>{% endif %}
           <div><span>دریافتی هنگام صدور</span><bdi>{{ invoice.received_toman|fa_money }} تومان</bdi></div>
         </div>
-        <div class="checkout-workspace__totals">
-          <div class="checkout-workspace__balance"><span>مانده فعلی خدمات فعال</span><strong>{{ current_balance|fa_money }} تومان</strong></div>
-          <small>پرداخت‌های بعدی در مانده فعلی منعکس می‌شوند.</small>
-        </div>
       </div>
       {% if receipts %}
       <section class="checkout-workspace__receipts"><h2><i data-lucide="receipt" aria-hidden="true"></i>رسیدهای پرداخت</h2>

@@ -518,3 +518,11 @@
   .maison-app.beautyos-checkout-shell .checkout-workspace__gratitude{padding:6px 9px}
   .maison-app.beautyos-checkout-shell .checkout-workspace__invoice-actions .checkout-workspace__btn{min-height:33px}
 }
+
+/* Issued invoice has a single financial summary, not an empty balance column. */
+.maison-app.beautyos-checkout-shell .checkout-workspace__settlement--issued {
+  grid-template-columns:minmax(0,1fr);
+}
+.checkout-workspace--issued .checkout-workspace__settlement--issued > .checkout-workspace__issued-lines {
+  grid-column:1/-1;
+}
