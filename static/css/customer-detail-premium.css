@@ -1925,29 +1925,39 @@
   .maison-app.management-suite .customer-detail-page .customer-detail-header__avatar--icon:has(img) {width:36px;height:36px;}
 }
 
-/* Atelier editorial header: restrained artwork, readable identity, clear actions. */
+/* Premium customer identity banner — one compact, responsive surface. */
 .maison-app.management-suite .customer-detail-page .customer-detail-header {
-  background:linear-gradient(100deg,var(--cp-paper) 0%,var(--cp-paper) 37%,#f8eee8 73%,#efdcd2 100%);
-  border-color:var(--cp-line);box-shadow:0 3px 12px rgba(81,68,63,.045);
+  background:radial-gradient(ellipse at 91% 50%,#ead4c9 0%,transparent 37%),linear-gradient(105deg,var(--cp-paper) 0%,#fcf6f2 56%,#f3e5de 100%);
+  border-color:var(--cp-line);box-shadow:0 3px 12px rgba(81,68,63,.055);
+  box-sizing:border-box;padding-inline:16px;
 }
-.customer-detail-header__illustration {width:154px;inset-inline-start:4px;}
-.maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:150px;gap:9px;}
-.maison-app.management-suite .customer-detail-page .customer-detail-header__name {font-size:20px;line-height:1.45;letter-spacing:-.35px;}
-.maison-app.management-suite .customer-detail-page .customer-detail-header__phone {background:none;padding:0;gap:5px;color:var(--cp-muted);font-size:12px;}
-.maison-app.management-suite .customer-detail-page .customer-detail-header__btn {min-height:38px;padding-inline:13px;}
+.customer-detail-header__ornament {opacity:.7;}
+.customer-detail-header__illustration {width:190px;inset-inline-start:0;filter:drop-shadow(0 3px 4px #80554e12);}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:172px;gap:10px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__name {font-size:21px;line-height:1.4;letter-spacing:-.3px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__phone {background:none;padding:0;gap:6px;color:var(--cp-muted);font-size:12px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__actions {gap:8px;}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__btn {min-height:40px;padding-inline:14px;border-radius:10px;}
 .maison-app.management-suite .customer-detail-page .customer-detail-header__btn--ghost {background:var(--cp-paper);border-color:var(--cp-line);color:var(--cp-ink);}
+.maison-app.management-suite .customer-detail-page .customer-detail-header__btn--primary {background:var(--cp-accent);box-shadow:0 3px 8px #80554e20;}
 .maison-app.management-suite .customer-detail-page .customer-detail-header__btn--primary:hover {background:var(--cp-accent-deep);}
+.customer-detail-header__back {height:40px;width:40px;border-radius:10px;}
+@container management-content (max-width:800px){
+  .customer-detail-header__illustration {width:110px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:96px;}
+}
 @media(max-width:850px){
-  .customer-detail-header__illustration {width:110px;inset-inline-start:0;}
-  .maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:98px;}
+  .customer-detail-header__illustration {width:110px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:96px;}
 }
 @media(max-width:580px){
-  .customer-detail-header__illustration {width:102px;height:74px;}
-  .maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:91px;}
+  .customer-detail-header__illustration {width:100px;height:72px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__identity {padding-inline-start:84px;min-height:56px;}
   .maison-app.management-suite .customer-detail-page .customer-detail-header__name {font-size:17px;}
-  .maison-app.management-suite .customer-detail-page .customer-detail-header__btn {min-height:44px;padding-inline:8px;}
+  .maison-app.management-suite .customer-detail-page .customer-detail-header__btn {min-height:44px;padding-inline:7px;}
+  .customer-detail-header__back {height:44px;}
 }
 @media(prefers-reduced-motion:no-preference){
-  .customer-detail-header__illustration svg {animation:customer-hero-reveal .45s ease-out both;}
-  @keyframes customer-hero-reveal {from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .customer-detail-header__illustration svg {animation:customer-hero-reveal .4s ease-out both;}
+  @keyframes customer-hero-reveal {from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 }
