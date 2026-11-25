@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="230" viewBox="0 0 820 230" role="img" aria-labelledby="ttl">
+<title id="ttl">تصویر مفهومی میز پذیرش سالن زیبایی</title>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fae8e0"/><stop offset=".6" stop-color="#fffbf7"/><stop offset="1" stop-color="#efd7cd"/></linearGradient>
+ <linearGradient id="arch" x1="0" x2="1"><stop stop-color="#e9b8a7"/><stop offset=".45" stop-color="#ffdfcc"/><stop offset="1" stop-color="#f8ece6"/></linearGradient>
+ <linearGradient id="desk" x1="0" y1="0" x2="1" y2=".9"><stop stop-color="#fdf4ef"/><stop offset=".65" stop-color="#e8c5b5"/><stop offset="1" stop-color="#d9ac9d"/></linearGradient>
+ <linearGradient id="marble" x1="0" x2="1"><stop stop-color="#fffaf6"/><stop offset=".6" stop-color="#f2e2da"/><stop offset="1" stop-color="#fff8f4"/></linearGradient>
+ <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+</defs>
+<path fill="url(#bg)" d="M0 0H820V230H0z" opacity=".01"/>
+<ellipse cx="490" cy="214" rx="288" ry="15" fill="#9f776b" opacity=".18" filter="url(#shadow)"/>
+<path d="M146 230V115C146 54 197 2 261 2H482V230Z" fill="url(#arch)" opacity=".72"/>
+<path d="M162 230V121C162 62 210 15 267 15H462V230Z" fill="#ffece1" opacity=".72"/>
+<path d="M185 230V123C185 73 226 32 275 32H450V230Z" fill="#fff8f2" opacity=".76"/>
+<path d="M204 230V127C204 89 237 52 280 52H442V230Z" fill="#f5d9cb" opacity=".46"/>
+<g opacity=".62" stroke="#d3a08b" stroke-width="2"><path d="M219 54v175M231 46v184M243 39v191M255 34v196M267 31v199M279 31v199M291 31v199M303 31v199"/></g>
+<path d="M347 0v58" stroke="#aa7668" stroke-width="2"/>
+<path d="M330 59h35l-6 5h-23Z" fill="#d8a48a"/><ellipse cx="347" cy="64" rx="25" ry="4" fill="#f7d8bb" opacity=".65"/>
+<rect x="300" y="80" width="160" height="72" rx="6" fill="#e0bba9" opacity=".25"/>
+<path d="M345 98h71v49h-71z" fill="#e9ddd7"/><path d="M351 104h59v34h-59z" fill="#fff9f5"/><path d="M361 147h40" stroke="#9f897e" stroke-width="3"/>
+<rect x="302" y="148" width="236" height="17" rx="8" fill="url(#marble)" stroke="#d6b1a3"/>
+<path d="M322 160h195l-11 65H338Z" fill="url(#desk)" stroke="#d2a797"/>
+<path d="M350 165c30 16 45 17 65 22s26 17 51 27M480 163c-28 16-36 30-43 62" fill="none" stroke="#bd988d" stroke-width="2" opacity=".55"/>
+<path d="M365 181c22 8 24 15 41 20" fill="none" stroke="#fff7f0" opacity=".66" stroke-width="3"/>
+<rect x="346" y="81" width="20" height="34" rx="2" fill="#f7ede9"/>
+<path d="M351 81V64h10v17" fill="#b99987"/><path d="M345 62c-17-15-23-30-15-46M354 65c0-30-11-46-11-53M360 65c14-15 28-40 20-51" stroke="#9e7c65" stroke-width="2" fill="none"/>
+<g fill="#d7999c" opacity=".85"><circle cx="328" cy="24" r="4"/><circle cx="340" cy="30" r="4"/><circle cx="356" cy="23" r="4"/><circle cx="364" cy="38" r="5"/><circle cx="379" cy="25" r="4"/><circle cx="329" cy="44" r="3"/><circle cx="348" cy="13" r="4"/></g>
+<path d="M320 119h224" stroke="#fffdfb" opacity=".65"/>
+<path d="M555 230H820V0H555z" fill="#fffdf9" opacity=".08"/>
+</svg>
