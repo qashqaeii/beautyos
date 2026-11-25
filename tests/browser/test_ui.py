@@ -392,7 +392,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                         assert heading["y"] + heading["height"] <= header["y"] + header["height"] + 2
                         assert day_picker["x"] + day_picker["width"] <= header["x"] + header["width"] + 2
 
-                    buttons = page.locator(".reception-overview-actions")
+                    buttons = page.locator(".reception-desk-quick")
                     if buttons.count():
                         action_box = buttons.bounding_box()
                         assert action_box and action_box["y"] >= kpi_box["y"] + kpi_box["height"] - 2
@@ -402,7 +402,7 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     if width >= 1180 and height >= 650:
                         layout = page.locator(".reception-desk-layout").bounding_box()
                         flow_box = flow.bounding_box()
-                        next_box = page.locator(".reception-desk-priority").bounding_box()
+                        next_box = page.locator(".reception-desk-priority__next").bounding_box()
                         team_box = page.locator(".reception-desk-workspace__team").bounding_box()
                         assert layout and flow_box and next_box and team_box
                         assert flow_box["width"] > next_box["width"], "today operations must be the main panel"
@@ -413,6 +413,9 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                         assert next_card and pending_card
                         assert next_card["height"] >= 85 and pending_card["height"] >= 85, "priority cards became too short"
                         assert pending_card["y"] >= next_card["y"] + next_card["height"] - 2
+                        assert abs(pending_card["y"] - team_box["y"]) <= 3
+                        for selector in (".reception-desk-priority__next", ".reception-desk-priority__pending"):
+                            assert page.locator(selector).evaluate("(el) => el.scrollHeight <= el.clientHeight + 3"), selector + " content clipped"
 
                         assert page.locator(".reception-desk-page").evaluate(
                             "(el) => el.getBoundingClientRect().bottom <= innerHeight + 3"
@@ -576,7 +579,9 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
             pw.expect(page.locator(f"input[name='appointment'][value='{completed.pk}']")).to_be_checked()
             pw.expect(page.locator(".checkout-workspace__totals > div:first-child bdi")).to_have_text("۱٬۲۵۰٬۰۰۰ تومان")
             page.locator("select[name='voucher']").select_option(str(voucher.pk))
-            page.locator("input[name='card']").fill("1200000")
+            page.locator("[data-checkout-money='card']").fill("1200000")
+            pw.expect(page.locator("[data-checkout-money='card']")).to_have_value("۱٬۲۰۰٬۰۰۰")
+            pw.expect(page.locator("input[name='card']")).to_have_value("1200000")
             pw.expect(page.locator(".checkout-workspace__balance strong")).to_have_text("۰ تومان")
             page.get_by_role("button",name="ثبت فاکتور و پرداخت").click()
             pw.expect(page.locator(".checkout-workspace__invoice-ref")).to_contain_text("فاکتور")
@@ -1350,8 +1355,10 @@ def test_checkout_editorial_customer_selection_and_invoice_workflow(
 
         checkbox = invoice_form.locator(f'input[name="appointment"][value="{appt.pk}"]')
         checkbox.check()
-        cash = invoice_form.locator('input[name="cash"]')
-        cash.fill("200000")
+        cash = invoice_form.locator('[data-checkout-money="cash"]')
+        cash.fill("۲۰۰۰۰۰")
+        pw.expect(cash).to_have_value("۲۰۰٬۰۰۰")
+        pw.expect(invoice_form.locator('input[name="cash"]')).to_have_value("200000")
         assert "تومان" in invoice_form.locator(".checkout-workspace__balance strong").inner_text()
         invoice_form.get_by_role("button", name="ثبت فاکتور و پرداخت").click()
         page.wait_for_url("**/finance/invoices/*/")

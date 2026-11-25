@@ -75,7 +75,28 @@ def test_reception_quick_access_for_owner_and_receptionist(client, salon, owner_
     session.save()
     reception_html = client.get("/reception/").content.decode()
     assert "دسترسی سریع" in reception_html
-    assert reception_html.count("reception-desk-quick__link") == 3
+    from django.urls import reverse
+    from html.parser import HTMLParser
+
+    class QuickLinks(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.links = []
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if tag == "a" and "reception-desk-quick__link" in attrs.get("class", "").split():
+                self.links.append(attrs.get("href", ""))
+
+    for html, package_path in ((owner_html, "/packages/"), (reception_html, "/packages/sell/")):
+        parser = QuickLinks()
+        parser.feed(html)
+        urls = parser.links
+        assert len(urls) == len(set(urls)) == 6
+        assert "/waitlist/" in urls and "/retention/" in urls
+        assert package_path in urls
+        assert reverse("finance:checkout_customers") in urls
+        assert reverse("finance:invoices") in urls
+        assert any(url.startswith(reverse("reception:desk") + "?book=1") for url in urls)
     assert 'reception-desk-quick__label">فروش پکیج</span>' in reception_html
     assert 'reception-desk-header__title' in reception_html
 

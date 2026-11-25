@@ -162,6 +162,7 @@ def test_editorial_invoice_detail_is_printable_and_keeps_issue_time_amounts(
     assert response.status_code == 200
     html = response.content.decode()
     assert "checkout-workspace--issued" in html
+    assert "مانده هنگام صدور" not in html
     assert "مراقبت پوست" in html
     assert "مریم رضایی" in html
     assert "چاپ / ذخیره PDF" in html

@@ -88,7 +88,7 @@
             {% for field in form.visible_fields %}{% if field.name != "voucher" %}
             <label class="checkout-workspace__field"><span>{{ field.label }}</span>
               <input type="hidden" name="{{ field.name }}" x-ref="{{ field.name }}" :value="{{ field.name }}" value="{{ field.value|default_if_none:''|unlocalize }}" data-initial="{{ field.value|default_if_none:''|unlocalize }}">
-              <input type="text" class="input-field" :value="moneyDisplay({{ field.name }})" @input="editMoney('{{ field.name }}', $event)" inputmode="numeric" autocomplete="off" dir="ltr" placeholder="۰">
+              <input type="text" class="input-field" data-checkout-money="{{ field.name }}" :value="moneyDisplay({{ field.name }})" @input="editMoney('{{ field.name }}', $event)" inputmode="numeric" autocomplete="off" dir="ltr" placeholder="۰">
             </label>
             {% endif %}{% endfor %}
           </div>
