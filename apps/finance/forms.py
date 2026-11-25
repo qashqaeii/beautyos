@@ -1,8 +1,20 @@
 from django import forms
+from django.utils import timezone
+import jdatetime
+from apps.core.utils.money import format_toman_fa
 
 from apps.core.forms import PersianForm, PersianModelForm
 from apps.customers.models import Customer
 from apps.finance.models import Payment, SalonDebt
+
+
+class PaymentAppointmentSelect(forms.Select):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        appointment = getattr(value, "instance", None)
+        if appointment is not None:
+            option["attrs"].update({"data-customer": str(appointment.customer_id), "data-balance": str(self.balances[appointment.pk])})
+        return option
 
 
 class PaymentForm(PersianModelForm):
@@ -20,16 +32,23 @@ class PaymentForm(PersianModelForm):
         ]
         widgets = {
             "customer": forms.Select(attrs={"class": "input-field"}),
-            "appointment": forms.Select(attrs={"class": "input-field"}),
-            "total_amount_toman": forms.NumberInput(attrs={"class": "input-field"}),
-            "discount_toman": forms.NumberInput(attrs={"class": "input-field"}),
-            "paid_amount_toman": forms.NumberInput(attrs={"class": "input-field"}),
+            "appointment": PaymentAppointmentSelect(attrs={"class": "input-field"}),
+            "total_amount_toman": forms.TextInput(attrs={"class": "input-field", "inputmode": "numeric", "data-payment-money": "true"}),
+            "discount_toman": forms.TextInput(attrs={"class": "input-field", "inputmode": "numeric", "data-payment-money": "true"}),
+            "paid_amount_toman": forms.TextInput(attrs={"class": "input-field", "inputmode": "numeric", "data-payment-money": "true"}),
             "method": forms.Select(attrs={"class": "input-field"}),
             "status": forms.Select(attrs={"class": "input-field"}),
             "notes": forms.Textarea(attrs={"class": "input-field", "rows": 2}),
         }
 
     def __init__(self, *args, salon=None, **kwargs):
+        # Normalize only valid grouped integer amounts; never silently strip signs.
+        if args and args[0] is not None:
+            data = args[0].copy()
+            for key in ("total_amount_toman", "discount_toman", "paid_amount_toman"):
+                if key in data:
+                    data[key] = str(data[key]).translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")).replace(".", "").replace(",", "").replace("٬", "")
+            args = (data, *args[1:])
         super().__init__(*args, **kwargs)
         self.fields["status"].choices = [(v, label) for v, label in Payment.Status.choices if v != Payment.Status.REFUNDED]
         self.fields["total_amount_toman"].label = "مبلغ قابل پرداخت پیش از تخفیف"
@@ -37,10 +56,28 @@ class PaymentForm(PersianModelForm):
             self.fields["customer"].queryset = Customer.scoped(salon).filter(is_deleted=False)
             from apps.appointments.models import Appointment
 
-            recent = Appointment.scoped(salon).order_by("-start_at", "-pk").values("pk")[:200]
-            # ModelChoiceField validation calls queryset.get(); the outer query must not be sliced.
-            self.fields["appointment"].queryset = Appointment.scoped(salon).filter(pk__in=recent).order_by("-start_at", "-pk")
-            self.fields["appointment"].required = False
+            from apps.dashboard.role_services import appointment_payment_summary
+            candidates = Appointment.scoped(salon).exclude(
+                status__in=(Appointment.Status.CANCELLED, Appointment.Status.NO_SHOW)
+            ).filter(price_toman__gt=0, customer__is_deleted=False).select_related(
+                "service", "staff", "package_use"
+            ).prefetch_related("payments__refunds").order_by("-start_at", "-pk")
+            balances = {}
+            labels = {}
+            for appointment in candidates:
+                balance = appointment_payment_summary(appointment)["owed_toman"]
+                if balance <= 0:
+                    continue
+                balances[appointment.pk] = balance
+                day = jdatetime.date.fromgregorian(date=timezone.localtime(appointment.start_at).date()).strftime("%Y/%m/%d")
+                labels[appointment.pk] = f"{appointment.service.name} | {appointment.staff.display_name} | {day} | مانده {format_toman_fa(balance)} تومان"
+            field = self.fields["appointment"]
+            field.queryset = candidates.filter(pk__in=balances)
+            field.widget.balances = balances
+            field.label_from_instance = lambda appointment: labels[appointment.pk]
+            field.label = "خدمت قابل پرداخت"
+            field.empty_label = "پرداخت بدون نوبت"
+            field.required = False
 
     def clean(self):
         data = super().clean()
@@ -48,6 +85,8 @@ class PaymentForm(PersianModelForm):
         customer = data.get("customer")
         if appointment and customer and appointment.customer_id != customer.pk:
             self.add_error("appointment", "نوبت انتخاب‌شده متعلق به این مشتری نیست.")
+        if appointment and data.get("total_amount_toman") is not None and data["total_amount_toman"] != self.fields["appointment"].widget.balances.get(appointment.pk):
+            self.add_error("total_amount_toman", "مبلغ باید برابر مانده خدمت انتخاب‌شده باشد.")
         for field in ("total_amount_toman", "discount_toman", "paid_amount_toman"):
             value = data.get(field)
             if value is not None and value < 0:

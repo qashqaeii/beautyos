@@ -3,6 +3,7 @@
   action="{% url 'finance:payment_create' %}"
   class="inventory-create-modal__form finance-payment-form finance-payment-form--modal"
   id="finance-payment-create-form"
+  x-data="financePaymentPicker()"
 >
   {% csrf_token %}
   <input type="hidden" name="next" value="{{ payment_return_url }}">
@@ -20,7 +21,7 @@
     {% endif %}
 
     <section class="finance-payment-form__section" aria-labelledby="finance-payment-customer-title">
-      <h3 id="finance-payment-customer-title" class="finance-payment-form__section-title">مشتری و نوبت</h3>
+      <h3 id="finance-payment-customer-title" class="finance-payment-form__section-title">مشتری و خدمت</h3>
       <div class="finance-payment-form__fields">
         <div class="finance-payment-form__field">
           <label class="field-label" for="{{ payment_form.customer.id_for_label }}">{{ payment_form.customer.label }}</label>
@@ -29,7 +30,8 @@
         </div>
         <div class="finance-payment-form__field">
           <label class="field-label" for="{{ payment_form.appointment.id_for_label }}">{{ payment_form.appointment.label }}</label>
-          {{ payment_form.appointment }}
+          <div x-ref="appointmentSelect">{{ payment_form.appointment }}</div>
+          <p class="finance-payment-picker-hint" x-text="hint" aria-live="polite"></p>
           {% if payment_form.appointment.errors %}<p class="finance-payment-form__error">{{ payment_form.appointment.errors.0 }}</p>{% endif %}
         </div>
       </div>

@@ -801,3 +801,6 @@ body.theme-app .luna-modal--service .service-form__intro--edit {margin:0 0 10px;
 body.theme-app .luna-modal--service .luna-service-field-card .toman-amount {width:100%;min-width:0;}
 body.theme-app .luna-modal--service .luna-service-field-card .toman-amount__control {width:100%;min-width:0;}
 body.theme-app .luna-modal--service .luna-service-field-card .toman-amount__display {min-width:0;height:40px;min-height:40px;text-align:left;}
+
+body.theme-app .finance-payment-form--modal .finance-payment-picker-hint{font-size:11px;color:#806961;margin:0;line-height:1.5;}
+body.theme-app .finance-payment-form--modal [data-payment-money]{font-variant-numeric:tabular-nums;}

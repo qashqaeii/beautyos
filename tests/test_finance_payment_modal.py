@@ -100,7 +100,11 @@ def test_payment_form_validates_appointment_picker_without_sliced_queryset(salon
         start_at=start, end_at=start + timedelta(minutes=30), price_toman=100000)
     data = {"customer": customer.pk, "appointment": appointment.pk, "total_amount_toman": 100000,
         "discount_toman": 0, "paid_amount_toman": 100000, "method": Payment.Method.CASH, "status": Payment.Status.PAID}
-    assert PaymentForm(data, salon=salon).is_valid()
+    valid_form = PaymentForm(data, salon=salon)
+    assert valid_form.is_valid(), valid_form.errors
+    assert "Appointment object" not in str(valid_form["appointment"])
+    assert "data-balance" in str(valid_form["appointment"])
+    assert PaymentForm({**data, "total_amount_toman": "۱۰۰.۰۰۰"}, salon=salon).is_valid()
     form = PaymentForm({**data, "customer": other.pk}, salon=salon)
     assert not form.is_valid()
     assert "appointment" in form.errors
