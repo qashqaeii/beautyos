@@ -20,6 +20,14 @@
     <p class="finance-payment-form__error finance-payment-form__error--form">{{ payment_form.non_field_errors.0 }}</p>
     {% endif %}
 
+    <section class="finance-payment-form__section" aria-label="نوع پرداخت">
+      <div class="finance-payment-form__fields">
+        {% for choice in payment_form.payment_kind %}
+        <label class="finance-payment-form__field" style="flex-direction:row;align-items:center;gap:8px">{{ choice.tag }} {{ choice.choice_label }}</label>
+        {% endfor %}
+      </div>
+      <p class="finance-payment-picker-hint" x-text="kindHint"></p>
+    </section>
     <section class="finance-payment-form__section" aria-labelledby="finance-payment-customer-title">
       <h3 id="finance-payment-customer-title" class="finance-payment-form__section-title">مشتری و خدمت</h3>
       <div class="finance-payment-form__fields">

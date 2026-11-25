@@ -152,3 +152,13 @@ def test_payment_modal_amounts_have_no_deposit_hint_and_stable_grid_styles(
     assert "finance-payment-form__fields > .finance-payment-form__field" in css
     assert "grid-template-columns:repeat(3,minmax(0,1fr))" in css
     assert "@media(max-width:639px)" in css
+
+
+@pytest.mark.django_db
+def test_explicit_deposit_requires_positive_amount_without_discount(salon):
+    from apps.finance.forms import PaymentForm
+    customer = Customer.objects.create(salon=salon, full_name="مشتری بیعانه", phone="+989121277799")
+    data = {"customer": customer.pk, "payment_kind": "deposit", "total_amount_toman": 500000, "discount_toman": 0, "paid_amount_toman": 500000, "method": "cash", "status": "paid"}
+    assert PaymentForm(data, salon=salon).is_valid()
+    assert not PaymentForm({**data, "payment_kind": "service"}, salon=salon).is_valid()
+    assert not PaymentForm({**data, "paid_amount_toman": 0}, salon=salon).is_valid()

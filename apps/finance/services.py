@@ -327,6 +327,7 @@ def record_customer_payment(*, salon, form, actor):
     from apps.dashboard.role_services import appointment_payment_summary
 
     payment = form.save(commit=False)
+    payment.is_deposit = form.cleaned_data.get("payment_kind") == "deposit"
     payment.salon = salon
     if payment.customer.salon_id != salon.pk:
         raise ValidationError("مشتری متعلق به این سالن نیست.")
@@ -382,6 +383,7 @@ def create_appointment_deposit(
         method=method,
         status=status,
         notes="بیعانه هنگام رزرو",
+        is_deposit=True,
     )
     from apps.loyalty.automation import award_payment
     award_payment(payment)

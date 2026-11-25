@@ -18,6 +18,7 @@ class PaymentAppointmentSelect(forms.Select):
 
 
 class PaymentForm(PersianModelForm):
+    payment_kind = forms.ChoiceField(choices=[("service", "پرداخت هزینه خدمت"), ("deposit", "ثبت بیعانه")], required=False, initial="service", widget=forms.RadioSelect)
     class Meta:
         model = Payment
         fields = [
@@ -69,12 +70,20 @@ class PaymentForm(PersianModelForm):
             field.widget.balances = balances
             field.label_from_instance = lambda appointment: labels[appointment.pk]
             field.label = "خدمت قابل پرداخت"
-            field.empty_label = "پرداخت بدون نوبت"
+            field.empty_label = "انتخاب نوبت (برای بیعانه اختیاری)"
             field.required = False
 
     def clean(self):
         data = super().clean()
         appointment = data.get("appointment")
+        kind = data.get("payment_kind") or "service"
+        if self.data.get("payment_kind") == "service" and not appointment:
+            self.add_error("appointment", "برای پرداخت هزینه خدمت، نوبت را انتخاب کنید.")
+        if kind == "deposit":
+            if not data.get("paid_amount_toman") or data.get("discount_toman") != 0:
+                self.add_error("paid_amount_toman", "بیعانه باید مبلغ مثبت و بدون تخفیف باشد.")
+            if not appointment and data.get("total_amount_toman") != data.get("paid_amount_toman"):
+                self.add_error("total_amount_toman", "مبلغ بیعانه و دریافتی باید برابر باشند.")
         customer = data.get("customer")
         if appointment and customer and appointment.customer_id != customer.pk:
             self.add_error("appointment", "نوبت انتخاب‌شده متعلق به این مشتری نیست.")

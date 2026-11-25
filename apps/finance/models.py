@@ -16,6 +16,7 @@ class Payment(TenantModelMixin, TimeStampedModel):
         PAID = "paid", "تسویه"
         REFUNDED = "refunded", "استرداد"
 
+    is_deposit = models.BooleanField(default=False)
     invoice = models.ForeignKey("finance.Invoice", on_delete=models.PROTECT, null=True, blank=True, related_name="payments")
     customer = models.ForeignKey(
         "customers.Customer",
