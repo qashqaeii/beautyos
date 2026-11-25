@@ -50,15 +50,15 @@
 <section class="reception-overview-kpis" aria-label="آمار پذیرش">
   <article class="reception-overview-kpi reception-overview-kpi--featured">
     <span class="reception-overview-kpi__icon"><i data-lucide="calendar-days" aria-hidden="true"></i></span>
-    <div><span class="reception-overview-kpi__label">نوبت‌های روز</span><strong class="tabular-nums">{{ day_operations_summary.total|fa_num }}</strong></div>
+    <div><span class="reception-overview-kpi__label">نوبت‌های روز</span><strong class="tabular-nums" data-count-up="{{ day_operations_summary.total }}">{{ day_operations_summary.total|fa_num }}</strong></div>
   </article>
   <article class="reception-overview-kpi">
     <span class="reception-overview-kpi__icon"><i data-lucide="hourglass" aria-hidden="true"></i></span>
-    <div><span class="reception-overview-kpi__label">در انتظار تأیید</span><strong class="tabular-nums">{{ day_operations_summary.pending|fa_num }}</strong></div>
+    <div><span class="reception-overview-kpi__label">در انتظار تأیید</span><strong class="tabular-nums" data-count-up="{{ day_operations_summary.pending }}">{{ day_operations_summary.pending|fa_num }}</strong></div>
   </article>
   <article class="reception-overview-kpi">
     <span class="reception-overview-kpi__icon"><i data-lucide="check-circle-2" aria-hidden="true"></i></span>
-    <div><span class="reception-overview-kpi__label">پذیرش‌شده</span><strong class="tabular-nums">{{ day_operations_summary.checked_in|fa_num }}</strong></div>
+    <div><span class="reception-overview-kpi__label">پذیرش‌شده</span><strong class="tabular-nums" data-count-up="{{ day_operations_summary.checked_in }}">{{ day_operations_summary.checked_in|fa_num }}</strong></div>
   </article>
   <article class="reception-overview-kpi">
     <span class="reception-overview-kpi__icon"><i data-lucide="{% if can_payment_create %}wallet{% else %}badge-check{% endif %}" aria-hidden="true"></i></span>
@@ -190,7 +190,7 @@
       <div class="reception-journey__step">
         <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="circle-check-big"></i></span>
         <span class="reception-journey__name">تکمیل و تسویه</span>
-        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.completed }}">{{ day_operations_summary.completed|fa_num }}</strong>
+        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.settled }}">{{ day_operations_summary.settled|fa_num }}</strong>
       </div>
     </div>
     <details class="reception-operations-disclosure">
