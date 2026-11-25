@@ -75,6 +75,12 @@
   color:white;background:#986c65;border-color:#986c65;
 }
 .luna-reception-shell .reception-overview-actions__button--primary:hover{background:#865a54}
+.luna-reception-shell .reception-overview-actions__history{
+  display:inline-flex;align-items:center;align-self:center;justify-content:center;
+  color:#805e54;font-size:10px;font-weight:650;min-height:34px;padding:6px 9px;
+  border-radius:9px;text-decoration:underline;text-underline-offset:3px;
+}
+.luna-reception-shell .reception-overview-actions__history:hover{background:#f4e4dd}
 .luna-reception-shell .reception-desk-layout{display:grid;gap:10px;min-width:0}
 .luna-reception-shell .reception-flow,
 .luna-reception-shell .reception-desk-priority__next,
@@ -208,6 +214,7 @@
   .luna-reception-shell .reception-overview-kpi{min-height:68px;padding:9px}
   .luna-reception-shell .reception-overview-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
   .luna-reception-shell .reception-overview-actions__button{font-size:11px;padding:9px;width:100%}
+  .luna-reception-shell .reception-overview-actions__history{grid-column:1/-1;min-height:28px}
   .luna-reception-shell .reception-desk-priority__grid,
   .luna-reception-shell .reception-desk-workspace__grid{grid-template-columns:minmax(0,1fr)}
   .luna-reception-shell .reception-flow__item{grid-template-columns:55px minmax(0,1fr)}
