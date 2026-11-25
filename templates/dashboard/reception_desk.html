@@ -47,7 +47,7 @@
 {% include "partials/reception_desk_header.html" %}
 
 <section class="reception-overview-kpis" aria-label="آمار پذیرش">
-  <article class="reception-overview-kpi">
+  <article class="reception-overview-kpi reception-overview-kpi--featured">
     <span class="reception-overview-kpi__icon"><i data-lucide="calendar-days" aria-hidden="true"></i></span>
     <div><span class="reception-overview-kpi__label">نوبت‌های روز</span><strong class="tabular-nums">{{ day_operations_summary.total|fa_num }}</strong></div>
   </article>
@@ -165,11 +165,36 @@
     <div class="reception-flow__heading">
       <div>
         
-        <h2 id="reception-flow-title">جریان کار امروز سالن</h2>
+        <h2 id="reception-flow-title"><i data-lucide="layers-3" aria-hidden="true"></i>جریان کار امروز سالن</h2>
         <p>تمام نوبت‌های روز انتخاب‌شده؛ از تأیید و پذیرش تا تکمیل خدمت و صندوق.</p>
       </div>
       <span class="reception-flow__total">{{ day_operations_summary.total|fa_num }} نوبت</span>
     </div>
+    <div class="reception-journey" role="group" aria-label="مراحل نوبت‌های روز">
+      <div class="reception-journey__step">
+        <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="calendar-days"></i></span>
+        <span class="reception-journey__name">نوبت ثبت‌شده</span>
+        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.total }}">{{ day_operations_summary.total|fa_num }}</strong>
+      </div>
+      <div class="reception-journey__step">
+        <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="user-round-check"></i></span>
+        <span class="reception-journey__name">در حال پذیرش</span>
+        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.checked_in }}">{{ day_operations_summary.checked_in|fa_num }}</strong>
+      </div>
+      <div class="reception-journey__step">
+        <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="scissors"></i></span>
+        <span class="reception-journey__name">تأییدشده، آماده خدمت</span>
+        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.confirmed }}">{{ day_operations_summary.confirmed|fa_num }}</strong>
+      </div>
+      <div class="reception-journey__step">
+        <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="circle-check-big"></i></span>
+        <span class="reception-journey__name">تکمیل و تسویه</span>
+        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.completed }}">{{ day_operations_summary.completed|fa_num }}</strong>
+      </div>
+    </div>
+    <details class="reception-operations-disclosure">
+      <summary><i data-lucide="list-checks" aria-hidden="true"></i> مشاهده و مدیریت نوبت‌های روز <i data-lucide="chevron-down" aria-hidden="true"></i></summary>
+      <div class="reception-operations-disclosure__content">
     <div class="reception-flow__metrics reception-flow__metrics--secondary" aria-label="وضعیت عملیات روز">
       <div><span>منتظر تأیید</span><strong>{{ day_operations_summary.pending|fa_num }}</strong></div>
       <div><span>پذیرش‌شده</span><strong>{{ day_operations_summary.checked_in|fa_num }}</strong></div>
@@ -259,6 +284,8 @@
     {% if day_operations_summary.truncated %}
       <p class="reception-flow__more">این فهرست حداکثر ۱۰۰ نوبت اول روز را نمایش می‌دهد. برای بررسی سایر نوبت‌ها به تقویم مراجعه کنید.</p>
     {% endif %}
+      </div>
+    </details>
   </section>
 
   <section class="reception-desk-workspace dashboard-enter" aria-label="وقت آزاد و تیم">
