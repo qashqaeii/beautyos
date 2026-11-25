@@ -42,13 +42,6 @@ class PaymentForm(PersianModelForm):
         }
 
     def __init__(self, *args, salon=None, **kwargs):
-        # Normalize only valid grouped integer amounts; never silently strip signs.
-        if args and args[0] is not None:
-            data = args[0].copy()
-            for key in ("total_amount_toman", "discount_toman", "paid_amount_toman"):
-                if key in data:
-                    data[key] = str(data[key]).translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")).replace(".", "").replace(",", "").replace("٬", "")
-            args = (data, *args[1:])
         super().__init__(*args, **kwargs)
         self.fields["status"].choices = [(v, label) for v, label in Payment.Status.choices if v != Payment.Status.REFUNDED]
         self.fields["total_amount_toman"].label = "مبلغ قابل پرداخت پیش از تخفیف"

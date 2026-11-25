@@ -6,7 +6,7 @@
   const ENGLISH = "0123456789";
 
   function toEnDigits(s) {
-    return String(s).replace(/[۰-۹]/g, (d) => {
+    return String(s).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, (d) => {
       const i = PERSIAN.indexOf(d);
       return i >= 0 ? ENGLISH[i] : d;
     });
@@ -147,8 +147,30 @@
     }));
   }
 
+  // Delegated handlers work for teleported dialogs and dynamically inserted forms.
+  function formatGrouped(value) {
+    const raw = toEnDigits(value);
+    if (!/^[0-9.,٬]*$/.test(raw)) return value;
+    const digits = raw.replace(/[.,٬]/g, "").replace(/^0+(?=[0-9])/, "");
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".").replace(/[0-9]/g, d => PERSIAN[Number(d)]);
+  }
+  document.addEventListener("input", event => {
+    const el = event.target;
+    if (!el.matches?.("input[data-grouped-toman]")) return;
+    const before = extractDigits(el.value.slice(0, el.selectionStart ?? el.value.length)).length;
+    el.value = formatGrouped(el.value);
+    if (/^[۰-۹.]*$/.test(el.value)) {
+      const pos = digitIndexForCaret(el.value, before);
+      el.setSelectionRange(pos, pos);
+    }
+  }, true);
+  document.addEventListener("focusin", event => {
+    const el = event.target;
+    if (el.matches?.("input[data-grouped-toman]")) el.value = formatGrouped(el.value);
+  });
   window.BeautyOSMoney = {
     formatTomanFa,
+    formatGrouped,
     parseTomanDisplay,
     extractDigits,
   };

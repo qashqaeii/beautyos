@@ -98,3 +98,36 @@ def apply_jalali_date_widgets(form: forms.BaseForm) -> None:
             attrs = dict(getattr(field.widget, "attrs", {}) or {})
             attrs.setdefault("class", "input-field")
             field.widget = JalaliDateWidget(attrs=attrs)
+
+
+class GroupedTomanInput(forms.TextInput):
+    """Integer money input with grouping; preserve the original field validators."""
+    def __init__(self, attrs=None):
+        super().__init__({**(attrs or {}), "inputmode": "numeric", "data-grouped-toman": "true", "autocomplete": "off"})
+
+    def value_from_datadict(self, data, files, name):
+        import re
+        value = super().value_from_datadict(data, files, name)
+        if not isinstance(value, str):
+            return value
+        value = value.strip().translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789"))
+        if re.fullmatch(r"[+-]?(?:[0-9]+|[0-9]{1,3}(?:[.,٬][0-9]{3})+)", value):
+            return re.sub(r"[.,٬]", "", value)
+        # IntegerField accepts decimal .0; reject malformed grouping explicitly.
+        return value if not value else "invalid"
+
+    def format_value(self, value):
+        from apps.core.utils.money import format_toman_fa
+        if value is None or value == "":
+            return ""
+        try:
+            return format_toman_fa(int(value))
+        except (ValueError, TypeError):
+            return str(value)
+
+
+def apply_toman_widgets(form):
+    for name, field in form.fields.items():
+        if isinstance(field, forms.IntegerField) and name.endswith("_toman") and isinstance(field.widget, (forms.NumberInput, forms.TextInput)):
+            if not isinstance(field.widget, GroupedTomanInput):
+                field.widget = GroupedTomanInput(attrs=field.widget.attrs)

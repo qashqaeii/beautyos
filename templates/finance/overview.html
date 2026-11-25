@@ -238,7 +238,7 @@
           {% csrf_token %}
           <input type="hidden" name="action" value="pay_debt">
           <input type="hidden" name="debt_id" value="{{ debt.pk }}">
-          <input type="number" name="amount_toman" class="input-field finance-debt-pay-form__amount" min="1" max="{{ debt.balance_toman|unlocalize }}" placeholder="مبلغ (تومان)" aria-label="مبلغ پرداخت بدهی {{ debt.creditor_name }}" required>
+          <input type="text" inputmode="numeric" data-grouped-toman="true" name="amount_toman" class="input-field finance-debt-pay-form__amount" placeholder="مبلغ (تومان)" aria-label="مبلغ پرداخت بدهی {{ debt.creditor_name }}" required>
           <button type="submit" class="btn-secondary finance-debt-pay-form__btn">ثبت پرداخت بدهی</button>
         </form>
         {% endif %}

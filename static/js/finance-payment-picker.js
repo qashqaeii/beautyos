@@ -14,11 +14,7 @@
           if (appointment.selectedIndex < 0) appointment.value = "";
           this.hint = !customer.value ? "ابتدا مشتری را انتخاب کنید." : appointment.options.length === 1 ? "خدمت دارای مانده برای این مشتری وجود ندارد." : "خدمت موردنظر را انتخاب کنید.";
         };
-        const format = value => {
-          const digits = String(value).replace(/[۰-۹]/g,d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/[٠-٩]/g,d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-          if (!/^[0-9.,٬]*$/.test(digits)) return value;
-          return digits.replace(/[.,٬]/g,"").replace(/\B(?=(\d{3})+(?!\d))/g,".").replace(/[0-9]/g,d => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
-        };
+        const format = value => window.BeautyOSMoney.formatGrouped(value);
         const fields = ["total_amount_toman","discount_toman","paid_amount_toman"];
         const number = name => Number(String(form.elements[name].value).replace(/[۰-۹]/g,d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/[.,٬]/g,""));
         const status = () => {
@@ -39,15 +35,7 @@
         fields.forEach(name => {
           const input = form.elements[name];
           input.value = format(input.value);
-          input.addEventListener("input", () => {
-            const end = input.selectionStart === input.value.length;
-            const old = input.selectionStart;
-            const before = input.value.length;
-            input.value = format(input.value);
-            const pos = end ? input.value.length : Math.max(0, old + input.value.length - before);
-            input.setSelectionRange(pos,pos);
-            status();
-          });
+          input.addEventListener("input", status);
         });
         filter(false);
         customer.addEventListener("change", () => { filter(true); fill(); });

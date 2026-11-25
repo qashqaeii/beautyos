@@ -91,3 +91,18 @@ def test_settle_staff_page_posts_exact_toman(client, owner_membership, salon):
     assert post.status_code == 302
     assert CommissionSettlement.objects.count() == before + 1
     assert CommissionSettlement.objects.latest("pk").amount_toman == 1320024
+
+
+def test_shared_grouped_toman_widget_preserves_integer_validation():
+    from django import forms
+    from apps.core.forms import PersianForm
+    class SampleForm(PersianForm):
+        amount_toman = forms.IntegerField(min_value=0, max_value=2000000)
+        duration_minutes = forms.IntegerField()
+    for value in ("۱.۳۲۰.۰۲۴", "١٬٣٢٠٬٠٢٤", "1320024", "0"):
+        form = SampleForm({"amount_toman": value, "duration_minutes": "30"})
+        assert form.is_valid(), form.errors
+        assert "data-grouped-toman" in str(form["amount_toman"])
+        assert "data-grouped-toman" not in str(form["duration_minutes"])
+    for value in ("-1000", "1.25", "3000000", "abc"):
+        assert not SampleForm({"amount_toman": value, "duration_minutes": "30"}).is_valid()

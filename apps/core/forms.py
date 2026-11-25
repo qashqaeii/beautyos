@@ -99,9 +99,10 @@ class PersianModelForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        from apps.core.widgets import apply_jalali_date_widgets
+        from apps.core.widgets import apply_jalali_date_widgets, apply_toman_widgets
 
         apply_jalali_date_widgets(self)
+        apply_toman_widgets(self)
         meta_labels = getattr(self.Meta, "labels", None) or {}
         for name, field in self.fields.items():
             if name in meta_labels:
@@ -117,9 +118,10 @@ class PersianForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        from apps.core.widgets import apply_jalali_date_widgets
+        from apps.core.widgets import apply_jalali_date_widgets, apply_toman_widgets
 
         apply_jalali_date_widgets(self)
+        apply_toman_widgets(self)
         for name, field in self.fields.items():
             if name in PERSIAN_FIELD_LABELS and (not field.label or str(field.label).replace(" ", "").isascii()):
                 field.label = PERSIAN_FIELD_LABELS[name]
