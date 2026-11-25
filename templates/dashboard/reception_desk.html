@@ -74,22 +74,6 @@
   </article>
 </section>
 
-{% if can_book_appointment or can_issue_invoice or can_view_invoices %}
-<nav class="reception-overview-actions" aria-label="اقدامات اصلی پذیرش">
-  {% if can_book_appointment %}
-  <a class="reception-overview-actions__button reception-overview-actions__button--primary" href="{% url 'reception:desk' %}?book=1&amp;day={{ selected_day|date:'Y-m-d' }}{% if selected_service %}&amp;service={{ selected_service.pk }}{% endif %}{% if selected_slot_staff_id %}&amp;staff={{ selected_slot_staff_id }}{% endif %}"><i data-lucide="calendar-plus" aria-hidden="true"></i><span>ثبت نوبت جدید</span></a>
-  {% endif %}
-  {% if can_issue_invoice %}
-  <a class="reception-overview-actions__button" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>فاکتور</span></a>
-  {% elif can_view_invoices %}
-  <a class="reception-overview-actions__button" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورها</span></a>
-  {% endif %}
-  {% if can_view_invoices %}
-  <a class="reception-overview-actions__history" href="{% url 'finance:invoices' %}">فاکتورهای صادرشده</a>
-  {% endif %}
-</nav>
-{% endif %}
-
 <div class="reception-desk-layout">
   <section class="reception-desk-priority dashboard-enter" aria-label="نوبت بعدی و تأییدها">
     <div class="reception-desk-priority__grid">
@@ -146,7 +130,7 @@
         </header>
         {% if pending_confirm %}
         <ul class="reception-desk-pending-list{% if pending_confirm|length > 1 %} reception-desk-pending-list--grid{% endif %}{% if pending_confirm|length > 3 %} reception-desk-pending-list--dense{% endif %}">
-          {% for a in pending_confirm|slice:":8" %}
+          {% for a in pending_confirm|slice:":2" %}
           <li class="reception-desk-pending-list__item">
             <span class="reception-desk-pending-item__time tabular-nums">{{ a.start_at|fa_time }}</span>
             <span class="reception-desk-pending-item__name min-w-0 truncate">{{ a.customer.full_name }}</span>
@@ -154,6 +138,7 @@
           </li>
           {% endfor %}
         </ul>
+        {% if pending_confirm|length > 2 %}<a class="reception-pending-more" href="{% url 'appointments:calendar' %}?day={{ selected_day|date:'Y-m-d' }}">مشاهده همه نوبت‌ها در تقویم</a>{% endif %}
         {% else %}
         <p class="reception-desk-empty reception-desk-empty--inline">رزروی در انتظار تأیید نیست.</p>
         <img class="luna-reception-empty-art" src="{% static 'images/photos/beautyos-reception-pending.webp' %}" width="236" height="140" alt="" decoding="async">
@@ -394,10 +379,22 @@
     </div>
   </section>
 
-  {% if quick_access_links %}
+  {% if quick_access_links or can_book_appointment or can_issue_invoice or can_view_invoices %}
   <section class="reception-desk-quick dashboard-enter">
     <h2 class="reception-desk-quick__title"><i data-lucide="zap" aria-hidden="true"></i>دسترسی سریع</h2>
     <div class="reception-desk-quick__row">
+  {% if can_book_appointment %}
+  <a class="reception-desk-quick__link reception-desk-quick__link--primary" href="{% url 'reception:desk' %}?book=1&amp;day={{ selected_day|date:'Y-m-d' }}{% if selected_service %}&amp;service={{ selected_service.pk }}{% endif %}{% if selected_slot_staff_id %}&amp;staff={{ selected_slot_staff_id }}{% endif %}"><i data-lucide="calendar-plus" aria-hidden="true"></i><span>ثبت نوبت جدید</span></a>
+  {% endif %}
+  {% if can_issue_invoice %}
+  <a class="reception-desk-quick__link" href="{% url 'finance:checkout_customers' %}"><i data-lucide="receipt-text" aria-hidden="true"></i><span>فاکتور</span></a>
+  {% elif can_view_invoices %}
+  <a class="reception-desk-quick__link" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورها</span></a>
+  {% endif %}
+  {% if can_view_invoices %}
+  <a class="reception-desk-quick__link" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورهای صادرشده</span></a>
+  {% endif %}
+
       {% for link in quick_access_links %}
       <a href="{{ link.url }}" class="reception-desk-quick__link">
         <span class="luna-reception-quick-icon" aria-hidden="true"><i data-lucide="{{ link.icon }}" class="reception-desk-quick__icon"></i></span>

@@ -730,3 +730,39 @@ body.theme-app .maison-app.luna-reception-shell {
   .luna-reception-shell .reception-desk-workspace__slots{padding:14px;gap:9px;}
   .luna-reception-shell .reception-desk-slot-filters select{min-height:40px;}
 }
+
+/* Reception desktop: quick actions adjacent to daily operations; cards fit
+   their content rather than hiding controls in nested scrolling containers. */
+.luna-reception-shell .reception-desk-quick__link>svg{width:19px;height:19px;flex:none;}
+.luna-reception-shell .reception-desk-quick__link--primary{background:#987068;color:white!important;border-color:#987068;}
+.luna-reception-shell .reception-desk-quick__link--primary:hover{background:#865f58;}
+.luna-reception-shell .reception-desk-quick__link{font-size:11px;font-weight:700;}
+.luna-reception-shell .reception-pending-more{font-size:10px;color:var(--desk-muted);line-height:1.5;}
+.luna-reception-shell .reception-desk-priority__next,
+.luna-reception-shell .reception-desk-priority__pending,
+.luna-reception-shell .reception-desk-pending-list{overflow:visible;max-height:none;}
+.luna-reception-shell .reception-desk-pending-list__item{min-height:30px;padding:3px 6px;}
+.luna-reception-shell .reception-desk-pending-item__action{min-height:25px;}
+@media(min-width:1180px) and (min-height:560px){
+  .luna-reception-shell .reception-desk-page{grid-template-rows:88px 74px minmax(0,1fr);}
+  .luna-reception-shell .reception-desk-layout{grid-template-columns:minmax(0,.86fr) minmax(0,1.12fr) minmax(0,1.08fr);grid-template-rows:minmax(180px,1.1fr) minmax(140px,1fr);}
+  .luna-reception-shell .reception-desk-priority{grid-column:3;grid-row:1 / 3;}
+  .luna-reception-shell .reception-desk-priority__grid{grid-template-rows:minmax(155px,1.1fr) minmax(130px,1fr);height:100%;}
+  .luna-reception-shell .reception-desk-priority__next{justify-content:center;gap:6px;}
+  .luna-reception-shell .reception-desk-priority__pending{justify-content:flex-start;gap:6px;}
+  .luna-reception-shell .reception-flow{grid-column:1;grid-row:1;}
+  .luna-reception-shell .reception-desk-quick{grid-column:2;grid-row:1;}
+  .luna-reception-shell .reception-desk-quick__row{overflow:visible;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+  .luna-reception-shell .reception-desk-quick__link{min-height:33px;padding:4px 6px;}
+  .luna-reception-shell .reception-journey{margin-inline:0;}
+  .luna-reception-shell .reception-journey__name{font-size:9px;}
+  .luna-reception-shell .reception-journey__icon{width:36px;height:36px;}
+  .luna-reception-shell .reception-journey__icon svg{width:19px;height:19px;}
+  .luna-reception-shell .reception-journey::before{top:calc(50% - 23px);}
+}
+@media(min-width:1180px) and (max-height:620px){
+  body.theme-app .maison-app.luna-reception-shell,
+  body.theme-app .maison-app.luna-reception-shell > .maison-main,
+  .luna-reception-shell .maison-content,
+  .luna-reception-shell .reception-desk-page{height:auto;max-height:none;overflow:visible;}
+}
