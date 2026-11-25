@@ -359,10 +359,10 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     pw.expect(journey_steps).to_have_count(4)
                     disclosure = page.locator(".reception-operations-disclosure")
                     pw.expect(disclosure).to_be_visible()
-                    disclosure.locator("summary").click()
+                    disclosure.locator(":scope > summary").click()
                     assert disclosure.evaluate("(el) => el.open"), "daily operations must remain accessible"
                     pw.expect(disclosure.locator(".reception-flow__list")).to_be_visible()
-                    disclosure.locator("summary").click()
+                    disclosure.locator(":scope > summary").click()
                     assert not disclosure.evaluate("(el) => el.open")
 
                     header = page.locator(".reception-desk-header").bounding_box()
