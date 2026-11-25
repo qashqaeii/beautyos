@@ -172,6 +172,17 @@
 .luna-reception-shell .reception-desk-quick__label{font-size:11px}
 .luna-reception-shell .reception-desk-quick__arrow{display:none}
 @media(min-width:1180px) and (min-height:560px){
+  /* Own the viewport only on the reception screen. Internal card lists
+     retain scrolling so content remains accessible without document scroll. */
+  body.theme-app .maison-app.luna-reception-shell{
+    height:100dvh;min-height:0;max-height:100dvh;overflow:hidden;
+  }
+  body.theme-app .maison-app.luna-reception-shell > .maison-main{
+    height:100dvh;min-height:0;overflow:hidden;
+  }
+  .luna-reception-shell .maison-content{
+    height:100%;min-height:0;box-sizing:border-box;overflow:hidden;
+  }
   .luna-reception-shell .maison-content{padding:10px 14px;min-height:0}
   .luna-reception-shell .reception-desk-page{
     height:calc(100dvh - 20px);min-height:0;overflow:hidden;
