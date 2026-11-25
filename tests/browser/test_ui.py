@@ -349,6 +349,22 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                 if name == "reception":
                     kpis = page.locator(".reception-overview-kpis > .reception-overview-kpi")
                     pw.expect(kpis).to_have_count(4)
+                    assert kpis.first.evaluate(
+                        "(el) => getComputedStyle(el).backgroundImage.includes('linear-gradient')"
+                    ), "the leading KPI must carry the warm rose highlight"
+                    assert page.locator(".reception-desk-header").evaluate(
+                        "(el) => getComputedStyle(el).backgroundImage.includes('reception-desk-hero.svg')"
+                    ), "illustrated reception hero must be present"
+                    journey_steps = page.locator(".reception-journey__step")
+                    pw.expect(journey_steps).to_have_count(4)
+                    disclosure = page.locator(".reception-operations-disclosure")
+                    pw.expect(disclosure).to_be_visible()
+                    disclosure.locator("summary").click()
+                    assert disclosure.evaluate("(el) => el.open"), "daily operations must remain accessible"
+                    pw.expect(disclosure.locator(".reception-flow__list")).to_be_visible()
+                    disclosure.locator("summary").click()
+                    assert not disclosure.evaluate("(el) => el.open")
+
                     header = page.locator(".reception-desk-header").bounding_box()
                     kpi_box = page.locator(".reception-overview-kpis").bounding_box()
                     assert header and kpi_box and kpi_box["y"] >= header["y"] + header["height"] - 2
