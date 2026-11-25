@@ -13,7 +13,7 @@
     <h2><i data-lucide="history" aria-hidden="true"></i>فاکتورهای اخیر</h2>
     {% for previous in latest_invoices %}
       <a href="{% url 'finance:invoice_detail' previous.pk %}">
-        <span><strong>{{ previous.customer_name }}</strong><small>فاکتور {{ previous.pk|fa_num }} · {{ previous.created_at|fa_jalali }}</small></span>
+        <span><strong>{{ previous.customer_name }}</strong><small>فاکتور {{ previous.invoice_number }} · {{ previous.created_at|fa_jalali }}</small></span>
         <bdi>{{ previous.gross_toman|fa_money }}</bdi>
       </a>
     {% empty %}<p class="checkout-workspace__sidebar-empty">هنوز فاکتوری ثبت نشده است.</p>{% endfor %}

@@ -359,3 +359,19 @@ def test_cash_filter_has_only_today_and_calendar(client, owner_membership):
         assert other not in html
     legacy = client.get(reverse("finance:overview"), {"tab": "cash", "range": "month"})
     assert legacy.context["range_key"] == "day"
+
+
+@pytest.mark.django_db
+def test_receipts_search_stable_invoice_number(client, owner_membership, salon):
+    from uuid import uuid4
+    from apps.finance.models import Invoice
+    client.force_login(owner_membership.user)
+    customer = Customer.objects.create(salon=salon, full_name="مشتری فاکتور", phone="+989121212390")
+    invoice = Invoice.objects.create(salon=salon, customer=customer, customer_name=customer.full_name, request_key=uuid4(), request_digest="x", gross_toman=800000)
+    assert invoice.invoice_number == f"BF-{invoice.pk:06d}"
+    for query in (invoice.invoice_number, "مشتری فاکتور"):
+        response = client.get(reverse("finance:overview"), {"tab": "receipts", "q": query})
+        assert response.status_code == 200
+        assert list(response.context["invoice_page"]) == [invoice]
+        assert invoice.invoice_number in response.content.decode()
+        assert 'id="invoice-search"' in response.content.decode()

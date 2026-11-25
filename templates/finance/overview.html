@@ -10,7 +10,7 @@
 
 {% block content %}
 <div
-  class="finance-page{% if tab == 'income' %} finance-page--dashboard{% elif tab == 'commissions' %} finance-page--commissions{% elif tab == 'cash' %} finance-page--cash{% endif %}"
+  class="finance-page{% if tab == 'income' %} finance-page--dashboard{% elif tab == 'commissions' %} finance-page--commissions{% elif tab == 'cash' %} finance-page--cash{% elif tab == 'receipts' %} finance-page--receipts{% endif %}"
   x-data="{
     expenseOpen: {{ expense_modal_open|default:False|yesno:'true,false' }},
     showDebtForm: {{ debt_form_open|default:False|yesno:'true,false' }},
@@ -90,6 +90,20 @@
       </form>
     </div>
   </section>
+  {% elif tab == 'receipts' %}
+  <section class="finance-page__range-bar finance-comm-filter finance-receipt-filter" aria-label="جستجو و تاریخ فاکتور">
+    <form method="get" class="suite-filter-form finance-comm-search" role="search">
+      <input type="hidden" name="tab" value="receipts"><input type="hidden" name="range" value="{{ range_key }}"><input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+      <label class="sr-only" for="invoice-search">جستجوی شماره فاکتور یا نام گیرنده</label>
+      <div class="suite-search staff-board-search finance-comm-search__wrap"><input type="search" id="invoice-search" name="q" value="{{ receipt_query }}" class="input-field" placeholder="جست‌وجوی شماره فاکتور یا نام گیرنده..." autocomplete="off"><button type="submit" class="staff-board-search__submit" aria-label="جست‌وجو"><i data-lucide="search" aria-hidden="true"></i></button></div>
+      {% if receipt_query %}<a class="finance-comm-clear" href="?tab=receipts&amp;range={{ range_key }}&amp;day={{ selected_day|date:'Y-m-d' }}" aria-label="پاک کردن جستجو"><i data-lucide="x" aria-hidden="true"></i></a>{% endif %}
+    </form>
+    <div class="finance-comm-date">
+      {% if range_key == 'day' %}<a class="finance-page__range-pill" href="?tab=receipts&amp;range=month&amp;day={{ selected_day|date:'Y-m-d' }}&amp;q={{ receipt_query|urlencode }}">نمایش ماه</a>{% endif %}
+      <form method="get" class="finance-page__day-picker"><input type="hidden" name="tab" value="receipts"><input type="hidden" name="range" value="day"><input type="hidden" name="q" value="{{ receipt_query }}">{% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}</form>
+      {% if range_key == 'month' %}<small>{{ range_display_jalali|persian_digits }}</small>{% endif %}
+    </div>
+  </section>
   {% elif tab != 'debts' %}
   <section class="finance-page__range-bar" aria-label="بازه گزارش">
     <div class="finance-page__range-pills" role="group" aria-label="بازه زمانی">
@@ -118,14 +132,8 @@
   {% if tab == 'income' or tab == 'reports' or tab == 'cash' %}
     {% include "finance/partials/management_dashboard.html" %}
   {% endif %}
-  {% if tab == 'receipts' %}
-  <section class="fin-panel">
-    <header class="fin-panel-head"><h2><i data-lucide="receipt-text" aria-hidden="true"></i>فاکتور خدمات</h2><a href="{% url 'finance:invoices' %}">مشاهده فاکتورها</a></header>
-    <p class="fin-muted">خدمات انجام‌شده یک مشتری را یکجا انتخاب و با احتساب پرداخت‌های قبلی تسویه کنید.</p>
-    {% if can_payment_create %}<div><a href="{% url 'finance:checkout_customers' %}" class="btn-primary">صدور فاکتور جدید</a></div>{% endif %}
-  </section>
-  {% endif %}
-  {% if tab == 'income' or tab == 'cash' or tab == 'receipts' %}
+  {% if tab == 'receipts' %}{% include "finance/partials/receipts_workspace.html" %}{% endif %}
+  {% if tab == 'income' or tab == 'cash' %}
   <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="دریافتی‌ها">
     {% if tab == 'cash' %}
     <div class="finance-stat-grid finance-cash-kpis">

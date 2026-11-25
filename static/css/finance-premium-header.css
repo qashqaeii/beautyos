@@ -772,3 +772,38 @@
   .luna-finance-shell .finance-cash-filter .finance-cash-search{width:100%}
   .luna-finance-shell .finance-cash-filter .finance-comm-search__wrap{flex:1;width:auto}
 }
+
+/* Invoice workspace — shared search/date control and compact editorial layout. */
+.luna-finance-shell .finance-page--receipts{gap:8px}
+.luna-finance-shell .finance-page--receipts .finance-receipt-filter{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:5px 9px}
+.finance-receipt-filter .finance-comm-search__wrap{width:clamp(250px,32vw,420px)}
+.finance-receipt-filter .finance-comm-date small{font-size:10px}
+.luna-finance-shell .finance-page--receipts .finance-receipt-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0}
+.luna-finance-shell .finance-receipt-kpis .finance-stat-card{min-height:82px;padding:10px 14px;padding-inline-end:60px;position:relative;gap:4px;border-radius:12px;background:linear-gradient(120deg,#f2e0dc,#fffaf7)}
+.luna-finance-shell .finance-receipt-kpis .finance-stat-card:nth-child(2){background:linear-gradient(120deg,#f5e8d9,#fffaf7)}
+.luna-finance-shell .finance-receipt-kpis .finance-stat-card:nth-child(3){background:linear-gradient(120deg,#eee3f0,#fffaf7)}
+.finance-receipt-kpis .luna-finance-stat-icon{position:absolute;inset-inline-end:12px;top:15px}
+.finance-receipt-kpis .finance-stat-card__value{font-size:19px}
+.finance-receipt-kpis .finance-stat-card__value small{font-size:11px}
+.luna-finance-shell .finance-receipt-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;margin:0;border-radius:14px;background:linear-gradient(115deg,#f1dfd7,#fffaf7 75%)}
+.finance-receipt-hero h2{display:flex;align-items:center;gap:7px;font-size:16px;margin:0 0 5px}
+.finance-receipt-hero p{font-size:12px;margin:0 0 9px}
+.finance-receipt-hero img{width:clamp(110px,20%,190px);height:100px;object-fit:contain}
+.finance-receipt-actions{display:flex;gap:7px;flex-wrap:wrap}
+.finance-receipt-actions a{min-height:34px;display:inline-flex;align-items:center;gap:5px}
+.luna-finance-shell .finance-receipt-list{padding:10px 12px;min-width:0}
+.finance-receipt-list .finance-table :is(th,td){padding:6px 9px;font-size:11px}
+.finance-invoice-number{font-weight:700;color:#875e56}
+.finance-receipt-details{font-size:11px;padding:6px 0}
+.finance-receipt-details a{display:block;padding:5px}
+@media(min-width:1100px) and (min-height:580px){
+ .luna-finance-shell .finance-page--receipts{min-height:calc(100dvh - 32px);grid-template-rows:auto auto auto auto auto minmax(min-content,1fr)}
+ .luna-finance-shell .finance-page--receipts .finance-page__header--premium{height:76px;min-height:76px;box-sizing:border-box}
+ .luna-finance-shell .finance-page--receipts .finance-phase2-tabs .finance-page__tab{min-height:36px}
+}
+@media(max-width:720px){
+ .finance-receipt-filter .finance-comm-search{width:100%}
+ .finance-receipt-filter .finance-comm-search__wrap{width:auto;flex:1;min-width:0}
+ .luna-finance-shell .finance-page--receipts .finance-receipt-kpis{grid-template-columns:1fr}
+ .finance-receipt-hero img{display:none}
+}

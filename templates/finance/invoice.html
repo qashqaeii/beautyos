@@ -1,6 +1,6 @@
 {% extends "layouts/app_shell.html" %}
 {% load static format_tags l10n %}
-{% block title %}فاکتور {{ invoice.pk|fa_num }} | BeautyOS{% endblock %}
+{% block title %}فاکتور {{ invoice.invoice_number }} | BeautyOS{% endblock %}
 {% block workspace_header %}{% endblock %}
 {% block shell_modifier %}beautyos-checkout-shell{% endblock %}
 {% block page_styles_after_suite %}<link rel="stylesheet" href="{% static 'css/checkout-editorial.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
@@ -10,7 +10,7 @@
   <div class="checkout-workspace__layout">
     <article class="checkout-workspace__paper checkout-workspace__invoice">
       <div class="checkout-workspace__invoice-head checkout-workspace__invoice-head--issued">
-        <span class="checkout-workspace__invoice-ref"><i data-lucide="badge-check" aria-hidden="true"></i>فاکتور {{ invoice.pk|fa_num }}<small>{{ invoice.created_at|fa_jalali_datetime }}</small></span>
+        <span class="checkout-workspace__invoice-ref"><i data-lucide="badge-check" aria-hidden="true"></i>فاکتور {{ invoice.invoice_number }}<small>{{ invoice.created_at|fa_jalali_datetime }}</small></span>
         <div class="checkout-workspace__invoice-brand"><i data-lucide="flower-2" aria-hidden="true"></i><strong>{{ active_salon.name }}</strong><small>فاکتور خدمات زیبایی</small></div>
         <span class="checkout-workspace__invoice-status">ثبت‌شده</span>
       </div>

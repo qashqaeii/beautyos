@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
-from django.db.models import Sum
+from django.db.models import Sum, Q, Count
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -109,6 +109,8 @@ def _finance_overview_context(
         tab = "income"
     if tab in ("commissions", "cash") and get_query.get("range", "today") not in ("today", "day"):
         get_query["range"] = "day"
+    if tab == "receipts" and get_query.get("range") not in ("day", "month"):
+        get_query["range"] = "month"
     range_ctx = parse_finance_range(_FinanceGetRequest(request, get_query))
 
     membership = getattr(request, "membership", None)
@@ -162,6 +164,19 @@ def _finance_overview_context(
         commissions["settled_staff_count"] = len(commissions["settled_rows"])
         commissions["need_payment_staff_count"] = len(commissions["pending_rows"])
 
+    receipt_query = get_query.get("q", "").strip()[:100] if tab == "receipts" else ""
+    invoice_page = None
+    invoice_totals = {}
+    if tab == "receipts":
+        invoices = Invoice.scoped(request.salon).filter(created_at__gte=range_ctx["start_dt"], created_at__lt=range_ctx["end_dt"])
+        invoice_totals = invoices.aggregate(count=Count("pk"), gross=Sum("gross_toman"))
+        if receipt_query:
+            number = receipt_query.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")).upper().removeprefix("BF-")
+            match = Q(customer_name__icontains=receipt_query)
+            if number.isascii() and number.isdecimal() and len(number) <= 19 and int(number) <= 2**63-1:
+                match |= Q(pk=int(number))
+            invoices = invoices.filter(match)
+        invoice_page = Paginator(invoices.order_by("-created_at", "-pk"), 5).get_page(get_query.get("invoice_page", 1))
     from apps.expenses.forms import ExpenseForm
     from django.utils import timezone
     return {
@@ -174,6 +189,9 @@ def _finance_overview_context(
         "dashboard": finance_dashboard(request.salon, range_ctx) if tab in ("income", "cash", "debts", "reports") else None,
         "payments": payments,
         "cash_query": cash_query,
+        "receipt_query": receipt_query,
+        "invoice_page": invoice_page,
+        "invoice_totals": invoice_totals,
         "cash_partial_total": cash_partial_total,
         "cash_paid_total": cash_paid_total,
         "cash_invoice_total": cash_invoice_total,

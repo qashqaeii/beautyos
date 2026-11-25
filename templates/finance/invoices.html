@@ -4,7 +4,7 @@
 {% block content %}
 <section class="premium-card p-4 space-y-3">
   {% if can_checkout %}<a class="btn-primary" href="{% url 'finance:checkout_customers' %}">صدور فاکتور</a>{% endif %}
-  {% for invoice in page %}<a class="flex flex-wrap justify-between gap-3 border-b border-line py-3" href="{% url 'finance:invoice_detail' invoice.pk %}"><span><strong>{{ invoice.customer_name }}</strong><small class="block text-xs text-ink-secondary">فاکتور {{ invoice.pk|fa_num }} · {{ invoice.created_at|fa_jalali }}</small></span><span>{{ invoice.gross_toman|fa_money }} تومان</span></a>{% empty %}<p class="text-sm text-ink-secondary">فاکتوری ثبت نشده است.</p>{% endfor %}
+  {% for invoice in page %}<a class="flex flex-wrap justify-between gap-3 border-b border-line py-3" href="{% url 'finance:invoice_detail' invoice.pk %}"><span><strong>{{ invoice.customer_name }}</strong><small class="block text-xs text-ink-secondary">فاکتور {{ invoice.invoice_number }} · {{ invoice.created_at|fa_jalali }}</small></span><span>{{ invoice.gross_toman|fa_money }} تومان</span></a>{% empty %}<p class="text-sm text-ink-secondary">فاکتوری ثبت نشده است.</p>{% endfor %}
   <div class="flex gap-3">{% if page.has_previous %}<a class="btn-secondary" href="?page={{ page.previous_page_number|unlocalize }}">قبلی</a>{% endif %}{% if page.has_next %}<a class="btn-secondary" href="?page={{ page.next_page_number|unlocalize }}">بعدی</a>{% endif %}</div>
 </section>
 {% endblock %}

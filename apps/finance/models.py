@@ -94,6 +94,10 @@ class Invoice(TenantModelMixin, TimeStampedModel):
     received_toman = models.BigIntegerField(default=0)
     balance_at_issue_toman = models.BigIntegerField(default=0)
 
+    @property
+    def invoice_number(self):
+        return f"BF-{self.pk:06d}" if self.pk else ""
+
     class Meta:
         constraints = [models.UniqueConstraint(fields=["salon", "request_key"], name="finance_invoice_request_key")]
 
