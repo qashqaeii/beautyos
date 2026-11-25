@@ -171,7 +171,7 @@
 .luna-reception-shell .reception-desk-quick__icon{width:17px;height:17px}
 .luna-reception-shell .reception-desk-quick__label{font-size:11px}
 .luna-reception-shell .reception-desk-quick__arrow{display:none}
-@media(min-width:1180px) and (min-height:650px){
+@media(min-width:1180px) and (min-height:560px){
   .luna-reception-shell .maison-content{padding:10px 14px;min-height:0}
   .luna-reception-shell .reception-desk-page{
     height:calc(100dvh - 20px);min-height:0;overflow:hidden;
@@ -193,7 +193,7 @@
   .luna-reception-shell .reception-desk-workspace__slots{grid-column:2;grid-row:2;min-height:0;overflow:hidden}
   .luna-reception-shell .reception-desk-quick{grid-column:3;grid-row:2;min-height:0;overflow:hidden}
 }
-@media(min-width:1024px) and (max-height:649px){
+@media(min-width:1024px) and (max-height:559px){
   .luna-reception-shell .maison-content{padding:8px 12px}
   .luna-reception-shell .reception-desk-header{height:88px;min-height:88px}
   .luna-reception-shell .reception-desk-layout{grid-template-columns:minmax(0,1fr)}
