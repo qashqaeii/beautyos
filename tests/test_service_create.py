@@ -84,3 +84,17 @@ def test_service_directory_uses_premium_hero_and_preserves_modal_actions(client,
     assert css_path and illustration_path
     css=Path(css_path).read_text(encoding="utf-8")
     assert "100dvh" in css and "grid-template-rows:repeat(3" in css
+
+
+@pytest.mark.django_db
+def test_service_price_uses_shared_grouped_money_widget(salon):
+    from apps.core.widgets import TomanAmountWidget
+    from apps.services.forms import ServiceCreateForm, ServiceForm
+    for form_class in (ServiceCreateForm, ServiceForm):
+        form = form_class(salon=salon)
+        assert isinstance(form.fields["price_toman"].widget, TomanAmountWidget)
+        assert 'data-show-zero="true"' in str(form["price_toman"])
+    for amount in ("850000", "0"):
+        form = ServiceCreateForm({"name": "خدمت", "price_toman": amount}, salon=salon)
+        assert form.is_valid(), form.errors
+        assert form.cleaned_data["price_toman"] == int(amount)

@@ -52,12 +52,14 @@
       amount: "",
       display: "",
       _formSubmitHandler: null,
+      showZero: false,
 
       init() {
+        this.showZero = this.$refs.displayInput?.dataset.showZero === "true";
         const n = Number(config.amount);
-        if (Number.isFinite(n) && n > 0) {
+        if (Number.isFinite(n) && (n > 0 || (n === 0 && this.showZero))) {
           this.amount = n;
-          this.display = formatTomanFa(n);
+          this.display = n === 0 && this.showZero ? "۰" : formatTomanFa(n);
         } else {
           this.amount = "";
           this.display = "";
@@ -107,7 +109,7 @@
         }
         const parsed = parseInt(digits, 10);
         this.amount = parsed;
-        this.display = formatTomanFa(parsed);
+        this.display = parsed === 0 && this.showZero ? "۰" : formatTomanFa(parsed);
         this.syncHiddenDom();
         if (!el) return;
         this.$nextTick(() => {

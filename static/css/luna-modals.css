@@ -796,3 +796,8 @@ body.theme-app .luna-modal--service .service-form__intro--edit {margin:0 0 10px;
   body.theme-app .luna-modal--service :is(.luna-service-paired-grid,.luna-service-advanced-grid) {grid-template-columns:minmax(0,1fr);gap:8px;}
   body.theme-app .luna-modal--service .luna-service-field-card > :is(input,select,textarea) {min-height:44px;}
 }
+
+/* Service price uses the shared live thousands formatter. */
+body.theme-app .luna-modal--service .luna-service-field-card .toman-amount {width:100%;min-width:0;}
+body.theme-app .luna-modal--service .luna-service-field-card .toman-amount__control {width:100%;min-width:0;}
+body.theme-app .luna-modal--service .luna-service-field-card .toman-amount__display {min-width:0;height:40px;min-height:40px;text-align:left;}

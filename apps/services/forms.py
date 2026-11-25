@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 
 from apps.core.forms import PersianModelForm
+from apps.core.widgets import TomanAmountWidget
 from apps.services.models import Service, ServiceCategory
 
 
@@ -65,7 +66,7 @@ class ServiceCreateForm(PersianModelForm):
         widgets = {
             "name": forms.TextInput(attrs={"class": "input-field"}),
             "description": forms.Textarea(attrs={"class": "input-field", "rows": 3}),
-            "price_toman": forms.NumberInput(attrs={"class": "input-field"}),
+            "price_toman": TomanAmountWidget(attrs={"data-show-zero": "true"}),
             "category": forms.Select(attrs={"class": "input-field"}),
             "is_active": forms.CheckboxInput(attrs={"class": "rounded"}),
             "is_public": forms.CheckboxInput(attrs={"class": "rounded"}),
@@ -105,7 +106,7 @@ class ServiceForm(PersianModelForm):
             "name": forms.TextInput(attrs={"class": "input-field"}),
             "description": forms.Textarea(attrs={"class": "input-field", "rows": 3}),
             "duration_minutes": forms.NumberInput(attrs={"class": "input-field"}),
-            "price_toman": forms.NumberInput(attrs={"class": "input-field"}),
+            "price_toman": TomanAmountWidget(attrs={"data-show-zero": "true"}),
             "sort_order": forms.NumberInput(attrs={"class": "input-field"}),
             "category": forms.Select(attrs={"class": "input-field"}),
             "is_active": forms.CheckboxInput(attrs={"class": "rounded"}),
