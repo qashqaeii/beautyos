@@ -1448,6 +1448,7 @@ def test_shared_jalali_birth_picker_has_equal_month_year_cards_and_working_days(
         assert dates.count()==30
         chosen = calendar.get_by_role("gridcell",name="۱۵",exact=True)
         pw.expect(chosen).to_be_enabled()
+        assert chosen.evaluate("(el) => { const r=el.getBoundingClientRect(); return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)); }"), "calendar day intercepted by overlay"
         chosen.click()
         pw.expect(calendar).not_to_be_visible()
         selected=form.locator('[name="birth_date"]')

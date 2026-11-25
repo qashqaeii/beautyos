@@ -2,6 +2,7 @@
 <template x-teleport="{{ portal_target|default:'body' }}">
   <div
     x-ref="popover"
+    x-init="bindCalendarDays($el)"
     class="jalali-date__popover jalali-date__popover--portal"
     :class="{ 'jalali-date__popover--birth': birthPicker, 'jalali-date__popover--compact': directNavigation }"
     :style="popoverStyle"
@@ -80,8 +81,7 @@
           :aria-label="cell.inMonth ? cell.label : null"
           :aria-current="cell.selected ? 'date' : false"
           :aria-selected="Boolean(cell.selected)"
-          @pointerdown.prevent.stop
-          @click.stop.prevent="pick(cell)"
+          :data-jalali-day="cell.inMonth ? `${cell.jy}-${cell.jm}-${cell.jd}` : null"
           x-text="cell.label"
         ></button>
       </template>

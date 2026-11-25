@@ -200,6 +200,21 @@
     return {
       birthPicker: false,
       directNavigation: false,
+      bindCalendarDays(pop) {
+        // Bind to the actual teleported DOM, keeping the original Alpine field scope.
+        if (pop.__beautyosDaysBound) return;
+        pop.__beautyosDaysBound = true;
+        const picker = this;
+        pop.addEventListener("click", event => {
+          const day = event.target.closest?.("[data-jalali-day]");
+          if (!day || !pop.contains(day) || day.disabled || !picker.open) return;
+          event.preventDefault();
+          event.stopPropagation();
+          const [jy,jm,jd] = day.dataset.jalaliDay.split("-").map(Number);
+          if (!jy || !jm || !jd) return;
+          picker.pick({inMonth:true, disabled:false, jy, jm, jd});
+        }, true);
+      },
       popoverStyle: {},
       popoverPlacement: "below",
       jalaliDismissPointer(event) {
@@ -232,7 +247,7 @@
         if (this._jalaliFollowBound) return;
         this._jalaliFollowBound = true;
         this._jalaliFollow = (event) => {
-          if (!this.open || this.$refs.popover?.contains(event.target)) return;
+          if (!this.open || (event.target instanceof Node && this.$refs.popover?.contains(event.target))) return;
           this.positionPopover();
         };
         window.addEventListener("resize", this._jalaliFollow, { passive: true });
@@ -245,7 +260,7 @@
         this._jalaliFollowBound = false;
       },
       positionPopover() {
-        const anchor = popoverAnchorEl(this.$el, this.$refs);
+        const anchor = popoverAnchorEl(this._fieldRoot || this.$el, this.$refs);
         if (!anchor) return;
         const r = anchor.getBoundingClientRect();
         this.positionCompactPopover(r);
@@ -281,7 +296,7 @@
       _finishPopoverPosition() {
         this.positionPopover();
         const pop = this.$refs.popover;
-        const anchor = popoverAnchorEl(this.$el, this.$refs);
+        const anchor = popoverAnchorEl(this._fieldRoot || this.$el, this.$refs);
         if (pop && anchor) {
           const pr = pop.getBoundingClientRect();
           const r = anchor.getBoundingClientRect();
@@ -307,7 +322,7 @@
             this.viewJm = j.jm;
           }
         }
-        const anchor = popoverAnchorEl(this.$el, this.$refs);
+        const anchor = popoverAnchorEl(this._fieldRoot || this.$el, this.$refs);
         if (anchor && typeof anchor.scrollIntoView === "function") {
           try {
             anchor.scrollIntoView({ block: "nearest", inline: "nearest" });

@@ -495,3 +495,7 @@ body .jalali-date__popover--portal .jalali-date__popover-foot {margin-top:6px;pa
 @media(max-height:420px){
   body .jalali-date__popover.jalali-date__popover--portal {--jalali-day-size:26px;}
 }
+
+/* A teleported calendar is an interactive overlay even above a form dialog. */
+body .jalali-date__popover.jalali-date__popover--portal {pointer-events:auto;}
+body .jalali-date__popover--portal .jalali-date__day:not(:disabled) {pointer-events:auto;cursor:pointer;touch-action:manipulation;}
