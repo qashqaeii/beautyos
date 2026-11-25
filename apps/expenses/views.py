@@ -1,12 +1,15 @@
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, Q
+from django.core.paginator import Paginator
+from datetime import date
+from urllib.parse import urlencode
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
 from apps.audit.models import AuditLog
-from apps.core.utils.dates import jalali_month_bounds
+from apps.core.utils.dates import jalali_month_bounds, to_jalali
 from apps.dashboard.role_services import day_bounds
 from apps.expenses.forms import ExpenseForm
 from apps.expenses.models import Expense
@@ -22,8 +25,17 @@ def overview(request):
     return _overview(request, open_modal=request.GET.get("expense") == "1")
 
 
-def _overview(request, *, form=None, open_modal=False, status=200):
-    month_start, month_end = jalali_month_bounds()
+def _overview(request, *, form=None, open_modal=False, status=200, query=None):
+    query = request.GET if query is None else query
+    q = query.get("q", "").strip()[:100]
+    today = timezone.localdate()
+    try:
+        selected_day = date.fromisoformat(query.get("day", ""))
+        if not 1800 <= selected_day.year <= 2200:
+            selected_day = today
+    except (ValueError, TypeError):
+        selected_day = today
+    month_start, month_end = jalali_month_bounds(selected_day)
     start, _ = day_bounds(month_start)
     _, end = day_bounds(month_end)
     expenses = Expense.scoped(request.salon).filter(expense_date__range=(month_start, month_end)).order_by("-expense_date", "-pk")
@@ -35,14 +47,24 @@ def _overview(request, *, form=None, open_modal=False, status=200):
         .aggregate(t=Sum("paid_amount_toman"))["t"]
         or 0
     )
+    listed = expenses
+    if q:
+        categories = [key for key, label in Expense.Category.choices if q.casefold() in label.casefold()]
+        listed = listed.filter(Q(description__icontains=q) | Q(category__in=categories))
+    expense_page = Paginator(listed, 5).get_page(query.get("page", 1))
     return render(
         request,
         "expenses/overview.html",
         {
             "expense_form": form if form is not None else ExpenseForm(initial={"expense_date": timezone.localdate()}),
             "expense_modal_open": open_modal,
-            "expense_return_url": reverse("expenses:overview"),
-            "expenses": expenses[:30],
+            "expense_return_url": reverse("expenses:overview") + "?" + urlencode({"day": selected_day.isoformat(), "q": q}),
+            "expenses": expense_page,
+            "expense_page": expense_page,
+            "q": q,
+            "selected_day": selected_day,
+            "day_jalali": to_jalali(selected_day),
+            "month_label": to_jalali(month_start)[:7],
             "expense_total": expense_total,
             "revenue_total": revenue_total,
             "operating_estimate": revenue_total - expense_total,
@@ -60,7 +82,7 @@ def create(request):
     from django.utils.http import url_has_allowed_host_and_scheme
     from urllib.parse import urlsplit
     target = request.POST.get("next", "")
-    if not target.startswith("/") or target.startswith("//") or not url_has_allowed_host_and_scheme(target, allowed_hosts=set()) or urlsplit(target).path != reverse("finance:overview"):
+    if not target.startswith("/") or target.startswith("//") or not url_has_allowed_host_and_scheme(target, allowed_hosts=set()) or urlsplit(target).path not in (reverse("finance:overview"), reverse("expenses:overview")):
         target = reverse("expenses:overview")
     if request.method == "POST" and form.is_valid():
         expense = form.save(commit=False)
@@ -72,7 +94,7 @@ def create(request):
                 metadata={"amount_toman": expense.amount_toman, "category": expense.category})
         messages.success(request, "هزینه ثبت شد.")
         return redirect(target)
-    if target != reverse("expenses:overview"):
+    if urlsplit(target).path == reverse("finance:overview"):
         from django.http import QueryDict
         from apps.finance.views import _finance_overview_context
         from django.core.exceptions import PermissionDenied
@@ -83,4 +105,5 @@ def create(request):
         else:
             ctx.update(expense_form=form, expense_modal_open=True, expense_return_url=target)
             return render(request, "finance/overview.html", ctx, status=400)
-    return _overview(request, form=form, open_modal=True, status=400)
+    from django.http import QueryDict
+    return _overview(request, form=form, open_modal=True, status=400, query=QueryDict(urlsplit(target).query))

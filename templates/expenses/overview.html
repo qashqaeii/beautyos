@@ -1,28 +1,48 @@
 {% extends "layouts/app_shell.html" %}
-{% load humanize %}
-{% block page_title %}هزینه‌های سالن{% endblock %}
-{% block page_subtitle %}گزارش ماه جاری{% endblock %}
+{% load static format_tags l10n %}
+{% block title %}هزینه‌های سالن{% endblock %}
+{% block workspace_header %}{% endblock %}
+{% block shell_modifier %}management-suite expenses-shell{% endblock %}
+{% block page_styles_after_suite %}
+<link rel="stylesheet" href="{% static 'css/staff-viewport.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/expenses-workspace.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+{% endblock %}
 {% block content %}
-<div x-data="{expenseOpen: {{ expense_modal_open|yesno:'true,false' }}}" x-effect="document.documentElement.classList.toggle('app-modal-open', expenseOpen)" @keydown.escape.window="if (!window.__beautyosJalaliCalendarOpen) expenseOpen=false">
-<div class="grid gap-2.5 sm:grid-cols-3 sm:gap-3 mb-5">
-  {% include "partials/stat_card.html" with label="دریافتی ماه" value=revenue_total|fa_money suffix="تومان" icon="wallet" variant="primary" %}
-  {% include "partials/stat_card.html" with label="هزینه ماه" value=expense_total|fa_money suffix="تومان" icon="receipt" %}
-  {% include "partials/stat_card.html" with label="دریافتی منهای هزینه" value=operating_estimate|fa_money suffix="تومان" hint="جریان ثبت‌شده؛ نه سود خالص" icon="chart-no-axes-column-increasing" %}
+<div class="expenses-workspace" x-data="{expenseOpen: {{ expense_modal_open|yesno:'true,false' }}}" x-effect="document.documentElement.classList.toggle('app-modal-open', expenseOpen)" @keydown.escape.window="if (!window.__beautyosJalaliCalendarOpen) expenseOpen=false">
+<header class="expenses-hero">
+  <div class="expenses-hero__identity"><span class="expenses-hero__icon"><i data-lucide="coins" aria-hidden="true"></i></span><div><h1>هزینه‌های سالن</h1><p>ثبت و مدیریت هزینه‌های جاری سالن</p></div></div>
+  <div class="expenses-hero__art" aria-hidden="true"><i data-lucide="receipt-text"></i><i data-lucide="coins"></i><i data-lucide="calculator"></i></div>
+</header>
+{% if messages %}<div role="status">{% for message in messages %}<p class="inventory-page__flash text-sm">{{ message }}</p>{% endfor %}</div>{% endif %}
+<section class="expenses-kpis" aria-label="خلاصه مالی ماه انتخاب‌شده">
+  <article><span class="expenses-kpi-icon expenses-kpi-icon--green"><i data-lucide="wallet" aria-hidden="true"></i></span><div><p>دریافتی ماه</p><strong><bdi>{{ revenue_total|fa_money }}</bdi> <small>تومان</small></strong><small>{{ month_label|persian_digits }}</small></div></article>
+  <article><span class="expenses-kpi-icon"><i data-lucide="receipt" aria-hidden="true"></i></span><div><p>هزینه ماه</p><strong><bdi>{{ expense_total|fa_money }}</bdi> <small>تومان</small></strong><small>{{ month_label|persian_digits }}</small></div></article>
+  <article><span class="expenses-kpi-icon"><i data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i></span><div><p>دریافتی منهای هزینه</p><strong><bdi>{{ operating_estimate|fa_money }}</bdi> <small>تومان</small></strong><small>جریان ثبت‌شده؛ نه سود خالص</small></div></article>
+</section>
+<div class="expenses-toolbar suite-toolbar suite-filter-bar">
+  <form method="get" class="suite-filter-form staff-board-filters expenses-search" role="search">
+    <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
+    <div class="suite-search staff-board-search">
+      <input class="input-field" type="search" name="q" value="{{ q }}" placeholder="جست‌وجوی عنوان یا توضیحات هزینه..." aria-label="جست‌وجوی هزینه" autocomplete="off">
+      <button type="submit" class="staff-board-search__submit" aria-label="جست‌وجو" title="جست‌وجو"><i data-lucide="search" aria-hidden="true"></i></button>
+    </div>
+    {% if q %}<a class="suite-clear" href="?day={{ selected_day|date:'Y-m-d' }}">پاک کردن</a>{% endif %}
+  </form>
+  <div class="expenses-toolbar__actions">
+    <form method="get" class="expenses-date"><input type="hidden" name="q" value="{{ q }}">{% include "partials/jalali_day_field.html" with iso_day=selected_day|date:'Y-m-d' fallback_jalali=day_jalali %}</form>
+    <a href="{% url 'finance:recurring' %}" class="btn-secondary"><i data-lucide="repeat" aria-hidden="true"></i>هزینه‌های دوره‌ای</a>
+    <button type="button" @click="expenseOpen=true" class="btn-primary"><i data-lucide="plus" aria-hidden="true"></i>ثبت هزینه</button>
+  </div>
 </div>
-<div class="editorial-module-toolbar">
-  <p class="text-xs text-ink-muted">تعهد پورسانت جداگانه در بخش پورسانت محاسبه می‌شود.</p>
-  <a href="{% url 'finance:recurring' %}" class="btn-secondary">هزینه‌های دوره‌ای</a>
-  <button type="button" @click="expenseOpen=true" class="btn-primary text-sm"><i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i> ثبت هزینه</button>
-</div>
-{% if expenses %}
-<section class="editorial-section" aria-labelledby="expense-list-heading"><div class="editorial-section-head"><h2 id="expense-list-heading">هزینه‌های ثبت‌شده</h2></div><ul class="editorial-ledger">
+<section class="expenses-list" aria-labelledby="expense-list-heading">
+  <header><h2 id="expense-list-heading"><i data-lucide="list" aria-hidden="true"></i>هزینه‌های ثبت‌شده</h2><small>{{ expense_page.paginator.count|fa_num }} هزینه · ماه انتخاب‌شده</small></header>
+  <ul class="expenses-rows">
   {% for e in expenses %}
-  <li><span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="receipt"></i></span><div class="editorial-ledger-copy"><strong>{{ e.get_category_display }}</strong><small>{{ e.description|default:"بدون توضیح" }} · {{ e.expense_date|fa_jalali }}</small></div><span class="editorial-ledger-aside">{{ e.amount_toman|fa_money }} تومان</span></li>
-  {% endfor %}
-</ul></section>
-{% else %}
-{% include "partials/empty_state.html" with icon="receipt" title="هزینه‌ای ثبت نشده" cta_url="/expenses/new/" cta_label="ثبت هزینه" %}
-{% endif %}
+  <li><span class="expenses-row-icon"><i data-lucide="{% if e.category == 'rent' %}house{% elif e.category == 'marketing' %}megaphone{% elif e.category == 'supplies' or e.category == 'inventory_purchase' %}shopping-cart{% else %}receipt{% endif %}" aria-hidden="true"></i></span><div class="expenses-row-copy"><strong>{{ e.get_category_display }}</strong><small>{{ e.description|default:"بدون توضیح" }} · {{ e.expense_date|fa_jalali }}</small></div><span class="expenses-row-amount"><bdi>{{ e.amount_toman|fa_money }}</bdi> <small>تومان</small></span></li>
+  {% empty %}<li class="expenses-empty"><i data-lucide="receipt" aria-hidden="true"></i><strong>{% if q %}هزینه‌ای مطابق جستجو یافت نشد{% else %}هزینه‌ای ثبت نشده است{% endif %}</strong></li>{% endfor %}
+  </ul>
+  <footer><small>تعهد پورسانت جداگانه محاسبه می‌شود.</small><nav aria-label="صفحه‌بندی هزینه‌ها">{% if expense_page.has_previous %}<a class="btn-secondary" href="?day={{ selected_day|date:'Y-m-d' }}&amp;q={{ q|urlencode }}&amp;page={{ expense_page.previous_page_number|unlocalize }}">قبلی</a>{% endif %}<span>{{ expense_page.number|fa_num }} از {{ expense_page.paginator.num_pages|fa_num }}</span>{% if expense_page.has_next %}<a class="btn-secondary" href="?day={{ selected_day|date:'Y-m-d' }}&amp;q={{ q|urlencode }}&amp;page={{ expense_page.next_page_number|unlocalize }}">بعدی</a>{% endif %}</nav></footer>
+</section>
 {% include "expenses/partials/create_modal.html" %}
 </div>
 {% endblock %}
