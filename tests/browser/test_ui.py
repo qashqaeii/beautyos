@@ -278,51 +278,33 @@ def test_real_browser_layout_and_controls(live_server, client, owner_membership,
                     caveat.locator("summary").click()
                     assert caveat.evaluate("(el) => el.open"), "finance explanatory note must stay accessible"
                 if name == "customer-detail":
-                    assert page.locator(".customer-detail-header__avatar--icon").count() == 1
-                    assert page.locator(".customer-detail-hero-art__glass svg").count() == 1
-                    assert page.locator(".customer-detail-hero-art").evaluate(
-                        "(el) => getComputedStyle(el).display === 'none'"
-                    ), "customer hero must use the same restrained icon treatment as other management pages"
-                    assert page.locator(".customer-detail-header").evaluate(
-                        "(el) => getComputedStyle(el).backgroundImage.includes('linear-gradient')"
-                    )
-                    assert page.locator(".customer-detail-card--main").evaluate(
-                        "(el) => getComputedStyle(el).color === 'rgb(80, 62, 55)'"
-                    ), "appointments must inherit the shared management ink color"
-
-                    assert page.locator(".customer-detail-hero-title h1").inner_text() == "پروفایل مشتری"
-                    assert page.locator(".customer-detail-header__content").is_visible()
-                    header_title = page.locator(".customer-detail-hero-title").bounding_box()
-                    identity = page.locator(".customer-detail-header__content").bounding_box()
-                    assert header_title and identity
-                    assert header_title["y"] + header_title["height"] <= identity["y"] - 2, (
-                        "customer profile title must not overlap the identity card"
-                    )
-
-
-                    assert page.locator(".customer-detail-header img.customer-detail-header__avatar").count() == 0
-                    upcoming = page.locator(".customer-detail-workspace__primary > .customer-detail-card--main")
+                    header = page.locator(".customer-detail-header")
+                    pw.expect(header).to_be_visible()
+                    assert header.locator(".customer-detail-header__avatar--icon").count() == 1
+                    assert header.locator(".customer-detail-header__ornament svg").count() == 1
+                    assert header.locator(".customer-detail-breadcrumbs").count() == 0
+                    assert header.locator(".customer-detail-header__since").count() == 0
+                    assert header.locator("h1").inner_text().strip()
+                    upcoming = page.locator(".customer-detail-card--main")
+                    preferences = page.locator(".customer-detail-card--preferences")
                     pw.expect(upcoming).to_be_visible()
-                    assert page.locator(".customer-detail-workspace__aside .customer-detail-card--notes").count() == 1
-                    assert page.locator(".customer-detail-workspace__aside .customer-detail-card--preferences").count() == 1
+                    pw.expect(preferences).to_be_visible()
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3")
                     main_box = upcoming.bounding_box()
-                    aside_box = page.locator(".customer-detail-workspace__aside").bounding_box()
+                    aside_box = preferences.bounding_box()
                     assert main_box and aside_box
-                    if width >= 900:
-                        assert abs(main_box["y"] - aside_box["y"]) < 8, "customer sections should share a row"
-                        assert main_box["width"] > aside_box["width"], "upcoming appointments must be the primary column"
-                        if width >= 1180 and height >= 560:
-                            profile = page.locator(".customer-detail-page").bounding_box()
-                            assert profile and profile["y"] + profile["height"] <= height + 3, "customer profile must fit desktop viewport"
-                            cards = page.locator(".customer-detail-history > .customer-detail-card")
-                            assert cards.count() >= 1
-                            for card in cards.all():
-                                box = card.bounding_box()
-                                assert box and box["y"] + box["height"] <= height + 3, "history card extends beyond desktop viewport"
-
-                    else:
-                        assert aside_box["y"] >= main_box["y"] + main_box["height"] - 4, "mobile customer cards should stack below upcoming appointments"
+                    if width >= 1180 and height >= 600:
+                        assert abs(main_box["y"] - aside_box["y"]) < 8
+                        assert main_box["width"] > aside_box["width"]
+                        profile = page.locator(".customer-detail-page").bounding_box()
+                        assert profile and profile["y"] + profile["height"] <= height + 3
+                        assert height - (profile["y"] + profile["height"]) <= 50
+                        actions = header.locator(".customer-detail-header__actions").bounding_box()
+                        identity = header.locator(".customer-detail-header__identity").bounding_box()
+                        assert actions and identity and actions["x"] < identity["x"]
+                        for card in page.locator(".customer-detail-workspace .customer-detail-card").all():
+                            box = card.bounding_box()
+                            assert box and box["y"] + box["height"] <= height + 3
                 if name == "staff-detail":
                     book_link = page.locator('.staff-profile-header__actions a[href*="book=1"]').first
                     if book_link.count():

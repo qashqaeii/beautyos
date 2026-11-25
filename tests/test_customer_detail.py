@@ -163,7 +163,8 @@ def test_customer_detail_premium_profile_uses_real_customer_attributes(client, s
     assert 'customer-detail-workspace__aside' in body
     assert 'customer-detail-history' in body
 
-    assert 'customer-detail-breadcrumbs' in body
+    assert 'customer-detail-breadcrumbs' not in header
+    assert 'عضو سالن از' not in header
     assert "مشتری ویژه" in body
     assert "خدمات پرتکرار" in body
     assert "کراتین تخصصی" in body

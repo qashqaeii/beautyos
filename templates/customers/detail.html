@@ -37,12 +37,12 @@
 >
 
   <header class="customer-detail-header" aria-label="پروفایل مشتری">
-    <div class="customer-detail-header__ornament" aria-hidden="true"><i data-lucide="flower-2"></i></div>
+    <div class="customer-detail-header__ornament" aria-hidden="true"><svg viewBox="0 0 180 90" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="90" cy="45" rx="75" ry="34" stroke="currentColor" stroke-opacity=".22"/><ellipse cx="90" cy="45" rx="60" ry="42" transform="rotate(-18 90 45)" stroke="currentColor" stroke-opacity=".18"/><rect x="62" y="15" width="57" height="60" rx="13" fill="var(--cp-paper)" stroke="currentColor" stroke-opacity=".55"/><circle cx="90" cy="34" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M74 56c0-15 32-15 32 0M80 64h20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="120" cy="63" r="12" fill="var(--cp-tint)" stroke="currentColor"/><path d="m115 63 3 3 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 24v10m-5-5h10M137 16v8m-4-4h8" stroke="currentColor" stroke-linecap="round"/></svg></div>
     <div class="customer-detail-header__content">
       <div class="customer-detail-header__identity">
         <span class="customer-detail-header__avatar customer-detail-header__avatar--icon">{% if customer.avatar %}<img src="{{ customer.avatar.url }}" alt="">{% else %}<i data-lucide="user-round" aria-hidden="true"></i>{% endif %}</span>
         <div class="customer-detail-header__copy">
-          <nav class="customer-detail-breadcrumbs" aria-label="مسیر صفحه"><a href="{% url 'customers:list' %}">مشتریان</a><i data-lucide="chevron-left" aria-hidden="true"></i><span aria-current="page">پروفایل مشتری</span></nav>
+
           <div class="customer-detail-header__name-row">
             <h1 class="customer-detail-header__name">{{ customer.full_name }}</h1>
             {% if customer.is_vip or customer.status == 'vip' %}
@@ -50,7 +50,7 @@
             {% endif %}
           </div>
           <a class="customer-detail-header__phone" href="tel:{{ customer.phone }}" dir="ltr"><i data-lucide="phone" aria-hidden="true"></i><bdi>{{ customer.phone }}</bdi></a>
-          <p class="customer-detail-header__since">عضو سالن از {{ customer.created_at|fa_jalali }}</p>
+
         </div>
       </div>
       <div class="customer-detail-header__actions">
