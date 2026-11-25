@@ -83,6 +83,9 @@
   {% elif can_view_invoices %}
   <a class="reception-overview-actions__button" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورها</span></a>
   {% endif %}
+  {% if can_view_invoices %}
+  <a class="reception-overview-actions__history" href="{% url 'finance:invoices' %}">فاکتورهای صادرشده</a>
+  {% endif %}
 </nav>
 {% endif %}
 
@@ -162,7 +165,7 @@
     <div class="reception-flow__heading">
       <div>
         
-        <h2 id="reception-flow-title">نوبت‌های امروز سالن</h2>
+        <h2 id="reception-flow-title">جریان کار امروز سالن</h2>
         <p>تمام نوبت‌های روز انتخاب‌شده؛ از تأیید و پذیرش تا تکمیل خدمت و صندوق.</p>
       </div>
       <span class="reception-flow__total">{{ day_operations_summary.total|fa_num }} نوبت</span>
