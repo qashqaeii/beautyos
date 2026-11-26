@@ -17,10 +17,14 @@
 </a>
 {% endif %}
 {% if nav_specialists %}
+{% if active_membership.role == 'specialist' %}
+<a href="{% url 'dashboard:specialist_workspace' %}" class="nav-link {% if request.resolver_match.url_name == 'specialist_workspace' %}nav-link-active{% endif %}" title="میز کار من"><i data-lucide="user-round" class="beautyos-lucide beautyos-lucide--nav"></i><span class="nav-label">میز کار من</span></a>
+{% else %}
 <a href="{% url 'dashboard:specialists' %}" class="nav-link {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'specialists' %}nav-link-active{% endif %}" {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'specialists' %}aria-current="page"{% endif %} title="متخصص‌ها">
   <i data-lucide="sparkles" class="beautyos-lucide beautyos-lucide--nav"></i>
   <span class="nav-label">متخصص‌ها</span>
 </a>
+{% endif %}
 {% endif %}
 {% if nav_calendar %}
 <a href="{% url 'appointments:calendar' %}{% if active_membership.role == 'specialist' and active_membership.staff_profile %}?staff={{ active_membership.staff_profile.pk }}{% endif %}" class="nav-link {% if request.resolver_match.app_name == 'appointments' and request.resolver_match.url_name == 'calendar' %}nav-link-active{% endif %}" {% if request.resolver_match.app_name == 'appointments' and request.resolver_match.url_name == 'calendar' %}aria-current="page"{% endif %} title="تقویم">
