@@ -810,3 +810,74 @@ body.theme-app .luna-modal--expense .luna-service-field-card{min-width:0}
 body.theme-app .luna-modal--expense .luna-service-field-card > :is(div,input,select){min-width:0;max-width:100%}
 body.theme-app .luna-modal--expense .luna-service-field-card .field-label{white-space:normal}
 body.theme-app .luna-modal--expense .inventory-create-modal__foot .btn-primary{display:inline-flex;align-items:center;gap:6px}
+
+
+/* Modal polish / dedicated workspace dialogs: shared visual rhythm only.
+   Deliberately avoid changing open/close handlers, date widgets or form submission. */
+body.theme-app .luna-modal-root .luna-modal {
+  --bo-dialog-radius:16px;
+  font-variant-numeric:tabular-nums;
+}
+body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__head {
+  min-height:68px;
+  box-sizing:border-box;
+  gap:12px;
+  text-align:right;
+}
+body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__title {
+  font-size:17px;
+  line-height:1.5;
+  letter-spacing:0;
+}
+body.theme-app .luna-modal-root .luna-modal .luna-modal-subtitle {
+  font-size:12px;
+  line-height:1.65;
+}
+body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__close:focus-visible,
+body.theme-app .luna-modal-root .luna-modal :is(button,a,input,select,textarea):focus-visible {
+  outline:2px solid #9d726e;
+  outline-offset:2px;
+}
+body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__scroll {
+  overscroll-behavior-y:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#c6a59a transparent;
+}
+body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__foot {
+  box-sizing:border-box;
+  min-width:0;
+  gap:8px;
+  border-top:1px solid #eee1db;
+  background:#fffdfa;
+}
+body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__foot :is(button,a) {
+  min-height:40px;
+  border-radius:10px;
+  white-space:normal;
+}
+body.theme-app .luna-modal-root .luna-modal :is(input,select,textarea):disabled {
+  cursor:not-allowed;
+  opacity:.65;
+}
+@media(min-width:640px) {
+  body.theme-app .luna-modal-root .luna-modal {
+    border-radius:var(--bo-dialog-radius);
+  }
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__head {
+    min-height:62px;
+    padding:12px 14px;
+  }
+  body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__scroll {
+    padding:12px 14px;
+  }
+  body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__foot :is(button,a) {
+    min-height:44px;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  body.theme-app .luna-modal-root .luna-modal {
+    scroll-behavior:auto;
+  }
+}
