@@ -57,6 +57,15 @@ def desk(request):
         slot_staff_id=slot_staff_pk,
     )
     ctx.update(day_operations(salon=request.salon, queue=ctx["queue"]))
+    week_start = day - timedelta(days=(day.weekday() + 2) % 7)
+    ctx["reception_week_days"] = [
+        {
+            "iso": (week_start + timedelta(days=offset)).isoformat(),
+            "day": week_start + timedelta(days=offset),
+            "selected": week_start + timedelta(days=offset) == day,
+        }
+        for offset in range(7)
+    ]
     ctx.update(
         {
             "day_jalali": to_jalali(day),
