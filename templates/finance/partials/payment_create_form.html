@@ -18,17 +18,17 @@
 
   <div class="inventory-create-modal__scroll maison-scroll-themed">
     {% if payment_form.non_field_errors %}<div role="alert" class="finance-payment-form__error">{{ payment_form.non_field_errors }}</div>{% endif %}
-    <fieldset class="finance-payment-form__section" style="margin-bottom:10px">
+    <fieldset class="finance-payment-form__section finance-payment-form__section--kind">
       <legend class="field-label">نوع دریافت</legend>
       <div class="luna-service-paired-grid">
-        {% for choice in payment_form.payment_kind %}<label class="luna-service-field-card" style="flex-direction:row;align-items:center;gap:8px">{{ choice.tag }} {{ choice.choice_label }}</label>{% endfor %}
+        {% for choice in payment_form.payment_kind %}<label class="luna-service-field-card finance-payment-form__kind-option">{{ choice.tag }} {{ choice.choice_label }}</label>{% endfor %}
       </div>
       {% if payment_form.payment_kind.errors %}<div role="alert">{{ payment_form.payment_kind.errors }}</div>{% endif %}
     </fieldset>
-    <div class="luna-service-paired-grid">
+    <div class="luna-service-paired-grid finance-payment-form__fields">
       {% for field in payment_form.visible_fields %}
       {% if field.name == 'customer' or field.name == 'paid_amount_toman' or field.name == 'method' or field.name == 'notes' %}
-      <div class="luna-service-field-card">
+      <div class="luna-service-field-card{% if field.name == 'notes' %} finance-payment-form__field--notes{% endif %}">
         <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
         {{ field }}
         {% if field.errors %}<div role="alert" class="finance-payment-form__error">{{ field.errors }}</div>{% endif %}
