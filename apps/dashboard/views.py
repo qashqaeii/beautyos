@@ -185,6 +185,7 @@ def specialists(request):
 def specialist_workspace(request):
     """Private specialist workspace: never accept a staff id from the client."""
     from django.db.models import Sum
+    from apps.salons.permissions_policy import P_APPOINTMENT_CREATE, has_permission
     from apps.appointments.models import Appointment
     from apps.commissions.models import CommissionEntry
     from apps.dashboard.role_services import day_bounds
@@ -225,9 +226,27 @@ def specialist_workspace(request):
     )
     earned = int(amounts["earned"] or 0)
     settled = int(amounts["settled"] or 0)
-    finance_visible = True  # Own commission only; staff is derived from authenticated membership.
+    from datetime import timedelta
+    chart_buckets = []
+    cursor = month_start
+    while cursor <= month_end:
+        bucket_end = min(cursor + timedelta(days=6), month_end)
+        bucket_start_dt, _ = day_bounds(cursor)
+        _, bucket_end_dt = day_bounds(bucket_end)
+        chart_buckets.append({
+            "label": str(to_jalali(cursor)),
+            "count": month_appts.filter(start_at__gte=bucket_start_dt, start_at__lt=bucket_end_dt).count(),
+        })
+        cursor = bucket_end + timedelta(days=1)
+    max_count = max((item["count"] for item in chart_buckets), default=0)
+    for item in chart_buckets:
+        item["height_pct"] = round(item["count"] * 100 / max_count) if max_count else 0
+
+    finance_visible = True  # Only authenticated specialist's own entries are queried.
     return render(request, "dashboard/specialist_workspace.html", {
         "profile": profile,
+        "chart_buckets": chart_buckets,
+        "can_book_appointment": has_permission(membership, P_APPOINTMENT_CREATE),
         "today_jalali": to_jalali(today),
         "today_appointments": today_appts,
         "today_count": today_appts.count(),
