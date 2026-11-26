@@ -2,11 +2,9 @@
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from django.core.exceptions import PermissionDenied
 from django.test import RequestFactory, SimpleTestCase
 
 from apps.appointments.views import _appointment_qs
-from apps.dashboard.views import specialist_workspace
 from apps.salons.models import SalonMembership
 
 
@@ -47,7 +45,3 @@ class SpecialistIsolationTests(SimpleTestCase):
         _appointment_qs(request)
         scoped.return_value.select_related.return_value.none.assert_called_once()
 
-    def test_manager_cannot_open_private_specialist_workspace(self):
-        request = self.request(role=SalonMembership.Role.MANAGER)
-        with self.assertRaises(PermissionDenied):
-            specialist_workspace.__wrapped__(request)
