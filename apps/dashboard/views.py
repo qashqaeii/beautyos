@@ -146,6 +146,8 @@ def management(request):
 @salon_required
 def specialists(request):
     membership = request.membership
+    if membership and membership.role == SalonMembership.Role.SPECIALIST:
+        return redirect("dashboard:specialist_workspace")
     if not can_see_specialists(membership):
         raise PermissionDenied
 
