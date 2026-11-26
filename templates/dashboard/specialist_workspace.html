@@ -6,6 +6,12 @@
 {% block page_subtitle %}{{ profile.full_display_name }} · برنامه و عملکرد اختصاصی شما{% endblock %}
 {% block content %}
 <div class="space-y-5">
+  <div class="flex flex-wrap items-center gap-3">
+    {% if can_book_appointment %}
+    <a href="{% url 'appointments:create' %}?staff={{ profile.pk }}" class="btn-primary inline-flex items-center gap-2"><i data-lucide="plus" class="h-5 w-5" aria-hidden="true"></i>رزرو نوبت جدید</a>
+    {% endif %}
+    <a href="{% url 'appointments:calendar' %}?staff={{ profile.pk }}" class="inline-flex items-center gap-2 text-sm font-semibold text-ink"><i data-lucide="calendar-days" class="h-5 w-5" aria-hidden="true"></i>تقویم من</a>
+  </div>
   <section class="grid grid-cols-2 gap-3 lg:grid-cols-4">
     <div class="maison-panel"><i data-lucide="calendar-check" class="h-6 w-6" style="color:var(--color-primary)" aria-hidden="true"></i><p class="mt-2 text-xs text-ink-muted">نوبت‌های امروز</p><p class="mt-1 text-2xl font-bold tabular-nums">{{ today_count|persian_digits }}</p></div>
     <div class="maison-panel"><i data-lucide="calendar-clock" class="h-6 w-6" style="color:var(--color-primary)" aria-hidden="true"></i><p class="mt-2 text-xs text-ink-muted">نوبت‌های پیش رو</p><p class="mt-1 text-2xl font-bold tabular-nums">{{ upcoming_count|persian_digits }}</p></div>
@@ -33,6 +39,19 @@
       <div><p class="text-ink-muted">خدمات انجام‌شده</p><p class="mt-2 text-xl font-semibold">{{ month_completed|persian_digits }}</p></div>
       <div><p class="text-ink-muted">مشتریان رزروکننده</p><p class="mt-2 text-xl font-semibold">{{ month_customers|persian_digits }}</p></div>
     </div>
+  </section>
+  <section class="maison-panel">
+    <h2 class="mb-4 inline-flex items-center gap-2 font-semibold"><i data-lucide="chart-column" class="h-5 w-5" aria-hidden="true"></i>روند رزروهای ماه جاری</h2>
+    <div class="flex h-44 items-end gap-3 border-b pb-2" style="border-color:var(--color-divider)" role="img" aria-label="نمودار تعداد رزروهای هر هفته در ماه جاری">
+      {% for bucket in chart_buckets %}
+      <div class="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2">
+        <span class="text-xs font-semibold tabular-nums">{{ bucket.count|persian_digits }}</span>
+        <div class="w-full max-w-16 rounded-t-lg" style="height:{{ bucket.height_pct }}%;min-height:3px;background:var(--color-primary);opacity:.8"></div>
+        <span class="text-center text-xs text-ink-muted">هفته {{ forloop.counter|persian_digits }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="mt-3 text-xs text-ink-muted">تعداد نوبت‌های ثبت‌شده برای شما در هر بازه هفت‌روزه ماه جاری</p>
   </section>
   {% if finance_visible %}
   <section class="maison-panel">
