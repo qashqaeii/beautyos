@@ -225,7 +225,7 @@ def specialist_workspace(request):
     )
     earned = int(amounts["earned"] or 0)
     settled = int(amounts["settled"] or 0)
-    finance_visible = bool(getattr(request.salon.settings, "specialist_can_view_commission", False))
+    finance_visible = True  # Own commission only; staff is derived from authenticated membership.
     return render(request, "dashboard/specialist_workspace.html", {
         "profile": profile,
         "today_jalali": to_jalali(today),
