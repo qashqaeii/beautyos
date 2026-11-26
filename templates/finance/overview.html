@@ -9,8 +9,31 @@
 {% block page_subtitle %}{% endblock %}
 
 {% block content %}
+{% if tab == 'debts' %}<style>
+.luna-finance-shell .finance-page.finance-page--debts{display:flex;flex-direction:column;align-items:stretch;gap:9px;min-height:0;height:auto}
+.luna-finance-shell .finance-page--debts .finance-page__header--premium{box-sizing:border-box;min-height:88px;height:88px;padding:10px 16px;flex:none}
+.luna-finance-shell .finance-page--debts .finance-page__head-icon{background:none!important;border:0!important;box-shadow:none!important;width:auto!important}
+.luna-finance-shell .finance-page--debts .finance-phase2-tabs .finance-page__tab{min-height:36px}
+.debt-summary,.debt-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
+.debt-metric,.debt-panel{border:1px solid #e6d5cd;border-radius:13px;background:#fffaf7;min-width:0}
+.debt-metric{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;gap:8px;min-height:78px}
+.debt-metric--receivable{background:linear-gradient(110deg,#e7efe6,#fffaf7 85%);color:#41664b}
+.debt-metric--payable{background:linear-gradient(110deg,#efdcd4,#fffaf7 85%);color:#86574e}
+.debt-metric p,.debt-metric span{margin:0;font-size:12px}.debt-metric strong{display:block;font-size:23px;line-height:1.5}.debt-metric small{font-size:11px;font-weight:400}.debt-metric svg{width:27px;height:27px;flex:none}
+.debt-columns{align-items:start}.debt-panel{padding:12px;display:flex;flex-direction:column;gap:9px}
+.debt-panel-head,.debt-payables .finance-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0!important;flex-wrap:wrap}
+.debt-panel h2{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:700;margin:0}.debt-panel h2 svg{width:19px;height:19px;color:#9d726e}
+.debt-panel-head small,.debt-panel p{font-size:12px}.debt-payables .finance-section-head__cta{min-height:36px;padding:6px 12px}
+.debt-scroll{max-height:clamp(160px,calc(100dvh - 350px),480px);overflow:auto;scrollbar-width:thin;min-width:0}
+.debt-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:116px;padding:12px;text-align:center;color:#75635b;background:#f8f1ec;border-radius:9px}
+.debt-empty svg{width:27px;height:27px;color:#9d726e}.debt-empty strong{font-size:13px}.debt-empty p{margin:0;font-size:11px}
+.debt-receivable-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 3px;border-bottom:1px solid #eadbd4;font-size:13px}.debt-receivable-row small{display:block;font-size:11px;color:#75635b}.debt-receivable-row bdi{font-weight:650}
+.debt-panel .finance-debt-row{display:flex;flex-wrap:wrap;gap:8px;padding:9px 4px}.debt-panel .finance-debt-pay-form{display:flex;flex-wrap:wrap;gap:6px;width:100%;min-width:0}.debt-panel .finance-debt-pay-form__amount{flex:1;min-width:110px;width:auto}.debt-panel .finance-debt-form__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:950px){.debt-columns{grid-template-columns:1fr}.debt-scroll{max-height:none}}
+@media(max-width:520px){.debt-summary{grid-template-columns:1fr}.debt-panel .finance-debt-form__grid{grid-template-columns:1fr}}
+</style>{% endif %}
 <div
-  class="finance-page{% if tab == 'income' %} finance-page--dashboard{% elif tab == 'commissions' %} finance-page--commissions{% elif tab == 'cash' %} finance-page--cash{% elif tab == 'receipts' %} finance-page--receipts{% endif %}"
+  class="finance-page{% if tab == 'income' %} finance-page--dashboard{% elif tab == 'commissions' %} finance-page--commissions{% elif tab == 'cash' %} finance-page--cash{% elif tab == 'receipts' %} finance-page--receipts{% elif tab == 'debts' %} finance-page--debts{% endif %}"
   x-data="{
     expenseOpen: {{ expense_modal_open|default:False|yesno:'true,false' }},
     showDebtForm: {{ debt_form_open|default:False|yesno:'true,false' }},
@@ -196,16 +219,22 @@
   {% endif %}
 
   {% if tab == 'debts' %}
-    {% include "finance/partials/receivables.html" %}
-  <section class="finance-page__panel luna-finance-layout dashboard-enter" aria-label="بدهی‌های سالن">
-    <article class="finance-stat-card finance-stat-card--wide finance-stat-card--warning">
-      <span class="luna-finance-stat-icon" aria-hidden="true"><i data-lucide="receipt-text"></i></span>
-      <p class="finance-stat-card__label">مانده بدهی سالن</p>
-      <p class="finance-stat-card__value tabular-nums">{{ total_balance|fa_money }} <span class="finance-stat-card__unit">تومان</span></p>
-      <p class="finance-stat-card__hint">مانده تمام بدهی‌های باز سالن، مستقل از بازه زمانی</p>
-    </article>
+  <div class="debt-summary">
+    <article class="debt-metric debt-metric--receivable"><div><p>مطالبات مشتریان</p><strong><bdi>{{ dashboard.receivable_total|fa_money }}</bdi> <small>تومان</small></strong><span>{{ dashboard.receivable_count|fa_num }} نوبت دارای مانده</span></div><i data-lucide="arrow-down-left" aria-hidden="true"></i></article>
+    <article class="debt-metric debt-metric--payable"><div><p>مانده بدهی سالن</p><strong><bdi>{{ total_balance|fa_money }}</bdi> <small>تومان</small></strong><span>تمام بدهی‌های باز سالن</span></div><i data-lucide="arrow-up-right" aria-hidden="true"></i></article>
+  </div>
+  <div class="debt-columns">
+    <section class="debt-panel" aria-label="مطالبات مشتریان">
+      <header class="debt-panel-head"><h2><i data-lucide="hand-coins" aria-hidden="true"></i>مطالبات مشتریان</h2><small>{{ dashboard.receivable_count|fa_num }} نوبت</small></header>
+      <div class="debt-scroll" tabindex="0" aria-label="فهرست مطالبات">
+      {% for row in dashboard.receivables %}
+      <div class="debt-receivable-row"><div><a href="{% url 'customers:detail' row.appointment.customer_id %}">{{ row.appointment.customer.full_name }}</a><small>{{ row.appointment.service.name }}</small></div><bdi>{{ row.amount|fa_money }} تومان</bdi></div>
+      {% empty %}<div class="debt-empty"><i data-lucide="circle-check" aria-hidden="true"></i><strong>مطالبه بازی وجود ندارد</strong><p>مانده خدمات انجام‌شده اینجا نمایش داده می‌شود.</p></div>{% endfor %}
+      {% if dashboard.receivable_count > 30 %}<p class="fin-muted">۳۰ مورد قدیمی‌تر نمایش داده شده است؛ مجموع شامل همه موارد است.</p>{% endif %}
+      </div>
+    </section>
+    <section class="debt-panel debt-payables" aria-label="بدهی‌های سالن">
 
-    <div class="luna-finance-panel">
     <div class="finance-section-head">
       <div class="luna-finance-panel-title"><i data-lucide="list" aria-hidden="true"></i><div><h2 class="finance-section-head__title">بدهی‌های باز</h2><p>پیگیری مانده و سررسید بدهی‌ها</p></div></div>
       {% if can_manage_debt %}
@@ -247,6 +276,7 @@
     </div>
     {% endif %}
 
+    <div class="debt-scroll" tabindex="0" aria-label="فهرست بدهی‌ها">
     {% if open_debts %}
     <ul class="finance-debt-list">
       {% for debt in open_debts %}
@@ -274,10 +304,11 @@
       {% endfor %}
     </ul>
     {% else %}
-    <div class="luna-finance-empty"><span class="luna-finance-empty-icon" aria-hidden="true"><i data-lucide="receipt-text"></i></span><strong>بدهی بازی ثبت نشده است</strong><p>بدهی‌های فعال سالن در این بخش نمایش داده می‌شوند.</p></div>
+    <div class="debt-empty"><i data-lucide="receipt-text" aria-hidden="true"></i><strong>بدهی بازی ثبت نشده است</strong><p>بدهی‌های فعال سالن در این بخش نمایش داده می‌شوند.</p></div>
     {% endif %}
     </div>
   </section>
+  </div>
   {% endif %}
 
   {% if tab == 'commissions' %}
