@@ -56,8 +56,10 @@ def _appointment_qs(request):
     qs = Appointment.scoped(request.salon).select_related("customer", "staff", "service")
     if request.membership.role == SalonMembership.Role.SPECIALIST:
         profile = getattr(request.membership, "staff_profile", None)
-        if profile:
+        if profile and profile.salon_id == request.salon.pk and profile.is_active and not profile.is_deleted:
             qs = qs.filter(staff=profile)
+        else:
+            qs = qs.none()
     staff_id = request.GET.get("staff")
     status = request.GET.get("status")
     if staff_id:
@@ -272,6 +274,9 @@ def calendar_week(request):
     from apps.staff.models import StaffProfile
 
     staff_list = StaffProfile.scoped(request.salon).filter(is_active=True, is_deleted=False)
+    if request.membership.role == SalonMembership.Role.SPECIALIST:
+        profile = getattr(request.membership, 'staff_profile', None)
+        staff_list = staff_list.filter(pk=profile.pk) if profile and profile.salon_id == request.salon.pk else staff_list.none()
     today = timezone.localdate()
     hours = list(range(8, 22))
     return render(
