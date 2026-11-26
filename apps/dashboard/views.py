@@ -40,6 +40,8 @@ def home(request):
         return redirect("salons_onboarding:create")
 
     if not can_see_overview(membership):
+        if membership.role == SalonMembership.Role.SPECIALIST:
+            return redirect("dashboard:specialist_workspace")
         if can_see_calendar(membership):
             url = reverse("appointments:calendar")
             profile = getattr(membership, "staff_profile", None)
