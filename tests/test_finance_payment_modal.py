@@ -17,7 +17,8 @@ def test_finance_list_payment_query_opens_modal(client, owner_membership, salon)
     assert response.status_code == 200
     html = response.content.decode()
     assert "finance-payment-create-form" in html
-    assert "luna-modal--service" in html
+    assert "luna-modal--payment" in html
+    assert 'luna-modal--service' not in html.split('id="finance-payment-modal-title"')[0].split('class="inventory-create-modal inventory-create-modal--wide')[-1].split('role="dialog"')[0]
     assert 'aria-describedby="finance-payment-modal-title-description"' in html
     assert "ثبت پرداخت مشتری" in html
     assert "paymentOpen: true" in html
