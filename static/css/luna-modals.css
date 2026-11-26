@@ -881,3 +881,55 @@ body.theme-app .luna-modal-root .luna-modal :is(input,select,textarea):disabled 
     scroll-behavior:auto;
   }
 }
+
+
+/* Dedicated dialog interiors: consistent field rhythm without flattening their
+   different workflows (booking, customer, service, finance and inventory). */
+body.theme-app .luna-modal-root .luna-modal:is(
+  .appointment-booking-modal,.luna-modal--service,.luna-modal--expense,
+  .luna-modal--staff-invite,.luna-modal--inventory
+) :is(.customer-form-field,.service-form-field,.inventory-form-field,.finance-payment-form__field) {
+  min-width:0;
+  max-width:100%;
+}
+body.theme-app .luna-modal-root .luna-modal :is(
+  .customer-form-field,.service-form-field,.inventory-form-field,.finance-payment-form__field
+) > :is(label,.field-label) {
+  display:block;
+  margin-bottom:5px;
+  text-align:right;
+  line-height:1.6;
+}
+body.theme-app .luna-modal-root .luna-modal :is(
+  .customer-form-field,.service-form-field,.inventory-form-field,.finance-payment-form__field
+) :is(input,select,textarea) {
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+body.theme-app .luna-modal-root .luna-modal :is(
+  .luna-service-paired-grid,.luna-service-advanced-grid,
+  .customer-form__primary-grid,.luna-customer-edit-grid,
+  .appt-booking-advanced__pair
+) > * {
+  min-width:0;
+}
+body.theme-app .luna-modal-root .luna-modal :is(
+  .customer-form-field,.service-form-field,.inventory-form-field,.finance-payment-form__field
+) :is(.field-hint,.field-error,[role="alert"]) {
+  overflow-wrap:anywhere;
+  line-height:1.65;
+}
+body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__foot {
+  position:relative;
+  z-index:1;
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal-root .luna-modal :is(
+    .luna-service-paired-grid,.luna-service-advanced-grid,
+    .customer-form__primary-grid,.luna-customer-edit-grid,
+    .appt-booking-advanced__pair
+  ) {
+    min-width:0;
+  }
+}
