@@ -1388,3 +1388,71 @@ body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-for
   }
   body.theme-app .luna-modal-root .luna-modal--payment .inventory-create-modal__scroll {padding:12px 13px}
 }
+
+
+/* Expense dialog: match the shared service/payment modal visual system. */
+body.theme-app .luna-modal-root .luna-modal--expense {
+  --modal-max-width:600px;
+  width:min(600px,calc(100vw - 32px));
+  max-width:calc(100vw - 32px);
+}
+body.theme-app .luna-modal-root .luna-modal--expense .inventory-create-modal__scroll {
+  min-width:0;
+  padding:14px 16px;
+  overflow-x:hidden;
+}
+body.theme-app .luna-modal-root .luna-modal--expense #expense-create-form .expense-create-form__fields {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 12px;
+  align-items:start;
+}
+body.theme-app .luna-modal-root .luna-modal--expense #expense-create-form .expense-create-form__fields > .luna-service-field-card {
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:6px;
+  min-width:0;
+  margin:0;
+  padding:10px 11px;
+  border:1px solid var(--dialog-line,#e8ddd7);
+  border-radius:12px;
+  background:var(--dialog-surface,#fffdfa);
+}
+body.theme-app .luna-modal-root .luna-modal--expense #expense-create-form .expense-create-form__fields .field-label {
+  display:block;
+  position:static;
+  transform:none;
+  width:auto;
+  margin:0;
+  font-size:12px;
+  font-weight:650;
+  line-height:1.6;
+  text-align:right;
+}
+body.theme-app .luna-modal-root .luna-modal--expense #expense-create-form .expense-create-form__fields :is(input,select,textarea) {
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  height:40px;
+  min-height:40px;
+  padding:8px 11px;
+  margin:0;
+  border-radius:9px;
+  direction:rtl;
+  text-align:right;
+}
+body.theme-app .luna-modal-root .luna-modal--expense #expense-create-form .expense-create-form__field--description {
+  grid-column:1/-1;
+}
+body.theme-app .luna-modal-root .luna-modal--expense #expense-create-form :is(.service-form-field__error,[role="alert"]) {
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal-root .luna-modal--expense {width:calc(100vw - 20px);max-width:calc(100vw - 20px)}
+  body.theme-app .luna-modal-root .luna-modal--expense #expense-create-form .expense-create-form__fields {grid-template-columns:minmax(0,1fr)}
+  body.theme-app .luna-modal-root .luna-modal--expense .inventory-create-modal__scroll {padding:12px 13px}
+}
