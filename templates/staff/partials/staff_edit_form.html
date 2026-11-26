@@ -8,7 +8,17 @@
       {{ form.avatar }}{{ form.avatar.errors }}
       <div class="luna-form-grid">
         <div class="luna-field"><label for="{{ form.display_name.id_for_label }}">نام و نام خانوادگی</label>{{ form.display_name }}{{ form.display_name.errors }}</div>
-        <div class="luna-field"><label for="{{ form.title.id_for_label }}">تخصص</label>{{ form.title }}{{ form.title.errors }}</div>
+        <div class="luna-field" x-data="{ open: false, names: [] }" x-init="names = Array.from($el.querySelectorAll('input[name=services]:checked')).map(el => el.closest('label').textContent.trim())" @change="names = Array.from($el.querySelectorAll('input[name=services]:checked')).map(el => el.closest('label').textContent.trim()); $refs.specialtyTitle.value = names.join('، ').slice(0,80)">
+          <label for="staff-specialty-trigger">تخصص</label>
+          <input type="hidden" name="title" x-ref="specialtyTitle" value="{{ form.title.value|default_if_none:'' }}">
+          <button id="staff-specialty-trigger" type="button" class="input-field" style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:right;height:auto;min-height:38px" @click="open = !open" :aria-expanded="open.toString()" aria-controls="staff-specialty-options">
+            <span x-text="names.length ? names.join('، ') : 'انتخاب از خدمات سالن'">انتخاب از خدمات سالن</span><i data-lucide="chevron-down" aria-hidden="true"></i>
+          </button>
+          <div id="staff-specialty-options" x-show="open || {{ form.services.errors|yesno:'true,false' }}" x-cloak style="padding:10px;border:1px solid var(--color-line,#e5d8d2);border-radius:10px;margin-top:5px;max-height:180px;overflow:auto">
+            {% if form.services.field.queryset.exists %}{{ form.services }}{% else %}<p class="luna-section-hint">هنوز خدمت فعالی در سالن ثبت نشده است.</p>{% endif %}
+          </div>
+          {{ form.services.errors }}{{ form.title.errors }}
+        </div>
         <div class="luna-field luna-field--full"><label for="{{ form.bio.id_for_label }}">بیوگرافی <small>اختیاری</small></label>{{ form.bio }}{{ form.bio.errors }}</div>
       </div>
     </section>
@@ -20,11 +30,7 @@
       </div>
       <fieldset class="luna-color-field"><legend>رنگ تقویم</legend>{{ form.calendar_color }}{{ form.calendar_color.errors }}</fieldset>
     </section>
-    <details class="luna-form-section luna-service-section" {% if form.services.errors %}open{% endif %}>
-      <summary class="luna-section-title"><i data-lucide="scissors" aria-hidden="true"></i><h3>خدمات قابل ارائه</h3><i class="luna-section-chevron" data-lucide="chevron-down" aria-hidden="true"></i></summary>
-      <p class="luna-section-hint">خدمات مربوط به این متخصص را انتخاب کنید.</p>
-      {{ form.services }}{{ form.services.errors }}
-    </details>
+
   </div>
   <footer class="inventory-create-modal__foot">
     <button type="submit" class="btn-primary customer-form__submit-modal"><i data-lucide="check" aria-hidden="true"></i>ذخیره تغییرات</button>
