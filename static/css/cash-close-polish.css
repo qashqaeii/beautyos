@@ -70,3 +70,28 @@
 @media(max-width:900px){.cash-close-layout{grid-template-columns:minmax(0,1fr)}.cash-close-history{min-height:0}}
 @media(max-width:600px){.cash-close-datebar{justify-content:space-between}.cash-close-metrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.cash-close-metric{padding:9px 7px;min-height:78px}.cash-close-metric strong{font-size:13px}.cash-close-metric span{font-size:10px}.cash-close-metric small{font-size:9px}.cash-close-summary>.fin-muted{font-size:11px}}
 @media(max-width:380px){.cash-close-metrics{grid-template-columns:1fr}.cash-close-metric{min-height:0}}
+
+/* Shared header and viewport-conscious cash closing layout. */
+.maison-unified-header .cash-close-back{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:7px 12px;font-weight:650}
+.maison-unified-header .cash-close-back svg{width:16px;height:16px}
+.cash-close-page{max-width:none;gap:9px}
+.cash-close-datebar{min-height:36px}
+.cash-close-datebar :is(input,select){min-height:34px}
+.cash-close-summary{gap:0}
+.cash-close-metric{min-height:60px;padding:8px 12px;gap:2px}
+.cash-close-metric small{line-height:1.3}
+.cash-close-layout{gap:10px;grid-template-columns:minmax(0,1.65fr) minmax(255px,.9fr)}
+.cash-close-main,.cash-close-aside{gap:10px}
+.cash-close-page .fin-panel{padding:12px 14px}
+.cash-close-page .fin-panel-head{margin-bottom:8px}
+.cash-close-page .fin-line{padding:7px 0}
+.cash-close-fields{gap:8px 11px}
+.cash-close-field{gap:4px}
+.cash-close-field input{min-height:36px}
+.cash-close-field textarea{min-height:48px}
+.cash-close-page .cash-close-form .cash-close-actions{margin-top:10px}
+.cash-close-actions :is(button,a){min-height:36px}
+.cash-close-history{min-height:0}
+@media(min-width:1100px) and (min-height:700px){.cash-close-page{gap:8px}.cash-close-metric{min-height:56px}}
+@media(max-width:900px){.cash-close-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.cash-close-page .fin-panel{padding:12px}.cash-close-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.cash-close-metric{min-height:72px;padding:7px}}
