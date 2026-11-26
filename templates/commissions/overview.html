@@ -1,37 +1,34 @@
 {% extends "layouts/app_shell.html" %}
-{% load humanize %}
-{% block page_title %}پورسانت{% endblock %}
-{% block page_subtitle %}شناسایی و تسویه{% endblock %}
+{% load format_tags l10n %}
+{% block title %}پورسانت متخصصان{% endblock %}
+{% block workspace_header %}{% endblock %}
+{% block shell_modifier %}management-suite commission-shell{% endblock %}
 {% block content %}
-<div class="editorial-module-toolbar"><p>مدیریت سهم متخصصان و قوانین پرداخت</p><div class="editorial-module-actions">
-  <a href="{% url 'commissions:rules' %}" class="btn-secondary text-sm">قوانین</a>
-  <a href="{% url 'commissions:rule_create' %}" class="btn-primary text-sm">قانون جدید</a>
-</div></div>
-{% if by_staff %}
-<section class="editorial-section"><div class="editorial-section-head"><h2>مانده قابل تسویه</h2></div><div class="editorial-module-grid">
-  {% for row in by_staff %}
-  <article class="editorial-module-card"><div class="editorial-module-card__head"><span class="editorial-directory-icon" aria-hidden="true"><i data-lucide="wallet"></i></span>
-    <div>
-      <h3>{{ row.staff__display_name|default:"متخصص" }}</h3><p>مانده تسویه</p>
-      <p class="editorial-module-value">{{ row.total|fa_money }} <span class="text-base font-normal">تومان</span></p>
-    </div>
-    <a href="{% url 'commissions:settle' staff_id=row.staff_id %}" class="btn-secondary text-xs">تسویه</a>
-  </div></article>
-  {% endfor %}
-</div></section>
-{% endif %}
-{% if entries %}
-<div class="editorial-section-head"><h2>سوابق پورسانت</h2></div><div class="premium-card overflow-x-auto p-0">
-  <table class="w-full text-sm">
-    <thead class="border-b border-line bg-surface-muted text-ink-secondary"><tr><th class="p-3 text-right">متخصص</th><th class="p-3 text-right">مبلغ</th><th class="p-3 text-right">وضعیت</th></tr></thead>
-    <tbody>
-      {% for e in entries %}
-      <tr class="border-b border-line/80"><td class="p-3">{{ e.staff.display_name }}</td><td class="p-3">{{ e.commission_amount_toman|fa_money }}</td><td class="p-3">{{ e.get_status_display }}</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% else %}
-{% include "partials/empty_state.html" with icon="percent" title="هنوز پورسانتی شناسایی نشده" description="با تکمیل نوبت‌ها، پورسانت به‌صورت خودکار محاسبه می‌شود." %}
-{% endif %}
+<style>
+.cm-board{display:flex;flex-direction:column;gap:9px;color:var(--color-ink,#503e37);min-width:0}
+.cm-hero,.cm-panel,.cm-kpi,.cm-filter{border:1px solid #e8d8d0;border-radius:13px;background:#fffaf7;box-sizing:border-box}
+.cm-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;min-height:var(--bo-page-header-height,88px);background:linear-gradient(105deg,#ead4ca,#fff7f3 70%)}
+.cm-identity,.cm-actions,.cm-filter,.cm-panel-head,.cm-footer{display:flex;align-items:center;gap:9px}
+.cm-identity h1{font-size:20px;margin:0}.cm-identity p{font-size:11px;margin:4px 0 0;color:#806961}
+.cm-art{display:flex;align-items:center;gap:8px;color:#a67a70}.cm-art svg{width:34px;height:34px;stroke-width:1.3}.cm-art svg:nth-child(2){width:48px;height:48px}
+.cm-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.cm-kpi{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 13px;min-height:72px}.cm-kpi:first-child{background:linear-gradient(110deg,#ead4ca,#fffaf7)}.cm-kpi:nth-child(2){background:#edf2e9}
+.cm-kpi p{margin:0;font-size:11px;color:#806961}.cm-kpi strong{display:block;font-size:19px;line-height:1.5}.cm-kpi small{font-size:10px;font-weight:400}.cm-kpi svg{width:24px;height:24px;color:#986c65}.cm-kpi:nth-child(2) svg{color:#52785a}
+.cm-filter{padding:7px 10px;flex-wrap:wrap}.cm-filter label{display:flex;align-items:center;gap:5px;font-size:11px}.cm-filter select,.cm-filter input{height:35px;min-height:35px;font-size:12px;max-width:160px}.cm-filter .btn-primary,.cm-filter .btn-secondary,.cm-actions a{min-height:34px;padding:6px 10px;font-size:11px}
+.cm-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:9px;min-height:0;flex:1}
+.cm-panel{display:flex;flex-direction:column;min-width:0;min-height:0;padding:10px;gap:8px}.cm-panel-head,.cm-footer{justify-content:space-between;flex-wrap:wrap}.cm-panel h2{font-size:14px;margin:0}.cm-panel small{font-size:11px;color:#806961}.cm-scroll{overflow:auto;min-height:0;scrollbar-width:thin;flex:1}
+.cm-table{width:100%;border-collapse:collapse;font-size:12px;text-align:right;white-space:nowrap}.cm-table th,.cm-table td{padding:9px 8px;border-bottom:1px solid #eee1db;text-align:right}.cm-table th{background:#f4eae4;color:#806961;font-size:11px;position:sticky;top:0}.cm-table tr:hover td{background:#f9f1ec}
+.cm-status{display:inline-flex;align-items:center;gap:5px;font-size:11px}.cm-status:before{content:"";width:6px;height:6px;border-radius:50%;background:#b78b61}.cm-status--settled:before{background:#52785a}.cm-status--void:before{background:#a75e58}
+.cm-balance{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #eee1db;font-size:12px}.cm-balance strong{display:block;margin-top:4px}.cm-balance a,.cm-footer a{font-size:11px;padding:5px 8px;min-height:28px}.cm-empty{padding:24px 8px;text-align:center;color:#806961;font-size:12px}
+@media(min-width:1100px) and (min-height:580px){.commission-shell #workspace-content{padding:12px 15px 16px;box-sizing:border-box}.cm-board{height:calc(100dvh - 30px)}}
+@media(max-width:950px){.cm-grid{grid-template-columns:1fr}.cm-hero{flex-wrap:wrap}.cm-scroll{overflow-x:auto}.cm-art{display:none}}
+@media(max-width:600px){.cm-kpis{grid-template-columns:1fr}.cm-filter label{flex:1 1 100%}.cm-filter select,.cm-filter input{max-width:none;flex:1}.cm-hero{padding:10px}.cm-actions{flex-wrap:wrap}}
+@media(prefers-reduced-motion:no-preference){.cm-kpi,.cm-panel{animation:cm-in .3s ease-out}@keyframes cm-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}}
+</style>
+<div class="cm-board">
+<header class="cm-hero"><div class="cm-identity"><i data-lucide="hand-coins" aria-hidden="true"></i><div><h1>پورسانت متخصصان</h1><p>مدیریت سهم متخصصان و تسویه حساب</p></div></div><div class="cm-art" aria-hidden="true"><i data-lucide="receipt-text"></i><i data-lucide="hand-coins"></i><i data-lucide="wallet"></i></div><div class="cm-actions"><a href="{% url 'commissions:rules' %}" class="btn-secondary">قوانین پورسانت</a><a href="{% url 'commissions:rule_create' %}" class="btn-primary">قانون جدید</a></div></header>
+<section class="cm-kpis" aria-label="خلاصه تسویه کل دوره"><article class="cm-kpi"><div><p>مجموع پرداخت و مانده</p><strong>{{ total|fa_money }} <small>تومان</small></strong></div><i data-lucide="coins"></i></article><article class="cm-kpi"><div><p>تسویه نقدی ثبت‌شده</p><strong>{{ paid|fa_money }} <small>تومان</small></strong></div><i data-lucide="check-circle"></i></article><article class="cm-kpi"><div><p>مانده قابل تسویه</p><strong>{{ outstanding|fa_money }} <small>تومان</small></strong></div><i data-lucide="wallet"></i></article></section>
+<form class="cm-filter" method="get"><label>متخصص<select name="staff" class="input-field"><option value="">همه متخصصان</option>{% for person in staff_list %}<option value="{{ person.pk|unlocalize }}" {% if person.pk == selected_staff.pk %}selected{% endif %}>{{ person.display_name }}</option>{% endfor %}</select></label><label>وضعیت<select name="status" class="input-field"><option value="">همه وضعیت‌ها</option>{% for key,label in statuses %}<option value="{{ key }}" {% if key == selected_status %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><label>ماه سوابق<input type="date" name="day" class="input-field" value="{{ selected_day|date:'Y-m-d' }}" aria-label="انتخاب تاریخ برای فیلتر ماه"></label><button class="btn-primary" type="submit">اعمال فیلتر</button><a class="btn-secondary" href="{% url 'commissions:overview' %}">پاک کردن</a><small>خلاصه مالی: کل دوره</small></form>
+<div class="cm-grid"><section class="cm-panel"><header class="cm-panel-head"><h2>سوابق پورسانت</h2><small>{{ entries.paginator.count|fa_num }} رکورد</small></header><div class="cm-scroll"><table class="cm-table"><thead><tr><th>متخصص / خدمت</th><th>تاریخ</th><th>پورسانت (تومان)</th><th>وضعیت</th></tr></thead><tbody>{% for e in entries %}<tr><td><strong>{{ e.staff.display_name }}</strong><br><small>{{ e.appointment.service.name|default:"—" }}</small></td><td>{{ e.created_at|fa_jalali }}</td><td>{{ e.commission_amount_toman|fa_money }}</td><td><span class="cm-status cm-status--{{ e.status }}">{{ e.get_status_display }}</span></td></tr>{% empty %}<tr><td colspan="4" class="cm-empty">سابقه‌ای برای نمایش وجود ندارد.</td></tr>{% endfor %}</tbody></table></div><footer class="cm-footer"><small>صفحه {{ entries.number|fa_num }} از {{ entries.paginator.num_pages|fa_num }}</small><nav>{% if entries.has_previous %}<a class="btn-secondary" href="?staff={{ selected_staff.pk|unlocalize }}&amp;status={{ selected_status }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;page={{ entries.previous_page_number|unlocalize }}">قبلی</a>{% endif %} {% if entries.has_next %}<a class="btn-secondary" href="?staff={{ selected_staff.pk|unlocalize }}&amp;status={{ selected_status }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;page={{ entries.next_page_number|unlocalize }}">بعدی</a>{% endif %}</nav></footer></section>
+<section class="cm-panel"><header class="cm-panel-head"><h2>مانده متخصصان</h2><small>کل دوره</small></header><div class="cm-scroll">{% for row in by_staff %}<div class="cm-balance"><div>{{ row.staff__display_name }}<strong>{{ row.total|fa_money }} <small>تومان</small></strong></div><a class="btn-secondary" href="{% url 'commissions:settle' staff_id=row.staff_id %}">تسویه</a></div>{% empty %}<p class="cm-empty">مانده قابل تسویه وجود ندارد.</p>{% endfor %}</div></section></div></div>
 {% endblock %}
