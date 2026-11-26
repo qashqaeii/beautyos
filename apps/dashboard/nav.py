@@ -55,7 +55,7 @@ def can_see_reception(membership: SalonMembership | None) -> bool:
 
 
 def can_see_specialists(membership: SalonMembership | None) -> bool:
-    return can_see_reception(membership)
+    return bool(membership and membership.is_active and (can_see_reception(membership) or membership.role == SalonMembership.Role.SPECIALIST))
 
 
 def can_see_calendar(membership: SalonMembership | None) -> bool:
