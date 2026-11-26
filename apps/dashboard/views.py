@@ -167,6 +167,9 @@ def specialists(request):
         .order_by("display_name")
     )
     staff_rows = build_specialist_rows(profiles, week_start=week_start)
+    if role_at_least(membership, SalonMembership.Role.MANAGER) and request.GET.get("book") != "1" and profiles:
+        selected = next((p for p in profiles if str(p.pk) == request.GET.get("staff")), profiles[0])
+        return _render_specialist_workspace(request, selected, team_profiles=profiles)
     can_book_appointment = has_permission(membership, P_APPOINTMENT_CREATE)
 
     ctx = {
@@ -201,6 +204,15 @@ def specialist_workspace(request):
     if profile is None:
         raise PermissionDenied
 
+    return _render_specialist_workspace(request, profile)
+
+
+def _render_specialist_workspace(request, profile, *, team_profiles=None):
+    from django.db.models import Sum
+    from apps.appointments.models import Appointment
+    from apps.commissions.models import CommissionEntry
+    from apps.salons.permissions_policy import P_APPOINTMENT_CREATE, P_FINANCE_REPORTS
+    membership = request.membership
     today = timezone.localdate()
     start, end = day_bounds(today)
     now = timezone.now()
@@ -242,9 +254,10 @@ def specialist_workspace(request):
     for item in chart_buckets:
         item["height_pct"] = round(item["count"] * 100 / max_count) if max_count else 0
 
-    finance_visible = True  # Only authenticated specialist's own entries are queried.
+    finance_visible = team_profiles is None or has_permission(membership, P_FINANCE_REPORTS)
     return render(request, "dashboard/specialist_workspace.html", {
         "profile": profile,
+        "team_profiles": team_profiles,
         "chart_buckets": chart_buckets,
         "can_book_appointment": has_permission(membership, P_APPOINTMENT_CREATE),
         "today_jalali": to_jalali(today),
