@@ -17,3 +17,7 @@
 .reception-flow__button{white-space:nowrap}
 @media(max-width:680px){.reception-week{padding:10px}.reception-week__heading{align-items:flex-start;flex-direction:column;gap:3px}.reception-week__days{gap:3px}.reception-week__day{min-height:57px;padding:6px 1px}.reception-week__day span{font-size:9px}.reception-week__day strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.reception-week__day,.reception-flow__item{transition:none}}
+
+.reception-desk-header__art{width:112px;height:76px;object-fit:contain;flex:none;filter:drop-shadow(0 7px 12px rgba(125,95,164,.12))}
+.reception-desk-header__brand{display:flex;align-items:center;gap:14px;min-width:0}
+@media(max-width:680px){.reception-desk-header__art{width:70px;height:55px}.reception-desk-header__brand{gap:8px}}
