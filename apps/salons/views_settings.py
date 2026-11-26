@@ -19,6 +19,9 @@ def salon_settings(request):
     retention_form = SalonRetentionSettingsForm(instance=settings_obj)
     hours_rows = ow.salon_hours_grid(salon)
     hours_errors = []
+    active_tab = request.GET.get("tab", "profile")
+    if active_tab not in {"profile", "hours", "rules"}:
+        active_tab = "profile"
 
     if request.method == "POST":
         form_kind = request.POST.get("form_kind", "profile")
@@ -32,20 +35,22 @@ def salon_settings(request):
             return redirect("salons_settings:home")
 
         if form_kind == "hours":
+            active_tab = "hours"
             rows, hours_errors = ow.parse_work_hours_post(request.POST)
             if hours_errors:
                 messages.error(request, "لطفاً ساعات کاری را اصلاح کنید.")
             else:
                 ow.save_salon_work_hours(salon, rows)
                 messages.success(request, "ساعات فعالیت ذخیره شد.")
-                return redirect("salons_settings:home")
+                return redirect(reverse("salons_settings:home") + "?tab=hours")
 
         if form_kind == "retention":
+            active_tab = "rules"
             retention_form = SalonRetentionSettingsForm(request.POST, instance=settings_obj)
             if retention_form.is_valid():
                 retention_form.save()
                 messages.success(request, "قوانین رزرو و پیگیری ذخیره شد.")
-                return redirect("salons_settings:home")
+                return redirect(reverse("salons_settings:home") + "?tab=rules")
 
         if form_kind == "profile":
             profile_form = SalonProfileForm(request.POST, request.FILES, instance=salon)
@@ -61,6 +66,7 @@ def salon_settings(request):
         "settings/salon.html",
         {
             "salon": salon,
+            "active_tab": active_tab,
             "profile_form": profile_form,
             "retention_form": retention_form,
             "hours_rows": hours_rows,
