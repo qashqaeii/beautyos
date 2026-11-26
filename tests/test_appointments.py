@@ -37,3 +37,33 @@ def test_appointment_conflict(salon, owner_membership):
     create_appointment(salon=salon, customer=customer, staff=staff, service=service, start=start, actor=user)
     with pytest.raises(SchedulingError):
         create_appointment(salon=salon, customer=customer, staff=staff, service=service, start=start, actor=user)
+
+
+@pytest.mark.django_db
+def test_booking_rejects_unassigned_service(salon, owner_membership):
+    """Server-side enforcement must not rely on the specialist dropdown filter."""
+    user = owner_membership.user
+    category = ServiceCategory.objects.create(salon=salon, name="Other category")
+    service = Service.objects.create(
+        salon=salon, category=category, name="Unassigned service",
+        duration_minutes=45, price_toman=200,
+    )
+    staff, _ = StaffProfile.objects.get_or_create(
+        salon=salon, membership=owner_membership,
+        defaults={"display_name": "Specialist", "is_bookable": True},
+    )
+    staff.services.remove(service)
+    customer = Customer.objects.create(
+        salon=salon, full_name="Customer", phone="+989121234569",
+    )
+    start = timezone.localtime(timezone.now() + timedelta(days=2)).replace(
+        hour=10, minute=0, second=0, microsecond=0,
+    )
+    with pytest.raises(SchedulingError):
+        create_appointment(
+            salon=salon, customer=customer, staff=staff,
+            service=service, start=start, actor=user,
+        )
+    assert not Appointment.objects.filter(
+        salon=salon, customer=customer, service=service,
+    ).exists()
