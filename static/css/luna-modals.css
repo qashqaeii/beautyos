@@ -1208,3 +1208,44 @@ body.theme-app :is(.luna-modal--expense #expense-create-form,.luna-modal--paymen
     grid-template-columns:minmax(0,1fr);
   }
 }
+
+
+/* Reception booking: labels stay above their controls; RTL select text never
+   collides with the native dropdown indicator or neighboring fields. */
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-fields > .customer-form-field,
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-datetime > .customer-form-field {
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:6px;
+  min-width:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-fields .field-label,
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-datetime .field-label {
+  display:block;
+  position:static;
+  transform:none;
+  width:auto;
+  margin:0;
+  line-height:1.65;
+  text-align:right;
+  white-space:normal;
+  pointer-events:auto;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-fields select,
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-datetime :is(input,select) {
+  box-sizing:border-box;
+  display:block;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  min-height:42px;
+  text-align:right;
+  direction:rtl;
+  padding-inline:14px 34px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-fields select {
+  white-space:nowrap;
+}
