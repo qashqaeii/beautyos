@@ -38,6 +38,16 @@ python manage.py ensure_superuser --phone 09357930033 --name qashqaeii
 
 ثبت‌نام در `/auth/register/` — کد OTP در **کنسول سرور** چاپ می‌شود (DevSMSProvider).
 
+## همگام‌سازی با GitHub (Windows)
+
+اگر `git pull` خطای «would be overwritten by merge» برای فایل محلی untracked داد (مثلاً `luna-salon-hero.webp`):
+
+```powershell
+.\scripts\sync-from-github.ps1
+```
+
+در PowerShell ممکن است پیام‌های `git pull` با رنگ قرمز دیده شوند؛ اگر در پایان `Already up to date` یا fast-forward موفق بود، خطای واقعی نیست.
+
 ## Docker (PostgreSQL + Redis)
 
 ```bash
