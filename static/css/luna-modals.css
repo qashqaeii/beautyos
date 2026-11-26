@@ -1051,3 +1051,62 @@ body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-
     grid-template-columns:minmax(0,1fr);
   }
 }
+
+
+/* Service create/edit: keep essential pricing fields compact while allowing
+   category creation, description and advanced settings their own space. */
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) {
+  min-width:0;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form__fields {
+  min-width:0;
+  align-items:start;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form-field__error {
+  margin:2px 0 0;
+  line-height:1.65;
+  overflow-wrap:anywhere;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form-advanced__toggle {
+  width:100%;
+  min-height:42px;
+  text-align:right;
+  border-radius:10px;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form-advanced__toggle:focus-visible {
+  outline:2px solid #9d726e;
+  outline-offset:2px;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form-category-panel {
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form-category-panel__actions {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form-file {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  min-width:0;
+  gap:8px;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form-file__name {
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form-checkbox {
+  min-width:0;
+  align-items:center;
+  gap:8px;
+  line-height:1.6;
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form) .service-form__fields {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
