@@ -66,7 +66,7 @@
   <div class="reception-week__days">
     {% for d in reception_week_days %}
     <a class="reception-week__day{% if d.selected %} is-selected{% endif %}" href="{% url 'reception:desk' %}?day={{ d.iso }}{% if selected_service %}&amp;service={{ selected_service.pk }}{% endif %}{% if selected_slot_staff_id %}&amp;staff={{ selected_slot_staff_id }}{% endif %}" {% if d.selected %}aria-current="date"{% endif %}>
-      <span>{{ d.day|date:"l" }}</span><strong>{{ d.day|date:"j"|fa_num }}</strong>
+      <span>{{ d.day|fa_weekday }}</span><strong>{{ d.jalali_day|fa_num }}</strong>
     </a>
     {% endfor %}
   </div>
