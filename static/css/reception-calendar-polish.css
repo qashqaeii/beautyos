@@ -1,0 +1,19 @@
+/* Reception calendar polish — inherits BeautyOS theme tokens. */
+.reception-desk-page{--reception-accent:var(--color-primary,#9275b6)}
+.reception-week{margin:14px 0 16px;padding:14px 16px;border:1px solid rgba(143,119,177,.16);border-radius:20px;background:var(--surface,#fff);box-shadow:0 8px 28px rgba(49,33,75,.035)}
+.reception-week__heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;font-weight:750;color:var(--text-primary,#332d40)}
+.reception-week__heading small{font-size:12px;font-weight:400;color:var(--text-muted,#8b8593)}
+.reception-week__days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.reception-week__day{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:67px;padding:9px 4px;border-radius:14px;background:rgba(139,116,173,.045);border:1px solid transparent;text-decoration:none;color:inherit;transition:background .18s,border-color .18s,transform .18s}
+.reception-week__day span{font-size:11px;color:var(--text-muted,#77717e);white-space:nowrap}
+.reception-week__day strong{font-size:18px;font-variant-numeric:tabular-nums}
+.reception-week__day:hover{background:rgba(139,116,173,.1);transform:translateY(-1px)}
+.reception-week__day.is-selected{background:rgba(139,116,173,.15);border-color:rgba(139,116,173,.4);color:var(--reception-accent)}
+.reception-operations-disclosure[open]>summary{margin-bottom:10px}
+.reception-flow__list{display:flex;flex-direction:column;gap:8px}
+.reception-flow__item{transition:box-shadow .18s,border-color .18s;min-width:0}
+.reception-flow__item:hover{box-shadow:0 7px 22px rgba(51,39,72,.06)}
+.reception-flow__actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.reception-flow__button{white-space:nowrap}
+@media(max-width:680px){.reception-week{padding:10px}.reception-week__heading{align-items:flex-start;flex-direction:column;gap:3px}.reception-week__days{gap:3px}.reception-week__day{min-height:57px;padding:6px 1px}.reception-week__day span{font-size:9px}.reception-week__day strong{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.reception-week__day,.reception-flow__item{transition:none}}
