@@ -2,9 +2,9 @@
 {% load static format_tags l10n %}
 {% block page_title %}بستن صندوق روزانه{% endblock %}
 {% block page_subtitle %}کنترل وجه نقد پایان روز و ثبت مغایرت{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}"><link rel="stylesheet" href="{% static 'css/cash-close-polish.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
 {% block content %}
-<div class="space-y-3 max-w-3xl mx-auto">
+<div class="cash-close-page" dir="rtl"><header class="cash-close-hero"><div class="cash-close-hero__icon"><i data-lucide="wallet-cards" aria-hidden="true"></i></div><div><h1>بستن صندوق روزانه</h1><p>کنترل دریافت‌ها و ثبت وضعیت پایان روز</p></div><a href="{% url 'finance:overview' %}?tab=cash" class="cash-close-back">بازگشت به صندوق</a></header><div class="cash-close-layout"><main class="cash-close-main">
   <section class="fin-panel">
     <header class="fin-panel-head"><h2><i data-lucide="calendar-days" aria-hidden="true"></i>دریافتی‌های روز</h2><form method="get">{% include "partials/jalali_day_field.html" with iso_day=day|date:'Y-m-d' fallback_jalali=day_jalali %}</form></header>
     <div class="fin-line"><span>دریافتی نقدی مشتری</span><bdi>{{ totals.cash|fa_money }} تومان</bdi></div>
@@ -27,14 +27,13 @@
     {% if late_cash_delta or late_card_delta or late_transfer_delta %}<p role="status" class="luna-modal-errors">بعد از بستن صندوق، گردش ثبت‌شده تغییر کرده است: نقد {{ late_cash_delta|fa_money }}، کارت {{ late_card_delta|fa_money }}، انتقال {{ late_transfer_delta|fa_money }} تومان. صورت‌وضعیت بسته‌شده تغییر نکرده است.</p>{% endif %}
   </section>
   {% else %}
-  <form method="post" class="fin-panel">{% csrf_token %}<input type="hidden" name="day" value="{{ day|date:'Y-m-d' }}">
+  <form method="post" class="fin-panel cash-close-form">{% csrf_token %}<input type="hidden" name="day" value="{{ day|date:'Y-m-d' }}">
     <header class="fin-panel-head"><h2><i data-lucide="calculator" aria-hidden="true"></i>ثبت وضعیت پایان روز</h2></header>
     <p class="fin-muted">ورود و خروج نقدی خارج از پرداخت‌های مشتری را دستی وارد کنید؛ هزینه یا تسویه‌ای را که نقدی نبوده وارد نکنید. این صورت‌وضعیت باعث ثبت دوباره درآمد یا هزینه نمی‌شود.</p>
-    {% for field in form %}<label class="finance-checkout-field" for="{{ field.id_for_label }}"><span>{{ field.label }}{% if field.name != 'note' %} (تومان){% endif %}</span>{{ field }}</label>{% endfor %}
-    <button type="submit" class="btn-primary">ثبت و بستن صندوق</button>
+    <div class="cash-close-fields">{% for field in form %}<div class="cash-close-field{% if field.name == 'note' %} cash-close-field--wide{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}{% if field.name != 'note' %} (تومان){% endif %}</label>{{ field }}{% if field.errors %}<div role="alert">{{ field.errors }}</div>{% endif %}</div>{% endfor %}</div>
+    <div class="cash-close-actions"><button type="submit" class="btn-primary">ثبت و بستن صندوق</button><a class="btn-secondary" href="{% url 'finance:overview' %}?tab=cash">انصراف</a></div>
     <p class="fin-muted">بعد از ثبت، صورت‌وضعیت ثابت است. تغییر دریافتی‌های بعدی جداگانه نشان داده می‌شود.</p>
   </form>
   {% endif %}
-  <section class="fin-panel"><header class="fin-panel-head"><h2>صندوق‌های بسته‌شده اخیر</h2></header>{% for record in history %}<div class="fin-line"><a href="?day={{ record.day|date:'Y-m-d' }}">{{ record.day|fa_jalali }}</a><bdi>{{ record.counted_toman|fa_money }} تومان</bdi></div>{% empty %}<p class="fin-muted">هنوز صندوقی بسته نشده است.</p>{% endfor %}</section>
-</div>
+  </main><aside class="cash-close-aside"><section class="fin-panel cash-close-history"><header class="fin-panel-head"><h2><i data-lucide="history" aria-hidden="true"></i>صندوق‌های بسته‌شده اخیر</h2></header>{% for record in history %}<div class="fin-line"><a href="?day={{ record.day|date:'Y-m-d' }}">{{ record.day|fa_jalali }}</a><bdi>{{ record.counted_toman|fa_money }} تومان</bdi></div>{% empty %}<p class="fin-muted">هنوز صندوقی بسته نشده است.</p>{% endfor %}</section></aside></div></div>
 {% endblock %}
