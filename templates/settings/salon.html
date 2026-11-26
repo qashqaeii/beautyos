@@ -3,8 +3,36 @@
 {% block page_title %}اطلاعات سالن{% endblock %}
 {% block page_subtitle %}مدیریت هویت، تماس، صفحه عمومی و ساعات فعالیت سالن شما{% endblock %}
 
+{% block workspace_header %}{% endblock %}
 {% block content %}
-<div class="suite-settings mx-auto space-y-6 pb-24 sm:pb-8">
+<style>
+#workspace-content .salon-settings-board{display:flex!important;flex-direction:column;gap:10px;margin:0!important;padding:0!important;max-width:none;min-width:0}
+.salon-settings-board .ss-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:88px;padding:10px 16px;border:1px solid #e6d3ca;border-radius:15px;background:linear-gradient(105deg,#ead5cb,#fff8f4 70%)}
+.ss-hero h1{font-size:20px;font-weight:700;margin:0}.ss-hero p{font-size:12px;margin:3px 0;color:#806961}.ss-hero svg{width:82px;height:58px;flex:none}
+#workspace-content .salon-settings-board .ss-profile{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:10px;align-items:start;margin:0!important}
+#workspace-content .salon-settings-board .premium-card{padding:12px 14px!important;margin:0!important;min-width:0;min-height:0;height:auto;border-radius:13px}
+#workspace-content .ss-profile>section:first-of-type{grid-row:span 2}
+#workspace-content .ss-profile>section{display:flex;flex-direction:column;gap:8px}
+#workspace-content .ss-profile>section>*{margin-block:0!important}
+#workspace-content .ss-profile .public-auth-field{display:flex;flex-direction:column;gap:4px;margin:0!important}
+#workspace-content .ss-profile .public-auth-field label{font-size:12px;font-weight:600}
+#workspace-content .ss-profile .input-field{min-height:36px!important;height:36px!important;padding-block:5px!important;font-size:13px}
+#workspace-content .ss-profile textarea.input-field{height:56px!important;min-height:56px!important;resize:vertical}
+#workspace-content .ss-profile .grid{gap:8px}
+.ss-profile h3,.ss-extra h3{font-size:15px;font-weight:700}
+.ss-profile input[type=checkbox],.ss-extra input[type=checkbox]{accent-color:#66896c;width:16px;height:16px}
+.ss-profile input[type=file]{font-size:0;max-width:100%;padding:5px!important;height:auto!important}
+.ss-profile input[type=file]::file-selector-button{font-size:0;color:#78554d;background:#f3e6df;border:1px solid #dfc9be;border-radius:8px;padding:8px 12px;cursor:pointer}
+.ss-upload input[type=file]{position:absolute;width:1px;height:1px!important;opacity:0;overflow:hidden}.ss-upload:focus-within label{outline:2px solid #9c716b}.ss-save{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px}
+.ss-save .btn-primary{min-height:38px!important}
+.ss-tabs{display:flex;gap:6px;flex-wrap:wrap}.ss-tabs button{padding:7px 13px;border-radius:9px;border:1px solid #e1cec5;font-size:13px}.ss-tabs button[aria-pressed=true]{background:#9c716b;color:white}
+.ss-extra{display:flex;flex-direction:column;gap:10px}.ss-extra .suite-hours-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.ss-extra .input-field{min-height:36px}
+@media(max-width:850px){#workspace-content .salon-settings-board .ss-profile{grid-template-columns:1fr}.ss-extra .suite-hours-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.ss-hero svg{width:50px}.ss-extra .suite-hours-grid{grid-template-columns:1fr}}
+</style>
+<div class="suite-settings salon-settings-board" x-data="{ tab: '{% if hours_errors %}hours{% elif retention_form.errors %}rules{% else %}profile{% endif %}' }">
+<header class="ss-hero"><div><h1>اطلاعات سالن</h1><p>{{ salon.name }} · {{ business_type_label }} · {% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</p></div><svg viewBox="0 0 100 70" aria-hidden="true"><rect x="14" y="24" width="72" height="39" rx="7" fill="#f9eee8" stroke="#b78b7e"/><path d="M9 25L20 8h60l11 17" fill="#d9b5a5" stroke="#a7796d"/><path d="M30 9l-5 16m20-16-2 16m12-16 2 16m13-16 5 16" stroke="#fff5ed" stroke-width="3"/><rect x="42" y="37" width="16" height="26" rx="3" fill="#b98c80"/><rect x="21" y="37" width="14" height="13" rx="3" fill="#e5c9bc"/><rect x="65" y="37" width="14" height="13" rx="3" fill="#e5c9bc"/></svg></header>
+<nav class="ss-tabs" aria-label="بخش‌های اطلاعات سالن"><button type="button" @click="tab='profile'" :aria-pressed="tab==='profile'">اطلاعات و هویت سالن</button><button type="button" @click="tab='hours'" :aria-pressed="tab==='hours'">ساعات فعالیت</button><button type="button" @click="tab='rules'" :aria-pressed="tab==='rules'">قوانین رزرو</button></nav>
   {% if salon_onboarding_available %}
   <section class="salon-onboarding-settings-banner premium-card" aria-labelledby="salon-onboarding-settings-title">
     <div class="salon-onboarding-settings-banner__copy">
@@ -17,43 +45,12 @@
     <button type="button" class="btn-primary" data-open-salon-onboarding><i data-lucide="list-checks" aria-hidden="true"></i>ادامه راه‌اندازی</button>
   </section>
   {% endif %}
-  {# هویت سالن #}
-  <section class="premium-card overflow-hidden p-0">
-    <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-      <div class="flex items-center gap-4">
-        <div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-line bg-surface-elevated text-xl font-semibold text-accent">
-          {% if salon.logo %}
-          <img src="{{ salon.logo.url }}" alt="" class="h-full w-full object-cover" width="64" height="64">
-          {% else %}
-          <span aria-hidden="true">{{ salon.name|slice:":1"|default:"س" }}</span>
-          {% endif %}
-        </div>
-        <div class="min-w-0">
-          <h2 class="truncate text-lg font-semibold text-espresso">{{ salon.name }}</h2>
-          <p class="mt-0.5 text-sm text-ink-secondary">{{ business_type_label }}</p>
-          <p class="mt-1 text-xs text-ink-muted" dir="ltr">{{ salon.slug }}</p>
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-2 text-xs">
-        {% if salon.is_active %}
-        <span class="rounded-full bg-sage/15 px-2.5 py-1 text-sage">فعال</span>
-        {% else %}
-        <span class="rounded-full bg-coral/10 px-2.5 py-1 text-coral">غیرفعال</span>
-        {% endif %}
-        {% if salon.is_accepting_bookings %}
-        <span class="rounded-full border border-sage/30 bg-sage/10 px-2.5 py-1 text-sage">رزرو آنلاین فعال</span>
-        {% else %}
-        <span class="rounded-full border border-line px-2.5 py-1 text-ink-muted">رزرو آنلاین غیرفعال</span>
-        {% endif %}
-      </div>
-    </div>
-  </section>
-
   {# فرم اطلاعات #}
   <form
     method="post"
     enctype="multipart/form-data"
-    class="space-y-6"
+    class="ss-profile"
+    x-show="tab === 'profile'" x-cloak
     x-data="{ submitting: false }"
     @submit="submitting = true"
   >
@@ -105,8 +102,8 @@
           {% endif %}
         </div>
         <div class="min-w-0 flex-1 space-y-2">
-          <label class="text-sm font-medium text-espresso" for="id_logo">تغییر لوگو</label>
-          {{ profile_form.logo }}
+          <label class="text-sm font-medium text-espresso" for="id_logo">انتخاب تصویر لوگو</label>
+          <div class="ss-upload" x-data="{ filename: '' }" @change="filename = $event.target.files?.[0]?.name || ''"><label for="id_logo" class="btn-secondary">انتخاب تصویر</label>{{ profile_form.logo }}<span x-text="filename" class="text-xs"></span></div>
           <p class="text-xs text-ink-muted">JPG، PNG یا WebP — حداکثر ۲ مگابایت</p>
           {% if profile_form.logo.errors %}<p class="text-xs text-coral">{{ profile_form.logo.errors.0 }}</p>{% endif %}
         </div>
@@ -152,19 +149,19 @@
       {% endif %}
     </section>
 
-    <button
+    <div class="ss-save"><button
       type="submit"
-      class="btn-primary sticky bottom-4 z-10 min-h-[48px] w-full sm:static sm:w-auto"
+      class="btn-primary"
       :disabled="submitting"
       :class="{ 'opacity-70': submitting }"
     >
       <span x-show="!submitting">ذخیره اطلاعات سالن</span>
       <span x-show="submitting" x-cloak>در حال ذخیره…</span>
-    </button>
+    </button></div>
   </form>
 
   {% if salon.logo %}
-  <form method="post" class="premium-card p-5 sm:p-6" onsubmit="return confirm('لوگو حذف شود؟');">
+  <form method="post" class="premium-card" x-show="tab === 'profile'" x-cloak onsubmit="return confirm('لوگو حذف شود؟');">
     {% csrf_token %}
     <input type="hidden" name="form_kind" value="clear_logo">
     <button type="submit" class="btn-secondary min-h-[44px] text-sm text-coral">حذف لوگو</button>
@@ -172,7 +169,7 @@
   {% endif %}
 
   {# ساعات فعالیت مستقل سالن، بدون وابستگی به تخصص یا تقویم مالک #}
-  <section class="premium-card space-y-4 p-5 sm:p-6">
+  <section class="premium-card ss-extra" x-show="tab === 'hours'" x-cloak>
     <div>
       <h3 class="text-base font-semibold text-espresso">ساعات فعالیت</h3>
       <p class="mt-1 text-xs text-ink-muted">
@@ -211,8 +208,8 @@
     </form>
   </section>
 
-  <details class="premium-card group p-5 sm:p-6">
-    <summary class="cursor-pointer list-none text-base font-semibold text-espresso">قوانین رزرو و پیگیری</summary>
+  <section class="premium-card ss-extra" x-show="tab === 'rules'" x-cloak>
+    <h3>قوانین رزرو و پیگیری</h3>
     <form method="post" class="mt-4 space-y-4">
       {% csrf_token %}
       <input type="hidden" name="form_kind" value="retention">
@@ -224,7 +221,7 @@
       {% endfor %}
       <button type="submit" class="btn-secondary min-h-[44px] w-full sm:w-auto">ذخیره قوانین</button>
     </form>
-  </details>
+  </section>
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
