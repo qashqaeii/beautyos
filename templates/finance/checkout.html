@@ -66,7 +66,7 @@
                 <td data-label="مانده" class="checkout-workspace__due"><bdi>{{ row.owed|fa_money }}</bdi></td>
               </tr>
               {% empty %}
-              <tr><td colspan="5"><div class="checkout-workspace__empty checkout-workspace__empty--table"><i data-lucide="calendar-x" aria-hidden="true"></i><strong>خدمت قابل صدور وجود ندارد</strong><span>ابتدا یک نوبت انجام‌شده و فاقد فاکتور برای این مشتری ثبت کنید.</span></div></td></tr>
+              <tr class="checkout-workspace__table-row--empty"><td colspan="5"><div class="checkout-workspace__empty checkout-workspace__empty--table" role="status"><i data-lucide="calendar-x" aria-hidden="true"></i><strong>خدمت قابل صدور وجود ندارد</strong><span>ابتدا یک نوبت انجام‌شده و فاقد فاکتور برای این مشتری ثبت کنید.</span></div></td></tr>
               {% endfor %}
             </tbody>
           </table>
