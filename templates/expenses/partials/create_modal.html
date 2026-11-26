@@ -2,7 +2,7 @@
 <template x-teleport="body">
   <div class="inventory-create-modal-root luna-modal-root" x-cloak x-show="expenseOpen" x-transition.opacity role="presentation">
     <button type="button" class="inventory-create-modal__backdrop" tabindex="-1" aria-label="بستن" @click="expenseOpen=false"></button>
-    <div class="inventory-create-modal inventory-create-modal--wide luna-modal luna-modal--service luna-modal--expense" role="dialog" aria-modal="true" aria-labelledby="expense-modal-title" @click.stop>
+    <div class="inventory-create-modal inventory-create-modal--wide luna-modal luna-modal--expense" role="dialog" aria-modal="true" aria-labelledby="expense-modal-title" @click.stop>
       <header class="inventory-create-modal__head">
         <div class="luna-modal-heading">
           <span class="luna-modal-emblem" aria-hidden="true"><i data-lucide="receipt"></i></span>
