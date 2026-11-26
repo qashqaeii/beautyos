@@ -388,3 +388,81 @@ body.theme-app .luna-modal .inventory-create-modal__foot :is(a,button) {
     width:20px;height:20px;
   }
 }
+
+
+/* Cross-workspace visual consistency: shared RTL search, header alignment and dialogs.
+   Keep page-specific layout and functional date-picker behavior intact. */
+body.theme-app .maison-app :is(
+  .maison-unified-header,.customers-list-page__header,.staff-team-page__header,
+  .inventory-page__header,.finance-page__header--premium,.reception-desk-header,
+  .retention-page__hero,.waitlist-page__hero
+) {
+  direction:rtl;
+  text-align:right;
+}
+body.theme-app .maison-app :is(
+  .suite-search,.staff-board-search,
+  .suite-filter-form input[type="search"],.suite-toolbar input[type="search"],
+  .editorial-module-toolbar input[type="search"]
+) { box-sizing:border-box; min-width:0; }
+body.theme-app .maison-app :is(
+  .suite-search,.staff-board-search
+) {
+  position:relative;
+  display:flex;
+  align-items:center;
+  border:1px solid #dfd0c8;
+  border-radius:12px;
+  background:#fffdfb;
+  min-height:40px;
+  box-shadow:0 2px 8px rgba(84,59,49,.035);
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+body.theme-app .maison-app :is(.suite-search,.staff-board-search):focus-within {
+  border-color:#a77b70;
+  box-shadow:0 0 0 3px rgba(167,123,112,.12);
+}
+body.theme-app .maison-app :is(.suite-search,.staff-board-search) input[type="search"] {
+  flex:1 1 auto;
+  width:100%;
+  min-width:0;
+  min-height:38px;
+  border:0;
+  outline:0;
+  box-shadow:none;
+  background:transparent;
+  text-align:right;
+  direction:rtl;
+  padding:8px 12px;
+  font-size:12px;
+}
+body.theme-app .maison-app :is(.suite-search,.staff-board-search) input[type="search"]:focus {
+  outline:0; box-shadow:none;
+}
+body.theme-app .maison-app :is(.suite-search,.staff-board-search) button {
+  flex:0 0 36px;
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  background:transparent;
+  color:#8f6d62;
+  cursor:pointer;
+}
+body.theme-app .luna-modal-root .luna-modal {
+  direction:rtl;
+  text-align:right;
+  border-radius:16px;
+  scrollbar-width:thin;
+  scrollbar-color:#b99485 transparent;
+}
+body.theme-app .luna-modal-root .luna-modal :is(input,select,textarea) {
+  max-width:100%;
+}
+@media(max-width:639px) {
+  body.theme-app .maison-app :is(.suite-search,.staff-board-search) input[type="search"] {
+    font-size:16px;
+  }
+}
