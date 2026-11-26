@@ -62,6 +62,7 @@ def desk(request):
         {
             "iso": (week_start + timedelta(days=offset)).isoformat(),
             "day": week_start + timedelta(days=offset),
+            "jalali_day": int(to_jalali(week_start + timedelta(days=offset)).split("/")[-1]),
             "selected": week_start + timedelta(days=offset) == day,
         }
         for offset in range(7)
