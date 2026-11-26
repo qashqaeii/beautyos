@@ -1310,3 +1310,81 @@ body.theme-app .luna-modal--payment #finance-payment-create-form .finance-paymen
     grid-template-columns:minmax(0,1fr);
   }
 }
+
+
+/* Payment dialog: give its content the same visual grammar as shared dialogs.
+   Previous payment overrides only changed widths and left service-card visuals unset. */
+body.theme-app .luna-modal-root .luna-modal--payment {
+  --modal-max-width:600px;
+  width:min(600px,calc(100vw - 32px));
+  max-width:calc(100vw - 32px);
+}
+body.theme-app .luna-modal-root .luna-modal--payment .inventory-create-modal__scroll {
+  padding:14px 16px;
+  min-width:0;
+  overflow-x:hidden;
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__section--kind legend {
+  font-size:12px;
+  font-weight:700;
+  color:var(--color-ink,#51413d);
+  margin-bottom:6px;
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__section--kind .luna-service-paired-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .luna-service-field-card {
+  box-sizing:border-box;
+  min-width:0;
+  margin:0;
+  padding:10px 11px;
+  border:1px solid var(--dialog-line,#e8ddd7);
+  border-radius:12px;
+  background:var(--dialog-surface,#fffdfa);
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__kind-option {
+  cursor:pointer;
+  min-height:43px;
+  transition:border-color .15s ease,background .15s ease;
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__kind-option:has(input:checked) {
+  border-color:#b99889;
+  background:#faf1eb;
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields .field-label {
+  font-size:12px;
+  font-weight:650;
+  line-height:1.6;
+  color:var(--color-ink,#51413d);
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields :is(input,select,textarea) {
+  min-height:40px;
+  height:40px;
+  padding:8px 11px;
+  margin:0;
+  border-radius:9px;
+  direction:rtl;
+  line-height:1.5;
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields textarea {
+  height:auto;
+  min-height:62px;
+  resize:vertical;
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__field--notes {
+  grid-column:1/-1;
+}
+body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-picker-hint {
+  font-size:11px;
+  line-height:1.8;
+  color:var(--color-ink-secondary,#85756d);
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal-root .luna-modal--payment {width:calc(100vw - 20px);max-width:calc(100vw - 20px)}
+  body.theme-app .luna-modal-root .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body.theme-app .luna-modal-root .luna-modal--payment .inventory-create-modal__scroll {padding:12px 13px}
+}
