@@ -175,3 +175,66 @@ def specialists(request):
     if can_book_appointment and request.GET.get("book") == "1":
         ctx.update(appointment_booking_context(request, book_modal_open=True))
     return render(request, "dashboard/specialists.html", ctx)
+
+
+@salon_required
+def specialist_workspace(request):
+    """Private specialist workspace: never accept a staff id from the client."""
+    from django.db.models import Sum
+    from apps.appointments.models import Appointment
+    from apps.commissions.models import CommissionEntry
+    from apps.dashboard.role_services import day_bounds
+    from apps.staff.models import StaffWorkHours
+    from apps.core.utils.dates import jalali_month_bounds
+
+    membership = request.membership
+    if not membership or membership.role != SalonMembership.Role.SPECIALIST or not membership.is_active:
+        raise PermissionDenied
+    profile = StaffProfile.scoped(request.salon).filter(
+        membership=membership, is_active=True, is_deleted=False
+    ).first()
+    if profile is None:
+        raise PermissionDenied
+
+    today = timezone.localdate()
+    start, end = day_bounds(today)
+    now = timezone.now()
+    own_appts = Appointment.scoped(request.salon).filter(staff=profile)
+    active = own_appts.exclude(status__in=[Appointment.Status.CANCELLED, Appointment.Status.NO_SHOW])
+    today_appts = active.filter(start_at__gte=start, start_at__lt=end).select_related(
+        "customer", "service"
+    ).order_by("start_at")
+    upcoming = active.filter(start_at__gte=now).order_by("start_at")
+    month_start, month_end = jalali_month_bounds(today)
+    month_start_dt, _ = day_bounds(month_start)
+    _, month_end_dt = day_bounds(month_end)
+    month_appts = active.filter(start_at__gte=month_start_dt, start_at__lt=month_end_dt)
+    completed_month = month_appts.filter(status=Appointment.Status.COMPLETED)
+    weekday = (today.weekday() + 2) % 7
+    hours = StaffWorkHours.scoped(request.salon).filter(staff=profile, weekday=weekday).first()
+
+    entries = CommissionEntry.scoped(request.salon).filter(
+        staff=profile, created_at__gte=month_start_dt, created_at__lt=month_end_dt
+    ).exclude(status=CommissionEntry.Status.VOID)
+    amounts = entries.aggregate(
+        earned=Sum("commission_amount_toman"), settled=Sum("settled_amount_toman")
+    )
+    earned = int(amounts["earned"] or 0)
+    settled = int(amounts["settled"] or 0)
+    finance_visible = bool(getattr(request.salon.settings, "specialist_can_view_commission", False))
+    return render(request, "dashboard/specialist_workspace.html", {
+        "profile": profile,
+        "today_jalali": to_jalali(today),
+        "today_appointments": today_appts,
+        "today_count": today_appts.count(),
+        "upcoming_count": upcoming.count(),
+        "upcoming_appointments": upcoming[:6],
+        "month_count": month_appts.count(),
+        "month_completed": completed_month.count(),
+        "month_customers": month_appts.values("customer_id").distinct().count(),
+        "hours": hours,
+        "finance_visible": finance_visible,
+        "earned": earned if finance_visible else None,
+        "settled": settled if finance_visible else None,
+        "outstanding": max(earned - settled, 0) if finance_visible else None,
+    })
