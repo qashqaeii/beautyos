@@ -1249,3 +1249,64 @@ body.theme-app .luna-modal.appointment-booking-modal .appt-booking-datetime :is(
 body.theme-app .luna-modal.appointment-booking-modal .appt-booking-fields select {
   white-space:nowrap;
 }
+
+
+/* Finance payment: match shared modal rhythm without changing form behavior. */
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__section--kind {
+  margin:0 0 12px;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__kind-option {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-start;
+  gap:9px;
+  min-height:44px;
+  text-align:right;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__kind-option input {
+  flex:0 0 auto;
+  width:17px;
+  height:17px;
+  min-height:0;
+  margin:0;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 12px;
+  align-items:start;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields > .luna-service-field-card {
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:6px;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields .field-label {
+  display:block;
+  position:static;
+  transform:none;
+  margin:0;
+  line-height:1.65;
+  text-align:right;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields :is(input,select,textarea) {
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  text-align:right;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__field--notes {
+  grid-column:1/-1;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-picker-hint {
+  margin:12px 0 0;
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__fields {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
