@@ -950,3 +950,47 @@ body.theme-app .luna-modal-root .luna-modal--payment .finance-payment-form__fiel
 body.theme-app .luna-modal-root .luna-modal--payment :is(input,select,textarea) {
   max-width:100%;
 }
+
+
+/* Booking dialog: keep the customer/service choice, date/time and optional
+   payment details legible independently of the other dialog types. */
+body.theme-app .luna-modal.appointment-booking-modal .inventory-create-modal__scroll {
+  min-width:0;
+  overflow-x:hidden;
+}
+body.theme-app .luna-modal.appointment-booking-modal :is(
+  .appt-booking-modal__primary-pair,.appt-booking-fields,.appt-booking-datetime,
+  .appt-booking-advanced__body,.appt-booking-advanced__pair
+) {
+  min-width:0;
+}
+body.theme-app .luna-modal.appointment-booking-modal :is(
+  .appt-booking-section__title,.appt-booking-advanced__toggle
+) {
+  text-align:right;
+  line-height:1.6;
+}
+body.theme-app .luna-modal.appointment-booking-modal :is(
+  .customer-form-field__error,.inventory-create-modal__form-error,.luna-modal-errors
+) {
+  max-width:100%;
+  overflow-wrap:anywhere;
+  line-height:1.7;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__toggle {
+  cursor:pointer;
+}
+body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__toggle:focus-visible {
+  outline:2px solid #9d726e;
+  outline-offset:3px;
+  border-radius:6px;
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair,
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-datetime {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body.theme-app .luna-modal.appointment-booking-modal .appt-booking-modal__primary-pair > .appt-booking-section--modal {
+    min-width:0;
+  }
+}
