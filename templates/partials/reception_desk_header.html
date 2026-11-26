@@ -1,8 +1,13 @@
 {% load static %}
+<style>
+.reception-desk-header .reception-desk-header__bar{background-image:none!important}
+.reception-desk-header .reception-desk-header__brand{gap:0}
+.reception-desk-header{background-position:left 24% center!important;background-size:auto 100%!important}
+@media(max-width:700px){.reception-desk-header{background-position:left center!important}}
+</style>
 <header class="reception-desk-header dashboard-enter">
   <div class="reception-desk-header__bar">
     <div class="reception-desk-header__brand">
-      <img class="reception-desk-header__art" src="{% static 'images/reception-desk-illustration.svg' %}" width="144" height="90" alt="" aria-hidden="true">
       <div class="reception-desk-header__copy"><h1 class="reception-desk-header__title">میز پذیرش</h1><p>مدیریت نوبت‌ها، مشتریان و جریان کار سالن</p></div>
     </div>
     <div class="reception-desk-header__date" aria-label="انتخاب روز">
