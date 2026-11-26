@@ -90,8 +90,6 @@ def cash_close_view(request):
     membership = getattr(request,"membership",None)
     if not (has_permission(membership,P_PAYMENT_CREATE) and has_permission(membership,P_PAYMENT_VIEW)):
         raise PermissionDenied
-    embedded = request.GET.get("embedded") == "1" or request.POST.get("embedded") == "1"
-    template_name = "finance/cash_close_embedded.html" if embedded else "finance/cash_close.html"
     today=timezone.localdate()
     raw=request.POST.get("day") if request.method=="POST" else request.GET.get("day")
     try:
@@ -100,7 +98,7 @@ def cash_close_view(request):
             raise ValueError
     except (ValueError,TypeError):
         if request.method=="POST":
-            return render(request,template_name,{
+            return render(request,"finance/cash_close.html",{
                 "day":today,"day_jalali":to_jalali(today),"totals":cash_totals(request.salon,today),
                 "close":CashClose.scoped(request.salon).filter(day=today).first(),
                 "form":CashCloseForm(),"invalid_day":True},status=400)
@@ -114,10 +112,10 @@ def cash_close_view(request):
         except ValidationError as exc:
             form.add_error(None,exc)
         else:
-            return redirect(reverse("finance:cash_close")+"?"+urlencode({"day":day.isoformat(), **({"embedded":"1","saved":"1"} if embedded else {})}))
+            return redirect(reverse("finance:cash_close")+"?"+urlencode({"day":day.isoformat()}))
     totals=cash_totals(request.salon,day)
     close=CashClose.scoped(request.salon).filter(day=day).first()
-    return render(request,template_name,{
+    return render(request,"finance/cash_close.html",{
         "day":day,"day_jalali":to_jalali(day),"form":form,"totals":totals,"close":close,
         "late_cash_delta":totals["cash"]-close.cash_received_toman if close else 0,
         "late_card_delta":totals["card"]-close.card_received_toman if close else 0,
