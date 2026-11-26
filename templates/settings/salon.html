@@ -9,9 +9,16 @@
 #workspace-content .salon-settings-board{display:flex!important;flex-direction:column;gap:10px;margin:0!important;padding:0!important;max-width:none;min-width:0}
 .salon-settings-board .ss-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:88px;padding:10px 16px;border:1px solid #e6d3ca;border-radius:15px;background:linear-gradient(105deg,#ead5cb,#fff8f4 70%)}
 .ss-hero h1{font-size:20px;font-weight:700;margin:0}.ss-hero p{font-size:12px;margin:3px 0;color:#806961}.ss-hero svg{width:82px;height:58px;flex:none}
-#workspace-content .salon-settings-board .ss-profile{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:10px;align-items:start;margin:0!important}
+#workspace-content .salon-settings-board .ss-profile{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:10px;align-items:start;margin:0!important}
 #workspace-content .salon-settings-board .premium-card{padding:12px 14px!important;margin:0!important;min-width:0;min-height:0;height:auto;border-radius:13px}
 #workspace-content .ss-profile>section:first-of-type{grid-row:span 2}
+#workspace-content .ss-profile{grid-template-rows:auto 1fr auto}
+#workspace-content .salon-settings-board [x-cloak]{display:none!important}
+#workspace-content .salon-settings-board .ss-profile[style*="display: none"],#workspace-content .salon-settings-board .ss-extra[style*="display: none"]{display:none!important}
+#workspace-content .ss-extra form{margin:0!important}
+#workspace-content .ss-extra .ss-rules-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#workspace-content .ss-rules-grid .public-auth-field{margin:0!important;min-width:0}
+@media(max-width:720px){#workspace-content .ss-extra .ss-rules-grid{grid-template-columns:1fr}}
 #workspace-content .ss-profile>section{display:flex;flex-direction:column;gap:8px}
 #workspace-content .ss-profile>section>*{margin-block:0!important}
 #workspace-content .ss-profile .public-auth-field{display:flex;flex-direction:column;gap:4px;margin:0!important}
@@ -50,7 +57,7 @@
     method="post"
     enctype="multipart/form-data"
     class="ss-profile"
-    x-show="tab === 'profile'" x-cloak
+    x-show.important="tab === 'profile'" x-cloak
     x-data="{ submitting: false }"
     @submit="submitting = true"
   >
@@ -161,7 +168,7 @@
   </form>
 
   {% if salon.logo %}
-  <form method="post" class="premium-card" x-show="tab === 'profile'" x-cloak onsubmit="return confirm('لوگو حذف شود؟');">
+  <form method="post" class="premium-card" x-show.important="tab === 'profile'" x-cloak onsubmit="return confirm('لوگو حذف شود؟');">
     {% csrf_token %}
     <input type="hidden" name="form_kind" value="clear_logo">
     <button type="submit" class="btn-secondary min-h-[44px] text-sm text-coral">حذف لوگو</button>
@@ -169,7 +176,7 @@
   {% endif %}
 
   {# ساعات فعالیت مستقل سالن، بدون وابستگی به تخصص یا تقویم مالک #}
-  <section class="premium-card ss-extra" x-show="tab === 'hours'" x-cloak>
+  <section class="premium-card ss-extra" x-show.important="tab === 'hours'" x-cloak>
     <div>
       <h3 class="text-base font-semibold text-espresso">ساعات فعالیت</h3>
       <p class="mt-1 text-xs text-ink-muted">
@@ -204,22 +211,23 @@
         </li>
         {% endfor %}
       </ul>
-      <button type="submit" class="btn-secondary min-h-[44px] w-full sm:w-auto">ذخیره ساعات</button>
+      <button type="submit" class="btn-primary min-h-[44px] w-full sm:w-auto">ذخیره ساعات</button>
     </form>
   </section>
 
-  <section class="premium-card ss-extra" x-show="tab === 'rules'" x-cloak>
+  <section class="premium-card ss-extra" x-show.important="tab === 'rules'" x-cloak>
     <h3>قوانین رزرو و پیگیری</h3>
-    <form method="post" class="mt-4 space-y-4">
+    <form method="post" class="ss-rules-grid">
       {% csrf_token %}
       <input type="hidden" name="form_kind" value="retention">
       {% for field in retention_form %}
       <div class="public-auth-field">
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
         {{ field }}
+        {{ field.errors }}
       </div>
       {% endfor %}
-      <button type="submit" class="btn-secondary min-h-[44px] w-full sm:w-auto">ذخیره قوانین</button>
+      <div class="ss-save"><button type="submit" class="btn-primary">ذخیره قوانین</button></div>
     </form>
   </section>
 </div>
