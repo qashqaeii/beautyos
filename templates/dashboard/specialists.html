@@ -1,8 +1,8 @@
 {% extends "layouts/app_shell.html" %}
 {% load format_tags static %}
 {% block title %}متخصص‌ها · {{ active_salon.name }}{% endblock %}
-{% block page_title %}متخصص‌ها{% endblock %}
-{% block page_subtitle %}{% endblock %}
+{% block page_title %}<span class="inline-flex items-center gap-3"><i data-lucide="users-round" class="h-7 w-7 shrink-0" style="color:var(--color-primary);" aria-hidden="true"></i><span>متخصص‌ها</span></span>{% endblock %}
+{% block page_subtitle %}برنامه کاری، خدمات و رزرو متخصصان سالن{% endblock %}
 {% block page_actions %}{% endblock %}
 
 {% block extra_head %}
@@ -33,6 +33,16 @@
   @beautyos-close-modal.window="closeModals()"
   @keydown.escape.window="bookOpen && !window.__beautyosJalaliCalendarOpen && closeModals()"
 >
+  <section class="mb-5 flex items-center justify-between gap-4 rounded-2xl border p-4 sm:p-5" style="border-color:var(--color-divider);background:var(--color-surface,white);">
+    <div class="flex min-w-0 items-center gap-3">
+      <i data-lucide="scissors" class="h-8 w-8 shrink-0" style="color:var(--color-primary);" aria-hidden="true"></i>
+      <div class="min-w-0">
+        <h2 class="text-base font-semibold text-ink">تیم متخصصان سالن</h2>
+        <p class="mt-1 text-xs text-ink-muted">برنامه امروز و دسترسی سریع به رزرو هر متخصص</p>
+      </div>
+    </div>
+    <span class="shrink-0 text-sm font-semibold tabular-nums text-ink">{{ staff_count|persian_digits }} متخصص</span>
+  </section>
   {% if staff_rows %}
   <div class="specialists-list dashboard-enter" role="list">
     {% for row in staff_rows %}
