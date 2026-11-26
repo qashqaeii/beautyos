@@ -8,6 +8,20 @@
 <link rel="stylesheet" href="{% static 'css/reception-dashboard-v3.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/reception-calendar-polish.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 <script defer src="{% static 'js/reception-dashboard-v4.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
+<style>
+.luna-reception-shell .reception-desk-page{display:flex!important;flex-direction:column;gap:10px;height:auto!important;min-height:100%;overflow:visible!important}
+.luna-reception-shell .reception-desk-page > *{flex-shrink:0;min-width:0}
+.luna-reception-shell .maison-content{overflow-y:auto!important}
+.luna-reception-shell .reception-week{margin:0;flex:none}
+.luna-reception-shell .reception-calendar-layout{display:block!important;min-height:0;flex:1 0 auto}
+.luna-reception-shell .reception-calendar-layout .reception-flow{overflow:visible;min-height:180px}
+.luna-reception-shell .reception-flow__list{overflow:visible;max-height:none}
+.luna-reception-shell .reception-desk-quick__row{display:flex;flex-wrap:wrap;overflow:visible}
+.luna-reception-shell .reception-desk-quick__title{display:none}
+.luna-reception-shell .reception-desk-quick__link{min-height:38px;padding:7px 16px}
+.luna-reception-shell .reception-flow__item{display:grid;grid-template-columns:70px minmax(130px,1.3fr) minmax(110px,1fr) minmax(180px,1.2fr)}
+@media(max-width:800px){.luna-reception-shell .reception-flow__item{grid-template-columns:55px minmax(0,1fr)}.luna-reception-shell .reception-flow__actions{grid-column:1/-1}}
+</style>
 {% if can_book_appointment and appointment_form %}
 <script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 <script defer src="{% static 'js/time24-input.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
@@ -101,136 +115,26 @@
   <a class="reception-desk-quick__link" href="{% url 'finance:invoices' %}"><i data-lucide="files" aria-hidden="true"></i><span>فاکتورهای صادرشده</span></a>
   {% endif %}
 
-      {% for link in quick_access_links %}
+      {% comment %}{% for link in quick_access_links %}
       <a href="{{ link.url }}" class="reception-desk-quick__link">
         <span class="luna-reception-quick-icon" aria-hidden="true"><i data-lucide="{{ link.icon }}" class="reception-desk-quick__icon"></i></span>
         <span class="reception-desk-quick__label">{{ link.title }}</span>
         <i data-lucide="chevron-left" class="reception-desk-quick__arrow" aria-hidden="true"></i>
       </a>
-      {% endfor %}
+      {% endfor %}{% endcomment %}
     </div>
   </section>
   {% endif %}
 
-<div class="reception-desk-layout">
-  <section class="reception-desk-priority dashboard-enter" aria-label="نوبت بعدی و تأییدها">
-    <div class="reception-desk-priority__grid">
-      <div class="reception-desk-priority__next{% if not next_appt %} luna-reception-priority-empty{% endif %}">
-        <header class="luna-reception-priority-head">
-          <span class="luna-reception-icon" aria-hidden="true"><i data-lucide="calendar-days"></i></span>
-          <h2 class="reception-desk-priority__eyebrow">نوبت بعدی</h2>
-        </header>
-        {% if next_appt %}
-        <div class="reception-desk-next__row">
-          <div class="reception-next-timebox"><span>ساعت نوبت</span><time class="reception-desk-next__time tabular-nums" datetime="{{ next_appt.start_at|date:'c' }}">{{ next_appt.start_at|fa_time }}</time></div>
-          <div class="reception-desk-next__copy min-w-0">
-            <p class="reception-desk-next__name">{{ next_appt.customer.full_name }}</p>
-            <p class="reception-desk-next__meta">
-              <span class="reception-desk-next__service"><i data-lucide="scissors" aria-hidden="true"></i>{{ next_appt.service.name }}</span>
-              {% if next_appt.staff %}
-              
-              <span class="reception-desk-next__staff"><i data-lucide="user-round" aria-hidden="true"></i>{{ next_appt.staff.full_display_name }}</span>
-              {% endif %}
-            </p>
-          </div>
-          </div>
-        <div class="reception-desk-next__tail">
-            {% if next_payment %}
-            <span class="reception-desk-pay-chip reception-desk-pay-chip--{{ next_payment.status_code|default:'none' }}">
-              {{ next_payment.label }}
-            </span>
-            {% endif %}
-            {% if can_confirm and next_appt.status == 'pending' %}
-            <form method="post" action="{% url 'reception:confirm' pk=next_appt.pk %}" class="reception-desk-next__checkin m-0">
-              {% csrf_token %}<input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
-              <button type="submit" class="btn-primary text-sm">تأیید نوبت</button>
-            </form>
-            {% elif can_checkin and next_appt.status == 'confirmed' %}
-            <form method="post" action="{% url 'reception:checkin' pk=next_appt.pk %}" class="reception-desk-next__checkin m-0">
-              {% csrf_token %}<input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
-              <button type="submit" class="btn-primary text-sm">ثبت ورود</button>
-            </form>
-            {% endif %}
-          </div>
-        <a href="{% url 'appointments:detail' pk=next_appt.pk %}" class="reception-desk-next__detail">جزئیات نوبت</a>
-        {% if can_issue_invoice and next_appt.status == 'completed' %}<a href="{% url 'finance:checkout' next_appt.customer_id %}?appointment={{ next_appt.pk|unlocalize }}" class="reception-desk-next__detail">صدور فاکتور</a>{% endif %}
-        {% else %}
-        <p class="reception-desk-empty reception-desk-empty--inline">نوبت فعالی در صف نیست.</p>
-        <img class="luna-reception-empty-art" src="{% static 'images/photos/beautyos-reception-next.webp' %}" width="228" height="140" alt="" decoding="async">
-        {% endif %}
-      </div>
-
-      <div class="reception-desk-priority__pending{% if not pending_confirm %} luna-reception-priority-empty{% endif %}">
-        <header class="reception-desk-priority__pending-head luna-reception-priority-head">
-          <span class="luna-reception-icon" aria-hidden="true"><i data-lucide="hourglass"></i></span>
-          <h2 class="reception-desk-priority__eyebrow reception-desk-priority__eyebrow--inline">در انتظار تأیید</h2>
-          <span class="reception-desk-count tabular-nums">{{ pending_confirm|length|persian_digits }}</span>
-        </header>
-        {% if pending_confirm %}
-        <ul class="reception-desk-pending-list{% if pending_confirm|length > 1 %} reception-desk-pending-list--grid{% endif %}{% if pending_confirm|length > 3 %} reception-desk-pending-list--dense{% endif %}">
-          {% for a in pending_confirm|slice:":2" %}
-          <li class="reception-desk-pending-list__item">
-            <span class="reception-desk-pending-item__time tabular-nums">{{ a.start_at|fa_time }}</span>
-            <span class="reception-desk-pending-item__name min-w-0 truncate">{{ a.customer.full_name }}</span>
-            <a href="{% url 'appointments:detail' pk=a.pk %}" class="reception-desk-pending-item__action">بررسی</a>
-          </li>
-          {% endfor %}
-        </ul>
-        {% if pending_confirm|length > 2 %}<a class="reception-pending-more" href="{% url 'appointments:calendar' %}?day={{ selected_day|date:'Y-m-d' }}">مشاهده همه نوبت‌ها در تقویم</a>{% endif %}
-        {% else %}
-        <p class="reception-desk-empty reception-desk-empty--inline">رزروی در انتظار تأیید نیست.</p>
-        <img class="luna-reception-empty-art" src="{% static 'images/photos/beautyos-reception-pending.webp' %}" width="236" height="140" alt="" decoding="async">
-        {% endif %}
-      </div>
-    </div>
-  </section>
-
+<div class="reception-desk-layout reception-calendar-layout">
   <section class="reception-flow dashboard-enter" aria-labelledby="reception-flow-title">
     <div class="reception-flow__heading">
       <div>
         
-        <h2 id="reception-flow-title"><i data-lucide="layers-3" aria-hidden="true"></i>جریان کار امروز سالن</h2>
+        <h2 id="reception-flow-title"><i data-lucide="layers-3" aria-hidden="true"></i>نوبت‌های روز انتخاب‌شده</h2>
         <p>تمام نوبت‌های روز انتخاب‌شده؛ از تأیید و پذیرش تا تکمیل خدمت و صندوق.</p>
       </div>
       <span class="reception-flow__total">{{ day_operations_summary.total|fa_num }} نوبت</span>
-    </div>
-    <div class="reception-journey" role="group" aria-label="مراحل نوبت‌های روز">
-      <div class="reception-journey__step">
-        <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="calendar-days"></i></span>
-        <span class="reception-journey__name">نوبت ثبت‌شده</span>
-        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.total }}">{{ day_operations_summary.total|fa_num }}</strong>
-      </div>
-      <div class="reception-journey__step">
-        <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="user-round-check"></i></span>
-        <span class="reception-journey__name">در انتظار پذیرش</span>
-        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.confirmed }}">{{ day_operations_summary.confirmed|fa_num }}</strong>
-      </div>
-      <div class="reception-journey__step">
-        <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="scissors"></i></span>
-        <span class="reception-journey__name">در حال انجام خدمت</span>
-        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.checked_in }}">{{ day_operations_summary.checked_in|fa_num }}</strong>
-      </div>
-      <div class="reception-journey__step">
-        <span class="reception-journey__icon" aria-hidden="true"><i data-lucide="circle-check-big"></i></span>
-        {% if can_payment_create %}
-        <span class="reception-journey__name">تکمیل و تسویه</span>
-        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.settled }}">{{ day_operations_summary.settled|fa_num }}</strong>
-        {% else %}
-        <span class="reception-journey__name">خدمت تکمیل‌شده</span>
-        <strong class="reception-journey__count" data-count-up="{{ day_operations_summary.completed }}">{{ day_operations_summary.completed|fa_num }}</strong>
-        {% endif %}
-      </div>
-    </div>
-    <details class="reception-operations-disclosure" open>
-      <summary><i data-lucide="list-checks" aria-hidden="true"></i> مشاهده و مدیریت نوبت‌های روز <i data-lucide="chevron-down" aria-hidden="true"></i></summary>
-      <div class="reception-operations-disclosure__content">
-    <div class="reception-flow__metrics reception-flow__metrics--secondary" aria-label="وضعیت عملیات روز">
-      <div><span>منتظر تأیید</span><strong>{{ day_operations_summary.pending|fa_num }}</strong></div>
-      <div><span>پذیرش‌شده</span><strong>{{ day_operations_summary.checked_in|fa_num }}</strong></div>
-      <div><span>خدمات تکمیل‌شده</span><strong>{{ day_operations_summary.completed|fa_num }}</strong></div>
-      {% if can_payment_create %}
-      <div class="reception-flow__metric--money"><span>مانده خدمات تکمیل‌شده</span><strong>{{ day_operations_summary.outstanding_toman|fa_money }} <small>تومان</small></strong></div>
-      {% endif %}
     </div>
     <div class="reception-flow__list">
       {% for item in day_operations %}
@@ -276,7 +180,7 @@
             <a class="reception-flow__button reception-flow__button--soft" href="{% url 'finance:invoice_detail' invoice_id=item.invoice_id %}">مشاهده فاکتور</a>
             <a class="reception-flow__button reception-flow__button--print" href="{% url 'finance:invoice_detail' invoice_id=item.invoice_id %}?print=1" target="_blank" rel="noopener" aria-label="چاپ فاکتور {{ item.appointment.customer.full_name }}"><i data-lucide="printer" aria-hidden="true"></i> چاپ فاکتور</a>
           {% elif can_issue_invoice and item.can_checkout %}
-            <a class="reception-flow__button reception-flow__button--soft" href="{% url 'finance:checkout' item.appointment.customer_id %}?appointment={{ item.appointment.pk|unlocalize }}">صندوق کامل</a>
+            <a class="reception-flow__button reception-flow__button--soft" href="{% url 'finance:checkout' item.appointment.customer_id %}?appointment={{ item.appointment.pk|unlocalize }}">صدور فاکتور</a>
           {% endif %}
           <a class="reception-flow__details" href="{% url 'appointments:detail' pk=item.appointment.pk %}" aria-label="جزئیات نوبت {{ item.appointment.customer.full_name }}"><i data-lucide="arrow-up-left" aria-hidden="true"></i><span>جزئیات</span></a>
         </div>
@@ -313,108 +217,6 @@
     {% if day_operations_summary.truncated %}
       <p class="reception-flow__more">این فهرست حداکثر ۱۰۰ نوبت اول روز را نمایش می‌دهد. برای بررسی سایر نوبت‌ها به تقویم مراجعه کنید.</p>
     {% endif %}
-      </div>
-    </details>
-  </section>
-
-  <section class="reception-desk-workspace dashboard-enter" aria-label="وقت آزاد و تیم">
-    <div class="reception-desk-workspace__grid">
-      <div class="reception-desk-workspace__slots">
-        <h2 class="reception-desk-workspace__title">اولین وقت آزاد</h2>
-        <form method="get" action="{% url 'reception:desk' %}" class="reception-desk-slot-filters">
-          <input type="hidden" name="day" value="{{ selected_day|date:'Y-m-d' }}">
-          <div class="reception-desk-slot-filters__field">
-            <label class="reception-desk-service-form__label" for="reception-desk-service">خدمت</label>
-            <select id="reception-desk-service" name="service" class="input-field text-sm" onchange="this.form.submit()">
-              <option value="">انتخاب خدمت</option>
-              {% for s in services %}
-              <option value="{{ s.pk }}" {% if selected_service and selected_service.pk == s.pk %}selected{% endif %}>{{ s.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="reception-desk-slot-filters__field">
-            <label class="reception-desk-service-form__label" for="reception-desk-staff">متخصص</label>
-            <select
-              id="reception-desk-staff"
-              name="staff"
-              class="input-field text-sm"
-              onchange="this.form.submit()"
-              {% if not selected_service %}disabled{% endif %}
-            >
-              <option value="" {% if not selected_slot_staff_id %}selected{% endif %}>همهٔ متخصص‌ها</option>
-              {% for st in bookable_staff_for_service %}
-              <option value="{{ st.pk }}" {% if selected_slot_staff_id == st.pk %}selected{% endif %}>{{ st|staff_booking_label_filter }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </form>
-        {% if first_slots %}
-        <div class="reception-desk-slots-table" role="table" aria-label="اولین وقت آزاد">
-          <div class="reception-desk-slots-table__head" role="row">
-            <span role="columnheader">متخصص</span>
-            <span role="columnheader">تخصص</span>
-            <span role="columnheader">زمان</span>
-            <span role="columnheader">رزرو</span>
-          </div>
-          <ul class="reception-desk-slots-list m-0 list-none p-0">
-            {% for row in first_slots %}
-            <li class="reception-desk-slots-list__item">
-              <div class="reception-desk-slots-table__row" role="row">
-                <span class="reception-desk-slots-table__staff" role="cell">{{ row.staff.full_display_name }}</span>
-                <span class="reception-desk-slots-table__spec" role="cell">{% if row.staff.title %}{{ row.staff.title }}{% else %}—{% endif %}</span>
-                <span class="reception-desk-slots-table__time tabular-nums" role="cell">{{ row.start|fa_time }}</span>
-                <div class="reception-desk-slots-table__action" role="cell">
-                  {% if can_book_appointment %}
-                  <a
-                    href="{% url 'reception:desk' %}?book=1&amp;staff={{ row.staff.pk }}&amp;service={{ row.service.pk }}&amp;day={{ selected_day|date:'Y-m-d' }}&amp;start={{ row.start|date:'c'|urlencode }}"
-                    class="reception-desk-slot-btn"
-                  >رزرو</a>
-                  {% else %}<span aria-label="بدون دسترسی رزرو">—</span>{% endif %}
-                </div>
-              </div>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
-        {% else %}
-        <div class="reception-desk-empty reception-desk-empty--block">
-          <p>{% if not selected_service %}
-          برای دیدن وقت‌ها یک خدمت انتخاب کنید.
-          {% elif slot_staff_no_availability %}
-          این متخصص در روز انتخاب‌شده وقت آزاد ندارد.
-          {% else %}
-          وقت آزاد برای این خدمت نیست.
-          {% endif %}</p>
-        </div>
-        {% endif %}
-      </div>
-
-      <div class="reception-desk-workspace__team">
-        <header class="reception-desk-workspace__head">
-          <h2 class="reception-desk-workspace__title !mb-0"><i data-lucide="users-round" aria-hidden="true"></i>تیم سالن</h2>
-          {% if can_manage_staff %}
-          <a href="{% url 'staff:list' %}" class="reception-desk-card__link">مدیریت تیم <i data-lucide="external-link" aria-hidden="true"></i></a>
-          {% endif %}
-        </header>
-        <ul class="reception-desk-team reception-desk-team--grid">
-          {% for item in staff_roster|slice:":8" %}
-          <li class="reception-desk-team__row">
-            {% if item.staff.avatar %}
-            <img src="{{ item.staff.avatar.url }}" alt="" class="staff-team-avatar staff-team-avatar--sm" width="40" height="40" loading="lazy">
-            {% else %}
-            <span class="staff-team-avatar staff-team-avatar--sm staff-team-avatar--placeholder" aria-hidden="true">{{ item.staff.initials }}</span>
-            {% endif %}
-            <div class="reception-desk-team__copy min-w-0">
-              <span class="reception-desk-team__name">{{ item.staff.display_name }}</span>
-              <span class="reception-desk-team__status">{{ item.day_status|persian_digits }}</span>
-            </div>
-          </li>
-          {% empty %}
-          <li class="reception-desk-empty reception-desk-empty--span">متخصص فعالی ثبت نشده است.</li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
   </section>
 
     {% if can_book_appointment and appointment_form %}
