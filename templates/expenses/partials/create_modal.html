@@ -1,14 +1,14 @@
 {% if expense_form %}
 <template x-teleport="body">
   <div class="inventory-create-modal-root luna-modal-root" x-cloak x-show="expenseOpen" x-transition.opacity role="presentation">
-    <button type="button" class="inventory-create-modal__backdrop" tabindex="-1" aria-label="بستن" @click="$dispatch('beautyos-close-create-modal')"></button>
+    <button type="button" class="inventory-create-modal__backdrop" tabindex="-1" aria-label="بستن" @click="expenseOpen = false; $dispatch('beautyos-close-create-modal')"></button>
     <div class="inventory-create-modal inventory-create-modal--wide luna-modal luna-modal--expense" role="dialog" aria-modal="true" aria-labelledby="expense-modal-title" aria-describedby="expense-modal-description" @click.stop>
       <header class="inventory-create-modal__head">
         <div class="luna-modal-heading">
           <span class="luna-modal-emblem" aria-hidden="true"><i data-lucide="receipt"></i></span>
           <div class="luna-modal-heading__copy"><h2 id="expense-modal-title" class="inventory-create-modal__title" tabindex="-1">ثبت هزینه</h2><p id="expense-modal-description" class="luna-modal-subtitle">مشخصات هزینه سالن را وارد کنید.</p></div>
         </div>
-        <button type="button" class="inventory-create-modal__close" aria-label="بستن" @click="$dispatch('beautyos-close-create-modal')"><i data-lucide="x" aria-hidden="true"></i></button>
+        <button type="button" class="inventory-create-modal__close" aria-label="بستن" @click="expenseOpen = false; $dispatch('beautyos-close-create-modal')"><i data-lucide="x" aria-hidden="true"></i></button>
       </header>
       <form method="post" action="{% url 'expenses:create' %}" class="inventory-create-modal__form" id="expense-create-form">
         {% csrf_token %}
@@ -27,7 +27,7 @@
         </div>
         <footer class="inventory-create-modal__foot">
           <button type="submit" class="btn-primary"><i data-lucide="check" aria-hidden="true"></i>ذخیره هزینه</button>
-          <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="$dispatch('beautyos-close-create-modal')">انصراف</button>
+          <button type="button" class="btn-secondary inventory-create-modal__cancel" @click="expenseOpen = false; $dispatch('beautyos-close-create-modal')">انصراف</button>
         </footer>
       </form>
     </div>
