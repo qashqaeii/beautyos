@@ -3,6 +3,8 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from django.test import RequestFactory, SimpleTestCase
+from django.core.exceptions import ValidationError
+from apps.appointments.forms import AppointmentForm
 
 from apps.appointments.views import _appointment_qs
 from apps.salons.models import SalonMembership
@@ -45,3 +47,36 @@ class SpecialistIsolationTests(SimpleTestCase):
         _appointment_qs(request)
         scoped.return_value.select_related.return_value.none.assert_called_once()
 
+
+class SpecialistBookingGuardTests(SimpleTestCase):
+    def test_forged_other_staff_rejected_at_form_validation(self):
+        form = AppointmentForm.__new__(AppointmentForm)
+        form.salon = SimpleNamespace(pk="salon-a")
+        form.membership = SimpleNamespace(
+            role=SalonMembership.Role.SPECIALIST,
+            staff_profile=SimpleNamespace(pk=11, salon_id="salon-a"),
+        )
+        form.locked_staff = None
+        form.cleaned_data = {
+            "staff": SimpleNamespace(
+                pk=22, salon_id="salon-a", is_deleted=False,
+                is_active=True, is_bookable=True,
+            )
+        }
+        with self.assertRaisesMessage(ValidationError, "فقط می‌توانید برای خودتان"):
+            form.clean_staff()
+
+    def test_own_staff_accepted_at_form_validation(self):
+        form = AppointmentForm.__new__(AppointmentForm)
+        form.salon = SimpleNamespace(pk="salon-a")
+        form.membership = SimpleNamespace(
+            role=SalonMembership.Role.SPECIALIST,
+            staff_profile=SimpleNamespace(pk=11, salon_id="salon-a"),
+        )
+        form.locked_staff = None
+        own_staff = SimpleNamespace(
+            pk=11, salon_id="salon-a", is_deleted=False,
+            is_active=True, is_bookable=True,
+        )
+        form.cleaned_data = {"staff": own_staff}
+        self.assertIs(form.clean_staff(), own_staff)
