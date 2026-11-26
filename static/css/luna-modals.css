@@ -933,3 +933,20 @@ body.theme-app .luna-modal-root .luna-modal .inventory-create-modal__foot {
     min-width:0;
   }
 }
+
+
+/* Payment dialog is not a service editor: prevent service-only paired field
+   rules from affecting the finance workflow. */
+body.theme-app .luna-modal-root .luna-modal--payment {
+  --modal-max-width:560px;
+}
+body.theme-app .luna-modal-root .luna-modal--payment .finance-payment-form--modal {
+  min-width:0;
+  width:100%;
+}
+body.theme-app .luna-modal-root .luna-modal--payment .finance-payment-form__field {
+  min-width:0;
+}
+body.theme-app .luna-modal-root .luna-modal--payment :is(input,select,textarea) {
+  max-width:100%;
+}
