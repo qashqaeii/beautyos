@@ -27,3 +27,24 @@
 .cash-close-page :is(a,button,input,textarea):focus-visible{outline:2px solid #9c746b;outline-offset:2px}
 @media(max-width:900px){.cash-close-layout{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){.cash-close-hero{padding:13px;flex-wrap:wrap}.cash-close-hero h1{font-size:16px}.cash-close-back{margin-inline-start:0}.cash-close-fields{grid-template-columns:minmax(0,1fr)}.cash-close-page .fin-panel{padding:13px}.cash-close-page .fin-line{align-items:flex-start}.cash-close-page .fin-line bdi{white-space:normal;text-align:left}}
+
+/* Compact reconciliation cards and a deliberately small confirmation dialog. */
+.cash-close-summary{display:grid;gap:10px}
+.cash-close-summary .fin-panel-head{margin-bottom:0}
+.cash-close-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cash-close-metric{display:flex;flex-direction:column;gap:6px;min-width:0;padding:14px;border:1px solid #e8ded7;border-radius:13px;background:#fffdfa}
+.cash-close-metric--cash{background:#f3ede6;border-color:#d9c9bd}
+.cash-close-metric span{font-size:12px;color:#796961}
+.cash-close-metric strong{font-size:clamp(16px,1.6vw,23px);font-weight:750;color:#4d3e39;overflow-wrap:anywhere}
+.cash-close-metric small{font-size:10px;color:#85766d;line-height:1.6}
+.cash-close-page .cash-close-form .fin-muted{margin:0 0 12px}
+.cash-close-page .cash-close-form .cash-close-actions{margin-top:16px}
+.cash-close-page .cash-close-form .cash-close-actions .btn-primary{gap:8px}
+.cash-close-confirm-root{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:18px;background:rgba(35,29,27,.52);backdrop-filter:blur(3px)}
+.cash-close-confirm{box-sizing:border-box;width:min(100%,440px);padding:25px;border:1px solid #e6d8cf;border-radius:19px;background:#fffdfa;box-shadow:0 24px 70px rgba(29,23,19,.22);text-align:center}
+.cash-close-confirm__icon{width:48px;height:48px;margin:0 auto 12px;display:grid;place-items:center;border-radius:14px;background:#efe4da;color:#84675a}
+.cash-close-confirm h2{margin:0 0 10px;font-size:18px;color:#483b35;font-weight:750}
+.cash-close-confirm p{margin:0;font-size:13px;line-height:1.9;color:#77685e}
+.cash-close-confirm__actions{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:22px}
+.cash-close-confirm__actions button{min-height:42px;border-radius:10px;padding:9px 14px}
+@media(max-width:700px){.cash-close-metrics{grid-template-columns:minmax(0,1fr)}.cash-close-metric{padding:12px}.cash-close-confirm{padding:19px}}
