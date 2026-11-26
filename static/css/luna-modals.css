@@ -994,3 +994,60 @@ body.theme-app .luna-modal.appointment-booking-modal .appt-booking-advanced__tog
     min-width:0;
   }
 }
+
+
+/* Customer dialogs: compact identity fields, clear optional information and
+   safe file-preview / consent controls. */
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) {
+  min-width:0;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form__primary-grid {
+  min-width:0;
+  gap:10px 12px;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form-field {
+  min-width:0;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form-advanced__toggle {
+  width:100%;
+  min-height:42px;
+  text-align:right;
+  border-radius:10px;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form-advanced__toggle:focus-visible {
+  outline:2px solid #9d726e;
+  outline-offset:2px;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form-file {
+  min-width:0;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form-file__name {
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form-file__preview {
+  display:block;
+  max-width:100%;
+  max-height:112px;
+  object-fit:contain;
+  border-radius:10px;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .luna-modal-choice-grid {
+  min-width:0;
+  gap:8px;
+}
+body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form-checkbox {
+  min-width:0;
+  align-items:center;
+  gap:8px;
+  line-height:1.6;
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal-root .luna-modal :is(#customer-create-form,#customer-edit-form) .customer-form__primary-grid {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
