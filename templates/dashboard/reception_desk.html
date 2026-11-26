@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{% static 'css/luna-reception.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/reception-flow.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/reception-dashboard-v3.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/reception-calendar-polish.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 <script defer src="{% static 'js/reception-dashboard-v4.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
 {% if can_book_appointment and appointment_form %}
 <script defer src="{% static 'js/appointment-customer-picker.js' %}?v={{ BEAUTYOS_ASSET_VERSION }}"></script>
@@ -46,6 +47,16 @@
   @keydown.escape.window="bookOpen && !window.__beautyosJalaliCalendarOpen && closeModals()"
 >
 {% include "partials/reception_desk_header.html" %}
+<nav class="reception-week" aria-label="انتخاب روز هفته">
+  <div class="reception-week__heading"><span>تقویم پذیرش</span><small>برای مشاهده نوبت‌ها، روز را انتخاب کنید</small></div>
+  <div class="reception-week__days">
+    {% for d in reception_week_days %}
+    <a class="reception-week__day{% if d.selected %} is-selected{% endif %}" href="{% url 'reception:desk' %}?day={{ d.iso }}{% if selected_service %}&amp;service={{ selected_service.pk }}{% endif %}{% if selected_slot_staff_id %}&amp;staff={{ selected_slot_staff_id }}{% endif %}" {% if d.selected %}aria-current="date"{% endif %}>
+      <span>{{ d.day|date:"l" }}</span><strong>{{ d.day|date:"j"|fa_num }}</strong>
+    </a>
+    {% endfor %}
+  </div>
+</nav>
 
 <section class="reception-overview-kpis" aria-label="آمار پذیرش">
   <article class="reception-overview-kpi reception-overview-kpi--featured">
@@ -210,7 +221,7 @@
         {% endif %}
       </div>
     </div>
-    <details class="reception-operations-disclosure">
+    <details class="reception-operations-disclosure" open>
       <summary><i data-lucide="list-checks" aria-hidden="true"></i> مشاهده و مدیریت نوبت‌های روز <i data-lucide="chevron-down" aria-hidden="true"></i></summary>
       <div class="reception-operations-disclosure__content">
     <div class="reception-flow__metrics reception-flow__metrics--secondary" aria-label="وضعیت عملیات روز">
