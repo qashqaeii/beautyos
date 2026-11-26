@@ -1,0 +1,49 @@
+{% extends "layouts/app_shell.html" %}
+{% load format_tags appointment_tags %}
+{% block title %}میز کار من · {{ active_salon.name }}{% endblock %}
+{% block page_eyebrow %}{{ today_jalali }}{% endblock %}
+{% block page_title %}<span class="inline-flex items-center gap-3"><i data-lucide="scissors" class="h-7 w-7 shrink-0" style="color:var(--color-primary)" aria-hidden="true"></i>میز کار من</span>{% endblock %}
+{% block page_subtitle %}{{ profile.full_display_name }} · برنامه و عملکرد اختصاصی شما{% endblock %}
+{% block content %}
+<div class="space-y-5">
+  <section class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div class="maison-panel"><i data-lucide="calendar-check" class="h-6 w-6" style="color:var(--color-primary)" aria-hidden="true"></i><p class="mt-2 text-xs text-ink-muted">نوبت‌های امروز</p><p class="mt-1 text-2xl font-bold tabular-nums">{{ today_count|persian_digits }}</p></div>
+    <div class="maison-panel"><i data-lucide="calendar-clock" class="h-6 w-6" style="color:var(--color-primary)" aria-hidden="true"></i><p class="mt-2 text-xs text-ink-muted">نوبت‌های پیش رو</p><p class="mt-1 text-2xl font-bold tabular-nums">{{ upcoming_count|persian_digits }}</p></div>
+    <div class="maison-panel"><i data-lucide="calendar-days" class="h-6 w-6" style="color:var(--color-primary)" aria-hidden="true"></i><p class="mt-2 text-xs text-ink-muted">رزروهای این ماه</p><p class="mt-1 text-2xl font-bold tabular-nums">{{ month_count|persian_digits }}</p></div>
+    <div class="maison-panel"><i data-lucide="clock-3" class="h-6 w-6" style="color:var(--color-primary)" aria-hidden="true"></i><p class="mt-2 text-xs text-ink-muted">ساعت کاری امروز</p><p class="mt-1 text-lg font-semibold tabular-nums">{% if hours and not hours.is_closed %}{{ hours.start_time|time:"H:i"|persian_digits }} تا {{ hours.end_time|time:"H:i"|persian_digits }}{% else %}تعطیل یا ثبت‌نشده{% endif %}</p></div>
+  </section>
+  <div class="grid gap-4 lg:grid-cols-3">
+    <section class="maison-panel lg:col-span-2">
+      <div class="mb-4 flex items-center justify-between gap-3"><h2 class="inline-flex items-center gap-2 font-semibold"><i data-lucide="list-checks" class="h-5 w-5" aria-hidden="true"></i>نوبت‌های امروز</h2><a class="text-sm" href="{% url 'appointments:calendar' %}?staff={{ profile.pk }}">تقویم من</a></div>
+      {% for a in today_appointments %}
+      <div class="border-b py-3 last:border-0" style="border-color:var(--color-divider)">{% include "partials/appointment_card_compact.html" with appointment=a %}</div>
+      {% empty %}<p class="py-6 text-sm text-ink-muted">برای امروز نوبتی ثبت نشده است.</p>{% endfor %}
+    </section>
+    <section class="maison-panel">
+      <h2 class="mb-4 inline-flex items-center gap-2 font-semibold"><i data-lucide="arrow-up-right" class="h-5 w-5" aria-hidden="true"></i>نوبت‌های پیش رو</h2>
+      {% for a in upcoming_appointments %}
+      <div class="border-b py-3 text-sm last:border-0" style="border-color:var(--color-divider)"><p class="font-semibold">{{ a.start_at|date:"Y/m/d" }} · {{ a.start_at|fa_time }}</p><p class="mt-1 text-ink-muted">{{ a.service.name }}</p></div>
+      {% empty %}<p class="text-sm text-ink-muted">نوبت آینده‌ای ندارید.</p>{% endfor %}
+    </section>
+  </div>
+  <section class="maison-panel">
+    <h2 class="mb-4 inline-flex items-center gap-2 font-semibold"><i data-lucide="chart-no-axes-column" class="h-5 w-5" aria-hidden="true"></i>خلاصه عملکرد ماه جاری</h2>
+    <div class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
+      <div><p class="text-ink-muted">رزروهای ماه</p><p class="mt-2 text-xl font-semibold">{{ month_count|persian_digits }}</p></div>
+      <div><p class="text-ink-muted">خدمات انجام‌شده</p><p class="mt-2 text-xl font-semibold">{{ month_completed|persian_digits }}</p></div>
+      <div><p class="text-ink-muted">مشتریان رزروکننده</p><p class="mt-2 text-xl font-semibold">{{ month_customers|persian_digits }}</p></div>
+    </div>
+  </section>
+  {% if finance_visible %}
+  <section class="maison-panel">
+    <h2 class="mb-4 inline-flex items-center gap-2 font-semibold"><i data-lucide="wallet" class="h-5 w-5" aria-hidden="true"></i>مالی من · ماه جاری</h2>
+    <div class="grid gap-4 text-sm sm:grid-cols-3">
+      <div><p class="text-ink-muted">پورسانت این ماه</p><p class="mt-2 text-xl font-semibold tabular-nums">{{ earned|fa_money }} تومان</p></div>
+      <div><p class="text-ink-muted">تسویه‌شده</p><p class="mt-2 text-xl font-semibold tabular-nums">{{ settled|fa_money }} تومان</p></div>
+      <div><p class="text-ink-muted">مانده تسویه</p><p class="mt-2 text-xl font-semibold tabular-nums">{{ outstanding|fa_money }} تومان</p></div>
+    </div>
+    <p class="mt-4 text-xs text-ink-muted">مبالغ بر اساس پورسانت‌های ثبت‌شده در ماه جاری محاسبه شده‌اند.</p>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
