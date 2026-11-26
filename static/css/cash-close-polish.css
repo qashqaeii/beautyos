@@ -1,0 +1,29 @@
+/* Daily cash closing workspace — scoped, responsive, RTL. */
+.cash-close-page{max-width:1240px;margin:0 auto;display:grid;gap:14px;min-width:0}
+.cash-close-hero{display:flex;align-items:center;gap:13px;padding:17px 20px;background:linear-gradient(110deg,#f7f0eb,#fbf8f5);border:1px solid #e9ddd6;border-radius:18px}
+.cash-close-hero__icon{display:grid;place-items:center;flex:0 0 44px;height:44px;border-radius:14px;background:#e9dad1;color:#8a635a}
+.cash-close-hero__icon svg{width:23px;height:23px}
+.cash-close-hero h1{margin:0;font-size:19px;font-weight:750;color:#493b36}
+.cash-close-hero p{margin:4px 0 0;color:#806e65;font-size:12px}
+.cash-close-back{margin-inline-start:auto;white-space:nowrap;border:1px solid #d9c9c0;border-radius:10px;padding:9px 13px;color:#77574f;text-decoration:none;font-size:12px}
+.cash-close-layout{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(245px,.8fr);gap:14px;align-items:start}
+.cash-close-main,.cash-close-aside{display:grid;gap:14px;min-width:0}
+.cash-close-page .fin-panel{border-radius:16px;min-width:0;padding:17px}
+.cash-close-page .fin-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.cash-close-page .fin-panel-head h2{display:flex;align-items:center;gap:8px;font-size:14px}
+.cash-close-page .fin-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0}
+.cash-close-page .fin-line bdi{white-space:nowrap;font-weight:700}
+.cash-close-page .fin-muted{font-size:12px;line-height:1.8}
+.cash-close-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cash-close-field{display:grid;gap:6px;min-width:0}
+.cash-close-field--wide{grid-column:1/-1}
+.cash-close-field label{font-size:12px;font-weight:650;text-align:right}
+.cash-close-field :is(input,textarea){width:100%;min-width:0;box-sizing:border-box;text-align:right;border-radius:10px}
+.cash-close-field input{min-height:42px}
+.cash-close-field textarea{resize:vertical;min-height:66px}
+.cash-close-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:15px}
+.cash-close-actions :is(button,a){display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 16px;border-radius:10px;text-decoration:none}
+.cash-close-history .fin-line a{color:#86635b}
+.cash-close-page :is(a,button,input,textarea):focus-visible{outline:2px solid #9c746b;outline-offset:2px}
+@media(max-width:900px){.cash-close-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.cash-close-hero{padding:13px;flex-wrap:wrap}.cash-close-hero h1{font-size:16px}.cash-close-back{margin-inline-start:0}.cash-close-fields{grid-template-columns:minmax(0,1fr)}.cash-close-page .fin-panel{padding:13px}.cash-close-page .fin-line{align-items:flex-start}.cash-close-page .fin-line bdi{white-space:normal;text-align:left}}
