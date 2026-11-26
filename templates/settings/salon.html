@@ -37,7 +37,7 @@
 @media(max-width:850px){#workspace-content .salon-settings-board .ss-profile{grid-template-columns:1fr}.ss-extra .suite-hours-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.ss-hero svg{width:50px}.ss-extra .suite-hours-grid{grid-template-columns:1fr}}
 </style>
-<div class="suite-settings salon-settings-board" x-data="{ tab: '{% if hours_errors %}hours{% elif retention_form.errors %}rules{% else %}profile{% endif %}' }">
+<div class="suite-settings salon-settings-board" x-data="{ tab: '{{ active_tab|default:'profile'|escapejs }}' }">
 <header class="ss-hero"><div><h1>اطلاعات سالن</h1><p>{{ salon.name }} · {{ business_type_label }} · {% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</p></div><svg viewBox="0 0 100 70" aria-hidden="true"><rect x="14" y="24" width="72" height="39" rx="7" fill="#f9eee8" stroke="#b78b7e"/><path d="M9 25L20 8h60l11 17" fill="#d9b5a5" stroke="#a7796d"/><path d="M30 9l-5 16m20-16-2 16m12-16 2 16m13-16 5 16" stroke="#fff5ed" stroke-width="3"/><rect x="42" y="37" width="16" height="26" rx="3" fill="#b98c80"/><rect x="21" y="37" width="14" height="13" rx="3" fill="#e5c9bc"/><rect x="65" y="37" width="14" height="13" rx="3" fill="#e5c9bc"/></svg></header>
 <nav class="ss-tabs" aria-label="بخش‌های اطلاعات سالن"><button type="button" @click="tab='profile'" :aria-pressed="tab==='profile'">اطلاعات و هویت سالن</button><button type="button" @click="tab='hours'" :aria-pressed="tab==='hours'">ساعات فعالیت</button><button type="button" @click="tab='rules'" :aria-pressed="tab==='rules'">قوانین رزرو</button></nav>
   {% if salon_onboarding_available %}
