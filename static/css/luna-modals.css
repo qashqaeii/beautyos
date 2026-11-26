@@ -1160,3 +1160,51 @@ body.theme-app .luna-modal-root .luna-modal #inventory-create-form :is(
     grid-template-columns:minmax(0,1fr);
   }
 }
+
+
+/* Finance dialogs: payment type is a choice, not a service field.
+   Expense fields remain a compact grid with independent error handling. */
+body.theme-app .luna-modal--payment #finance-payment-create-form,
+body.theme-app .luna-modal--expense #expense-create-form {
+  min-width:0;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__section {
+  min-width:0;
+  border:0;
+  padding:0;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__section legend {
+  padding:0 0 8px;
+  text-align:right;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__section .luna-service-paired-grid {
+  gap:8px;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-form__section .luna-service-field-card {
+  min-width:0;
+  cursor:pointer;
+  line-height:1.6;
+}
+body.theme-app .luna-modal--payment #finance-payment-create-form .finance-payment-picker-hint {
+  margin:10px 0 0;
+  line-height:1.8;
+  overflow-wrap:anywhere;
+}
+body.theme-app .luna-modal--expense #expense-create-form .luna-service-paired-grid {
+  min-width:0;
+  gap:10px 12px;
+}
+body.theme-app .luna-modal--expense #expense-create-form .luna-service-field-card {
+  min-width:0;
+}
+body.theme-app :is(.luna-modal--expense #expense-create-form,.luna-modal--payment #finance-payment-create-form) :is(
+  .service-form-field__error,.finance-payment-form__error,[role="alert"]
+) {
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+@media(max-width:639px) {
+  body.theme-app :is(.luna-modal--expense #expense-create-form,.luna-modal--payment #finance-payment-create-form) .luna-service-paired-grid {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
