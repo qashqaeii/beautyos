@@ -109,6 +109,16 @@ class AppointmentForm(PersianModelForm):
                 is_active=True, is_deleted=False, is_bookable=True
             )
             service_qs = Service.scoped(salon).filter(is_active=True, is_deleted=False)
+            from apps.salons.models import SalonMembership
+            if membership and membership.role == SalonMembership.Role.SPECIALIST:
+                own_profile = getattr(membership, "staff_profile", None)
+                staff_qs = staff_qs.filter(pk=own_profile.pk) if (
+                    own_profile and own_profile.salon_id == salon.pk
+                    and own_profile.is_active and not own_profile.is_deleted
+                ) else staff_qs.none()
+                # A forged staff preset must never bypass the authenticated identity.
+                if self.locked_staff and not staff_qs.filter(pk=self.locked_staff.pk).exists():
+                    self.locked_staff = None
             if self.locked_staff:
                 self.fields["staff"].widget = forms.HiddenInput()
                 self.fields["staff"].queryset = staff_qs.filter(pk=self.locked_staff.pk)
@@ -200,6 +210,11 @@ class AppointmentForm(PersianModelForm):
             raise ValidationError("متخصص معتبر نیست.")
         if self.locked_staff and staff.pk != self.locked_staff.pk:
             raise ValidationError("متخصص قابل تغییر نیست.")
+        from apps.salons.models import SalonMembership
+        if self.membership and self.membership.role == SalonMembership.Role.SPECIALIST:
+            own_profile = getattr(self.membership, "staff_profile", None)
+            if not own_profile or own_profile.salon_id != self.salon.pk or staff.pk != own_profile.pk:
+                raise ValidationError("فقط می‌توانید برای خودتان نوبت ثبت کنید.")
         return staff
 
     def clean(self):
