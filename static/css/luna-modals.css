@@ -1110,3 +1110,53 @@ body.theme-app .luna-modal--service :is(#service-create-form,#service-edit-form)
     grid-template-columns:minmax(0,1fr);
   }
 }
+
+
+/* Inventory: product identity, category creation and quantity thresholds have
+   separate rhythms; only their visual affordances are shared. */
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form,
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form .inventory-form__fields {
+  min-width:0;
+}
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form .inventory-form-field {
+  min-width:0;
+}
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form .inventory-form-grid {
+  min-width:0;
+  gap:10px 12px;
+}
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form .inventory-form-field__category-head {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px 10px;
+}
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form .inventory-form-category-panel {
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+}
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form .inventory-form-category-panel__actions {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form .inventory-form-field__error {
+  margin:3px 0 0;
+  line-height:1.65;
+  overflow-wrap:anywhere;
+}
+body.theme-app .luna-modal-root .luna-modal #inventory-create-form :is(
+  .inventory-form__add-category-btn,.inventory-form-category-panel__cancel
+):focus-visible {
+  outline:2px solid #9d726e;
+  outline-offset:2px;
+  border-radius:6px;
+}
+@media(max-width:639px) {
+  body.theme-app .luna-modal-root .luna-modal #inventory-create-form .inventory-form-grid {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
