@@ -80,7 +80,8 @@ def test_phase5_day_queue_shows_actions_real_payment_and_tenant_data(
     response = client.get(reverse("reception:desk"), {"day": day.isoformat()})
     assert response.status_code == 200
     text = response.content.decode()
-    assert "جریان کار امروز سالن" in text
+    assert 'id="reception-flow-title"' in text
+    assert "نوبت‌های روز انتخاب‌شده" in text
     assert "تأیید نوبت" in text
     assert "نرگس امینی" in text
     assert "۸۰۰.۰۰۰" in text  # fa_money uses Persian digits and dot grouping
