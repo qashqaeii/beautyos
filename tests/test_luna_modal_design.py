@@ -39,8 +39,13 @@ def test_staff_profile_form_has_grouped_controls_and_native_upload():
     assert isinstance(form.fields["avatar"].widget, ProfileImageWidget)
     assert isinstance(form.fields["services"].widget, CheckboxSelectMultiple)
     source=(ROOT / "templates/staff/partials/staff_edit_form.html").read_text(encoding="utf-8")
-    for name in ("avatar","display_name","title","bio","is_active","is_bookable","calendar_color","services"):
+    for name in ("avatar","display_name","bio","is_active","is_bookable","calendar_color","services"):
         assert "{{ form."+name+" }}" in source
+    assert 'type="hidden" name="title"' in source
+    assert 'value="{{ form.title.value|default_if_none:' in source
+    assert 'aria-controls="staff-specialty-options"' in source
+    assert 'id="staff-specialty-options"' in source
+    assert '$refs.specialtyTitle.value' in source
     assert 'enctype="multipart/form-data"' in source
     assert "luna-form-section" in source
     assert "luna-switch" in source
