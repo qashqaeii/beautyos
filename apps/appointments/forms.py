@@ -135,10 +135,11 @@ class AppointmentForm(PersianModelForm):
                 ).values_list("pk", "services__pk"):
                     assignments[staff_id].append(service_id)
                 staff_field = self.fields["staff"]
-                staff_field.queryset = staff_qs.filter(pk__in=assignments)
                 staff_field.widget = ServiceStaffSelect(attrs={"class": "input-field", "data-booking-staff-filter": "true"})
                 staff_field.widget.service_ids_by_staff = assignments
                 staff_field.empty_label = "ابتدا خدمت را انتخاب کنید"
+                # Assign the queryset after replacing the widget so Django binds its choices.
+                staff_field.queryset = staff_qs.filter(pk__in=assignments)
                 self.fields["staff"].label_from_instance = lambda obj: obj.full_display_name
             self.fields["service"].queryset = service_qs
             self.fields["service"].empty_label = "انتخاب خدمت"
