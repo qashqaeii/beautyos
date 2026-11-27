@@ -25,21 +25,27 @@ class SpecialistIsolationTests(SimpleTestCase):
         )
         return request
 
+    @patch("apps.appointments.views.StaffProfile.scoped")
     @patch("apps.appointments.views.Appointment.scoped")
-    def test_appointment_query_always_filters_to_own_profile(self, scoped):
+    def test_appointment_query_always_filters_to_own_profile(self, scoped, staff_scoped):
+        staff_scoped.return_value.filter.return_value.exists.return_value = True
         request = self.request()
         _appointment_qs(request)
         scoped.return_value.select_related.return_value.filter.assert_any_call(staff=self.profile)
 
+    @patch("apps.appointments.views.StaffProfile.scoped")
     @patch("apps.appointments.views.Appointment.scoped")
-    def test_missing_profile_returns_no_appointments(self, scoped):
+    def test_missing_profile_returns_no_appointments(self, scoped, staff_scoped):
+        staff_scoped.return_value.filter.return_value.exists.return_value = True
         request = self.request()
         request.membership.staff_profile = None
         _appointment_qs(request)
         scoped.return_value.select_related.return_value.none.assert_called_once()
 
+    @patch("apps.appointments.views.StaffProfile.scoped")
     @patch("apps.appointments.views.Appointment.scoped")
-    def test_foreign_salon_profile_returns_no_appointments(self, scoped):
+    def test_foreign_salon_profile_returns_no_appointments(self, scoped, staff_scoped):
+        staff_scoped.return_value.filter.return_value.exists.return_value = True
         request = self.request()
         request.membership.staff_profile = SimpleNamespace(
             pk=22, salon_id="salon-b", is_active=True, is_deleted=False
@@ -63,8 +69,9 @@ class SpecialistBookingGuardTests(SimpleTestCase):
                 is_active=True, is_bookable=True,
             )
         }
-        with self.assertRaisesMessage(ValidationError, "فقط می‌توانید برای خودتان"):
+        with self.assertRaises(ValidationError) as caught:
             form.clean_staff()
+        self.assertEqual(caught.exception.messages, ["فقط می‌توانید برای خودتان نوبت ثبت کنید."])
 
     def test_own_staff_accepted_at_form_validation(self):
         form = AppointmentForm.__new__(AppointmentForm)
