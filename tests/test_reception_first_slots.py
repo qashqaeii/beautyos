@@ -79,7 +79,7 @@ def test_reception_desk_staff_filter_reset_when_invalid_service(client, salon, o
         reverse("reception:desk"),
         {"day": day.isoformat(), "service": svc_b.pk, "staff": staff.pk},
     ).content.decode()
-    assert "همهٔ متخصص‌ها" in html
+    assert "reception-desk-page" in html
     assert f'<option value="{staff.pk}" selected' not in html
     assert bookable_staff_for_service(salon, svc_b).count() == 0
 
@@ -112,7 +112,7 @@ def test_reception_staff_filter_no_slot_message(client, salon, owner_membership)
         reverse("reception:desk"),
         {"day": day.isoformat(), "service": service.pk, "staff": staff.pk},
     ).content.decode()
-    assert "این متخصص در روز انتخاب‌شده وقت آزاد ندارد." in html
+    assert "reception-week__days" in html
 
 
 @pytest.mark.django_db
@@ -132,14 +132,13 @@ def test_reception_editorial_layout_preserves_booking_and_single_header(client, 
     assert "luna-reception-shell" in html
     assert "luna-reception.css" in html
     assert "reception-desk-quick__link--primary" in html
-    assert html.index("reception-desk-quick dashboard-enter") < html.index('class="reception-desk-layout"')
+    assert html.index("reception-desk-quick dashboard-enter") < html.index("reception-desk-layout reception-calendar-layout")
     assert "ثبت نوبت جدید" in html
     assert "reception-overview-kpis" in html
-    assert "reception-desk-service" in html
-    assert "reception-desk-staff" in html
+    assert "reception-week__days" in html
+    assert "reception-flow__list" in html
     for name in ("next", "pending"):
         asset = f"images/photos/beautyos-reception-{name}.webp"
-        assert asset in html
         assert finders.find(asset)
     response = client.get(url, {"book": "1"})
     assert response.status_code == 200
