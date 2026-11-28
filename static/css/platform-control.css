@@ -897,3 +897,28 @@ a.pc-exec__row:hover{background:var(--color-surface-muted,#faf7f4)}
 .pc-audit .pc-audit__empty p{margin-top:5px;font-size:.75rem;color:var(--color-text-secondary)}
 .pc-audit .pc-directory__surface .pc-pagination{padding:12px}
 @media(prefers-reduced-motion:no-preference){.pc-audit .pc-directory__surface{animation:pc-exec-enter .32s ease-out both}}
+
+/* System diagnostics — compact executive layout; configuration is not live monitoring. */
+.pc-system .pc-exec__heading{padding:12px 16px;border:1px solid var(--color-border);border-radius:15px;background:linear-gradient(110deg,var(--color-accent-soft),var(--color-surface-elevated) 72%)}
+.pc-system .pc-kpis{gap:11px}
+.pc-system .pc-kpi{min-height:122px;padding:14px 16px;gap:7px;border-radius:15px;background:var(--color-surface-elevated);border-color:var(--color-border);box-shadow:0 3px 14px #51443f09}
+.pc-system .pc-kpi__head,.pc-system .pc-kpi p{color:var(--color-text-secondary)}
+.pc-system .pc-kpi__head svg{color:var(--color-primary)}
+.pc-system .pc-kpi>.pc-kpi__text{font-size:1.15rem;color:var(--color-text-primary)}
+.pc-system .pc-kpi>.pc-kpi__text.is-good{color:var(--color-success-text)}
+.pc-system .pc-kpi>.pc-kpi__text.is-warn{color:#916b34}
+.pc-system .pc-panel{background:var(--color-surface-elevated);border-color:var(--color-border);border-radius:15px;box-shadow:0 3px 14px #51443f09}
+.pc-system .pc-panel--padded{padding:14px 16px}
+.pc-system .pc-panel--padded>.pc-panel__header{padding:0 0 10px;margin-bottom:10px;border-color:var(--color-border)}
+.pc-system .pc-panel__header h2{display:flex;align-items:center;gap:8px;font-size:.91rem}
+.pc-system .pc-panel__header h2 svg{color:var(--color-primary);width:18px;height:18px}
+.pc-system .pc-feature-list{margin:0;gap:8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.pc-system .pc-feature-list>div{min-width:0;padding:12px;gap:9px;border-color:var(--color-border);background:var(--color-surface-muted)}
+.pc-system .pc-feature-list>div>svg{color:var(--color-primary);width:19px;height:19px}
+.pc-system .pc-feature-list>div:first-child>svg{color:var(--color-success)}
+.pc-system .pc-feature-list p{color:var(--color-text-secondary);font-size:.73rem}
+.pc-system .pc-note{padding:12px 16px;background:var(--color-surface-elevated);border-color:var(--color-border);color:var(--color-primary-hover)}
+.pc-system .pc-note p{color:var(--color-text-secondary);margin-top:4px}
+@media(max-width:960px){.pc-system .pc-feature-list{grid-template-columns:1fr}}
+@media(max-width:640px){.pc-system .pc-kpis{grid-template-columns:1fr}.pc-system .pc-kpi{min-height:100px;padding:12px}.pc-system .pc-exec__heading{padding:10px}}
+@media(prefers-reduced-motion:no-preference){.pc-system .pc-kpi,.pc-system .pc-panel{animation:pc-exec-enter .32s ease-out both}.pc-system .pc-kpi:nth-child(2){animation-delay:35ms}.pc-system .pc-kpi:nth-child(3){animation-delay:70ms}}
