@@ -1,18 +1,42 @@
 {% extends "platform_admin/base.html" %}
 {% block title %}مدیریت سالن‌ها · BeautyOS{% endblock %}
 {% block control_content %}
-<div class="pc-heading"><div><p class="pc-eyebrow">SALON DIRECTORY / ۰۲</p><h1>مدیریت سالن‌ها</h1><p>وضعیت فعالیت، پیشرفت راه‌اندازی و اعضای هر مجموعه را مدیریت کنید.</p></div></div>
-<section class="pc-panel">
-  <form method="get" class="pc-filterbar" role="search">
-    <label class="pc-search"><i data-lucide="search"></i><input name="q" value="{{ q }}" maxlength="80" placeholder="جستجو در نام، شهر، شماره یا آدرس سالن" aria-label="جستجوی سالن"></label>
-    <label class="pc-select-wrap"><span>وضعیت</span><select name="status"><option value="">همه سالن‌ها</option><option value="active" {% if status == 'active' %}selected{% endif %}>فعال</option><option value="inactive" {% if status == 'inactive' %}selected{% endif %}>غیرفعال</option><option value="setup" {% if status == 'setup' %}selected{% endif %}>نیازمند تکمیل</option></select></label>
-    <button type="submit" class="pc-button">اعمال فیلتر</button><a href="{% url 'platform_admin:salons' %}" class="pc-button pc-button--ghost">پاک‌سازی</a>
-  </form>
-  <div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>سالن</th><th>مالک و اعضا</th><th>راه‌اندازی</th><th>رزرو آنلاین</th><th>وضعیت</th><th></th></tr></thead><tbody>
-    {% for salon in page %}
-    <tr><td><div class="pc-table-name"><span class="pc-list-avatar">{{ salon.name|slice:":1" }}</span><div><strong>{{ salon.name }}</strong><small>{{ salon.city|default:"نامشخص" }} · {{ salon.slug }}</small></div></div></td><td>{{ salon.owners_count|fa_num }} مالک · {{ salon.members_count|fa_num }} عضو</td><td>{% if salon.settings.onboarding_completed_at %}<span class="pc-status pc-status--good">تکمیل</span>{% else %}<span class="pc-status pc-status--warn">در حال تکمیل</span>{% endif %}</td><td>{% if salon.is_accepting_bookings %}<span class="pc-status pc-status--good">فعال</span>{% else %}<span class="pc-status pc-status--muted">غیرفعال</span>{% endif %}</td><td><span class="pc-status {% if salon.is_active %}pc-status--good{% else %}pc-status--muted{% endif %}">{% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</span></td><td><a href="{% url 'platform_admin:salon_detail' salon_id=salon.pk %}" class="pc-table-link">پرونده سالن <i data-lucide="arrow-up-left"></i></a></td></tr>
-    {% empty %}<tr><td colspan="6" class="pc-empty">سالنی با این مشخصات پیدا نشد.</td></tr>{% endfor %}
-  </tbody></table></div>
-  {% include "platform_admin/_pagination.html" %}
-</section>
+<div class="pc-directory">
+  <header class="pc-directory__header">
+    <div class="pc-directory__identity"><span class="pc-directory__mark"><i data-lucide="store"></i></span><div><h1>مدیریت سالن‌ها</h1><p>فهرست و وضعیت عملیاتی مجموعه‌های BeautyOS</p></div></div>
+    <a href="{% url 'platform_admin:reports' %}" class="pc-directory__report"><i data-lucide="chart-no-axes-combined"></i> گزارش‌های پلتفرم</a>
+  </header>
+  <section class="pc-directory__kpis" aria-label="آمار سالن‌ها">
+    <a href="{% url 'platform_admin:salons' %}" class="pc-directory__kpi {% if not status %}is-current{% endif %}"><span>کل سالن‌ها <i data-lucide="store"></i></span><strong data-count="{{ totals.total }}">{{ totals.total|fa_num }}</strong></a>
+    <a href="?status=active" class="pc-directory__kpi {% if status == 'active' %}is-current{% endif %}"><span>سالن‌های فعال <i data-lucide="check-circle-2"></i></span><strong data-count="{{ totals.active }}">{{ totals.active|fa_num }}</strong></a>
+    <a href="?status=setup" class="pc-directory__kpi {% if status == 'setup' %}is-current{% endif %}"><span>راه‌اندازی ناتمام <i data-lucide="clipboard-list"></i></span><strong data-count="{{ totals.setup }}">{{ totals.setup|fa_num }}</strong></a>
+    <a href="?status=inactive" class="pc-directory__kpi {% if status == 'inactive' %}is-current{% endif %}"><span>سالن‌های غیرفعال <i data-lucide="pause-circle"></i></span><strong data-count="{{ totals.inactive }}">{{ totals.inactive|fa_num }}</strong></a>
+  </section>
+  <section class="pc-directory__surface" aria-label="فهرست سالن‌ها">
+    <div class="pc-directory__section-head"><div><h2>فهرست سالن‌ها</h2><p>{{ page.paginator.count|fa_num }} سالن مطابق فیلترهای انتخابی</p></div><span class="pc-directory__current">{% if status == 'setup' %}نیازمند تکمیل{% elif status == 'active' %}فعال{% elif status == 'inactive' %}غیرفعال{% else %}همه سالن‌ها{% endif %}</span></div>
+    <form method="get" class="pc-directory__filters" role="search">
+      <label class="pc-directory__search"><i data-lucide="search"></i><input name="q" value="{{ q }}" maxlength="80" placeholder="نام، شهر، شماره یا آدرس سالن" aria-label="جستجوی سالن"></label>
+      <label class="pc-directory__select"><span>وضعیت</span><select name="status" aria-label="فیلتر وضعیت"><option value="">همه سالن‌ها</option><option value="active" {% if status == 'active' %}selected{% endif %}>فعال</option><option value="inactive" {% if status == 'inactive' %}selected{% endif %}>غیرفعال</option><option value="setup" {% if status == 'setup' %}selected{% endif %}>نیازمند تکمیل</option></select></label>
+      <label class="pc-directory__select"><span>مرتب‌سازی</span><select name="sort" aria-label="مرتب‌سازی"><option value="newest" {% if sort == 'newest' %}selected{% endif %}>جدیدترین</option><option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>قدیمی‌ترین</option><option value="name" {% if sort == 'name' %}selected{% endif %}>نام سالن</option></select></label>
+      <button type="submit" class="pc-directory__apply"><i data-lucide="sliders-horizontal"></i> اعمال</button>
+      <a href="{% url 'platform_admin:salons' %}" class="pc-directory__reset">پاک‌سازی</a>
+    </form>
+    <div class="pc-directory__table-wrap"><table class="pc-directory__table"><thead><tr><th>سالن</th><th>مالک و اعضا</th><th>راه‌اندازی</th><th>رزرو آنلاین</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>
+      {% for salon in page %}
+      <tr><td><div class="pc-directory__salon"><span class="pc-directory__avatar">{{ salon.name|slice:":1" }}</span><div><strong>{{ salon.name }}</strong><small>{{ salon.city|default:"شهر نامشخص" }} · {{ salon.slug|truncatechars:26 }}</small></div></div></td><td class="pc-directory__muted">{{ salon.owners_count|fa_num }} مالک · {{ salon.members_count|fa_num }} عضو</td><td>{% if salon.settings.onboarding_completed_at %}<span class="pc-status pc-status--good">تکمیل‌شده</span>{% else %}<span class="pc-status pc-status--warn">در حال تکمیل</span>{% endif %}</td><td>{% if salon.is_accepting_bookings %}<span class="pc-status pc-status--good">فعال</span>{% else %}<span class="pc-status pc-status--muted">غیرفعال</span>{% endif %}</td><td><span class="pc-status {% if salon.is_active %}pc-status--good{% else %}pc-status--muted{% endif %}">{% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</span></td><td><a class="pc-directory__detail" href="{% url 'platform_admin:salon_detail' salon_id=salon.pk %}">پرونده سالن <i data-lucide="arrow-up-left"></i></a></td></tr>
+      {% empty %}<tr><td colspan="6" class="pc-directory__empty"><i data-lucide="search-x"></i><strong>سالنی پیدا نشد</strong><span>فیلترها یا عبارت جست‌وجو را تغییر دهید.</span></td></tr>{% endfor %}
+    </tbody></table></div>
+    {% include "platform_admin/_pagination.html" %}
+  </section>
+</div>
+<script>
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.pc-directory__kpi [data-count]').forEach(function(el){
+    var target=Number(el.dataset.count);
+    if(!Number.isSafeInteger(target)||target<0||target>100000000)return;
+    var start;function tick(now){if(start===undefined)start=now;var p=Math.min((now-start)/400,1);el.textContent=new Intl.NumberFormat('fa-IR').format(Math.round(target*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick);
+  });
+})();
+</script>
 {% endblock %}
