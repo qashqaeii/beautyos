@@ -215,7 +215,7 @@
       {% endfor %}
     </div>
     {% if day_operations_summary.truncated %}
-      <p class="reception-flow__more">این فهرست حداکثر ۱۰۰ نوبت اول روز را نمایش می‌دهد. برای بررسی سایر نوبت‌ها به تقویم مراجعه کنید.</p>
+      <p class="reception-flow__more">از {{ day_operations_summary.total|fa_num }} نوبت این روز، {{ day_operations_summary.visible_count|fa_num }} نوبت نمایش داده شده است. برای مشاهده سایر نوبت‌ها به تقویم مراجعه کنید.</p>
     {% endif %}
   </section>
 
