@@ -39,13 +39,14 @@
   </div>
   <p class="pc-subtle">عملیات فقط برای مدیر ارشد پلتفرم مجاز است و در تاریخچه اشتراک ثبت می‌شود.</p>
 </section>
+<div class="pc-kpis" style="margin-block:16px"><article class="pc-kpi"><span>سفارش‌های تأییدشده پلتفرم</span><strong>{{ verified_order_count|fa_num }}</strong></article><article class="pc-kpi"><span>مجموع پرداخت‌های تأییدشده اشتراک</span><strong>{{ verified_revenue_toman|fa_money }} تومان</strong></article></div>
 <section class="pc-panel pc-panel--padded" aria-labelledby="saas-orders-heading" style="margin-block:16px">
   <div class="pc-panel__header"><div><p class="pc-eyebrow">SAAS BILLING / READ ONLY</p><h2 id="saas-orders-heading">سفارش‌های اشتراک پلتفرم</h2><p>۲۰ سفارش اخیر · مستقل از فاکتور و دریافت‌های سالن</p></div></div>
   <div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>سالن</th><th>پلن</th><th>مبلغ ثابت سفارش</th><th>وضعیت</th><th>تاریخ</th></tr></thead><tbody>
   {% for order in recent_orders %}<tr><td>{{ order.salon.name }}</td><td>{{ order.plan.name }}</td><td>{{ order.amount_toman|fa_money }} تومان</td><td>{{ order.get_status_display }}</td><td>{{ order.created_at|fa_jalali_datetime }}</td></tr>
   {% empty %}<tr><td colspan="5">هنوز سفارش اشتراک ثبت نشده است.</td></tr>{% endfor %}
   </tbody></table></div>
-  <p class="pc-subtle">سفارش در انتظار پرداخت، درآمد محسوب نمی‌شود. فعال‌سازی درگاه و تأیید پرداخت هنوز پیاده‌سازی نشده است.</p>
+  <p class="pc-subtle">سفارش در انتظار پرداخت، درآمد محسوب نمی‌شود. سرویس تسویه امن آماده اتصال است، اما درگاه پرداخت هنوز متصل نشده و هیچ تراکنشی بدون تأیید سمت سرور معتبر نیست.</p>
 </section>
 <section class="pc-panel pc-subscriptions__plans">
   <div class="pc-panel__header"><h2>پلن‌های پلتفرم</h2><span class="pc-subtle">تعریف پلن فقط توسط مدیر مجاز</span></div>
