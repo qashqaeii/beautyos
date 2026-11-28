@@ -41,6 +41,10 @@
         href="{% url 'website:contact' %}"
         class="public-nav-link {% if url_name == 'contact' %}public-nav-link--active{% endif %}" {% if url_name == 'contact' %}aria-current="page"{% endif %}
       >تماس با ما</a>
+      <a
+        href="{% url 'platform_admin:login' %}"
+        class="public-nav-link"
+      >مدیریت پنل</a>
     </nav>
 
     <div class="public-nav__actions">
@@ -114,6 +118,7 @@
       <a href="{% url 'website:home' %}#faq" class="public-nav-drawer__link" @click="navOpen = false">سوالات</a>
       <a href="{% url 'website:faq' %}" class="public-nav-drawer__link {% if url_name == 'faq' %}is-active{% endif %}" {% if url_name == 'faq' %}aria-current="page"{% endif %} @click="navOpen = false">راهنمای کامل</a>
       <a href="{% url 'website:contact' %}" class="public-nav-drawer__link {% if url_name == 'contact' %}is-active{% endif %}" {% if url_name == 'contact' %}aria-current="page"{% endif %} @click="navOpen = false">تماس با ما</a>
+      <a href="{% url 'platform_admin:login' %}" class="public-nav-drawer__link" @click="navOpen = false">مدیریت پنل</a>
     </nav>
     <div class="public-nav-drawer__footer">
       {% if user.is_authenticated %}
