@@ -382,3 +382,67 @@ a.pc-list-row:hover{background:#faf8fc}
     min-height:85px;max-height:none;padding:9px;
   }
 }
+
+
+/* Executive Workspace v4: concise, non-repeating information architecture. */
+.pc-content:has(.pc-executive-priorities){gap:12px}
+.pc-content:has(.pc-executive-priorities) .pc-command-hero{
+  padding:17px 22px 13px;border-radius:15px;
+  background:linear-gradient(115deg,#f1e6e0 0%,#fffdfc 78%);
+}
+.pc-content:has(.pc-executive-priorities) .pc-command-hero__meta{display:none}
+.pc-content:has(.pc-executive-priorities) .pc-command-hero .pc-heading h1{
+  font-size:1.45rem;letter-spacing:-.025em
+}
+.pc-content:has(.pc-executive-priorities) .pc-command-hero .pc-heading p:not(.pc-eyebrow){font-size:.77rem}
+.pc-content:has(.pc-executive-priorities) .pc-period{
+  margin:0;min-height:35px;justify-self:start
+}
+.pc-content:has(.pc-executive-priorities)>.pc-kpis--overview{
+  gap:9px;grid-template-columns:repeat(4,minmax(0,1fr))
+}
+.pc-content:has(.pc-executive-priorities)>.pc-kpis--overview>.pc-kpi{
+  min-height:84px;max-height:none;padding:12px 14px;border-radius:13px;
+  gap:4px;box-shadow:0 3px 12px rgba(81,68,63,.035)
+}
+.pc-content:has(.pc-executive-priorities)>.pc-kpis--overview .pc-kpi>strong{font-size:1.32rem}
+.pc-content:has(.pc-executive-priorities)>.pc-kpis--overview .pc-kpi>.pc-kpi__amount{font-size:1.07rem}
+.pc-executive-priorities{
+  display:flex;align-items:center;gap:18px;padding:11px 15px;
+  border:1px solid #e5dcd6;border-radius:14px;background:#fffdfc;
+  box-shadow:0 3px 12px rgba(81,68,63,.03)
+}
+.pc-executive-priorities__title{display:flex;align-items:center;gap:9px;flex:none}
+.pc-executive-priorities__title>span:last-child{display:flex;flex-direction:column;gap:2px}
+.pc-executive-priorities__title strong{font-size:.77rem;color:#51443f}
+.pc-executive-priorities__title small{font-size:.66rem;color:#857771}
+.pc-executive-priorities__icon{
+  display:grid;place-items:center;width:32px;height:32px;border-radius:9px;
+  color:#8a635f;background:#f0e5df
+}
+.pc-executive-priorities__icon svg{width:17px;height:17px}
+.pc-executive-priorities__links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;flex:1;min-width:0}
+.pc-executive-priorities__links a{
+  display:flex;align-items:center;gap:7px;min-width:0;padding:9px 11px;
+  border:1px solid #eee7e3;border-radius:10px;background:#faf7f4;
+  color:#64544e;font-size:.72rem;text-decoration:none;transition:background .15s,border-color .15s
+}
+.pc-executive-priorities__links a:hover{background:#f1e7e1;border-color:#d9c9c0}
+.pc-executive-priorities__links a:focus-visible{outline:2px solid #9d726e;outline-offset:2px}
+.pc-priority-number{font-weight:800;color:#936b67;font-size:.9rem;font-variant-numeric:tabular-nums}
+.pc-executive-priorities__links svg{width:14px;height:14px;margin-inline-start:auto;flex:none}
+.pc-content:has(.pc-executive-priorities) .pc-command-section{margin:4px 0 0}
+.pc-content:has(.pc-executive-priorities) .pc-two-col--overview{align-items:start;gap:12px}
+.pc-content:has(.pc-executive-priorities) .pc-two-col--overview>.pc-panel{height:100%;min-width:0}
+.pc-content:has(.pc-executive-priorities) .pc-panel--activity .pc-list-row{padding:9px 14px}
+.pc-content:has(.pc-executive-priorities) .pc-insights{margin-top:2px}
+@media(max-width:1080px){
+  .pc-executive-priorities{align-items:stretch;flex-direction:column;gap:10px}
+  .pc-content:has(.pc-executive-priorities)>.pc-kpis--overview{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .pc-content:has(.pc-executive-priorities) .pc-command-hero{padding:14px}
+  .pc-executive-priorities{padding:11px}
+  .pc-executive-priorities__links{grid-template-columns:1fr}
+  .pc-content:has(.pc-executive-priorities)>.pc-kpis--overview>.pc-kpi{min-height:86px;padding:10px}
+}
