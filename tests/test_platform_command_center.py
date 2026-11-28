@@ -44,3 +44,16 @@ def test_command_center_tracks_fixed_cohort_and_no_activity(salon):
 def test_central_overview_denies_anonymous(client):
     response = client.get(reverse("platform_admin:overview"))
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_trend_has_daily_zero_filled_points(salon):
+    now = timezone.now()
+    record_activity(
+        salon=salon, kind=PlatformActivityEvent.Kind.CUSTOMER_CREATED,
+        occurred_at=now - timedelta(days=2),
+    )
+    result = command_center_snapshot(days=7, now=now)
+    assert len(result["trend"]) == 7
+    assert sum(point["count"] for point in result["trend"]) == 1
+    assert all(3 <= point["height"] <= 100 for point in result["trend"])
