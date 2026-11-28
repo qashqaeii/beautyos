@@ -1,3 +1,27 @@
+<style>
+/* Staff profile: equal-width, equal-height identity controls. */
+.luna-profile-form .staff-edit-identity-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  align-items:start;
+}
+.luna-profile-form .staff-edit-identity-grid > .luna-field {min-width:0;width:100%}
+.luna-profile-form .staff-edit-identity-grid > .luna-field:not(.luna-field--full) > :is(input,button) {
+  width:100%;
+  min-width:0;
+  height:44px;
+  min-height:44px;
+  box-sizing:border-box;
+  border-radius:11px;
+}
+.luna-profile-form .staff-edit-specialty-field #staff-specialty-trigger {padding-inline:12px;overflow:hidden}
+.luna-profile-form .staff-edit-specialty-field #staff-specialty-trigger span {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.luna-profile-form .staff-edit-specialty-field #staff-specialty-trigger svg {flex-shrink:0}
+@media(max-width:520px) {
+  .luna-profile-form .staff-edit-identity-grid {grid-template-columns:minmax(0,1fr)}
+}
+</style>
 <form method="post" action="{% url 'staff:edit' pk=profile.pk %}" enctype="multipart/form-data" class="inventory-create-modal__form customer-form luna-profile-form" id="staff-edit-form">
   {% csrf_token %}
   {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
@@ -6,12 +30,12 @@
     <section class="luna-form-section" aria-label="اطلاعات فردی">
       <div class="luna-section-title"><i data-lucide="user-round" aria-hidden="true"></i><h3>اطلاعات فردی</h3></div>
       {{ form.avatar }}{{ form.avatar.errors }}
-      <div class="luna-form-grid">
+      <div class="luna-form-grid staff-edit-identity-grid">
         <div class="luna-field"><label for="{{ form.display_name.id_for_label }}">نام و نام خانوادگی</label>{{ form.display_name }}{{ form.display_name.errors }}</div>
-        <div class="luna-field" x-data="{ open: false, names: [] }" x-init="names = Array.from($el.querySelectorAll('input[name=services]:checked')).map(el => el.closest('label').textContent.trim())" @change="names = Array.from($el.querySelectorAll('input[name=services]:checked')).map(el => el.closest('label').textContent.trim()); $refs.specialtyTitle.value = names.join('، ').slice(0,80)">
+        <div class="luna-field staff-edit-specialty-field" x-data="{ open: false, names: [] }" x-init="names = Array.from($el.querySelectorAll('input[name=services]:checked')).map(el => el.closest('label').textContent.trim())" @change="names = Array.from($el.querySelectorAll('input[name=services]:checked')).map(el => el.closest('label').textContent.trim()); $refs.specialtyTitle.value = names.join('، ').slice(0,80)">
           <label for="staff-specialty-trigger">تخصص</label>
           <input type="hidden" name="title" x-ref="specialtyTitle" value="{{ form.title.value|default_if_none:'' }}">
-          <button id="staff-specialty-trigger" type="button" class="input-field" style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:right;height:auto;min-height:38px" @click="open = !open" :aria-expanded="open.toString()" aria-controls="staff-specialty-options">
+          <button id="staff-specialty-trigger" type="button" class="input-field" style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:right" @click="open = !open" :aria-expanded="open.toString()" aria-controls="staff-specialty-options">
             <span x-text="names.length ? names.join('، ') : 'انتخاب از خدمات سالن'">انتخاب از خدمات سالن</span><i data-lucide="chevron-down" aria-hidden="true"></i>
           </button>
           <div id="staff-specialty-options" x-show="open || {{ form.services.errors|yesno:'true,false' }}" x-cloak style="padding:10px;border:1px solid var(--color-line,#e5d8d2);border-radius:10px;margin-top:5px;max-height:180px;overflow:auto">
