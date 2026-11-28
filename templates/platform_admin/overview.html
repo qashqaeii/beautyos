@@ -1,7 +1,7 @@
 {% extends "platform_admin/base.html" %}
 {% block title %}نمای کلی مدیریت · BeautyOS{% endblock %}
 {% block control_content %}
-<div class="pc-heading"><div><p class="pc-eyebrow">PLATFORM OVERVIEW / ۰۱</p><h1>نبض BeautyOS</h1><p>نمای یکپارچه از رشد، فعالیت سالن‌ها و موارد نیازمند توجه.</p></div><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:reports' %}"><i data-lucide="chart-column-increasing"></i> گزارش کامل</a></div>
+<section class="pc-command-hero"><div class="pc-heading"><div><p class="pc-eyebrow">BEAUTYOS / EXECUTIVE COMMAND CENTER</p><h1>مرکز فرمان BeautyOS</h1><p>رشد پلتفرم، سلامت سالن‌ها و اقدامات مهم؛ در یک نگاه.</p></div><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:reports' %}"><i data-lucide="chart-column-increasing"></i> گزارش کامل</a></div><div class="pc-command-hero__meta"><span><i data-lucide="shield-check"></i> نمای مدیریتی امن</span><span><i data-lucide="activity"></i> شاخص‌های واقعی پلتفرم</span></div></section>
 <div class="pc-period"><span><i data-lucide="calendar-range"></i> بازه گزارش</span><a href="?days=7" class="{% if days == 7 %}is-active{% endif %}">۷ روز</a><a href="?days=30" class="{% if days == 30 %}is-active{% endif %}">۳۰ روز</a><a href="?days=90" class="{% if days == 90 %}is-active{% endif %}">۹۰ روز</a></div>
 <div class="pc-kpis">
   <article class="pc-kpi pc-kpi--primary"><div class="pc-kpi__head"><span>کل سالن‌ها</span><i data-lucide="store"></i></div><strong>{{ kpis.salons_total|fa_num }}</strong><p>{{ kpis.salons_active|fa_num }} سالن فعال</p></article>
@@ -14,6 +14,7 @@
   <div><i data-lucide="clipboard-list"></i><span><strong>{{ kpis.salons_pending_setup|fa_num }}</strong> سالن با راه‌اندازی ناتمام</span></div>
   <a href="{% url 'platform_admin:support' %}"><i data-lucide="message-circle-more"></i><span><strong>{{ kpis.tickets_open|fa_num }}</strong> درخواست پشتیبانی باز</span><i data-lucide="arrow-up-left"></i></a>
 </section>
+<div class="pc-command-section"><div><p class="pc-eyebrow">OPERATIONAL WORKSPACE</p><h2>پیگیری و فعالیت‌های اخیر</h2></div><span>عملیات روزمره پلتفرم</span></div>
 <div class="pc-two-col">
   <section class="pc-panel"><div class="pc-panel__header"><div><p class="pc-eyebrow">RECENT SALONS</p><h2>سالن‌های تازه‌وارد</h2></div><a href="{% url 'platform_admin:salons' %}" class="pc-text-link">مشاهده همه <i data-lucide="arrow-up-left"></i></a></div>
     <div class="pc-list">
