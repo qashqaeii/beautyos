@@ -2,6 +2,8 @@
 from datetime import timedelta
 
 from django.utils import timezone
+from django.db.models import Sum
+from django.db.models.functions import TruncDate
 
 from apps.platform_admin.activity_metrics import activity_retention, usage_summary
 from apps.platform_admin.models import PlatformActivityEvent, SalonSubscription
@@ -35,7 +37,22 @@ def command_center_snapshot(days=30, now=None):
     subscribed = SalonSubscription.objects.filter(
         status=SalonSubscription.Status.ACTIVE, starts_at__lte=now, ends_at__gt=now,
     ).count()
+    # Fixed seven-day buckets; zero-activity intervals remain visible.
+    series = list(PlatformActivityEvent.objects.filter(
+        occurred_at__gte=start, occurred_at__lt=now,
+    ).annotate(day=TruncDate("occurred_at")).values("day").annotate(
+        total=Sum("count"),
+    ).order_by("day"))
+    counts = {item["day"]: item["total"] for item in series}
+    trend = []
+    for index in range(days):
+        day = (start + timedelta(days=index)).date()
+        trend.append({"date": day, "count": counts.get(day, 0)})
+    maximum = max((item["count"] for item in trend), default=0)
+    for item in trend:
+        item["height"] = max(3, round(100 * item["count"] / maximum)) if maximum else 3
     return {
+        "trend": trend,
         "usage_active": current["active_salons"],
         "usage_previous": earlier["active_salons"],
         "usage_events": current["events"],
