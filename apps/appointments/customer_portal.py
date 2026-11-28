@@ -147,6 +147,8 @@ def reschedule_customer_appointment(*, salon, appointment_id, phone, start):
     service = appointment.service
     if not service.is_active or service.is_deleted or not service.is_public:
         raise CustomerActionError("این خدمت دیگر برای رزرو آنلاین فعال نیست.")
+    if not staff.is_active or not staff.is_bookable or staff.is_deleted:
+        raise CustomerActionError("این متخصص دیگر برای رزرو آنلاین در دسترس نیست.")
     if not staff.services.filter(pk=service.pk).exists():
         raise CustomerActionError("این متخصص دیگر خدمت انتخاب‌شده را ارائه نمی‌دهد.")
     lead = getattr(salon.settings, "booking_lead_time_minutes", 60)
