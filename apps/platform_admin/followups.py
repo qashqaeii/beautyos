@@ -5,7 +5,7 @@ salons; never expose tenant customer details or invoice values.
 """
 from datetime import timedelta
 
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.utils import timezone
 
 from apps.platform_admin.models import PlatformActivityEvent, SalonSubscription, SupportTicket
@@ -24,7 +24,7 @@ def followup_queue(*, now=None, limit=12):
     ).values_list("salon_id", flat=True).distinct())
     subscriptions = {
         item.salon_id: item for item in
-        SalonSubscription.objects.select_related("plan").all()
+        SalonSubscription.objects.all()
     }
     open_counts = dict(
         SupportTicket.objects.filter(
@@ -36,21 +36,23 @@ def followup_queue(*, now=None, limit=12):
         reasons = []
         if open_counts.get(salon.pk, 0):
             reasons.append("پشتیبانی باز")
-        if not salon.settings.onboarding_completed_at:
+        setup_incomplete = not getattr(getattr(salon, "settings", None), "onboarding_completed_at", None)
+        if setup_incomplete:
             reasons.append("راه‌اندازی ناقص")
         if salon.pk in previous and salon.pk not in recent:
             reasons.append("افت فعالیت ثبت‌شده")
         subscription = subscriptions.get(salon.pk)
-        if subscription and subscription.ends_at <= now:
+        subscription_expired = bool(subscription and subscription.ends_at <= now and subscription.status != SalonSubscription.Status.CANCELED)
+        if subscription_expired:
             reasons.append("پایان تاریخ اشتراک")
         if not reasons:
             continue
         # Deterministic operational ordering, not a statistical health score.
         priority = (
             (4 if open_counts.get(salon.pk, 0) else 0)
-            + (3 if subscription and subscription.ends_at <= now else 0)
+            + (3 if subscription_expired else 0)
             + (2 if salon.pk in previous and salon.pk not in recent else 0)
-            + (1 if not salon.settings.onboarding_completed_at else 0)
+            + (1 if setup_incomplete else 0)
         )
         queue.append({
             "salon": salon, "reasons": reasons, "priority": priority,
