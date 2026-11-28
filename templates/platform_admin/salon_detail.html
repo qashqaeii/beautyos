@@ -52,6 +52,14 @@
     <p class="pc-subtle">این اعداد تنها رویدادهای ثبت‌شده در موتور تحلیل محصول هستند؛ نبود رویداد لزوماً به معنی غیرفعال بودن سالن نیست.</p>
   </section>
 </div>
+<section class="pc-panel pc-panel--padded" aria-labelledby="salon-performance-heading" style="margin-block:16px">
+  <div class="pc-panel__header"><div><p class="pc-eyebrow">SALON PERFORMANCE</p><h2 id="salon-performance-heading">عملکرد و رشد سالن</h2><p>مقایسه با دوره هم‌اندازه قبل، بدون نمایش اطلاعات شخصی مشتریان</p></div></div>
+  <div class="pc-period"><span>بازه گزارش</span><a href="?days=7" class="{% if performance.days == 7 %}is-active{% endif %}">۷ روز</a><a href="?days=30" class="{% if performance.days == 30 %}is-active{% endif %}">۳۰ روز</a><a href="?days=90" class="{% if performance.days == 90 %}is-active{% endif %}">۹۰ روز</a></div>
+  <div class="pc-kpis"><article class="pc-kpi pc-kpi--primary"><span>سهم رزرو آنلاین</span><strong>{% if performance.online_share is not None %}{{ performance.online_share|fa_num }}٪{% else %}—{% endif %}</strong><p>از نوبت‌های جدید بازه</p></article></div>
+  <div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>شاخص</th><th>بازه جاری</th><th>بازه قبل</th><th>تغییر</th></tr></thead><tbody>
+    {% for item in performance.comparison %}<tr><td>{{ item.label }}</td><td>{{ item.current|fa_num }}</td><td>{{ item.previous|fa_num }}</td><td dir="ltr">{{ item.difference|fa_num }}</td></tr>{% endfor %}
+  </tbody></table></div><p class="pc-chart-note">{{ performance.coverage_note }}</p>
+</section>
 <section class="pc-panel pc-panel--padded" aria-labelledby="salon-attention" style="margin-block:16px">
   <div class="pc-panel__header">
     <div><p class="pc-eyebrow">SALON 360 / FOLLOW-UP</p><h2 id="salon-attention">نشانه‌های نیاز به پیگیری</h2><p class="pc-subtle">هشدارهای مبتنی بر داده ثبت‌شده، نه پیش‌بینی قطعی ریزش</p></div>
