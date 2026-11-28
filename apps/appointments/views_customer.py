@@ -22,7 +22,7 @@ from apps.appointments.customer_portal import (
     verified_customer_phone,
 )
 from apps.appointments.models import Appointment
-from apps.appointments.services.scheduling import iter_day_slots
+from apps.appointments.services.scheduling import has_overlap, iter_day_slots
 from apps.core.utils.dates import to_jalali
 from apps.core.utils.phone import display_iran_mobile
 from apps.customers.models import Customer
@@ -245,6 +245,11 @@ def customer_reschedule(request, slug, appointment_id):
             slot for slot in iter_day_slots(
                 appointment.staff, day, appointment.service.duration_minutes,
             ) if slot >= earliest and slot != appointment.start_at
+            and not has_overlap(
+                salon, appointment.staff_id, slot,
+                slot + timedelta(minutes=appointment.service.duration_minutes),
+                exclude_id=appointment.pk,
+            )
         ]
     last_day = today + timedelta(days=365)
     day_choices = [
