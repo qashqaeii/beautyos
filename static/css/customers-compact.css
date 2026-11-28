@@ -865,3 +865,23 @@
     min-height:29px;
   }
 }
+
+/* Customer table: purchase totals share the same finance permission as cards. */
+.maison-app.management-suite .customers-list-page .customers-list-table:has(.customers-list-table__col--spent) .customers-list-table__col--name {width:26%}
+.maison-app.management-suite .customers-list-page .customers-list-table:has(.customers-list-table__col--spent) .customers-list-table__col--phone {width:25%}
+.maison-app.management-suite .customers-list-page .customers-list-table:has(.customers-list-table__col--spent) .customers-list-table__col--visits {width:12%}
+.maison-app.management-suite .customers-list-page .customers-list-table__col--spent {width:20%}
+.maison-app.management-suite .customers-list-page .customers-list-table:has(.customers-list-table__col--spent) .customers-list-table__col--action {width:17%}
+.maison-app.management-suite .customers-list-page .customers-list-table .customers-list-table__spent {text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.maison-app.management-suite .customers-list-page .customers-list-table__spent-unit {font-size:10px;color:#927d73}
+@media(max-width:900px){
+  .maison-app.management-suite .customers-list-page .customers-list-table tbody tr:has(.customers-list-table__spent) {
+    grid-template-areas:"name action" "phone visits" "spent spent";
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-table tbody td.customers-list-table__spent {
+    grid-area:spent;text-align:right;white-space:normal;
+  }
+  .maison-app.management-suite .customers-list-page .customers-list-table tbody td.customers-list-table__spent::before {
+    content:"مجموع خرید: ";color:#927d73;font-size:11px;
+  }
+}
