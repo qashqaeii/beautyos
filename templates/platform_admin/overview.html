@@ -1,4 +1,5 @@
-{% extends "platform_admin/base.html" %}{% endblock %}
+{% extends "platform_admin/base.html" %}
+{% block title %}نمای کلی مدیریت · BeautyOS{% endblock %}
 {% block control_content %}
 <div class="pc-heading"><div><p class="pc-eyebrow">PLATFORM OVERVIEW / ۰۱</p><h1>نبض BeautyOS</h1><p>نمای یکپارچه از رشد، فعالیت سالن‌ها و موارد نیازمند توجه.</p></div><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:reports' %}"><i data-lucide="chart-column-increasing"></i> گزارش کامل</a></div>
 <div class="pc-period"><span><i data-lucide="calendar-range"></i> بازه گزارش</span><a href="?days=7" class="{% if days == 7 %}is-active{% endif %}">۷ روز</a><a href="?days=30" class="{% if days == 30 %}is-active{% endif %}">۳۰ روز</a><a href="?days=90" class="{% if days == 90 %}is-active{% endif %}">۹۰ روز</a></div>
@@ -36,7 +37,6 @@
     {% empty %}<div class="pc-empty">هنوز رویدادی ثبت نشده است.</div>{% endfor %}
   </div>
 </section>
-{% block title %}نمای کلی مدیریت · BeautyOS
 <section class="pc-panel" aria-labelledby="command-heading" style="margin-block:18px">
   <div class="pc-panel__header"><div><p class="pc-eyebrow">PLATFORM INTELLIGENCE / ۰۲</p><h2 id="command-heading">فرماندهی و نگهداشت سالن‌ها</h2><p>تحلیل استفاده از محصول در بازه انتخابی؛ مستقل از گردش مالی سالن‌ها</p></div></div>
   <div class="pc-kpis" style="margin:14px 0">
