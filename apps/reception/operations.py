@@ -54,4 +54,5 @@ def day_operations(*, salon, queue, limit=100):
             "invoice_key": str(uuid4()) if completed and invoice_line is None else None,
         })
     summary["truncated"] = summary["total"] > len(rows)
+    summary["visible_count"] = len(rows)
     return {"day_operations": rows, "day_operations_summary": summary}
