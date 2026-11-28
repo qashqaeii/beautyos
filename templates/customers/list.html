@@ -127,6 +127,7 @@
               <col class="customers-list-table__col--name">
               <col class="customers-list-table__col--phone">
               <col class="customers-list-table__col--visits">
+              {% if 'payment.view' in membership_permissions %}<col class="customers-list-table__col--spent">{% endif %}
               <col class="customers-list-table__col--action">
             </colgroup>
             <thead>
@@ -134,6 +135,7 @@
                 <th scope="col">نام مشتری</th>
                 <th scope="col" class="customers-list-table__hide-sm">شماره موبایل</th>
                 <th scope="col">مراجعات</th>
+                {% if 'payment.view' in membership_permissions %}<th scope="col" class="customers-list-table__spent">مجموع خرید</th>{% endif %}
                 <th scope="col" class="customers-list-table__action-head">عملیات</th>
               </tr>
             </thead>
@@ -150,6 +152,7 @@
                 <td class="customers-list-table__visits" data-label="مراجعات">
                   <span class="customers-list-table__visits-num">{{ c.total_visits|fa_num }}</span>
                 </td>
+                {% if 'payment.view' in membership_permissions %}<td class="customers-list-table__spent" data-label="مجموع خرید"><bdi>{{ c.total_spent_toman|default:0|fa_money }}</bdi> <span class="customers-list-table__spent-unit">تومان</span></td>{% endif %}
                 <td class="customers-list-table__action" data-label="عملیات">
                   <a href="{% url 'customers:detail' pk=c.pk %}" class="customers-list-table__profile-link">
                     <span>پروفایل</span>
