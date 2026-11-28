@@ -4,7 +4,7 @@
   <div class="pc-panel__header"><div><p class="pc-eyebrow">PLATFORM INTELLIGENCE / ۰۲</p><h2 id="command-heading">فرماندهی و نگهداشت سالن‌ها</h2><p>تحلیل استفاده از محصول در بازه انتخابی؛ مستقل از گردش مالی سالن‌ها</p></div></div>
   <div class="pc-kpis" style="margin:14px 0">
     <article class="pc-kpi pc-kpi--primary"><div class="pc-kpi__head"><span>سالن‌های فعال در رویدادهای ردیابی‌شده</span><i data-lucide="activity"></i></div><strong>{{ command.usage_active|fa_num }}</strong><p>بازه قبل: {{ command.usage_previous|fa_num }} سالن</p></article>
-    <article class="pc-kpi"><div class="pc-kpi__head"><span>نرخ بازگشت استفاده</span><i data-lucide="repeat-2"></i></div><strong>{% if command.retention is not None %}{{ command.retention|fa_num }}٪{% else %}—{% endif %}</strong><p>{{ command.retained|fa_num }} از {{ command.cohort_size|fa_num }} سالن دوره قبل</p></article>
+    <article class="pc-kpi"><div class="pc-kpi__head"><span>نرخ بازگشت استفاده</span><i data-lucide="repeat-2"></i></div><strong>{% if command.cohort_size %}{{ command.retention|fa_num }}٪{% else %}—{% endif %}</strong><p>{{ command.retained|fa_num }} از {{ command.cohort_size|fa_num }} سالن دوره قبل</p></article>
     <article class="pc-kpi"><div class="pc-kpi__head"><span>بدون فعالیت در دوره جدید</span><i data-lucide="alert-triangle"></i></div><strong>{{ command.prior_inactive|fa_num }}</strong><p>فعال در دوره قبل، بدون رویداد در دوره جاری</p></article>
     <article class="pc-kpi"><div class="pc-kpi__head"><span>اشتراک فعال زمانی</span><i data-lucide="badge-check"></i></div><strong>{{ command.subscription_active|fa_num }}</strong><p>براساس وضعیت و تاریخ اشتراک؛ نه پرداخت تأییدشده</p></article>
   </div>
