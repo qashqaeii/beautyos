@@ -26,7 +26,7 @@ from apps.finance.models import Payment
 from apps.platform_admin.forms import ArticleForm, MessageForm, TicketForm
 from apps.platform_admin.command_center import command_center_snapshot
 from apps.platform_admin.guards import platform_required
-from apps.platform_admin.models import SupportMessage, SupportTicket
+from apps.platform_admin.models import SupportMessage, SupportTicket, SalonSubscription, PlatformActivityEvent
 from apps.salons.decorators import salon_required
 from apps.salons.models import Salon, SalonMembership
 from apps.salons.permissions_policy import P_SALON_SETTINGS, require_permission
@@ -145,8 +145,29 @@ def salon_detail(request, salon_id):
         .aggregate(total=Sum("paid_amount_toman"))["total"] or 0
     )
     expenses = Expense.objects.filter(salon=salon).aggregate(total=Sum("amount_toman"))["total"] or 0
+    now = timezone.now()
+    activity_since = now - timedelta(days=30)
+    prior_since = activity_since - timedelta(days=30)
+    recent_activity = PlatformActivityEvent.objects.filter(
+        salon=salon, occurred_at__gte=activity_since, occurred_at__lt=now,
+    )
+    previous_activity = PlatformActivityEvent.objects.filter(
+        salon=salon, occurred_at__gte=prior_since, occurred_at__lt=activity_since,
+    )
+    activity_breakdown = list(recent_activity.values("kind").annotate(
+        total=Sum("count"),
+    ).order_by("-total"))
+    kind_labels = dict(PlatformActivityEvent.Kind.choices)
+    for item in activity_breakdown:
+        item["label"] = kind_labels.get(item["kind"], item["kind"])
+    subscription = SalonSubscription.objects.filter(salon=salon).select_related("plan").first()
     return render(request, "platform_admin/salon_detail.html", {
         "salon": salon,
+        "subscription": subscription,
+        "activity_current": recent_activity.aggregate(total=Sum("count"))["total"] or 0,
+        "activity_previous": previous_activity.aggregate(total=Sum("count"))["total"] or 0,
+        "activity_breakdown": activity_breakdown,
+        "activity_latest": recent_activity.order_by("-occurred_at")[:8],
         "members": members,
         "metrics": {
             "customers": Customer.objects.filter(salon=salon, is_deleted=False).count(),
