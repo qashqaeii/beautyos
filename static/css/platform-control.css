@@ -631,7 +631,7 @@ a.pc-exec__row:hover{background:#faf7fd}
 
 
 /* /control/ overview — inherit the actual BeautyOS theme palette (2026-11). */
-.pc-shell:has(>.pc-main :is(.pc-exec,.pc-reports,.pc-directory)){
+.pc-shell:has(>.pc-main :is(.pc-exec,.pc-reports,.pc-directory,.pc-users)){
   --pc-bg:var(--color-background,#f5f0ec);
   --pc-surface:var(--color-surface-elevated,#fffdfc);
   --pc-ink:var(--color-text-primary,#51443f);
@@ -641,19 +641,19 @@ a.pc-exec__row:hover{background:#faf7fd}
   --pc-lavender:var(--color-accent-soft,#e9d8d2);
   background:var(--pc-bg);color:var(--pc-ink);
 }
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-sidebar,
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-topbar{background:var(--pc-surface);border-color:var(--pc-border)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-brand__mark,
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-operator__avatar,
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-mobile-mark{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-nav-label{color:var(--pc-muted)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-nav-item{color:var(--pc-muted)!important}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-nav-item:hover{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)!important}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-nav-item.is-active{background:var(--color-accent-soft,#e9d8d2);border-color:var(--color-border,#e5dcd6);color:var(--pc-accent)!important;box-shadow:inset -3px 0 var(--pc-accent)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-online-indicator{color:var(--color-success-text,#4d6b56)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-online-dot{background:var(--color-success,#769b82);box-shadow:0 0 0 4px var(--color-success-background,#e8f0ea)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-topbar__home{background:var(--color-surface-muted,#faf7f4);border-color:var(--pc-border);color:var(--pc-accent)!important}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-exec{
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-sidebar,
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-topbar{background:var(--pc-surface);border-color:var(--pc-border)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-brand__mark,
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-operator__avatar,
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-mobile-mark{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-nav-label{color:var(--pc-muted)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-nav-item{color:var(--pc-muted)!important}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-nav-item:hover{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)!important}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-nav-item.is-active{background:var(--color-accent-soft,#e9d8d2);border-color:var(--color-border,#e5dcd6);color:var(--pc-accent)!important;box-shadow:inset -3px 0 var(--pc-accent)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-online-indicator{color:var(--color-success-text,#4d6b56)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-online-dot{background:var(--color-success,#769b82);box-shadow:0 0 0 4px var(--color-success-background,#e8f0ea)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-topbar__home{background:var(--color-surface-muted,#faf7f4);border-color:var(--pc-border);color:var(--pc-accent)!important}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-exec{
   --exec-accent:var(--color-accent,#b58d89);
   --exec-accent-deep:var(--color-primary,#9d726e);
   --exec-lilac:var(--color-accent-soft,#e9d8d2);
@@ -680,16 +680,16 @@ a.pc-exec__row:hover{background:var(--color-surface-muted,#faf7f4)}
 .pc-exec__trend{border-color:var(--exec-line)}
 .pc-exec__trend>span{background:linear-gradient(180deg,var(--color-primary,#9d726e),var(--color-accent-soft,#e9d8d2))}
 .pc-exec__details .pc-insights__chevron{color:var(--exec-accent-deep)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-status--good{background:var(--color-success-background,#e8f0ea);color:var(--color-success-text,#4d6b56)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-status--warn{background:#fbf0dc;color:#916b34}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-status--info{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) :is(a,button,input,select,textarea,summary):focus-visible{outline-color:var(--color-focus,#9d726e)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-status--good{background:var(--color-success-background,#e8f0ea);color:var(--color-success-text,#4d6b56)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-status--warn{background:#fbf0dc;color:#916b34}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-status--info{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) :is(a,button,input,select,textarea,summary):focus-visible{outline-color:var(--color-focus,#9d726e)}
 
 /* Match the overview CTA and text links after control-wide button rules. */
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-exec__actions .pc-button:not(.pc-button--ghost){background:var(--color-primary,#9d726e);border-color:var(--color-primary,#9d726e);color:#fff}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-exec__actions .pc-button:not(.pc-button--ghost):hover{background:var(--color-primary-hover,#8a635f)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-exec__panel-heading>a{color:var(--color-primary,#9d726e)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory)) .pc-exec__brand-icon{background:var(--color-accent-soft,#e9d8d2);color:var(--color-primary,#9d726e)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-exec__actions .pc-button:not(.pc-button--ghost){background:var(--color-primary,#9d726e);border-color:var(--color-primary,#9d726e);color:#fff}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-exec__actions .pc-button:not(.pc-button--ghost):hover{background:var(--color-primary-hover,#8a635f)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-exec__panel-heading>a{color:var(--color-primary,#9d726e)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users)) .pc-exec__brand-icon{background:var(--color-accent-soft,#e9d8d2);color:var(--color-primary,#9d726e)}
 
 /* Reports: compact executive layout, shared theme, no changes to report calculations. */
 .pc-content:has(>.pc-reports){max-width:1720px;padding:22px clamp(16px,2.4vw,36px) 38px;display:block}
@@ -772,3 +772,15 @@ a.pc-exec__row:hover{background:var(--color-surface-muted,#faf7f4)}
 .pc-directory__surface .pc-pagination a{color:var(--dir-deep)!important}
 @media(min-width:961px){.pc-directory__kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:640px){.pc-content:has(>.pc-directory){padding:12px 10px 28px}.pc-directory__header{padding:10px}.pc-directory__kpi{min-height:92px;padding:11px}.pc-directory__report{font-size:.72rem}.pc-directory__filters{padding:0 11px 12px}.pc-directory__section-head{padding:12px 11px 10px}}
+
+/* Users directory — shared executive theme, compact responsive table. */
+.pc-users .pc-directory__table td{padding:8px 12px}
+.pc-users .pc-directory__salon{min-width:155px}
+.pc-users .pc-directory__phone{font-variant-numeric:tabular-nums;unicode-bidi:isolate;white-space:nowrap}
+.pc-users .pc-directory__table th:last-child,.pc-users .pc-directory__table td:last-child{text-align:left}
+.pc-users .pc-directory__table td:nth-child(3),.pc-users .pc-directory__table th:nth-child(3){text-align:center}
+.pc-users .pc-directory__table .pc-status--muted{background:var(--color-surface-muted);color:var(--color-text-secondary)}
+.pc-users .pc-directory__surface .pc-pagination{padding:12px}
+.pc-users .pc-directory__filters .pc-directory__search{flex:1 1 280px}
+.pc-users .pc-directory__table-wrap:focus-visible{outline:2px solid var(--color-focus);outline-offset:-2px}
+@media(prefers-reduced-motion:no-preference){.pc-users .pc-directory__surface{animation:pc-exec-enter .32s ease-out both}}
