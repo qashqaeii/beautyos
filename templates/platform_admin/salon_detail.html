@@ -1,4 +1,5 @@
-{% extends "platform_admin/base.html" %}{% endblock %}
+{% extends "platform_admin/base.html" %}
+{% block title %}{{ salon.name }} · پرونده سالن{% endblock %}
 {% block control_content %}
 <nav class="pc-breadcrumb"><a href="{% url 'platform_admin:salons' %}">سالن‌ها</a><i data-lucide="chevron-left"></i><span>پرونده سالن</span></nav>
 <div class="pc-heading"><div><p class="pc-eyebrow">SALON 360 / PROFILE</p><h1>{{ salon.name }}</h1><p>{{ salon.city|default:"شهر نامشخص" }} · {{ salon.created_at|fa_jalali }} · {{ salon.slug }}</p></div><a href="{% url 'salons_public:landing' slug=salon.slug %}" target="_blank" rel="noopener noreferrer" class="pc-button pc-button--ghost"><i data-lucide="external-link"></i> صفحه عمومی</a></div>
@@ -24,7 +25,6 @@
   <section class="pc-panel"><div class="pc-panel__header"><h2>درخواست‌های پشتیبانی</h2><a class="pc-text-link" href="{% url 'platform_admin:support' %}">صندوق پیام‌ها</a></div><div class="pc-list">{% for ticket in tickets %}<a href="{% url 'platform_admin:ticket_detail' ticket_id=ticket.pk %}" class="pc-list-row"><span class="pc-list-main"><strong>{{ ticket.title }}</strong><small>{{ ticket.last_activity_at|fa_jalali_datetime }}</small></span><span class="pc-status">{{ ticket.get_status_display }}</span></a>{% empty %}<div class="pc-empty">درخواستی ثبت نشده است.</div>{% endfor %}</div></section>
   <section class="pc-panel"><div class="pc-panel__header"><h2>تاریخچه فعالیت</h2><a class="pc-text-link" href="{% url 'platform_admin:audit' %}">تمام رویدادها</a></div><div class="pc-list">{% for event in audit_logs %}<div class="pc-list-row"><span class="pc-list-main"><strong>{{ event.message|default:event.entity_type|truncatechars:75 }}</strong><small>{{ event.actor.full_name|default:"سیستم" }}</small></span><span class="pc-date">{{ event.created_at|fa_jalali_datetime }}</span></div>{% empty %}<div class="pc-empty">رویدادی ثبت نشده است.</div>{% endfor %}</div></section>
 </div>
-{% block title %}{{ salon.name }} · پرونده سالن
 <div class="pc-two-col">
   <section class="pc-panel pc-panel--padded" aria-labelledby="salon-subscription">
     <div class="pc-panel__header"><h2 id="salon-subscription">اشتراک و اعتبار سالن</h2><a class="pc-text-link" href="{% url 'platform_admin:subscriptions' %}">مدیریت اشتراک‌ها</a></div>
