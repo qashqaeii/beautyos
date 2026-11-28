@@ -24,6 +24,21 @@
   </div>
   <p class="pc-subtle">این گزارش فقط پایش است؛ اشتراک‌ها خودکار تمدید، منقضی یا محدود نمی‌شوند. درآمد پلتفرم تا زمان ثبت پرداخت‌های تأییدشده قابل محاسبه نیست.</p>
 </section>
+<section class="pc-panel pc-panel--padded" aria-labelledby="subscription-correction-heading" style="margin-block:16px">
+  <div class="pc-panel__header"><div><p class="pc-eyebrow">CONTROLLED CORRECTION</p><h2 id="subscription-correction-heading">اصلاح وضعیت اشتراک</h2><p>فقط ثبت انقضا، لغو یا انتظار پرداخت؛ بدون تمدید اعتبار یا دریافت وجه</p></div></div>
+  <div class="pc-list">
+  {% for item in health.stale_salons %}
+    <div class="pc-list-row"><span class="pc-list-main"><strong>{{ item.salon.name }}</strong><small>اعتبار تا {{ item.ends_at|fa_jalali_datetime }} · {{ item.get_status_display }}</small></span>
+      <form method="post" action="{% url 'platform_admin:subscription_correct' subscription_id=item.pk %}" class="pc-action-form">
+        {% csrf_token %}<input type="hidden" name="status" value="expired">
+        <label for="reason-{{ item.pk }}">دلیل اصلاح</label><input id="reason-{{ item.pk }}" name="reason" class="input-field" required minlength="8" maxlength="300" placeholder="دلیل ثبت انقضا">
+        <button type="submit" class="pc-button pc-button--ghost">ثبت وضعیت منقضی</button>
+      </form>
+    </div>
+  {% empty %}<div class="pc-empty">مغایرتی برای اصلاح انقضا یافت نشد.</div>{% endfor %}
+  </div>
+  <p class="pc-subtle">عملیات فقط برای مدیر ارشد پلتفرم مجاز است و در تاریخچه اشتراک ثبت می‌شود.</p>
+</section>
 <section class="pc-panel pc-subscriptions__plans">
   <div class="pc-panel__header"><h2>پلن‌های پلتفرم</h2><span class="pc-subtle">تعریف پلن فقط توسط مدیر مجاز</span></div>
   <div class="pc-list">
