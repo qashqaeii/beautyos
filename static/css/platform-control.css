@@ -631,7 +631,7 @@ a.pc-exec__row:hover{background:#faf7fd}
 
 
 /* /control/ overview — inherit the actual BeautyOS theme palette (2026-11). */
-.pc-shell:has(>.pc-main :is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)){
+.pc-shell:has(>.pc-main :is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)){
   --pc-bg:var(--color-background,#f5f0ec);
   --pc-surface:var(--color-surface-elevated,#fffdfc);
   --pc-ink:var(--color-text-primary,#51443f);
@@ -641,19 +641,19 @@ a.pc-exec__row:hover{background:#faf7fd}
   --pc-lavender:var(--color-accent-soft,#e9d8d2);
   background:var(--pc-bg);color:var(--pc-ink);
 }
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-sidebar,
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-topbar{background:var(--pc-surface);border-color:var(--pc-border)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-brand__mark,
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-operator__avatar,
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-mobile-mark{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-nav-label{color:var(--pc-muted)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-nav-item{color:var(--pc-muted)!important}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-nav-item:hover{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)!important}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-nav-item.is-active{background:var(--color-accent-soft,#e9d8d2);border-color:var(--color-border,#e5dcd6);color:var(--pc-accent)!important;box-shadow:inset -3px 0 var(--pc-accent)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-online-indicator{color:var(--color-success-text,#4d6b56)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-online-dot{background:var(--color-success,#769b82);box-shadow:0 0 0 4px var(--color-success-background,#e8f0ea)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-topbar__home{background:var(--color-surface-muted,#faf7f4);border-color:var(--pc-border);color:var(--pc-accent)!important}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-exec{
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-sidebar,
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-topbar{background:var(--pc-surface);border-color:var(--pc-border)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-brand__mark,
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-operator__avatar,
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-mobile-mark{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-nav-label{color:var(--pc-muted)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-nav-item{color:var(--pc-muted)!important}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-nav-item:hover{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)!important}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-nav-item.is-active{background:var(--color-accent-soft,#e9d8d2);border-color:var(--color-border,#e5dcd6);color:var(--pc-accent)!important;box-shadow:inset -3px 0 var(--pc-accent)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-online-indicator{color:var(--color-success-text,#4d6b56)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-online-dot{background:var(--color-success,#769b82);box-shadow:0 0 0 4px var(--color-success-background,#e8f0ea)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-topbar__home{background:var(--color-surface-muted,#faf7f4);border-color:var(--pc-border);color:var(--pc-accent)!important}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-exec{
   --exec-accent:var(--color-accent,#b58d89);
   --exec-accent-deep:var(--color-primary,#9d726e);
   --exec-lilac:var(--color-accent-soft,#e9d8d2);
@@ -680,16 +680,16 @@ a.pc-exec__row:hover{background:var(--color-surface-muted,#faf7f4)}
 .pc-exec__trend{border-color:var(--exec-line)}
 .pc-exec__trend>span{background:linear-gradient(180deg,var(--color-primary,#9d726e),var(--color-accent-soft,#e9d8d2))}
 .pc-exec__details .pc-insights__chevron{color:var(--exec-accent-deep)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-status--good{background:var(--color-success-background,#e8f0ea);color:var(--color-success-text,#4d6b56)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-status--warn{background:#fbf0dc;color:#916b34}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-status--info{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) :is(a,button,input,select,textarea,summary):focus-visible{outline-color:var(--color-focus,#9d726e)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-status--good{background:var(--color-success-background,#e8f0ea);color:var(--color-success-text,#4d6b56)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-status--warn{background:#fbf0dc;color:#916b34}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-status--info{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) :is(a,button,input,select,textarea,summary):focus-visible{outline-color:var(--color-focus,#9d726e)}
 
 /* Match the overview CTA and text links after control-wide button rules. */
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-exec__actions .pc-button:not(.pc-button--ghost){background:var(--color-primary,#9d726e);border-color:var(--color-primary,#9d726e);color:#fff}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-exec__actions .pc-button:not(.pc-button--ghost):hover{background:var(--color-primary-hover,#8a635f)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-exec__panel-heading>a{color:var(--color-primary,#9d726e)}
-.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions)) .pc-exec__brand-icon{background:var(--color-accent-soft,#e9d8d2);color:var(--color-primary,#9d726e)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-exec__actions .pc-button:not(.pc-button--ghost){background:var(--color-primary,#9d726e);border-color:var(--color-primary,#9d726e);color:#fff}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-exec__actions .pc-button:not(.pc-button--ghost):hover{background:var(--color-primary-hover,#8a635f)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-exec__panel-heading>a{color:var(--color-primary,#9d726e)}
+.pc-shell:has(:is(.pc-exec,.pc-reports,.pc-directory,.pc-users,.pc-subscriptions,.pc-support)) .pc-exec__brand-icon{background:var(--color-accent-soft,#e9d8d2);color:var(--color-primary,#9d726e)}
 
 /* Reports: compact executive layout, shared theme, no changes to report calculations. */
 .pc-content:has(>.pc-reports){max-width:1720px;padding:22px clamp(16px,2.4vw,36px) 38px;display:block}
@@ -826,3 +826,20 @@ a.pc-exec__row:hover{background:var(--color-surface-muted,#faf7f4)}
 @media(max-width:960px){.pc-subscriptions .pc-kpis,.pc-subscriptions .pc-kpis--health{grid-template-columns:repeat(2,minmax(0,1fr))}.pc-subscriptions .pc-two-col{grid-template-columns:1fr}}
 @media(max-width:580px){.pc-content:has(>.pc-subscriptions){padding:12px 10px 28px}.pc-subscriptions .pc-exec__heading{padding:10px}.pc-subscriptions .pc-kpi{padding:10px;min-height:90px}.pc-subscriptions .pc-kpi__head{font-size:.68rem}.pc-subscriptions .pc-panel--padded{padding:12px}.pc-subscriptions .pc-health-list{margin-top:8px}}
 @media(prefers-reduced-motion:no-preference){.pc-subscriptions .pc-kpi,.pc-subscriptions .pc-panel{animation:pc-exec-enter .3s ease-out both}.pc-subscriptions .pc-kpi:nth-child(2){animation-delay:35ms}.pc-subscriptions .pc-kpi:nth-child(3){animation-delay:70ms}.pc-subscriptions .pc-kpi:nth-child(4){animation-delay:105ms}}
+
+/* Support inbox — shared executive directory, compact and accessible. */
+.pc-support .pc-directory__filters .pc-directory__search{flex:1 1 280px}
+.pc-support .pc-directory__table td{padding:9px 12px}
+.pc-support .pc-directory__salon{min-width:190px}
+.pc-support .pc-directory__salon strong{white-space:normal;overflow-wrap:anywhere}
+.pc-support .pc-directory__avatar svg{width:17px;height:17px}
+.pc-support .pc-directory__table td:last-child,.pc-support .pc-directory__table th:last-child{text-align:left}
+.pc-support .pc-directory__table td.pc-date{color:var(--color-text-secondary)}
+.pc-support .pc-directory__table-wrap:focus-visible{outline:2px solid var(--color-focus);outline-offset:-2px}
+.pc-support .pc-support__empty{padding:28px 16px!important;text-align:center}
+.pc-support .pc-support__empty-icon{display:grid;place-items:center;width:48px;height:48px;margin:0 auto 9px;border-radius:14px;background:var(--color-accent-soft);color:var(--color-primary)}
+.pc-support .pc-support__empty-icon svg{width:24px;height:24px}
+.pc-support .pc-support__empty strong{display:block;color:var(--color-text-primary);font-size:.88rem}
+.pc-support .pc-support__empty p{margin-top:5px;color:var(--color-text-secondary);font-size:.75rem;white-space:normal}
+.pc-support .pc-directory__surface .pc-pagination{padding:12px}
+@media(prefers-reduced-motion:no-preference){.pc-support .pc-directory__surface{animation:pc-exec-enter .32s ease-out both}}
