@@ -292,3 +292,26 @@ def test_customer_reschedule_has_weekly_day_navigation(client, salon, booked_cus
     assert response.status_code == 200
     assert "روزهای پیشنهادی" in response.content.decode()
     assert len(response.context["day_choices"]) == 7
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("field", ["is_active", "is_bookable", "is_deleted"])
+def test_customer_cannot_reschedule_with_unavailable_specialist(
+    salon, booked_customer, field,
+):
+    from apps.appointments.customer_portal import (
+        CustomerActionError, reschedule_customer_appointment,
+    )
+    customer, appointment = booked_customer
+    staff = appointment.staff
+    setattr(staff, field, False if field != "is_deleted" else True)
+    staff.save(update_fields=[field])
+    original_start = appointment.start_at
+    with pytest.raises(CustomerActionError, match="متخصص"):
+        reschedule_customer_appointment(
+            salon=salon, appointment_id=appointment.pk,
+            phone=customer.phone, start=original_start + timedelta(hours=2),
+        )
+    appointment.refresh_from_db()
+    assert appointment.start_at == original_start
+    assert appointment.status == Appointment.Status.CONFIRMED
