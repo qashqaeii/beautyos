@@ -342,3 +342,20 @@ def test_customer_upcoming_booking_not_hidden_by_large_history(
     assert response.status_code == 200
     assert upcoming.pk in [a.pk for a in response.context["upcoming"]]
     assert len(response.context["history"]) == 30
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("field", ["is_active", "is_bookable", "is_deleted"])
+def test_reschedule_page_hides_slots_for_unavailable_staff(
+    client, salon, booked_customer, customer_otp, field,
+):
+    customer, appointment = booked_customer
+    portal_login(client, salon, customer.phone, customer_otp)
+    staff = appointment.staff
+    setattr(staff, field, field == "is_deleted")
+    staff.save(update_fields=[field])
+    response = client.get(url(salon, "customer_reschedule", appointment_id=appointment.pk))
+    assert response.status_code == 200
+    assert response.context["can_manage"] is False
+    assert response.context["slots"] == []
+    assert "متخصص" in response.context["restriction"]
