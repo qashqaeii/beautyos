@@ -684,3 +684,9 @@ a.pc-exec__row:hover{background:var(--color-surface-muted,#faf7f4)}
 .pc-shell:has(.pc-exec) .pc-status--warn{background:#fbf0dc;color:#916b34}
 .pc-shell:has(.pc-exec) .pc-status--info{background:var(--color-accent-soft,#e9d8d2);color:var(--pc-accent)}
 .pc-shell:has(.pc-exec) :is(a,button,input,select,textarea,summary):focus-visible{outline-color:var(--color-focus,#9d726e)}
+
+/* Match the overview CTA and text links after control-wide button rules. */
+.pc-shell:has(.pc-exec) .pc-exec__actions .pc-button:not(.pc-button--ghost){background:var(--color-primary,#9d726e);border-color:var(--color-primary,#9d726e);color:#fff}
+.pc-shell:has(.pc-exec) .pc-exec__actions .pc-button:not(.pc-button--ghost):hover{background:var(--color-primary-hover,#8a635f)}
+.pc-shell:has(.pc-exec) .pc-exec__panel-heading>a{color:var(--color-primary,#9d726e)}
+.pc-shell:has(.pc-exec) .pc-exec__brand-icon{background:var(--color-accent-soft,#e9d8d2);color:var(--color-primary,#9d726e)}
