@@ -66,7 +66,7 @@ def test_platform_control_center_responsive_and_private(
         for route in routes:
             response = page.goto(live_server.url + route, wait_until="load")
             assert response and response.status == 200, route
-            assert page.locator(".pc-heading h1").count() == 1, route
+            assert page.locator(".pc-exec__title h1" if route == reverse("platform_admin:overview") else ".pc-heading h1").count() == 1, route
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 3"), route
             assert page.locator("html").get_attribute("dir") == "rtl"
             assert page.locator('link[href*="beautyos-motion.css"]').count() == 1
@@ -81,7 +81,7 @@ def test_platform_control_center_responsive_and_private(
         page.goto(live_server.url + reverse("platform_admin:overview"), wait_until="load")
         # CI normally requests reduced motion; no movement or counter rewrite is allowed.
         assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
-        card = page.locator(".pc-kpi").first
+        card = page.locator(".pc-exec__kpi").first
         if card.count():
             assert card.evaluate("(el) => getComputedStyle(el).translate === 'none' || getComputedStyle(el).translate === '0px'")
             before = card.locator("strong").first.inner_text()
