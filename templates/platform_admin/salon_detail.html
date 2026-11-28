@@ -9,7 +9,6 @@
       <div><dt>وضعیت ثبت‌شده</dt><dd>{{ subscription.get_status_display }}</dd></div>
       <div><dt>شروع دوره</dt><dd>{{ subscription.starts_at|fa_jalali_datetime }}</dd></div>
       <div><dt>پایان دوره</dt><dd>{{ subscription.ends_at|fa_jalali_datetime }}</dd></div>
-      <div><dt>اعتبار زمانی</dt><dd>{{ subscription.ends_at|fa_jalali_datetime }}</dd></div>
     </dl>
     <p class="pc-subtle">وضعیت اشتراک به معنی تأیید پرداخت نیست؛ تراکنش مالی پلتفرم جداگانه بررسی می‌شود.</p>
     {% else %}<div class="pc-empty">هنوز اشتراک پلتفرم برای این سالن ثبت نشده است.</div>{% endif %}
