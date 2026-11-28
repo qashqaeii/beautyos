@@ -1,12 +1,10 @@
 """Command center metrics: explicitly scoped, never confuse usage with billing."""
 from datetime import timedelta
 
-from django.db.models import Count
 from django.utils import timezone
 
 from apps.platform_admin.activity_metrics import activity_retention, usage_summary
 from apps.platform_admin.models import PlatformActivityEvent, SalonSubscription
-from apps.salons.models import Salon
 
 
 def command_center_snapshot(days=30, now=None):
@@ -23,7 +21,6 @@ def command_center_snapshot(days=30, now=None):
     active_ids = PlatformActivityEvent.objects.filter(
         occurred_at__gte=start, occurred_at__lt=now,
     ).values("salon_id").distinct()
-    tracked = Salon.objects.filter(pk__in=active_ids)
     # At-risk means a previously observed salon has no event in the current
     # period. This is NOT a prediction of churn or a subscription cancellation.
     inactive_prior = PlatformActivityEvent.objects.filter(
@@ -48,6 +45,6 @@ def command_center_snapshot(days=30, now=None):
         "prior_inactive": inactive_prior,
         "subscription_active": subscribed,
         "features": features,
-        "coverage_note": "فعلاً فقط ثبت نوبت جدید به‌طور خودکار ردیابی می‌شود؛ آمار فعالیت و ریزش جامع نیست.",
+        "coverage_note": "ثبت نوبت، مشتری، متخصص و فاکتور جدید ردیابی می‌شوند؛ سایر تعاملات و رویدادهای قدیمی پوشش کامل ندارند.",
         "revenue_note": "درآمد اشتراک BeautyOS هنوز قابل محاسبه نیست؛ پرداخت‌های سالن درآمد پلتفرم محسوب نمی‌شوند.",
     }
