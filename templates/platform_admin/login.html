@@ -16,6 +16,13 @@
   {% if phone_form.non_field_errors %}
     <div role="alert" class="mb-3 text-sm">{{ phone_form.non_field_errors.0 }}</div>
   {% endif %}
+  {% if dev_otp_code %}
+  <div role="status" class="rounded-xl border p-3 mb-4 text-center" style="background:#f3ebe6;border-color:#d7bcb2">
+    <div class="text-sm mb-1">کد ورود آزمایشی (فقط محیط توسعه)</div>
+    <strong dir="ltr" style="display:block;font-size:28px;letter-spacing:.25em;color:#77514e">{{ dev_otp_code }}</strong>
+    <a href="{% url 'accounts:verify' %}" class="inline-block mt-2 underline">ادامه و وارد کردن کد</a>
+  </div>
+  {% endif %}
   <div class="public-auth-field">
     <label for="id_phone">شماره موبایل مدیر پلتفرم</label>
     <div class="luna-auth-phone-input">{{ phone_form.phone }}<i data-lucide="shield-check" aria-hidden="true"></i></div>
