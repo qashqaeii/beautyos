@@ -3,7 +3,7 @@ from django.db.models import Count, Q
 from django.shortcuts import render
 
 from apps.platform_admin.guards import platform_required
-from apps.platform_admin.models import SalonSubscription, SubscriptionPlan
+from apps.platform_admin.models import SalonSubscription, SubscriptionPlan, SubscriptionChangeLog
 from apps.platform_admin.subscription_health import subscription_health
 
 
@@ -26,6 +26,7 @@ def subscriptions(request):
     return render(request, "platform_admin/subscriptions.html", {
         "plans": plans,
         "health": subscription_health(),
+        "recent_changes": SubscriptionChangeLog.objects.select_related("subscription__salon", "actor").order_by("-changed_at")[:15],
         "subscriptions": items[:100],
         "status_filter": status,
         "subscriptions_total": SalonSubscription.objects.count(),
