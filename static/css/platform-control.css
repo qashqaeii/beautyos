@@ -294,3 +294,54 @@ a.pc-list-row:hover{background:#faf8fc}
 .pc-period a.is-active{background:#e9d8d2;color:#51443f}
 .pc-shell .pc-button--ghost{border-color:#e5dcd6;background:#fffdfc;color:#51443f}
 .pc-shell .pc-button--ghost:hover{background:#faf7f4;border-color:#d5cac3}
+
+
+/* Platform overview v3 — approved compact editorial layout, brand colours.
+   Only /control/ overview; other control pages retain their own KPI sizing. */
+.pc-content:has(.pc-kpis--overview){gap:13px}
+.pc-content:has(.pc-kpis--overview) .pc-command-hero{padding:16px 21px 12px}
+.pc-content:has(.pc-kpis--overview) .pc-command-hero__meta{margin-top:8px}
+.pc-content:has(.pc-kpis--overview) .pc-period{justify-self:start}
+.pc-content .pc-kpis--overview{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pc-content .pc-kpis--overview>.pc-kpi,
+.pc-content:has(.pc-command-hero)>.pc-kpis--overview>.pc-kpi{
+  min-height:104px;max-height:116px;padding:12px 14px;gap:5px;border-radius:14px;
+  box-shadow:0 3px 12px rgba(81,68,63,.04)
+}
+.pc-kpis--overview .pc-kpi__head{font-size:.7rem;line-height:1.4}
+.pc-kpis--overview .pc-kpi__head svg{width:17px;height:17px}
+.pc-kpis--overview .pc-kpi>strong,
+.pc-content:has(.pc-command-hero)>.pc-kpis--overview .pc-kpi>strong{
+  font-size:clamp(1.22rem,1.7vw,1.55rem);line-height:1.2
+}
+.pc-kpis--overview .pc-kpi>.pc-kpi__amount,
+.pc-content:has(.pc-command-hero)>.pc-kpis--overview .pc-kpi>.pc-kpi__amount{
+  font-size:clamp(.99rem,1.35vw,1.24rem);line-height:1.4
+}
+.pc-kpis--overview .pc-kpi p{font-size:.65rem;line-height:1.4}
+.pc-overview-operations{padding:16px 18px;border:1px solid #e5dcd6;border-radius:16px;background:#fffdfc;box-shadow:0 4px 14px rgba(81,68,63,.04)}
+.pc-overview-operations__heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.pc-overview-operations__heading h2{font-size:.96rem;margin-top:4px}
+.pc-overview-operations__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pc-overview-operations__item{display:flex;align-items:center;gap:10px;min-width:0;padding:12px;border:1px solid #e9dfda;border-radius:12px;background:#faf7f4;transition:background .15s,border-color .15s}
+.pc-overview-operations__item:hover{background:#f0e5df;border-color:#d5cac3}
+.pc-overview-operations__icon{display:grid;place-items:center;width:35px;height:35px;flex:none;border-radius:10px;background:#e9d8d2;color:#8a635f}
+.pc-overview-operations__icon svg{width:17px;height:17px}
+.pc-overview-operations__item>span:nth-child(2){display:flex;flex-direction:column;gap:3px;min-width:0}
+.pc-overview-operations__item strong{font-size:.77rem;color:#51443f}
+.pc-overview-operations__item small{font-size:.65rem;color:#857771;line-height:1.4}
+.pc-overview-operations__item b{margin-inline-start:auto;font-size:1.2rem;color:#8a635f;font-variant-numeric:tabular-nums}
+.pc-content:has(.pc-kpis--overview) .pc-two-col--overview .pc-panel{min-height:0}
+.pc-content:has(.pc-kpis--overview) .pc-two-col--overview .pc-list-row{padding:9px 14px}
+.pc-content:has(.pc-kpis--overview) .pc-command-section{margin-top:3px}
+@media(max-width:1100px){
+  .pc-content .pc-kpis--overview{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pc-overview-operations__grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .pc-content .pc-kpis--overview{gap:8px}
+  .pc-content .pc-kpis--overview>.pc-kpi,.pc-content:has(.pc-command-hero)>.pc-kpis--overview>.pc-kpi{min-height:105px;max-height:none;padding:11px}
+  .pc-overview-operations{padding:12px}
+  .pc-overview-operations__heading{align-items:flex-start}
+  .pc-overview-operations__item{padding:10px}
+}
