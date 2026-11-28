@@ -250,3 +250,37 @@ def test_reception_queue_cap_reports_actual_visible_count(
     assert summary["truncated"] is True
     assert len(response.context["day_operations"]) == 100
     assert "سایر نوبت‌ها" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_reception_kpis_include_completed_visits_beyond_visible_queue(
+    client, salon, owner_membership, day_case,
+):
+    customer, staff, service, appointment, day = day_case
+    Appointment.objects.bulk_create([
+        Appointment(
+            salon=salon, customer=customer, staff=staff, service=service,
+            start_at=appointment.start_at + timedelta(minutes=i + 1),
+            end_at=appointment.end_at + timedelta(minutes=i + 1),
+            status=Appointment.Status.PENDING,
+            price_toman=800_000, tracking_code=f"FULL{i:08d}",
+        )
+        for i in range(99)
+    ])
+    last = Appointment.objects.create(
+        salon=salon, customer=customer, staff=staff, service=service,
+        start_at=appointment.start_at + timedelta(hours=5),
+        end_at=appointment.end_at + timedelta(hours=5),
+        status=Appointment.Status.COMPLETED, price_toman=800_000,
+    )
+    authenticate(client, owner_membership)
+    response = client.get(reverse("reception:desk"), {"day": day.isoformat()})
+    assert response.status_code == 200
+    summary = response.context["day_operations_summary"]
+    assert summary["total"] == 101
+    assert summary["visible_count"] == 100
+    assert summary["pending"] == 100
+    assert summary["completed"] == 1
+    assert summary["outstanding_toman"] == 800_000
+    assert summary["settled"] == 0
+    assert last.pk not in [row["appointment"].pk for row in response.context["day_operations"]]
