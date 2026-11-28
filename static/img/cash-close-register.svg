@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" role="img" aria-label="صندوق فروشگاهی">
+<defs><linearGradient id="case" x2=".8" y2="1"><stop stop-color="#a77baf"/><stop offset=".55" stop-color="#71527f"/><stop offset="1" stop-color="#483b62"/></linearGradient><linearGradient id="face" x2="0" y2="1"><stop stop-color="#f7e4d6"/><stop offset="1" stop-color="#d7b8ad"/></linearGradient><linearGradient id="screen" x2="0" y2="1"><stop stop-color="#e9f7e9"/><stop offset="1" stop-color="#b9d9c9"/></linearGradient><filter id="shadow"><feGaussianBlur stdDeviation="8"/></filter></defs>
+<ellipse cx="183" cy="137" rx="120" ry="9" fill="#866f8e" opacity=".19" filter="url(#shadow)"/>
+<circle cx="181" cy="76" r="72" fill="#f1dbe2" opacity=".65"/>
+<g transform="translate(83 13)">
+<path d="M37 72h158l12 44q-1 8-11 8H31q-10 0-11-8z" fill="url(#case)" stroke="#6d536f" stroke-width="3"/>
+<path d="M42 80h147l6 29H36z" fill="url(#face)"/>
+<path d="M100 89h29v6h-29z" rx="3" fill="#a67d8b"/><path d="M106 98h17" stroke="#886a78" stroke-width="3" stroke-linecap="round"/>
+<path d="M52 64h130l13 13H40z" fill="#9d7da4" stroke="#695572" stroke-width="3"/>
+<g fill="#e6cfda" stroke="#785f82" stroke-width="1.5"><rect x="55" y="69" width="19" height="6" rx="2"/><rect x="79" y="69" width="19" height="6" rx="2"/><rect x="103" y="69" width="19" height="6" rx="2"/><rect x="127" y="69" width="19" height="6" rx="2"/><rect x="151" y="69" width="19" height="6" rx="2"/></g>
+<path d="M69 8h102l-8 57H77z" fill="#604969" stroke="#4f3b5b" stroke-width="4"/><path d="M78 14h83l-6 42H84z" fill="url(#screen)"/><path d="M94 42h48" stroke="#8cbaa8" stroke-width="3"/><path d="M96 32l10-7 10 6 14-13 12 6" fill="none" stroke="#8ba7a0" stroke-width="3" stroke-linecap="round"/>
+<path d="M70 8l-8-6h111l-2 6" fill="#b18db6"/>
+</g><g fill="#d9a96e" stroke="#b88553" stroke-width="1.5"><ellipse cx="307" cy="124" rx="13" ry="4"/><rect x="294" y="103" width="26" height="21"/><ellipse cx="307" cy="103" rx="13" ry="4"/><path d="M294 111h26M294 118h26"/></g><path d="M64 122q-19-17-14-36M64 122q-8-34 10-57" fill="none" stroke="#b7a4a0" stroke-width="2"/><g fill="#c6a3b7"><ellipse cx="49" cy="91" rx="6" ry="10" transform="rotate(-35 49 91)"/><ellipse cx="72" cy="78" rx="6" ry="10" transform="rotate(40 72 78)"/><ellipse cx="57" cy="108" rx="6" ry="10" transform="rotate(-35 57 108)"/></g>
+</svg>
