@@ -13,28 +13,6 @@
 {% block content %}
 <div class="dashboard-mgmt-page">
   {% include "partials/management_hero_header.html" %}
-  <section class="management-command" aria-label="نمای کلی مدیریت">
-    <div class="management-command__intro">
-      <div>
-        <span class="management-command__eyebrow">BEAUTYOS / COMMAND CENTER</span>
-        <h2>مرکز فرمان سالن</h2>
-        <p>وضعیت امروز و مسیرهای اصلی مدیریت، یک‌جا و بدون شلوغی.</p>
-      </div>
-      <span class="management-command__date"><i data-lucide="calendar-days" aria-hidden="true"></i>{{ management_today }}</span>
-    </div>
-    <div class="management-command__metrics">
-      {% for metric in management_metrics %}
-      <div class="management-command__metric{% if metric.accent %} management-command__metric--accent{% endif %}">
-        <span class="management-command__metric-label"><i data-lucide="{{ metric.icon }}" aria-hidden="true"></i>{{ metric.label }}</span>
-        <strong class="management-command__metric-value">{{ metric.value }}</strong>
-      </div>
-      {% endfor %}
-    </div>
-  </section>
-  <div class="management-section-heading">
-    <div><h2>بخش‌های مدیریت</h2><p>برای مدیریت هر بخش، کارت مربوط را انتخاب کنید.</p></div>
-    <span class="management-section-heading__count">{{ links|length }} بخش</span>
-  </div>
   <nav class="dashboard-mgmt-grid" aria-label="بخش‌های مدیریتی">
     {% for link in links %}
     <a href="{{ link.url }}" class="dashboard-mgmt-card" style="--management-card-index:{{ forloop.counter0 }}">
