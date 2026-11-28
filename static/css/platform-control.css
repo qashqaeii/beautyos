@@ -922,3 +922,55 @@ a.pc-exec__row:hover{background:var(--color-surface-muted,#faf7f4)}
 @media(max-width:960px){.pc-system .pc-feature-list{grid-template-columns:1fr}}
 @media(max-width:640px){.pc-system .pc-kpis{grid-template-columns:1fr}.pc-system .pc-kpi{min-height:100px;padding:12px}.pc-system .pc-exec__heading{padding:10px}}
 @media(prefers-reduced-motion:no-preference){.pc-system .pc-kpi,.pc-system .pc-panel{animation:pc-exec-enter .32s ease-out both}.pc-system .pc-kpi:nth-child(2){animation-delay:35ms}.pc-system .pc-kpi:nth-child(3){animation-delay:70ms}}
+
+/* Executive overview: fit the desktop viewport without hiding content.
+   Expanded insights and genuinely short/narrow viewports retain natural scrolling. */
+@media(min-width:961px) and (min-height:620px){
+  .pc-shell:has([data-executive-dashboard]) .pc-topbar{height:48px;padding-inline:24px}
+  .pc-shell:has([data-executive-dashboard]) .pc-sidebar{padding:10px 12px 8px}
+  .pc-shell:has([data-executive-dashboard]) .pc-brand{padding:3px 8px 10px;gap:8px}
+  .pc-shell:has([data-executive-dashboard]) .pc-brand__mark{width:36px;height:36px;border-radius:10px}
+  .pc-shell:has([data-executive-dashboard]) .pc-nav-label{padding:10px 9px 4px}
+  .pc-shell:has([data-executive-dashboard]) .pc-navigation{gap:2px}
+  .pc-shell:has([data-executive-dashboard]) .pc-nav-item{min-height:32px;padding:5px 10px;gap:9px}
+  .pc-shell:has([data-executive-dashboard]) .pc-nav-item svg{width:17px;height:17px}
+  .pc-shell:has([data-executive-dashboard]) .pc-sidebar__footer{padding:6px 4px 0}
+  .pc-shell:has([data-executive-dashboard]) .pc-operator{padding:8px 4px 4px}
+  .pc-shell:has([data-executive-dashboard]) .pc-operator__avatar{width:30px;height:30px}
+  .pc-shell:has([data-executive-dashboard]) .pc-link-muted{padding:5px 4px}
+  .pc-content:has(>[data-executive-dashboard]){padding:10px clamp(14px,2vw,28px) 10px}
+  [data-executive-dashboard]{gap:8px}
+  [data-executive-dashboard] .pc-exec__heading{flex-direction:row;align-items:center;min-height:40px;gap:8px}
+  [data-executive-dashboard] .pc-exec__actions{width:auto;justify-content:flex-end}
+  [data-executive-dashboard] .pc-exec__brand-icon{width:36px;height:36px}
+  [data-executive-dashboard] .pc-exec__kpis{gap:8px}
+  [data-executive-dashboard] .pc-exec__kpi{min-height:76px;padding:8px 12px;gap:2px}
+  [data-executive-dashboard] .pc-exec__kpi>strong{font-size:1.35rem}
+  [data-executive-dashboard] .pc-exec__kpi .pc-exec__money{font-size:1.12rem}
+  [data-executive-dashboard] .pc-exec__attention{padding:5px;gap:5px}
+  [data-executive-dashboard] .pc-exec__attention>a{padding:5px 8px}
+  [data-executive-dashboard] .pc-exec__panels{gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  [data-executive-dashboard] .pc-exec__panel{min-height:0}
+  [data-executive-dashboard] .pc-exec__panel-heading{min-height:33px;padding:6px 10px}
+  [data-executive-dashboard] .pc-exec__row{min-height:31px;padding:3px 10px;gap:7px}
+  [data-executive-dashboard] .pc-exec__avatar{width:24px;height:24px;border-radius:7px}
+  [data-executive-dashboard] .pc-exec__row-main{gap:0}
+  [data-executive-dashboard] .pc-exec__empty{min-height:90px;padding:9px;gap:5px;flex:1}
+  [data-executive-dashboard] .pc-exec__trend{min-height:85px;margin:7px 10px 3px}
+  [data-executive-dashboard] .pc-exec__footnote{padding:0 10px 6px}
+  [data-executive-dashboard] .pc-exec__details .pc-insights__trigger{padding:5px 10px;gap:8px}
+  [data-executive-dashboard] .pc-exec__details .pc-insights__symbol{width:27px;height:27px}
+  [data-executive-dashboard] .pc-insights__trigger>span:nth-child(2){gap:0}
+  [data-executive-dashboard] .pc-insights__trigger strong{font-size:.78rem}
+  [data-executive-dashboard] .pc-insights__trigger small{font-size:.64rem}
+}
+@media(min-width:1201px) and (min-height:850px){
+  .pc-shell:has([data-executive-dashboard]) .pc-topbar{height:62px}
+  .pc-shell:has([data-executive-dashboard]) .pc-nav-item{min-height:43px}
+  .pc-content:has(>[data-executive-dashboard]){padding-block:18px}
+  [data-executive-dashboard]{gap:12px}
+  [data-executive-dashboard] .pc-exec__kpi{min-height:100px;padding:13px 16px}
+  [data-executive-dashboard] .pc-exec__row{min-height:42px;padding:7px 14px}
+  [data-executive-dashboard] .pc-exec__panel-heading{min-height:42px;padding:9px 14px}
+  [data-executive-dashboard] .pc-exec__panel{min-height:210px}
+}
