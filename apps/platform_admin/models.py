@@ -190,3 +190,38 @@ class SubscriptionChangeLog(models.Model):
         indexes = [
             models.Index(fields=["subscription", "-changed_at"], name="plat_sub_change_date_idx"),
         ]
+
+
+class PlatformSubscriptionOrder(TimeStampedModel):
+    """Immutable checkout price snapshot, not a verified payment or entitlement."""
+    class Status(models.TextChoices):
+        PENDING = "pending", "در انتظار پرداخت"
+        VERIFIED = "verified", "تأییدشده"
+        CANCELED = "canceled", "لغوشده"
+
+    salon = models.ForeignKey(
+        "salons.Salon", on_delete=models.PROTECT, related_name="platform_orders",
+    )
+    plan = models.ForeignKey(
+        SubscriptionPlan, on_delete=models.PROTECT, related_name="platform_orders",
+    )
+    request_key = models.UUIDField(unique=True)
+    amount_toman = models.PositiveBigIntegerField()
+    period_days = models.PositiveSmallIntegerField()
+    status = models.CharField(
+        max_length=16, choices=Status.choices, default=Status.PENDING, db_index=True,
+    )
+    # Only a trusted gateway verification service may eventually set VERIFIED.
+    provider = models.CharField(max_length=40, blank=True)
+    provider_reference = models.CharField(max_length=120, blank=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at", "-pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["provider", "provider_reference"],
+                condition=models.Q(status="verified"),
+                name="plat_order_verified_ref_unique",
+            ),
+        ]
