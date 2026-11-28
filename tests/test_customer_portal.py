@@ -376,3 +376,24 @@ def test_reschedule_page_hides_slots_for_unavailable_service(
     assert response.context["can_manage"] is False
     assert response.context["slots"] == []
     assert "خدمت" in response.context["restriction"]
+
+
+@pytest.mark.django_db
+def test_customer_reschedule_does_not_offer_occupied_slots(
+    client, salon, booked_customer, customer_otp,
+):
+    customer, appointment = booked_customer
+    target = appointment.start_at + timedelta(hours=2)
+    Appointment.objects.create(
+        salon=salon, customer=customer, staff=appointment.staff,
+        service=appointment.service, start_at=target,
+        end_at=target + timedelta(minutes=30),
+        source=Appointment.Source.PUBLIC, status=Appointment.Status.CONFIRMED,
+    )
+    portal_login(client, salon, customer.phone, customer_otp)
+    response = client.get(
+        url(salon, "customer_reschedule", appointment_id=appointment.pk),
+        {"day": target.date().isoformat()},
+    )
+    assert response.status_code == 200
+    assert target not in response.context["slots"]
