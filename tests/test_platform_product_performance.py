@@ -42,3 +42,20 @@ def test_salon_performance_is_scoped_and_reports_empty_share(salon, salon_b):
     assert customers["current"] == 1
     with pytest.raises(ValueError):
         salon_product_performance(salon=salon, days=5)
+
+
+@pytest.mark.django_db
+def test_feature_adoption_scoped_to_salon_and_window(salon, salon_b):
+    from apps.platform_admin.activity_metrics import record_activity
+    from apps.platform_admin.models import PlatformActivityEvent
+    from apps.platform_admin.product_performance import salon_feature_adoption
+    record_activity(salon=salon_b, kind=PlatformActivityEvent.Kind.INVOICE_CREATED)
+    rows = salon_feature_adoption(salon=salon, days=30)
+    assert all(row["current"] == 0 for row in rows)
+    record_activity(salon=salon, kind=PlatformActivityEvent.Kind.INVOICE_CREATED)
+    rows = salon_feature_adoption(salon=salon, days=30)
+    invoice = next(row for row in rows if row["label"] == "صدور فاکتور")
+    assert invoice["current"] == 1
+    assert invoice["previous"] == 0
+    with pytest.raises(ValueError):
+        salon_feature_adoption(salon=salon, days=31)
