@@ -1,47 +1,89 @@
 {% extends "platform_admin/base.html" %}
-{% block title %}نمای کلی مدیریت · BeautyOS{% endblock %}
+{% block title %}مرکز فرمان BeautyOS{% endblock %}
 {% block control_content %}
-<section class="pc-command-hero"><div class="pc-heading"><div><p class="pc-eyebrow">BEAUTYOS / EXECUTIVE COMMAND CENTER</p><h1>مرکز فرمان BeautyOS</h1><p>رشد پلتفرم، سلامت سالن‌ها و اقدامات مهم؛ در یک نگاه.</p></div><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:reports' %}"><i data-lucide="chart-column-increasing"></i> گزارش کامل</a></div><div class="pc-command-hero__meta"><span><i data-lucide="shield-check"></i> نمای مدیریتی امن</span><span><i data-lucide="activity"></i> شاخص‌های واقعی پلتفرم</span></div></section>
-<div class="pc-period"><span><i data-lucide="calendar-range"></i> بازه گزارش</span><a href="?days=7" class="{% if days == 7 %}is-active{% endif %}">۷ روز</a><a href="?days=30" class="{% if days == 30 %}is-active{% endif %}">۳۰ روز</a><a href="?days=90" class="{% if days == 90 %}is-active{% endif %}">۹۰ روز</a></div>
-<div class="pc-kpis pc-kpis--overview">
-  <article class="pc-kpi pc-kpi--primary"><div class="pc-kpi__head"><span>کل سالن‌ها</span><i data-lucide="store"></i></div><strong>{{ kpis.salons_total|fa_num }}</strong><p>{{ kpis.salons_active|fa_num }} سالن فعال</p></article>
-  <article class="pc-kpi"><div class="pc-kpi__head"><span>کاربران سیستم</span><i data-lucide="users-round"></i></div><strong>{{ kpis.users_total|fa_num }}</strong><p>{{ kpis.users_recent|fa_num }} ثبت‌نام جدید</p></article>
-  <article class="pc-kpi"><div class="pc-kpi__head"><span>نوبت‌های ثبت‌شده</span><i data-lucide="calendar-check"></i></div><strong>{{ kpis.bookings_count|fa_num }}</strong><p>{{ kpis.bookings_public|fa_num }} رزرو آنلاین</p></article>
-  <article class="pc-kpi"><div class="pc-kpi__head"><span>گردش مالی سالن‌ها</span><i data-lucide="wallet"></i></div><strong class="pc-kpi__amount">{{ kpis.salon_receipts_toman|fa_money }} <small>تومان</small></strong><p>مبالغ وصول ثبت‌شده، نه درآمد BeautyOS</p></article>
-</div>
-<section class="pc-executive-priorities" aria-label="اقدامات مهم">
-  <div class="pc-executive-priorities__title"><span class="pc-executive-priorities__icon"><i data-lucide="list-checks"></i></span><span><strong>نیازمند توجه</strong><small>اقدامات مهم امروز</small></span></div>
-  <div class="pc-executive-priorities__links">
-    <a href="{% url 'platform_admin:salons' %}"><span class="pc-priority-number">{{ kpis.salons_pending_setup|fa_num }}</span> راه‌اندازی ناتمام <i data-lucide="arrow-up-left"></i></a>
-    <a href="{% url 'platform_admin:support' %}"><span class="pc-priority-number">{{ kpis.tickets_open|fa_num }}</span> درخواست پشتیبانی <i data-lucide="arrow-up-left"></i></a>
-    <a href="{% url 'platform_admin:salons' %}"><span class="pc-priority-number">{{ kpis.salons_recent|fa_num }}</span> سالن جدید در بازه <i data-lucide="arrow-up-left"></i></a>
-  </div>
-</section>
-<div class="pc-command-section"><div><p class="pc-eyebrow">WORKSPACE</p><h2>آخرین وضعیت سالن‌ها و پشتیبانی</h2></div><span>نمای سریع عملیات پلتفرم</span></div>
-<div class="pc-two-col pc-two-col--overview">
-  <section class="pc-panel"><div class="pc-panel__header"><div><p class="pc-eyebrow">RECENT SALONS</p><h2>سالن‌های تازه‌وارد</h2></div><a href="{% url 'platform_admin:salons' %}" class="pc-text-link">مشاهده همه <i data-lucide="arrow-up-left"></i></a></div>
-    <div class="pc-list">
-      {% for salon in latest_salons %}
-      <a class="pc-list-row" href="{% url 'platform_admin:salon_detail' salon_id=salon.pk %}"><span class="pc-list-avatar">{{ salon.name|slice:":1" }}</span><span class="pc-list-main"><strong>{{ salon.name }}</strong><small>{{ salon.city|default:"شهر ثبت نشده" }} · {{ salon.created_at|fa_jalali }}</small></span><span class="pc-status {% if salon.is_active %}pc-status--good{% else %}pc-status--muted{% endif %}">{% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</span></a>
-      {% empty %}<div class="pc-empty">هنوز سالنی ثبت نشده است.</div>{% endfor %}
+<div class="pc-exec" data-executive-dashboard>
+  <header class="pc-exec__heading">
+    <div class="pc-exec__title">
+      <span class="pc-exec__brand-icon"><i data-lucide="layout-dashboard" aria-hidden="true"></i></span>
+      <div><h1>مرکز فرمان BeautyOS</h1><p>نمای یکپارچه عملکرد و وضعیت پلتفرم</p></div>
     </div>
-  </section>
-  <section class="pc-panel"><div class="pc-panel__header"><div><p class="pc-eyebrow">SUPPORT INBOX</p><h2>آخرین درخواست‌ها</h2></div><a href="{% url 'platform_admin:support' %}" class="pc-text-link">صندوق پشتیبانی <i data-lucide="arrow-up-left"></i></a></div>
-    <div class="pc-list">
-      {% for ticket in latest_tickets %}
-      <a class="pc-list-row" href="{% url 'platform_admin:ticket_detail' ticket_id=ticket.pk %}"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="message-square-text"></i></span><span class="pc-list-main"><strong>{{ ticket.title|truncatechars:55 }}</strong><small>{{ ticket.salon.name }} · {{ ticket.last_activity_at|fa_jalali_datetime }}</small></span><span class="pc-status {% if ticket.status == 'open' %}pc-status--warn{% elif ticket.status == 'in_progress' %}pc-status--info{% else %}pc-status--good{% endif %}">{{ ticket.get_status_display }}</span></a>
-      {% empty %}<div class="pc-empty">درخواست پشتیبانی ثبت نشده است.</div>{% endfor %}
+    <div class="pc-exec__actions">
+      <nav class="pc-period" aria-label="بازه گزارش"><span><i data-lucide="calendar-range"></i> بازه</span><a href="?days=7" class="{% if days == 7 %}is-active{% endif %}" {% if days == 7 %}aria-current="page"{% endif %}>۷ روز</a><a href="?days=30" class="{% if days == 30 %}is-active{% endif %}" {% if days == 30 %}aria-current="page"{% endif %}>۳۰ روز</a><a href="?days=90" class="{% if days == 90 %}is-active{% endif %}" {% if days == 90 %}aria-current="page"{% endif %}>۹۰ روز</a></nav>
+      <a class="pc-button" href="{% url 'platform_admin:reports' %}"><i data-lucide="chart-no-axes-combined"></i> گزارش کامل</a>
     </div>
+  </header>
+  <section class="pc-exec__kpis" aria-label="شاخص‌های اصلی">
+    <a class="pc-exec__kpi pc-exec__kpi--featured" href="{% url 'platform_admin:salons' %}">
+      <span class="pc-exec__kpi-top"><span>کل سالن‌ها</span><i data-lucide="store"></i></span>
+      <strong data-count="{{ kpis.salons_total }}">{{ kpis.salons_total|fa_num }}</strong>
+      <small>{{ kpis.salons_active|fa_num }} سالن فعال</small>
+    </a>
+    <a class="pc-exec__kpi" href="{% url 'platform_admin:users' %}">
+      <span class="pc-exec__kpi-top"><span>کاربران سیستم</span><i data-lucide="users-round"></i></span>
+      <strong data-count="{{ kpis.users_total }}">{{ kpis.users_total|fa_num }}</strong>
+      <small>{{ kpis.users_recent|fa_num }} ثبت‌نام در بازه</small>
+    </a>
+    <a class="pc-exec__kpi" href="{% url 'platform_admin:reports' %}">
+      <span class="pc-exec__kpi-top"><span>نوبت‌های ثبت‌شده</span><i data-lucide="calendar-check"></i></span>
+      <strong data-count="{{ kpis.bookings_count }}">{{ kpis.bookings_count|fa_num }}</strong>
+      <small>{{ kpis.bookings_public|fa_num }} رزرو آنلاین در بازه</small>
+    </a>
+    <a class="pc-exec__kpi" href="{% url 'platform_admin:reports' %}">
+      <span class="pc-exec__kpi-top"><span>وصولی سالن‌ها</span><i data-lucide="wallet"></i></span>
+      <strong class="pc-exec__money">{{ kpis.salon_receipts_toman|fa_money }} <em>تومان</em></strong>
+      <small>گردش مالی سالن‌ها، نه درآمد پلتفرم</small>
+    </a>
   </section>
-</div>
-<section class="pc-panel pc-panel--activity"><div class="pc-panel__header"><div><p class="pc-eyebrow">RECENT ACTIVITY</p><h2>رویدادهای اخیر</h2></div><a href="{% url 'platform_admin:audit' %}" class="pc-text-link">تمام لاگ‌ها <i data-lucide="arrow-up-left"></i></a></div>
-  <div class="pc-list">
-    {% for event in recent_audit %}
-    <div class="pc-list-row"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="activity"></i></span><span class="pc-list-main"><strong>{{ event.message|default:event.entity_type|truncatechars:100 }}</strong><small>{{ event.actor.full_name|default:"رویداد سیستمی" }}{% if event.salon %} · {{ event.salon.name }}{% endif %}</small></span><time class="pc-date">{{ event.created_at|fa_jalali_datetime }}</time></div>
-    {% empty %}<div class="pc-empty">هنوز رویدادی ثبت نشده است.</div>{% endfor %}
+  <section class="pc-exec__attention" aria-label="اقدامات نیازمند توجه">
+    <div class="pc-exec__attention-label"><i data-lucide="circle-alert"></i><strong>نیازمند توجه</strong></div>
+    <a href="{% url 'platform_admin:salons' %}?status=setup"><b>{{ kpis.salons_pending_setup|fa_num }}</b> راه‌اندازی ناتمام <i data-lucide="arrow-up-left"></i></a>
+    <a href="{% url 'platform_admin:support' %}"><b>{{ kpis.tickets_open|fa_num }}</b> درخواست پشتیبانی <i data-lucide="arrow-up-left"></i></a>
+    <a href="{% url 'platform_admin:salons' %}"><b>{{ kpis.salons_recent|fa_num }}</b> سالن جدید در بازه <i data-lucide="arrow-up-left"></i></a>
+  </section>
+  <div class="pc-exec__panels">
+    <section class="pc-exec__panel" aria-labelledby="exec-salons-title">
+      <div class="pc-exec__panel-heading"><h2 id="exec-salons-title"><i data-lucide="store"></i> سالن‌های تازه‌وارد</h2><a href="{% url 'platform_admin:salons' %}">مشاهده همه <i data-lucide="arrow-up-left"></i></a></div>
+      <div class="pc-exec__list">
+        {% for salon in latest_salons|slice:":4" %}
+        <a class="pc-exec__row" href="{% url 'platform_admin:salon_detail' salon_id=salon.pk %}"><span class="pc-exec__avatar">{{ salon.name|slice:":1" }}</span><span class="pc-exec__row-main"><strong>{{ salon.name }}</strong><small>{{ salon.city|default:"شهر ثبت نشده" }} · {{ salon.created_at|fa_jalali }}</small></span><span class="pc-status {% if salon.is_active %}pc-status--good{% else %}pc-status--muted{% endif %}">{% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</span></a>
+        {% empty %}<div class="pc-exec__empty"><i data-lucide="store"></i><span>هنوز سالنی ثبت نشده است.</span></div>{% endfor %}
+      </div>
+    </section>
+    <section class="pc-exec__panel" aria-labelledby="exec-support-title">
+      <div class="pc-exec__panel-heading"><h2 id="exec-support-title"><i data-lucide="headset"></i> وضعیت پشتیبانی</h2><a href="{% url 'platform_admin:support' %}">صندوق پشتیبانی <i data-lucide="arrow-up-left"></i></a></div>
+      {% if latest_tickets %}
+      <div class="pc-exec__list">
+        {% for ticket in latest_tickets|slice:":4" %}
+        <a class="pc-exec__row" href="{% url 'platform_admin:ticket_detail' ticket_id=ticket.pk %}"><span class="pc-exec__avatar"><i data-lucide="message-square"></i></span><span class="pc-exec__row-main"><strong>{{ ticket.title|truncatechars:48 }}</strong><small>{{ ticket.salon.name }} · {{ ticket.last_activity_at|fa_jalali_datetime }}</small></span><span class="pc-status {% if ticket.status == 'open' %}pc-status--warn{% elif ticket.status == 'in_progress' %}pc-status--info{% else %}pc-status--good{% endif %}">{{ ticket.get_status_display }}</span></a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="pc-exec__empty pc-exec__empty--support"><i data-lucide="check-check"></i><strong>درخواستی ثبت نشده است</strong><span>در حال حاضر موردی برای پیگیری وجود ندارد.</span></div>
+      {% endif %}
+    </section>
+    <section class="pc-exec__panel" aria-labelledby="exec-trend-title">
+      <div class="pc-exec__panel-heading"><h2 id="exec-trend-title"><i data-lucide="chart-no-axes-column"></i> روند فعالیت پلتفرم</h2><span class="pc-exec__panel-note">{{ days|fa_num }} روز اخیر</span></div>
+      {% if command.usage_events %}
+      <div class="pc-exec__trend" role="img" aria-label="نمودار تعداد رویدادهای ثبت‌شده در هر روز؛ جزئیات هر ستون در عنوان آن آمده است">
+        {% for point in command.trend %}
+        <span title="{{ point.date }}: {{ point.count }} رویداد" style="height:{{ point.height }}%"></span>
+        {% endfor %}
+      </div>
+      <p class="pc-exec__footnote">{{ command.usage_events|fa_num }} رویداد ردیابی‌شده؛ تاریخچه پیش از فعال‌سازی ردیابی در دسترس نیست.</p>
+      {% else %}
+      <div class="pc-exec__empty"><i data-lucide="chart-no-axes-column"></i><span>در این بازه فعالیت ردیابی‌شده‌ای ثبت نشده است.</span></div>
+      {% endif %}
+    </section>
+    <section class="pc-exec__panel" aria-labelledby="exec-activity-title">
+      <div class="pc-exec__panel-heading"><h2 id="exec-activity-title"><i data-lucide="activity"></i> آخرین رویدادها</h2><a href="{% url 'platform_admin:audit' %}">مشاهده همه <i data-lucide="arrow-up-left"></i></a></div>
+      <div class="pc-exec__list">
+        {% for event in recent_audit|slice:":4" %}
+        <div class="pc-exec__row"><span class="pc-exec__avatar"><i data-lucide="activity"></i></span><span class="pc-exec__row-main"><strong>{{ event.message|default:event.entity_type|truncatechars:65 }}</strong><small>{{ event.actor.full_name|default:"رویداد سیستمی" }}{% if event.salon %} · {{ event.salon.name }}{% endif %}</small></span><time class="pc-exec__time">{{ event.created_at|fa_jalali_datetime }}</time></div>
+        {% empty %}<div class="pc-exec__empty"><i data-lucide="activity"></i><span>هنوز رویدادی ثبت نشده است.</span></div>{% endfor %}
+      </div>
+    </section>
   </div>
-</section>
-<details class="pc-insights" id="platform-insights">
+<details class="pc-insights pc-exec__details" id="platform-insights">
   <summary class="pc-insights__trigger"><span class="pc-insights__symbol"><i data-lucide="chart-no-axes-combined"></i></span><span><strong>تحلیل‌های پیشرفته پلتفرم</strong><small>نگهداشت سالن‌ها، روند فعالیت، پیگیری و استفاده از قابلیت‌ها</small></span><i data-lucide="chevron-down" class="pc-insights__chevron"></i></summary>
   <div class="pc-insights__body"><section class="pc-panel" aria-labelledby="command-heading" >
   <div class="pc-panel__header"><div><p class="pc-eyebrow">PLATFORM INTELLIGENCE / ۰۲</p><h2 id="command-heading">فرماندهی و نگهداشت سالن‌ها</h2><p>تحلیل استفاده از محصول در بازه انتخابی؛ مستقل از گردش مالی سالن‌ها</p></div></div>
@@ -91,4 +133,25 @@
 </section>
 </div>
 </details>
-{% endblock %}
+<script>
+(function () {
+  const root = document.querySelector('[data-executive-dashboard]');
+  if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const formatter = new Intl.NumberFormat('fa-IR');
+  root.querySelectorAll('[data-count]').forEach((el) => {
+    const end = Number(el.dataset.count);
+    if (!Number.isSafeInteger(end) || end < 0 || end > 100000000 || !window.requestAnimationFrame) return;
+    const duration = 420;
+    let start;
+    const frame = (now) => {
+      if (start === undefined) start = now;
+      const progress = Math.min((now - start) / duration, 1);
+      el.textContent = formatter.format(Math.round(end * (1 - Math.pow(1 - progress, 3))));
+      if (progress < 1) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  });
+})();
+</script>
+</div>
+{% endblock %>
