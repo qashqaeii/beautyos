@@ -1,10 +1,15 @@
 """Read-only platform subscription inventory. Salon revenue is not SaaS revenue."""
 from django.db.models import Count, Q
-from django.shortcuts import render
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.views.decorators.http import require_POST
+from django.utils import timezone
+from django.shortcuts import render, get_object_or_404, redirect
 
 from apps.platform_admin.guards import platform_required
 from apps.platform_admin.models import SalonSubscription, SubscriptionPlan, SubscriptionChangeLog
 from apps.platform_admin.subscription_health import subscription_health
+from apps.platform_admin.subscription_lifecycle import change_subscription
 
 
 @platform_required
@@ -37,3 +42,31 @@ def subscriptions(request):
 def _unassigned_count():
     from apps.salons.models import Salon
     return Salon.objects.filter(platform_subscription__isnull=True).count()
+
+
+@platform_required
+@require_POST
+def correct_subscription_status(request, subscription_id):
+    """Restricted status correction, never an activation, extension or charge."""
+    subscription = get_object_or_404(SalonSubscription, pk=subscription_id)
+    target = request.POST.get("status", "")
+    reason = request.POST.get("reason", "")
+    allowed = {SalonSubscription.Status.EXPIRED, SalonSubscription.Status.CANCELED,
+               SalonSubscription.Status.PAST_DUE}
+    if target not in allowed:
+        messages.error(request, "فعال‌سازی یا تمدید فقط پس از پیاده‌سازی تأیید پرداخت مجاز است.")
+        return redirect("platform_admin:subscriptions")
+    if target == SalonSubscription.Status.EXPIRED and subscription.ends_at > timezone.now():
+        messages.error(request, "اشتراک هنوز از نظر تاریخ منقضی نشده است.")
+        return redirect("platform_admin:subscriptions")
+    try:
+        _, changed = change_subscription(
+            subscription_id=subscription.pk, new_status=target,
+            new_ends_at=subscription.ends_at, reason=reason,
+            actor=request.user, source="operator",
+        )
+    except ValidationError as exc:
+        messages.error(request, "؛ ".join(exc.messages))
+    else:
+        messages.success(request, "وضعیت اشتراک ثبت شد." if changed else "تغییری لازم نبود.")
+    return redirect("platform_admin:subscriptions")
