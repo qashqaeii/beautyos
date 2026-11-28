@@ -10,6 +10,7 @@ urlpatterns = [
     path("", views.overview, name="overview"),
     path("salons/", views.salons, name="salons"),
     path("subscriptions/", subscription_views.subscriptions, name="subscriptions"),
+    path("subscriptions/<int:subscription_id>/correct/", subscription_views.correct_subscription_status, name="subscription_correct"),
     path("salons/<uuid:salon_id>/", views.salon_detail, name="salon_detail"),
     path("salons/<uuid:salon_id>/status/", views.salon_status, name="salon_status"),
     path("users/", views.users, name="users"),
