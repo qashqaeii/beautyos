@@ -1,17 +1,19 @@
 {% extends "platform_admin/base.html" %}
 {% block title %}پشتیبانی · BeautyOS{% endblock %}
 {% block control_content %}
-<div class="pc-heading"><div><p class="pc-eyebrow">CUSTOMER SUCCESS / ۰۵</p><h1>صندوق پشتیبانی</h1><p>پیگیری متمرکز درخواست‌های ثبت‌شده توسط مدیران سالن‌ها.</p></div></div>
-<section class="pc-panel">
-<form method="get" role="search" class="pc-filterbar">
-  <label class="pc-search"><i data-lucide="search"></i><input type="search" name="q" maxlength="80" value="{{ q }}" placeholder="عنوان درخواست یا نام سالن" aria-label="جستجوی درخواست"></label>
-  <label class="pc-select-wrap"><span>وضعیت</span><select name="status"><option value="">همه درخواست‌ها</option>{% for value,label in statuses %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
-  <button class="pc-button" type="submit">جستجو</button><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:support' %}">پاک‌سازی</a>
+<div class="pc-directory pc-support">
+<header class="pc-directory__header"><div class="pc-directory__identity"><span class="pc-directory__mark"><i data-lucide="headset" aria-hidden="true"></i></span><div><h1>صندوق پشتیبانی</h1><p>مدیریت و پیگیری درخواست‌های پشتیبانی مدیران سالن‌ها</p></div></div></header>
+<section class="pc-directory__surface" aria-labelledby="support-list-heading"><div class="pc-directory__section-head"><div><h2 id="support-list-heading"><i data-lucide="messages-square" aria-hidden="true"></i> فهرست درخواست‌ها</h2><p>{{ page.paginator.count|fa_num }} درخواست مطابق فیلترهای انتخابی</p></div><span class="pc-directory__current">{% if status %}فیلتر وضعیت فعال{% else %}همه درخواست‌ها{% endif %}</span></div>
+<form method="get" role="search" class="pc-directory__filters">
+  <label class="pc-directory__search"><i data-lucide="search"></i><input type="search" name="q" maxlength="80" value="{{ q }}" placeholder="عنوان درخواست یا نام سالن" aria-label="جستجوی درخواست"></label>
+  <label class="pc-directory__select"><span>وضعیت</span><select name="status" aria-label="فیلتر وضعیت درخواست"><option value="">همه درخواست‌ها</option>{% for value,label in statuses %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+  <button class="pc-directory__apply" type="submit"><i data-lucide="sliders-horizontal" aria-hidden="true"></i> اعمال</button><a class="pc-directory__reset" href="{% url 'platform_admin:support' %}">پاک‌سازی</a>
 </form>
-<div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>شماره و عنوان</th><th>سالن</th><th>دسته‌بندی</th><th>اولویت</th><th>وضعیت</th><th>آخرین فعالیت</th><th></th></tr></thead><tbody>
-{% for ticket in page %}<tr><td><div class="pc-table-name"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="message-square-text"></i></span><div><strong>{{ ticket.title|truncatechars:65 }}</strong><small>#{{ ticket.pk|fa_num }}</small></div></div></td><td>{{ ticket.salon.name }}</td><td>{{ ticket.get_category_display }}</td><td><span class="pc-status {% if ticket.priority == 'urgent' %}pc-status--warn{% else %}pc-status--info{% endif %}">{{ ticket.get_priority_display }}</span></td><td><span class="pc-status {% if ticket.status == 'open' %}pc-status--warn{% elif ticket.status == 'in_progress' %}pc-status--info{% else %}pc-status--good{% endif %}">{{ ticket.get_status_display }}</span></td><td class="pc-date">{{ ticket.last_activity_at|fa_jalali_datetime }}</td><td><a class="pc-table-link" href="{% url 'platform_admin:ticket_detail' ticket_id=ticket.pk %}">بررسی <i data-lucide="arrow-up-left"></i></a></td></tr>
-{% empty %}<tr><td class="pc-empty" colspan="7">درخواستی در این وضعیت وجود ندارد.</td></tr>{% endfor %}
+<div class="pc-directory__table-wrap" tabindex="0" role="region" aria-label="جدول درخواست‌های پشتیبانی"><table class="pc-directory__table"><thead><tr><th>شماره و عنوان</th><th>سالن</th><th>دسته‌بندی</th><th>اولویت</th><th>وضعیت</th><th>آخرین فعالیت</th><th>عملیات</th></tr></thead><tbody>
+{% for ticket in page %}<tr><td><div class="pc-directory__salon"><span class="pc-directory__avatar"><i data-lucide="message-square-text"></i></span><div><strong>{{ ticket.title|truncatechars:65 }}</strong><small>#{{ ticket.pk|fa_num }}</small></div></div></td><td>{{ ticket.salon.name }}</td><td>{{ ticket.get_category_display }}</td><td><span class="pc-status {% if ticket.priority == 'urgent' %}pc-status--warn{% else %}pc-status--info{% endif %}">{{ ticket.get_priority_display }}</span></td><td><span class="pc-status {% if ticket.status == 'open' %}pc-status--warn{% elif ticket.status == 'in_progress' %}pc-status--info{% else %}pc-status--good{% endif %}">{{ ticket.get_status_display }}</span></td><td class="pc-date">{{ ticket.last_activity_at|fa_jalali_datetime }}</td><td><a class="pc-directory__detail" href="{% url 'platform_admin:ticket_detail' ticket_id=ticket.pk %}">بررسی <i data-lucide="arrow-up-left"></i></a></td></tr>
+{% empty %}<tr><td class="pc-support__empty" colspan="7"><span class="pc-support__empty-icon"><i data-lucide="{% if q or status %}search-x{% else %}inbox{% endif %}" aria-hidden="true"></i></span>{% if q or status %}<strong>درخواستی مطابق فیلترها یافت نشد</strong><p>عبارت جستجو یا وضعیت انتخابی را تغییر دهید.</p>{% else %}<strong>صندوق پشتیبانی خالی است</strong><p>درخواست‌های ثبت‌شده سالن‌ها در این بخش نمایش داده می‌شوند.</p>{% endif %}</td></tr>{% endfor %}
 </tbody></table></div>
 {% include "platform_admin/_pagination.html" %}
 </section>
+</div>
 {% endblock %}
