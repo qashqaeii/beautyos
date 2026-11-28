@@ -163,3 +163,30 @@ class PlatformActivityEvent(models.Model):
         constraints = [
             models.CheckConstraint(condition=models.Q(count__gte=1), name="plat_event_count_positive"),
         ]
+
+
+class SubscriptionChangeLog(models.Model):
+    """Immutable record of a platform subscription state transition.
+
+    This is not a payment receipt or evidence of a successful charge.
+    """
+    subscription = models.ForeignKey(
+        SalonSubscription, on_delete=models.CASCADE, related_name="change_logs",
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name="platform_subscription_changes",
+    )
+    changed_at = models.DateTimeField(default=timezone.now, db_index=True)
+    old_status = models.CharField(max_length=16, blank=True)
+    new_status = models.CharField(max_length=16, choices=SalonSubscription.Status.choices)
+    old_ends_at = models.DateTimeField(null=True, blank=True)
+    new_ends_at = models.DateTimeField()
+    reason = models.CharField(max_length=300)
+    source = models.CharField(max_length=32, default="system")
+
+    class Meta:
+        ordering = ["-changed_at", "-pk"]
+        indexes = [
+            models.Index(fields=["subscription", "-changed_at"], name="plat_sub_change_date_idx"),
+        ]
