@@ -60,5 +60,16 @@
   {% empty %}<div class="pc-empty">اشتراکی با این فیلتر یافت نشد.</div>{% endfor %}
   </div>
 </section>
+<section class="pc-panel pc-panel--padded" aria-labelledby="subscription-changes-heading" style="margin-block:16px">
+  <div class="pc-panel__header"><div><p class="pc-eyebrow">AUDIT TRAIL</p><h2 id="subscription-changes-heading">تاریخچه تغییرات اشتراک</h2><p>۱۵ تغییر اخیر ثبت‌شده از مسیر مدیریت چرخه عمر</p></div></div>
+  <div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>سالن</th><th>وضعیت قبلی</th><th>وضعیت جدید</th><th>زمان تغییر</th><th>دلیل</th></tr></thead><tbody>
+  {% for item in recent_changes %}<tr>
+    <td><a href="{% url 'platform_admin:salon_detail' salon_id=item.subscription.salon_id %}">{{ item.subscription.salon.name }}</a></td>
+    <td>{{ item.old_status|default:"ثبت اولیه" }}</td><td>{{ item.get_new_status_display }}</td>
+    <td>{{ item.changed_at|fa_jalali_datetime }}</td><td>{{ item.reason }}</td>
+  </tr>{% empty %}<tr><td colspan="5">هنوز تغییری در تاریخچه جدید ثبت نشده است. وضعیت‌های قدیمی به‌صورت خودکار بازسازی نمی‌شوند.</td></tr>{% endfor %}
+  </tbody></table></div>
+  <p class="pc-subtle">این تاریخچه سند پرداخت یا تأیید تمدید مالی نیست. فقط تغییراتی را ثبت می‌کند که از سرویس جدید مدیریت اشتراک عبور کنند.</p>
+</section>
 <p class="pc-subtle pc-subscriptions__disclaimer">وضعیت‌ها فعلاً ثبت اطلاعات هستند؛ فعال‌سازی درگاه پرداخت و محدودیت دسترسی نیازمند مرحله مستقل و تست‌شده است.</p>
 {% endblock %}
