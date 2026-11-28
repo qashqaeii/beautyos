@@ -1,16 +1,64 @@
 {% extends "layouts/app_shell.html" %}
 {% load static format_tags %}
-{% block page_title %}حساب‌های مالی{% endblock %}{% block page_subtitle %}موجودی ثبت‌شده و انتقال بین حساب‌ها{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
+{% block page_title %}حساب‌های مالی{% endblock %}
+{% block page_subtitle %}مدیریت موجودی، حساب‌ها و گردش وجوه سالن{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
 {% block content %}
-<div class="space-y-3">
-<section class="fin-panel"><header class="fin-panel-head"><h2><i data-lucide="landmark"></i>موجودی حساب‌ها</h2><a href="{% url 'finance:overview' %}">مدیریت مالی</a></header>
-<p class="fin-muted">موجودی بر اساس مانده افتتاح و گردش‌های تخصیص‌یافته است؛ بانک به صورت آنلاین متصل نیست. سندهای قبل از افتتاح را دوباره وارد نکنید.</p>
-<div class="fin-account-grid">{% for row in accounts %}<article class="fin-account-card"><span>{{ row.account.name }} · {{ row.account.get_kind_display }}</span><strong>{{ row.balance|fa_money }}</strong><small>تومان · از {{ row.account.opening_day|fa_jalali }}</small></article>{% empty %}<p class="fin-muted">ابتدا یک حساب تعریف کنید.</p>{% endfor %}</div></section>
-<div class="fin-tools-grid">
-<section class="fin-panel"><header class="fin-panel-head"><h2>حساب جدید</h2></header><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="account">{% include "finance/partials/tool_form.html" with form=account_form %}<button class="btn-primary">ایجاد حساب</button></form></section>
-<section class="fin-panel"><header class="fin-panel-head"><h2>انتقال و گردش وجه</h2></header><p class="fin-muted">انتقال درآمد یا هزینه جدید نیست. سایر ورود و خروج صرفاً برای گردش‌های خارج از اسناد مالی است.</p><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="movement">{% include "finance/partials/tool_form.html" with form=movement_form %}<button class="btn-primary">ثبت گردش</button></form></section>
-<section class="fin-panel"><header class="fin-panel-head"><h2>تخصیص سند به حساب</h2></header><p class="fin-muted">تا ۳۰ سند تخصیص‌نیافته اخیر از هر نوع؛ مبلغ از سند اصلی خوانده می‌شود و فقط یک بار قابل تخصیص است.</p><form method="post" class="fin-tools-form"><input type="hidden" name="action" value="posting">{% include "finance/partials/tool_form.html" with form=posting_form %}<button class="btn-primary">تخصیص به حساب</button></form></section>
-<section class="fin-panel"><header class="fin-panel-head"><h2>گردش‌های اخیر</h2></header>{% for row in movements %}<div class="fin-line"><span>{{ row.from_account.name|default:"ورود" }} ← {{ row.to_account.name|default:"خروج" }}<small>{{ row.day|fa_jalali }} · {{ row.note }}</small></span><bdi>{{ row.amount_toman|fa_money }} تومان</bdi></div>{% empty %}<p class="fin-muted">گردشی ثبت نشده است.</p>{% endfor %}</section>
-</div></div>
+<div class="fin-accounts-workspace" dir="rtl">
+  <section class="fin-panel fin-accounts-overview" aria-labelledby="fin-accounts-overview-title">
+    <header class="fin-panel-head">
+      <h2 id="fin-accounts-overview-title"><i data-lucide="landmark" aria-hidden="true"></i> موجودی حساب‌ها</h2>
+      <a href="{% url 'finance:overview' %}" class="fin-accounts-back">بازگشت به مدیریت مالی</a>
+    </header>
+    <div class="fin-account-grid">
+      {% for row in accounts %}
+      <article class="fin-account-card">
+        <div class="fin-account-card__top"><span>{{ row.account.name }}</span><small>{{ row.account.get_kind_display }}</small></div>
+        <strong><bdi>{{ row.balance|fa_money }}</bdi> <small>تومان</small></strong>
+        <span class="fin-account-card__date">از {{ row.account.opening_day|fa_jalali }}</span>
+      </article>
+      {% empty %}
+      <div class="fin-accounts-empty"><i data-lucide="wallet-cards" aria-hidden="true"></i><div><strong>هنوز حسابی ثبت نشده است</strong><p>برای شروع، از فرم «حساب جدید» استفاده کنید.</p></div></div>
+      {% endfor %}
+    </div>
+    <p class="fin-muted fin-accounts-note"><i data-lucide="info" aria-hidden="true"></i> موجودی بر اساس مانده افتتاح و گردش‌های ثبت‌شده محاسبه می‌شود؛ اتصال آنلاین به بانک وجود ندارد. اسناد پیش از افتتاح را دوباره ثبت نکنید.</p>
+  </section>
+  <div class="fin-accounts-forms">
+    <section class="fin-panel fin-accounts-form-panel" aria-labelledby="fin-create-account-title">
+      <header class="fin-panel-head"><h2 id="fin-create-account-title"><i data-lucide="plus-circle" aria-hidden="true"></i> حساب جدید</h2></header>
+      <p class="fin-muted">حساب نقدی یا بانکی سالن را برای ثبت گردش‌ها تعریف کنید.</p>
+      <form method="post" class="fin-tools-form fin-accounts-form">
+        <input type="hidden" name="action" value="account">
+        {% include "finance/partials/tool_form.html" with form=account_form %}
+        <div class="fin-accounts-form-actions"><button type="submit" class="btn-primary">ایجاد حساب</button></div>
+      </form>
+    </section>
+    <section class="fin-panel fin-accounts-form-panel" aria-labelledby="fin-movement-title">
+      <header class="fin-panel-head"><h2 id="fin-movement-title"><i data-lucide="arrow-left-right" aria-hidden="true"></i> انتقال و گردش وجه</h2></header>
+      <p class="fin-muted">انتقال بین حساب‌ها درآمد یا هزینه جدید نیست. سایر گردش‌ها فقط برای موارد خارج از اسناد مالی استفاده می‌شوند.</p>
+      <form method="post" class="fin-tools-form fin-accounts-form">
+        <input type="hidden" name="action" value="movement">
+        {% include "finance/partials/tool_form.html" with form=movement_form %}
+        <div class="fin-accounts-form-actions"><button type="submit" class="btn-primary">ثبت گردش</button></div>
+      </form>
+    </section>
+  </div>
+  <div class="fin-accounts-secondary">
+    <section class="fin-panel fin-accounts-form-panel" aria-labelledby="fin-posting-title">
+      <header class="fin-panel-head"><h2 id="fin-posting-title"><i data-lucide="file-check" aria-hidden="true"></i> تخصیص سند به حساب</h2></header>
+      <p class="fin-muted">تا ۳۰ سند تخصیص‌نیافته اخیر از هر نوع؛ مبلغ از سند اصلی خوانده می‌شود و هر سند فقط یک بار تخصیص می‌یابد.</p>
+      <form method="post" class="fin-tools-form fin-accounts-form">
+        <input type="hidden" name="action" value="posting">
+        {% include "finance/partials/tool_form.html" with form=posting_form %}
+        <div class="fin-accounts-form-actions"><button type="submit" class="btn-primary">تخصیص به حساب</button></div>
+      </form>
+    </section>
+    <section class="fin-panel fin-accounts-history" aria-labelledby="fin-history-title">
+      <header class="fin-panel-head"><h2 id="fin-history-title"><i data-lucide="history" aria-hidden="true"></i> گردش‌های اخیر</h2></header>
+      {% for row in movements %}
+      <div class="fin-line"><span>{{ row.from_account.name|default:"ورود" }} ← {{ row.to_account.name|default:"خروج" }}<small>{{ row.day|fa_jalali }} · {{ row.note }}</small></span><bdi>{{ row.amount_toman|fa_money }} تومان</bdi></div>
+      {% empty %}<div class="fin-accounts-empty fin-accounts-empty--small"><i data-lucide="receipt" aria-hidden="true"></i><div><strong>هنوز گردشی ثبت نشده است</strong><p>گردش‌های ثبت‌شده در این بخش نمایش داده می‌شوند.</p></div></div>{% endfor %}
+    </section>
+  </div>
+</div>
 {% endblock %}
