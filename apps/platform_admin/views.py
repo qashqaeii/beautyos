@@ -26,7 +26,7 @@ from apps.finance.models import Payment
 from apps.platform_admin.forms import ArticleForm, MessageForm, TicketForm
 from apps.platform_admin.command_center import command_center_snapshot
 from apps.platform_admin.followups import followup_queue
-from apps.platform_admin.product_performance import product_performance, salon_product_performance
+from apps.platform_admin.product_performance import product_performance, salon_product_performance, salon_feature_adoption
 from apps.platform_admin.guards import platform_required
 from apps.platform_admin.models import SupportMessage, SupportTicket, SalonSubscription, PlatformActivityEvent
 from apps.salons.decorators import salon_required
@@ -188,6 +188,7 @@ def salon_detail(request, salon_id):
     return render(request, "platform_admin/salon_detail.html", {
         "salon": salon,
         "performance": salon_product_performance(salon=salon, days=performance_days),
+        "feature_adoption": salon_feature_adoption(salon=salon, days=performance_days),
         "subscription": subscription,
         "salon_signals": signals,
         "unresolved_tickets": unresolved_tickets,
