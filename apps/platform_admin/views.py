@@ -24,6 +24,7 @@ from apps.customers.models import Customer
 from apps.expenses.models import Expense
 from apps.finance.models import Payment
 from apps.platform_admin.forms import ArticleForm, MessageForm, TicketForm
+from apps.platform_admin.command_center import command_center_snapshot
 from apps.platform_admin.guards import platform_required
 from apps.platform_admin.models import SupportMessage, SupportTicket
 from apps.salons.decorators import salon_required
@@ -98,6 +99,7 @@ def overview(request):
     days = _last_days(request)
     return render(request, "platform_admin/overview.html", {
         "days": days,
+        "command": command_center_snapshot(days=days),
         "kpis": _stats(days),
         "latest_salons": Salon.objects.order_by("-created_at")[:6],
         "latest_tickets": SupportTicket.objects.select_related("salon").order_by("-last_activity_at")[:6],
