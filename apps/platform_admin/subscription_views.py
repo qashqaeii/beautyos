@@ -1,5 +1,5 @@
 """Read-only platform subscription inventory. Salon revenue is not SaaS revenue."""
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_POST
@@ -32,6 +32,7 @@ def subscriptions(request):
         "plans": plans,
         "recent_orders": PlatformSubscriptionOrder.objects.select_related("salon", "plan").order_by("-created_at")[:20],
         "verified_order_count": PlatformSubscriptionOrder.objects.filter(status=PlatformSubscriptionOrder.Status.VERIFIED).count(),
+        "verified_revenue_toman": PlatformSubscriptionOrder.objects.filter(status=PlatformSubscriptionOrder.Status.VERIFIED).aggregate(total=Sum("amount_toman"))["total"] or 0,
         "health": subscription_health(),
         "recent_changes": SubscriptionChangeLog.objects.select_related("subscription__salon", "actor").order_by("-changed_at")[:15],
         "subscriptions": items[:100],
