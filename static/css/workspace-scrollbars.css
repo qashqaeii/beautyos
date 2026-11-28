@@ -1,16 +1,34 @@
-/* Hide visible scrollbar tracks in the authenticated workspace only.
-   Scrolling remains functional with mouse wheel, touch, keyboard and trackpads. */
+/* Workspace scrollbars: preserve scrolling, hide visual tracks.
+   Explicit selectors override later component rules setting scrollbar-width:thin. */
 html:has(.maison-app),
 body:has(.maison-app),
-.maison-app,
-.maison-app * {
-  scrollbar-width: none;
+body.theme-app .maison-app,
+body.theme-app .maison-app .maison-sidebar__nav,
+body.theme-app .maison-app .maison-sidebar--premium .maison-sidebar__nav,
+body.theme-app .maison-app .maison-main,
+body.theme-app .maison-app .maison-content,
+body.theme-app .maison-app :is(.overflow-y-auto,.overflow-x-auto,.overflow-auto) {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none;
 }
 html:has(.maison-app)::-webkit-scrollbar,
 body:has(.maison-app)::-webkit-scrollbar,
-.maison-app::-webkit-scrollbar,
-.maison-app *::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+body.theme-app .maison-app::-webkit-scrollbar,
+body.theme-app .maison-app .maison-sidebar__nav::-webkit-scrollbar,
+body.theme-app .maison-app .maison-sidebar--premium .maison-sidebar__nav::-webkit-scrollbar,
+body.theme-app .maison-app .maison-main::-webkit-scrollbar,
+body.theme-app .maison-app .maison-content::-webkit-scrollbar,
+body.theme-app .maison-app :is(.overflow-y-auto,.overflow-x-auto,.overflow-auto)::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+/* Other nested scroll regions (tables, panels) also remain scrollable. */
+body.theme-app .maison-app * {
+  scrollbar-width: none !important;
+}
+body.theme-app .maison-app *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
