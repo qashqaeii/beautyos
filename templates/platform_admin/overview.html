@@ -9,20 +9,15 @@
   <article class="pc-kpi"><div class="pc-kpi__head"><span>نوبت‌های ثبت‌شده</span><i data-lucide="calendar-check"></i></div><strong>{{ kpis.bookings_count|fa_num }}</strong><p>{{ kpis.bookings_public|fa_num }} رزرو آنلاین</p></article>
   <article class="pc-kpi"><div class="pc-kpi__head"><span>گردش مالی سالن‌ها</span><i data-lucide="wallet"></i></div><strong class="pc-kpi__amount">{{ kpis.salon_receipts_toman|fa_money }} <small>تومان</small></strong><p>مبالغ وصول ثبت‌شده، نه درآمد BeautyOS</p></article>
 </div>
-<section class="pc-alert-strip" aria-label="موارد نیازمند توجه">
-  <div><i data-lucide="sparkles"></i><span><strong>{{ kpis.salons_recent|fa_num }}</strong> سالن جدید در این بازه</span></div>
-  <div><i data-lucide="clipboard-list"></i><span><strong>{{ kpis.salons_pending_setup|fa_num }}</strong> سالن با راه‌اندازی ناتمام</span></div>
-  <a href="{% url 'platform_admin:support' %}"><i data-lucide="message-circle-more"></i><span><strong>{{ kpis.tickets_open|fa_num }}</strong> درخواست پشتیبانی باز</span><i data-lucide="arrow-up-left"></i></a>
-</section>
-<section class="pc-overview-operations" aria-label="وضعیت عملیاتی پلتفرم">
-  <div class="pc-overview-operations__heading"><div><p class="pc-eyebrow">OPERATIONS AT A GLANCE</p><h2>وضعیت عملیاتی پلتفرم</h2></div><a href="{% url 'platform_admin:reports' %}" class="pc-text-link">گزارش‌های کامل <i data-lucide="arrow-up-left"></i></a></div>
-  <div class="pc-overview-operations__grid">
-    <a href="{% url 'platform_admin:salons' %}" class="pc-overview-operations__item"><span class="pc-overview-operations__icon"><i data-lucide="store"></i></span><span><strong>سالن‌های فعال</strong><small>از کل سالن‌های ثبت‌شده</small></span><b>{{ kpis.salons_active|fa_num }}</b></a>
-    <a href="{% url 'platform_admin:support' %}" class="pc-overview-operations__item"><span class="pc-overview-operations__icon"><i data-lucide="message-square"></i></span><span><strong>درخواست‌های باز</strong><small>نیازمند رسیدگی پشتیبانی</small></span><b>{{ kpis.tickets_open|fa_num }}</b></a>
-    <a href="{% url 'platform_admin:salons' %}" class="pc-overview-operations__item"><span class="pc-overview-operations__icon"><i data-lucide="clipboard-check"></i></span><span><strong>راه‌اندازی ناتمام</strong><small>سالن‌های نیازمند تکمیل</small></span><b>{{ kpis.salons_pending_setup|fa_num }}</b></a>
+<section class="pc-executive-priorities" aria-label="اقدامات مهم">
+  <div class="pc-executive-priorities__title"><span class="pc-executive-priorities__icon"><i data-lucide="list-checks"></i></span><span><strong>نیازمند توجه</strong><small>اقدامات مهم امروز</small></span></div>
+  <div class="pc-executive-priorities__links">
+    <a href="{% url 'platform_admin:salons' %}"><span class="pc-priority-number">{{ kpis.salons_pending_setup|fa_num }}</span> راه‌اندازی ناتمام <i data-lucide="arrow-up-left"></i></a>
+    <a href="{% url 'platform_admin:support' %}"><span class="pc-priority-number">{{ kpis.tickets_open|fa_num }}</span> درخواست پشتیبانی <i data-lucide="arrow-up-left"></i></a>
+    <a href="{% url 'platform_admin:salons' %}"><span class="pc-priority-number">{{ kpis.salons_recent|fa_num }}</span> سالن جدید در بازه <i data-lucide="arrow-up-left"></i></a>
   </div>
 </section>
-<div class="pc-command-section"><div><p class="pc-eyebrow">OPERATIONAL WORKSPACE</p><h2>پیگیری و فعالیت‌های اخیر</h2></div><span>عملیات روزمره پلتفرم</span></div>
+<div class="pc-command-section"><div><p class="pc-eyebrow">WORKSPACE</p><h2>آخرین وضعیت سالن‌ها و پشتیبانی</h2></div><span>نمای سریع عملیات پلتفرم</span></div>
 <div class="pc-two-col pc-two-col--overview">
   <section class="pc-panel"><div class="pc-panel__header"><div><p class="pc-eyebrow">RECENT SALONS</p><h2>سالن‌های تازه‌وارد</h2></div><a href="{% url 'platform_admin:salons' %}" class="pc-text-link">مشاهده همه <i data-lucide="arrow-up-left"></i></a></div>
     <div class="pc-list">
