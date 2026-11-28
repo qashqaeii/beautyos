@@ -315,3 +315,29 @@ def test_customer_cannot_reschedule_with_unavailable_specialist(
     appointment.refresh_from_db()
     assert appointment.start_at == original_start
     assert appointment.status == Appointment.Status.CONFIRMED
+
+
+@pytest.mark.django_db
+def test_customer_upcoming_booking_not_hidden_by_large_history(
+    client, salon, booked_customer, customer_otp,
+):
+    customer, upcoming = booked_customer
+    now = timezone.now()
+    # The old combined 250-row cap could hide a distant upcoming appointment
+    # behind newer past bookings.
+    Appointment.objects.bulk_create([
+        Appointment(
+            salon=salon, customer=customer, staff=upcoming.staff,
+            service=upcoming.service,
+            start_at=now - timedelta(minutes=i + 1),
+            end_at=now - timedelta(minutes=i + 1) + timedelta(minutes=30),
+            source=Appointment.Source.PUBLIC,
+            status=Appointment.Status.COMPLETED,
+        )
+        for i in range(260)
+    ])
+    portal_login(client, salon, customer.phone, customer_otp)
+    response = client.get(url(salon, "customer_home"))
+    assert response.status_code == 200
+    assert upcoming.pk in [a.pk for a in response.context["upcoming"]]
+    assert len(response.context["history"]) == 30
