@@ -221,3 +221,32 @@ def test_phase5_cross_tenant_or_specialist_cannot_operate_reception(
         assert client.post(route(action, appointment), {"day": day.isoformat()}).status_code == 403
     appointment.refresh_from_db()
     assert appointment.status == Appointment.Status.PENDING
+
+
+@pytest.mark.django_db
+def test_reception_queue_cap_reports_actual_visible_count(
+    client, salon, owner_membership, day_case,
+):
+    customer, staff, service, appointment, day = day_case
+    # Bulk creation bypasses Appointment.save(), so tracking codes must be unique.
+    Appointment.objects.bulk_create([
+        Appointment(
+            salon=salon, customer=customer, staff=staff, service=service,
+            start_at=appointment.start_at + timedelta(minutes=i + 1),
+            end_at=appointment.end_at + timedelta(minutes=i + 1),
+            status=Appointment.Status.PENDING,
+            source=Appointment.Source.INTERNAL,
+            price_toman=800_000,
+            tracking_code=f"QCAP{i:08d}",
+        )
+        for i in range(100)
+    ])
+    authenticate(client, owner_membership)
+    response = client.get(reverse("reception:desk"), {"day": day.isoformat()})
+    assert response.status_code == 200
+    summary = response.context["day_operations_summary"]
+    assert summary["total"] == 101
+    assert summary["visible_count"] == 100
+    assert summary["truncated"] is True
+    assert len(response.context["day_operations"]) == 100
+    assert "سایر نوبت‌ها" in response.content.decode()
