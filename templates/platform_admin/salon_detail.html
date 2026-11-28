@@ -60,6 +60,13 @@
     {% for item in performance.comparison %}<tr><td>{{ item.label }}</td><td>{{ item.current|fa_num }}</td><td>{{ item.previous|fa_num }}</td><td dir="ltr">{{ item.difference|fa_num }}</td></tr>{% endfor %}
   </tbody></table></div><p class="pc-chart-note">{{ performance.coverage_note }}</p>
 </section>
+<section class="pc-panel pc-panel--padded" aria-labelledby="feature-adoption-heading" style="margin-block:16px">
+  <div class="pc-panel__header"><div><p class="pc-eyebrow">FEATURE ADOPTION</p><h2 id="feature-adoption-heading">استفاده از قابلیت‌های ثبت‌شده</h2><p>رویدادهای محصول در بازه انتخابی در مقایسه با بازه قبل</p></div></div>
+  <div class="pc-table-wrap"><table class="pc-table"><thead><tr><th>قابلیت</th><th>بازه جاری</th><th>بازه قبل</th><th>تغییر</th></tr></thead><tbody>
+    {% for item in feature_adoption %}<tr><td>{{ item.label }}</td><td>{{ item.current|fa_num }}</td><td>{{ item.previous|fa_num }}</td><td dir="ltr">{{ item.difference|fa_num }}</td></tr>{% endfor %}
+  </tbody></table></div>
+  <p class="pc-chart-note">این جدول فقط رویدادهای ثبت‌شده پس از فعال‌سازی ردیابی را نشان می‌دهد. صفر بودن مقدار لزوماً به معنی استفاده‌نشدن از قابلیت نیست.</p>
+</section>
 <section class="pc-panel pc-panel--padded" aria-labelledby="salon-attention" style="margin-block:16px">
   <div class="pc-panel__header">
     <div><p class="pc-eyebrow">SALON 360 / FOLLOW-UP</p><h2 id="salon-attention">نشانه‌های نیاز به پیگیری</h2><p class="pc-subtle">هشدارهای مبتنی بر داده ثبت‌شده، نه پیش‌بینی قطعی ریزش</p></div>
