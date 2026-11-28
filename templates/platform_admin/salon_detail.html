@@ -27,6 +27,21 @@
     <p class="pc-subtle">این اعداد تنها رویدادهای ثبت‌شده در موتور تحلیل محصول هستند؛ نبود رویداد لزوماً به معنی غیرفعال بودن سالن نیست.</p>
   </section>
 </div>
+<section class="pc-panel pc-panel--padded" aria-labelledby="salon-attention" style="margin-block:16px">
+  <div class="pc-panel__header">
+    <div><p class="pc-eyebrow">SALON 360 / FOLLOW-UP</p><h2 id="salon-attention">نشانه‌های نیاز به پیگیری</h2><p class="pc-subtle">هشدارهای مبتنی بر داده ثبت‌شده، نه پیش‌بینی قطعی ریزش</p></div>
+    <a class="pc-text-link" href="{% url 'platform_admin:support' %}">پیگیری پشتیبانی</a>
+  </div>
+  <div class="pc-list">
+    {% for title, description in salon_signals %}
+      <div class="pc-list-row">
+        <span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="clipboard-check"></i></span>
+        <span class="pc-list-main"><strong>{{ title }}</strong><small>{{ description }}</small></span>
+      </div>
+    {% endfor %}
+  </div>
+  <p class="pc-subtle">درخواست‌های پشتیبانی باز: {{ unresolved_tickets|fa_num }} · ارزیابی صرفاً برای کمک به اولویت‌بندی پیگیری است.</p>
+</section>
 {% endblock %}
 {% block control_content %}
 <nav class="pc-breadcrumb"><a href="{% url 'platform_admin:salons' %}">سالن‌ها</a><i data-lucide="chevron-left"></i><span>پرونده سالن</span></nav>
