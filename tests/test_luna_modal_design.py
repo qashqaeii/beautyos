@@ -39,8 +39,11 @@ def test_staff_profile_form_has_grouped_controls_and_native_upload():
     assert isinstance(form.fields["avatar"].widget, ProfileImageWidget)
     assert isinstance(form.fields["services"].widget, CheckboxSelectMultiple)
     source=(ROOT / "templates/staff/partials/staff_edit_form.html").read_text(encoding="utf-8")
-    for name in ("avatar","display_name","bio","is_active","is_bookable","calendar_color","services"):
+    for name in ("avatar","display_name","bio","is_active","is_bookable","calendar_color"):
         assert "{{ form."+name+" }}" in source
+    # The services widget is rendered only when its queryset contains options.
+    assert "{% if form.services.field.queryset.exists %}{{ form.services }}" in source
+    assert "هنوز خدمت فعالی در سالن ثبت نشده است." in source
     assert 'type="hidden" name="title"' in source
     assert 'value="{{ form.title.value|default_if_none:' in source
     assert 'aria-controls="staff-specialty-options"' in source
