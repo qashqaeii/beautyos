@@ -148,19 +148,19 @@ def customer_home(request, slug):
     customer = Customer.scoped(salon).filter(phone=phone, is_deleted=False).first()
     future, history = [], []
     if customer:
-        appointments = list(_customer_appointments(salon, phone).order_by("-start_at")[:250])
         now = timezone.now()
-        future = sorted((
-            a for a in appointments
-            if a.start_at >= now and a.status in (Appointment.Status.PENDING, Appointment.Status.CONFIRMED)
-        ), key=lambda a: a.start_at)
-        history = [
-            a for a in appointments
-            if a.start_at < now or a.status not in (Appointment.Status.PENDING, Appointment.Status.CONFIRMED)
-        ]
+        active_statuses = (Appointment.Status.PENDING, Appointment.Status.CONFIRMED)
+        appointments = _customer_appointments(salon, phone)
+        # Query independently: a cap on recent history must never hide future bookings.
+        future = list(appointments.filter(
+            start_at__gte=now, status__in=active_statuses,
+        ).order_by("start_at", "pk")[:12])
+        history = list(appointments.filter(
+            Q(start_at__lt=now) | ~Q(status__in=active_statuses),
+        ).order_by("-start_at", "-pk")[:30])
     return render(request, "public/customer/home.html", _context(
         salon, customer=customer, phone=display_iran_mobile(phone),
-        upcoming=future[:12], history=history[:30],
+        upcoming=future, history=history,
     ))
 
 
