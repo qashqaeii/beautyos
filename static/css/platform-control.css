@@ -596,3 +596,35 @@ a.pc-exec__row:hover{background:#faf7fd}
 @media(max-width:640px){.pc-content:has(>.pc-directory){padding:13px 10px}.pc-directory__header{align-items:flex-start}.pc-directory__header h1{font-size:1.16rem}.pc-directory__report{font-size:0;padding:9px}.pc-directory__report svg{width:19px;height:19px}.pc-directory__kpis{gap:8px}.pc-directory__kpi{min-height:82px;padding:10px}.pc-directory__kpi strong{font-size:1.3rem}.pc-directory__filters{padding:0 11px 12px}.pc-directory__search{flex-basis:100%}.pc-directory__select{flex:1 1 130px}.pc-directory__select select{min-width:0}.pc-directory__section-head{padding:12px}}
 @media(prefers-reduced-motion:no-preference){.pc-directory__kpi{animation:pc-exec-enter .28s ease-out both}.pc-directory__kpi:nth-child(2){animation-delay:35ms}.pc-directory__kpi:nth-child(3){animation-delay:70ms}.pc-directory__kpi:nth-child(4){animation-delay:105ms}}
 @media(prefers-reduced-motion:reduce){.pc-directory *{animation:none!important;transition:none!important}}
+
+
+/* BeautyOS control-wide lavender tokens: ensure navigation and every control
+   route use the same brand as the executive dashboard, not legacy rose. */
+.pc-shell{
+  --pc-bg:#f8f6fb;
+  --pc-surface:#fffdfc;
+  --pc-ink:#393047;
+  --pc-muted:#857b8d;
+  --pc-border:#e9e2ef;
+  --pc-accent:#76559e;
+  --pc-lavender:#f2eafa;
+  background:var(--pc-bg);
+  color:var(--pc-ink);
+}
+.pc-shell .pc-sidebar,.pc-shell .pc-topbar{background:#fffdfc;border-color:#e9e2ef}
+.pc-shell .pc-brand__mark,.pc-shell .pc-operator__avatar,.pc-shell .pc-mobile-mark{background:#f2eafa;color:#76559e}
+.pc-shell .pc-nav-label{color:#9588a4}
+.pc-shell .pc-nav-item{color:#62566e!important}
+.pc-shell .pc-nav-item:hover{background:#f8f3fc;color:#76559e!important}
+.pc-shell .pc-nav-item.is-active{background:#f2eafa;color:#76559e!important;border-color:#e9e2ef;box-shadow:inset -3px 0 #9374b7}
+.pc-shell .pc-period a.is-active{background:#f2eafa;color:#76559e}
+.pc-shell .pc-heading h1,.pc-shell .pc-command-section h2{color:#393047}
+.pc-shell .pc-eyebrow{color:#9374b7}
+.pc-shell .pc-button:not(.pc-button--ghost){background:#76559e;border-color:#76559e;color:#fff}
+.pc-shell .pc-button:not(.pc-button--ghost):hover{background:#65468d}
+.pc-shell .pc-button--ghost{background:#fff;border-color:#e9e2ef;color:#76559e}
+.pc-shell .pc-panel,.pc-shell .pc-insights{border-color:#e9e2ef;background:#fff}
+.pc-shell .pc-table thead th{background:#faf8fc;color:#857b8d}
+.pc-shell .pc-table tbody tr:hover{background:#fcfaff}
+.pc-shell .pc-table-link,.pc-shell .pc-text-link{color:#76559e}
+.pc-shell :is(input,select,textarea):focus-visible{outline-color:#9374b7}
