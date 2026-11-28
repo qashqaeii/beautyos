@@ -3,7 +3,7 @@
 {% block control_content %}
 <section class="pc-command-hero"><div class="pc-heading"><div><p class="pc-eyebrow">BEAUTYOS / EXECUTIVE COMMAND CENTER</p><h1>مرکز فرمان BeautyOS</h1><p>رشد پلتفرم، سلامت سالن‌ها و اقدامات مهم؛ در یک نگاه.</p></div><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:reports' %}"><i data-lucide="chart-column-increasing"></i> گزارش کامل</a></div><div class="pc-command-hero__meta"><span><i data-lucide="shield-check"></i> نمای مدیریتی امن</span><span><i data-lucide="activity"></i> شاخص‌های واقعی پلتفرم</span></div></section>
 <div class="pc-period"><span><i data-lucide="calendar-range"></i> بازه گزارش</span><a href="?days=7" class="{% if days == 7 %}is-active{% endif %}">۷ روز</a><a href="?days=30" class="{% if days == 30 %}is-active{% endif %}">۳۰ روز</a><a href="?days=90" class="{% if days == 90 %}is-active{% endif %}">۹۰ روز</a></div>
-<div class="pc-kpis">
+<div class="pc-kpis pc-kpis--overview">
   <article class="pc-kpi pc-kpi--primary"><div class="pc-kpi__head"><span>کل سالن‌ها</span><i data-lucide="store"></i></div><strong>{{ kpis.salons_total|fa_num }}</strong><p>{{ kpis.salons_active|fa_num }} سالن فعال</p></article>
   <article class="pc-kpi"><div class="pc-kpi__head"><span>کاربران سیستم</span><i data-lucide="users-round"></i></div><strong>{{ kpis.users_total|fa_num }}</strong><p>{{ kpis.users_recent|fa_num }} ثبت‌نام جدید</p></article>
   <article class="pc-kpi"><div class="pc-kpi__head"><span>نوبت‌های ثبت‌شده</span><i data-lucide="calendar-check"></i></div><strong>{{ kpis.bookings_count|fa_num }}</strong><p>{{ kpis.bookings_public|fa_num }} رزرو آنلاین</p></article>
@@ -13,6 +13,14 @@
   <div><i data-lucide="sparkles"></i><span><strong>{{ kpis.salons_recent|fa_num }}</strong> سالن جدید در این بازه</span></div>
   <div><i data-lucide="clipboard-list"></i><span><strong>{{ kpis.salons_pending_setup|fa_num }}</strong> سالن با راه‌اندازی ناتمام</span></div>
   <a href="{% url 'platform_admin:support' %}"><i data-lucide="message-circle-more"></i><span><strong>{{ kpis.tickets_open|fa_num }}</strong> درخواست پشتیبانی باز</span><i data-lucide="arrow-up-left"></i></a>
+</section>
+<section class="pc-overview-operations" aria-label="وضعیت عملیاتی پلتفرم">
+  <div class="pc-overview-operations__heading"><div><p class="pc-eyebrow">OPERATIONS AT A GLANCE</p><h2>وضعیت عملیاتی پلتفرم</h2></div><a href="{% url 'platform_admin:reports' %}" class="pc-text-link">گزارش‌های کامل <i data-lucide="arrow-up-left"></i></a></div>
+  <div class="pc-overview-operations__grid">
+    <a href="{% url 'platform_admin:salons' %}" class="pc-overview-operations__item"><span class="pc-overview-operations__icon"><i data-lucide="store"></i></span><span><strong>سالن‌های فعال</strong><small>از کل سالن‌های ثبت‌شده</small></span><b>{{ kpis.salons_active|fa_num }}</b></a>
+    <a href="{% url 'platform_admin:support' %}" class="pc-overview-operations__item"><span class="pc-overview-operations__icon"><i data-lucide="message-square"></i></span><span><strong>درخواست‌های باز</strong><small>نیازمند رسیدگی پشتیبانی</small></span><b>{{ kpis.tickets_open|fa_num }}</b></a>
+    <a href="{% url 'platform_admin:salons' %}" class="pc-overview-operations__item"><span class="pc-overview-operations__icon"><i data-lucide="clipboard-check"></i></span><span><strong>راه‌اندازی ناتمام</strong><small>سالن‌های نیازمند تکمیل</small></span><b>{{ kpis.salons_pending_setup|fa_num }}</b></a>
+  </div>
 </section>
 <div class="pc-command-section"><div><p class="pc-eyebrow">OPERATIONAL WORKSPACE</p><h2>پیگیری و فعالیت‌های اخیر</h2></div><span>عملیات روزمره پلتفرم</span></div>
 <div class="pc-two-col pc-two-col--overview">
