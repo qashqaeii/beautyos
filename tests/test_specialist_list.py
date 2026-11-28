@@ -48,7 +48,7 @@ def test_specialists_page_has_card_markup(client, salon, owner_membership):
     session = client.session
     session["active_salon_id"] = str(salon.id)
     session.save()
-    resp = client.get("/app/specialists/", HTTP_HOST="127.0.0.1:8000")
+    resp = client.get("/app/specialists/?book=1", HTTP_HOST="127.0.0.1:8000")
     assert resp.status_code == 200
     html = resp.content.decode()
     assert "specialists-page" in html
