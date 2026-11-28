@@ -1,5 +1,6 @@
 {% extends "layouts/app_shell.html" %}
 {% load static format_tags l10n %}
+{% block header_modifier %}cash-close-unified-header{% endblock %}
 {% block page_title %}بستن صندوق روزانه{% endblock %}
 {% block page_subtitle %}کنترل دریافت‌ها و ثبت وضعیت پایان روز{% endblock %}
 {% block page_actions %}<a href="{% url 'finance:overview' %}?tab=cash" class="cash-close-back"><i data-lucide="arrow-right" aria-hidden="true"></i>بازگشت به صندوق</a>{% endblock %}
