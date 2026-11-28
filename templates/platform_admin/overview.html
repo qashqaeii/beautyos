@@ -1,5 +1,27 @@
 {% extends "platform_admin/base.html" %}
-{% block title %}نمای کلی مدیریت · BeautyOS{% endblock %}
+{% block title %}نمای کلی مدیریت · BeautyOS
+<section class="pc-panel" aria-labelledby="command-heading" style="margin-block:18px">
+  <div class="pc-panel__header"><div><p class="pc-eyebrow">PLATFORM INTELLIGENCE / ۰۲</p><h2 id="command-heading">فرماندهی و نگهداشت سالن‌ها</h2><p>تحلیل استفاده از محصول در بازه انتخابی؛ مستقل از گردش مالی سالن‌ها</p></div></div>
+  <div class="pc-kpis" style="margin:14px 0">
+    <article class="pc-kpi pc-kpi--primary"><div class="pc-kpi__head"><span>سالن‌های فعال در رویدادهای ردیابی‌شده</span><i data-lucide="activity"></i></div><strong>{{ command.usage_active|fa_num }}</strong><p>بازه قبل: {{ command.usage_previous|fa_num }} سالن</p></article>
+    <article class="pc-kpi"><div class="pc-kpi__head"><span>نرخ بازگشت استفاده</span><i data-lucide="repeat-2"></i></div><strong>{% if command.retention is not None %}{{ command.retention|fa_num }}٪{% else %}—{% endif %}</strong><p>{{ command.retained|fa_num }} از {{ command.cohort_size|fa_num }} سالن دوره قبل</p></article>
+    <article class="pc-kpi"><div class="pc-kpi__head"><span>بدون فعالیت در دوره جدید</span><i data-lucide="alert-triangle"></i></div><strong>{{ command.prior_inactive|fa_num }}</strong><p>فعال در دوره قبل، بدون رویداد در دوره جاری</p></article>
+    <article class="pc-kpi"><div class="pc-kpi__head"><span>اشتراک فعال زمانی</span><i data-lucide="badge-check"></i></div><strong>{{ command.subscription_active|fa_num }}</strong><p>براساس وضعیت و تاریخ اشتراک؛ نه پرداخت تأییدشده</p></article>
+  </div>
+  <div class="pc-list">
+    <div class="pc-list-row"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="info"></i></span><span class="pc-list-main"><strong>محدودیت پوشش داده</strong><small>{{ command.coverage_note }}</small></span></div>
+    <div class="pc-list-row"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="wallet"></i></span><span class="pc-list-main"><strong>درآمد پلتفرم</strong><small>{{ command.revenue_note }}</small></span></div>
+  </div>
+</section>
+<section class="pc-panel" aria-labelledby="feature-heading" style="margin-block:18px">
+  <div class="pc-panel__header"><div><p class="pc-eyebrow">PRODUCT ADOPTION</p><h2 id="feature-heading">استفاده از قابلیت‌ها</h2><p>{{ command.usage_events|fa_num }} رویداد ثبت‌شده در بازه گزارش</p></div></div>
+  <div class="pc-list">
+    {% for feature in command.features %}
+    <div class="pc-list-row"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="chart-no-axes-column"></i></span><span class="pc-list-main"><strong>{{ feature.label }}</strong><small>{{ feature.salons|fa_num }} سالن استفاده‌کننده</small></span><strong>{{ feature.count|fa_num }}</strong></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
 {% block control_content %}
 <div class="pc-heading"><div><p class="pc-eyebrow">PLATFORM OVERVIEW / ۰۱</p><h1>نبض BeautyOS</h1><p>نمای یکپارچه از رشد، فعالیت سالن‌ها و موارد نیازمند توجه.</p></div><a class="pc-button pc-button--ghost" href="{% url 'platform_admin:reports' %}"><i data-lucide="chart-column-increasing"></i> گزارش کامل</a></div>
 <div class="pc-period"><span><i data-lucide="calendar-range"></i> بازه گزارش</span><a href="?days=7" class="{% if days == 7 %}is-active{% endif %}">۷ روز</a><a href="?days=30" class="{% if days == 30 %}is-active{% endif %}">۳۰ روز</a><a href="?days=90" class="{% if days == 90 %}is-active{% endif %}">۹۰ روز</a></div>
