@@ -1,10 +1,12 @@
 from django.urls import path
+from apps.platform_admin.auth_views import PlatformLoginView
 
 from apps.platform_admin import views, subscription_views
 
 app_name = "platform_admin"
 
 urlpatterns = [
+    path("login/", PlatformLoginView.as_view(), name="login"),
     path("", views.overview, name="overview"),
     path("salons/", views.salons, name="salons"),
     path("subscriptions/", subscription_views.subscriptions, name="subscriptions"),
