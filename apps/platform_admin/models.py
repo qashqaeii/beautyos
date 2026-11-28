@@ -128,3 +128,38 @@ class SalonSubscription(TimeStampedModel):
 
     def __str__(self):
         return f"{self.salon} — {self.plan}"
+
+
+class PlatformActivityEvent(models.Model):
+    """Privacy-minimal, immutable product-usage fact; separate from security AuditLog.
+
+    Only an allowlisted event name and numeric count are stored. Never store customer
+    names, phone numbers, appointment notes, or other salon-private payloads.
+    """
+
+    class Kind(models.TextChoices):
+        APPOINTMENT_CREATED = "appointment_created", "ثبت نوبت"
+        APPOINTMENT_COMPLETED = "appointment_completed", "تکمیل نوبت"
+        INVOICE_CREATED = "invoice_created", "صدور فاکتور"
+        CUSTOMER_CREATED = "customer_created", "ثبت مشتری"
+        STAFF_CREATED = "staff_created", "افزودن متخصص"
+        PUBLIC_BOOKING_ENABLED = "public_booking_enabled", "فعال‌سازی رزرو آنلاین"
+
+    salon = models.ForeignKey(
+        "salons.Salon", on_delete=models.CASCADE, related_name="platform_activity_events",
+    )
+    kind = models.CharField(max_length=40, choices=Kind.choices)
+    occurred_at = models.DateTimeField(default=timezone.now, db_index=True)
+    count = models.PositiveIntegerField(default=1)
+    # Optional idempotency key from the originating business operation.
+    dedupe_key = models.CharField(max_length=120, unique=True, null=True, blank=True)
+
+    class Meta:
+        ordering = ["-occurred_at", "-pk"]
+        indexes = [
+            models.Index(fields=["salon", "-occurred_at"], name="plat_event_salon_date_idx"),
+            models.Index(fields=["kind", "-occurred_at"], name="plat_event_kind_date_idx"),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(count__gte=1), name="plat_event_count_positive"),
+        ]
