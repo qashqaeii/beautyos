@@ -1,4 +1,4 @@
-# Local BeautyOS dev server (Windows). Run from repo root: .\scripts\run-dev.ps1
+﻿# Local BeautyOS dev server (Windows). Run from repo root: .\scripts\run-dev.ps1
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
@@ -29,5 +29,7 @@ if (-not (Test-Path (Join-Path $Root ".env"))) {
 }
 
 python manage.py migrate --noinput
+python manage.py ensure_superuser --phone 09357930033 --name "مدیر پلتفرم" --local-otp-only
+Write-Host "Platform admin bootstrap: 09357930033 -> /control/login/"
 Write-Host "Starting http://127.0.0.1:8000/"
 python manage.py runserver 127.0.0.1:8000

@@ -30,6 +30,10 @@ python manage.py runserver
 ورود ادمین با **شماره موبایل** (نه username). ایمیل در مدل User ذخیره نمی‌شود.
 
 ```powershell
+# مدیریت مرکزی (/control/) — فقط با is_superuser؛ در DEBUG می‌توانید بدون رمز ثابت:
+python manage.py ensure_superuser --phone 09357930033 --name "مدیر پلتفرم" --local-otp-only
+
+# یا با رمز (Production / admin سنتی):
 $env:BEAUTYOS_BOOTSTRAP_PASSWORD="your-secure-password"
 python manage.py ensure_superuser --phone 09357930033 --name qashqaeii
 ```

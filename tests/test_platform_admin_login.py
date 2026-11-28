@@ -66,3 +66,36 @@ def test_provisioned_admin_reaches_existing_otp_flow(client, monkeypatch):
     assert response.url == reverse("accounts:verify")
     assert client.session["auth_phone"] == "+989111110004"
     assert client.session["auth_purpose"] == OTPChallenge.Purpose.LOGIN
+    assert client.session.get("auth_flow") == "platform"
+
+
+@pytest.mark.django_db
+def test_platform_operator_end_to_end_otp_login(client, settings):
+    from django.core.management import call_command
+
+    settings.DEBUG = True
+    call_command(
+        "ensure_superuser",
+        "--phone",
+        "09357930033",
+        "--name",
+        "مدیر پلتفرم",
+        "--local-otp-only",
+    )
+    user = User.objects.get(phone="+989357930033")
+    assert user.is_active and user.is_staff and user.is_superuser
+
+    response = client.post(
+        reverse("platform_admin:login"),
+        {"step": "phone", "phone": "09357930033"},
+    )
+    assert response.status_code == 302
+    assert response.url == reverse("accounts:verify")
+    assert client.session.get("auth_flow") == "platform"
+    code = client.session.get("dev_otp_code")
+    assert code and len(code) == 6
+
+    verify = client.post(reverse("accounts:verify"), {"code": code}, follow=True)
+    assert verify.status_code == 200
+    assert client.session.get("_auth_user_id")
+    assert client.get(reverse("platform_admin:overview")).status_code == 200

@@ -76,7 +76,14 @@ def _client_ip(request):
 
 def _clear_pending_auth_session(request):
     clear_register_session_flags(request)
-    for key in ("auth_phone", "auth_purpose", "auth_next_step", "dev_otp_code", "otp_issued_at"):
+    for key in (
+        "auth_phone",
+        "auth_purpose",
+        "auth_next_step",
+        "auth_flow",
+        "dev_otp_code",
+        "otp_issued_at",
+    ):
         request.session.pop(key, None)
     request.session.modified = True
 
@@ -167,9 +174,11 @@ class RegisterView(View):
 
 
 class VerifyOTPView(View):
-    def _change_number_url(self, purpose):
+    def _change_number_url(self, request, purpose):
         if purpose == OTPChallenge.Purpose.REGISTER:
             return reverse("accounts:register")
+        if request.session.get("auth_flow") == "platform":
+            return reverse("platform_admin:login")
         return reverse("accounts:login")
 
     def get(self, request):
@@ -184,7 +193,7 @@ class VerifyOTPView(View):
             purpose=purpose,
             next_step=request.session.get("auth_next_step", ""),
         )
-        ctx["change_number_url"] = self._change_number_url(purpose)
+        ctx["change_number_url"] = self._change_number_url(request, purpose)
         return render(request, "accounts/verify_otp.html", ctx)
 
     def post(self, request):
@@ -203,7 +212,7 @@ class VerifyOTPView(View):
                     purpose=purpose,
                     next_step=request.session.get("auth_next_step", ""),
                 )
-                ctx["change_number_url"] = self._change_number_url(purpose)
+                ctx["change_number_url"] = self._change_number_url(request, purpose)
                 ctx["resend_error"] = "لطفاً چند ثانیه صبر کنید و دوباره تلاش کنید."
                 return render(request, "accounts/verify_otp.html", ctx)
             try:
@@ -221,7 +230,7 @@ class VerifyOTPView(View):
                     purpose=purpose,
                     next_step=request.session.get("auth_next_step", ""),
                 )
-                ctx["change_number_url"] = self._change_number_url(purpose)
+                ctx["change_number_url"] = self._change_number_url(request, purpose)
                 ctx["resend_error"] = str(exc)
                 return render(request, "accounts/verify_otp.html", ctx)
             _store_dev_otp(request, issued)
@@ -232,7 +241,7 @@ class VerifyOTPView(View):
                 purpose=purpose,
                 next_step=request.session.get("auth_next_step", ""),
             )
-            ctx["change_number_url"] = self._change_number_url(purpose)
+            ctx["change_number_url"] = self._change_number_url(request, purpose)
             ctx["resend_ok"] = True
             return render(request, "accounts/verify_otp.html", ctx)
 
@@ -240,7 +249,7 @@ class VerifyOTPView(View):
         next_step = request.POST.get("next_step", "") or request.session.get("auth_next_step", "")
         if not form.is_valid():
             ctx = _verify_context(request, phone=phone, otp_form=form, purpose=purpose, next_step=next_step)
-            ctx["change_number_url"] = self._change_number_url(purpose)
+            ctx["change_number_url"] = self._change_number_url(request, purpose)
             return render(request, "accounts/verify_otp.html", ctx)
 
         try:
@@ -248,7 +257,7 @@ class VerifyOTPView(View):
         except OTPInvalid as exc:
             form.add_error("code", str(exc))
             ctx = _verify_context(request, phone=phone, otp_form=form, purpose=purpose, next_step=next_step)
-            ctx["change_number_url"] = self._change_number_url(purpose)
+            ctx["change_number_url"] = self._change_number_url(request, purpose)
             return render(request, "accounts/verify_otp.html", ctx)
 
         if purpose == OTPChallenge.Purpose.REGISTER:
