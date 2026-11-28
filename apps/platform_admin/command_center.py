@@ -37,7 +37,7 @@ def command_center_snapshot(days=30, now=None):
     subscribed = SalonSubscription.objects.filter(
         status=SalonSubscription.Status.ACTIVE, starts_at__lte=now, ends_at__gt=now,
     ).count()
-    # Fixed seven-day buckets; zero-activity intervals remain visible.
+    # Calendar-day buckets in the configured local timezone. The reporting\n    # window itself remains a rolling interval, so it may touch days+1 dates.
     series = list(PlatformActivityEvent.objects.filter(
         occurred_at__gte=start, occurred_at__lt=now,
     ).annotate(day=TruncDate("occurred_at")).values("day").annotate(
@@ -45,12 +45,14 @@ def command_center_snapshot(days=30, now=None):
     ).order_by("day"))
     counts = {item["day"]: item["total"] for item in series}
     trend = []
-    for index in range(days):
-        day = timezone.localtime(start + timedelta(days=index)).date()
+    first_day = timezone.localtime(start).date()
+    last_day = timezone.localtime(now).date()
+    for index in range((last_day - first_day).days + 1):
+        day = first_day + timedelta(days=index)
         trend.append({"date": day, "count": counts.get(day, 0)})
     maximum = max((item["count"] for item in trend), default=0)
     for item in trend:
-        item["height"] = max(3, round(100 * item["count"] / maximum)) if maximum else 3
+        item["height"] = max(3, round(100 * item["count"] / maximum)) if item["count"] and maximum else 0
     return {
         "trend": trend,
         "usage_active": current["active_salons"],
