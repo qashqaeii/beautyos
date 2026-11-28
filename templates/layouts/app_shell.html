@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
 {% block body %}
+<link rel="stylesheet" href="{% static 'css/workspace-scrollbars.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">
 <div
   class="maison-app beautyos-main-bg__shell {% block shell_modifier %}{% endblock %} {% if request.resolver_match.namespace == "staff" or request.resolver_match.namespace == "customers" or request.resolver_match.namespace == "services" or request.resolver_match.namespace == "inventory" or request.resolver_match.namespace == "loyalty" or request.resolver_match.namespace == "salons_members" or request.resolver_match.namespace == "salons_settings" or request.resolver_match.namespace == "portfolio" or request.resolver_match.namespace == "packages" or request.resolver_match.namespace == "retention" or request.resolver_match.namespace == "waitlist" %}management-suite{% endif %} flex min-h-screen"
   x-data="{
