@@ -57,3 +57,49 @@ def _window(start, end):
         "customers": customers.count(),
         "customer_salons": customers.values("salon_id").distinct().count(),
     }
+
+
+def salon_product_performance(*, salon, days=30, now=None):
+    """Same-window comparisons scoped to a single salon; no personal records."""
+    if days not in (7, 30, 90):
+        raise ValueError("Unsupported reporting period")
+    now = now or timezone.now()
+    start = now - timedelta(days=days)
+    previous = start - timedelta(days=days)
+
+    def snapshot(begin, end):
+        bookings = Appointment.objects.filter(
+            salon=salon, created_at__gte=begin, created_at__lt=end,
+        )
+        stats = bookings.aggregate(
+            appointments=Count("pk"),
+            online=Count("pk", filter=Q(source=Appointment.Source.PUBLIC)),
+        )
+        return {
+            **stats,
+            "customers": Customer.objects.filter(
+                salon=salon, created_at__gte=begin, created_at__lt=end,
+            ).count(),
+        }
+
+    current = snapshot(start, now)
+    prior = snapshot(previous, start)
+    return {
+        "days": days,
+        "comparison": [
+            {
+                "label": label, "current": current[key],
+                "previous": prior[key], "difference": current[key] - prior[key],
+            }
+            for key, label in (
+                ("appointments", "نوبت‌های ثبت‌شده"),
+                ("online", "رزروهای اینترنتی"),
+                ("customers", "مشتریان جدید"),
+            )
+        ],
+        "online_share": (
+            round(100 * current["online"] / current["appointments"], 1)
+            if current["appointments"] else None
+        ),
+        "coverage_note": "شاخص‌ها براساس تاریخ ایجاد رکورد محاسبه شده‌اند؛ تاریخ انجام نوبت معیار این گزارش نیست.",
+    }
