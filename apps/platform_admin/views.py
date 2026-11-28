@@ -132,9 +132,23 @@ def salons(request):
         qs = qs.filter(settings__onboarding_completed_at__isnull=True)
     else:
         status = ""
+    totals = Salon.objects.aggregate(
+        total=Count("pk"),
+        active=Count("pk", filter=Q(is_active=True)),
+        inactive=Count("pk", filter=Q(is_active=False)),
+        setup=Count("pk", filter=Q(settings__onboarding_completed_at__isnull=True)),
+    )
+    sort = (request.GET.get("sort") or "newest").strip()
+    ordering = {
+        "newest": ("-created_at", "pk"),
+        "oldest": ("created_at", "pk"),
+        "name": ("name", "pk"),
+    }
+    if sort not in ordering:
+        sort = "newest"
     return render(request, "platform_admin/salons.html", {
-        "page": _page(request, qs.order_by("-created_at", "pk")),
-        "q": q, "status": status,
+        "page": _page(request, qs.order_by(*ordering[sort])),
+        "q": q, "status": status, "sort": sort, "totals": totals,
     })
 
 
