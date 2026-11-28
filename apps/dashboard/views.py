@@ -136,10 +136,32 @@ def management(request):
     }
     for link in links:
         link["description"] = descriptions.get(link["icon"], "")
+    # Command-center metrics are scoped to the active salon and to permissions.
+    from apps.appointments.models import Appointment
+    from apps.customers.models import Customer
+
+    today = timezone.localdate()
+    start_at, end_at = day_bounds(today)
+    today_appointments = Appointment.scoped(request.salon).filter(
+        start_at__gte=start_at, start_at__lt=end_at,
+    )
+    management_metrics = [
+        {"label": "نوبت‌های امروز", "value": today_appointments.count(), "icon": "calendar-days", "accent": True},
+        {"label": "در انتظار تأیید", "value": today_appointments.filter(status=Appointment.Status.PENDING).count(), "icon": "clock-3"},
+        {"label": "خدمات تکمیل‌شده", "value": today_appointments.filter(status=Appointment.Status.COMPLETED).count(), "icon": "badge-check"},
+    ]
+    if has_permission(membership, P_CUSTOMER_VIEW):
+        management_metrics.append({
+            "label": "مشتریان سالن",
+            "value": Customer.scoped(request.salon).count(),
+            "icon": "users-round",
+        })
     return render(
         request,
         "dashboard/management.html",
-        {"links": links, "membership": membership},
+        {"links": links, "membership": membership,
+         "management_metrics": management_metrics,
+         "management_today": today_jalali_label()},
     )
 
 
