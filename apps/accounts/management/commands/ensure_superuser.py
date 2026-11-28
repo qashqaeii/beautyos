@@ -1,6 +1,7 @@
 import getpass
 import os
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 
@@ -16,6 +17,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--phone", default="09357930033", help="Iran mobile")
         parser.add_argument("--name", default=DEFAULT_NAME, help="Display / full name")
+        parser.add_argument("--local-otp-only", action="store_true", help="DEBUG-only: provision OTP-only admin without password prompt")
         parser.add_argument(
             "--password-env",
             default="BEAUTYOS_BOOTSTRAP_PASSWORD",
@@ -27,8 +29,11 @@ class Command(BaseCommand):
         phone = normalize_iran_mobile(options["phone"])
         name = options["name"]
 
-        password = os.environ.get(options["password_env"])
-        if not password:
+        local_otp_only = options["local_otp_only"]
+        if local_otp_only and not settings.DEBUG:
+            raise CommandError("--local-otp-only is available only when DEBUG=True.")
+        password = None if local_otp_only else os.environ.get(options["password_env"])
+        if not password and not local_otp_only:
             if not os.isatty(0):
                 raise CommandError(
                     "Set BEAUTYOS_BOOTSTRAP_PASSWORD or run interactively for password prompt."
@@ -46,7 +51,12 @@ class Command(BaseCommand):
         user.is_staff = True
         user.is_superuser = True
         user.is_active = True
-        user.set_password(password)
+        if local_otp_only:
+            if created or not user.has_usable_password():
+                user.set_unusable_password()
+            # Preserve any existing usable password rather than silently disabling it.
+        else:
+            user.set_password(password)
         user.save()
 
         self.stdout.write(
