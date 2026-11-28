@@ -359,3 +359,20 @@ def test_reschedule_page_hides_slots_for_unavailable_staff(
     assert response.context["can_manage"] is False
     assert response.context["slots"] == []
     assert "متخصص" in response.context["restriction"]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("field", ["is_active", "is_public", "is_deleted"])
+def test_reschedule_page_hides_slots_for_unavailable_service(
+    client, salon, booked_customer, customer_otp, field,
+):
+    customer, appointment = booked_customer
+    portal_login(client, salon, customer.phone, customer_otp)
+    service = appointment.service
+    setattr(service, field, field == "is_deleted")
+    service.save(update_fields=[field])
+    response = client.get(url(salon, "customer_reschedule", appointment_id=appointment.pk))
+    assert response.status_code == 200
+    assert response.context["can_manage"] is False
+    assert response.context["slots"] == []
+    assert "خدمت" in response.context["restriction"]
