@@ -5,6 +5,8 @@ financial amount is persisted in reception.
 """
 from uuid import uuid4
 
+from django.db.models import Count, Q
+
 from apps.appointments.models import Appointment
 from apps.dashboard.role_services import appointment_payment_summary
 
@@ -26,6 +28,26 @@ def day_operations(*, salon, queue, limit=100):
         "settled": 0,
         "outstanding_toman": 0,
     }
+    counts = queue.aggregate(
+        pending_count=Count("pk", filter=Q(status=Appointment.Status.PENDING)),
+        confirmed_count=Count("pk", filter=Q(status=Appointment.Status.CONFIRMED)),
+        checked_in_count=Count("pk", filter=Q(status=Appointment.Status.CHECKED_IN)),
+        completed_count=Count("pk", filter=Q(status=Appointment.Status.COMPLETED)),
+    )
+    summary.update({
+        "pending": counts["pending_count"],
+        "confirmed": counts["confirmed_count"],
+        "checked_in": counts["checked_in_count"],
+        "completed": counts["completed_count"],
+    })
+    for completed_appointment in (
+        queue.filter(status=Appointment.Status.COMPLETED)
+        .select_related("package_use")
+        .prefetch_related("payments__refunds")
+    ):
+        payment = appointment_payment_summary(completed_appointment)
+        summary["settled"] += payment["owed_toman"] <= 0
+        summary["outstanding_toman"] += payment["owed_toman"]
     for appointment in appointments:
         # Preserve the same tenant as the reception source queryset; caller
         # cannot bring in a different salon's appointment.
@@ -34,13 +56,6 @@ def day_operations(*, salon, queue, limit=100):
         payment = appointment_payment_summary(appointment)
         invoice_line = getattr(appointment, "invoice_line", None)
         completed = appointment.status == Appointment.Status.COMPLETED
-        summary["pending"] += appointment.status == Appointment.Status.PENDING
-        summary["confirmed"] += appointment.status == Appointment.Status.CONFIRMED
-        summary["checked_in"] += appointment.status == Appointment.Status.CHECKED_IN
-        summary["completed"] += completed
-        summary["settled"] += completed and payment["owed_toman"] <= 0
-        if completed:
-            summary["outstanding_toman"] += payment["owed_toman"]
         rows.append({
             "appointment": appointment,
             "payment": payment,
