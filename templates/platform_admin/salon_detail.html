@@ -1,5 +1,34 @@
 {% extends "platform_admin/base.html" %}
-{% block title %}{{ salon.name }} · پرونده سالن{% endblock %}
+{% block title %}{{ salon.name }} · پرونده سالن
+<div class="pc-two-col">
+  <section class="pc-panel pc-panel--padded" aria-labelledby="salon-subscription">
+    <div class="pc-panel__header"><h2 id="salon-subscription">اشتراک و اعتبار سالن</h2><a class="pc-text-link" href="{% url 'platform_admin:subscriptions' %}">مدیریت اشتراک‌ها</a></div>
+    {% if subscription %}
+    <dl class="pc-facts">
+      <div><dt>پلن</dt><dd>{{ subscription.plan.name }}</dd></div>
+      <div><dt>وضعیت ثبت‌شده</dt><dd>{{ subscription.get_status_display }}</dd></div>
+      <div><dt>شروع دوره</dt><dd>{{ subscription.starts_at|fa_jalali_datetime }}</dd></div>
+      <div><dt>پایان دوره</dt><dd>{{ subscription.ends_at|fa_jalali_datetime }}</dd></div>
+      <div><dt>اعتبار زمانی</dt><dd>{{ subscription.ends_at|fa_jalali_datetime }}</dd></div>
+    </dl>
+    <p class="pc-subtle">وضعیت اشتراک به معنی تأیید پرداخت نیست؛ تراکنش مالی پلتفرم جداگانه بررسی می‌شود.</p>
+    {% else %}<div class="pc-empty">هنوز اشتراک پلتفرم برای این سالن ثبت نشده است.</div>{% endif %}
+  </section>
+  <section class="pc-panel pc-panel--padded" aria-labelledby="salon-usage">
+    <div class="pc-panel__header"><h2 id="salon-usage">فعالیت محصول در ۳۰ روز اخیر</h2><span class="pc-status pc-status--info">رویدادهای ردیابی‌شده</span></div>
+    <div class="pc-kpis">
+      <article class="pc-kpi"><span>۳۰ روز اخیر</span><strong>{{ activity_current|fa_num }}</strong></article>
+      <article class="pc-kpi"><span>۳۰ روز قبل</span><strong>{{ activity_previous|fa_num }}</strong></article>
+    </div>
+    <div class="pc-list">
+      {% for item in activity_breakdown %}
+      <div class="pc-list-row"><span class="pc-list-main"><strong>{{ item.label }}</strong></span><strong>{{ item.total|fa_num }}</strong></div>
+      {% empty %}<div class="pc-empty">در این بازه رویدادی ثبت نشده است.</div>{% endfor %}
+    </div>
+    <p class="pc-subtle">این اعداد تنها رویدادهای ثبت‌شده در موتور تحلیل محصول هستند؛ نبود رویداد لزوماً به معنی غیرفعال بودن سالن نیست.</p>
+  </section>
+</div>
+{% endblock %}
 {% block control_content %}
 <nav class="pc-breadcrumb"><a href="{% url 'platform_admin:salons' %}">سالن‌ها</a><i data-lucide="chevron-left"></i><span>پرونده سالن</span></nav>
 <div class="pc-heading"><div><p class="pc-eyebrow">SALON 360 / PROFILE</p><h1>{{ salon.name }}</h1><p>{{ salon.city|default:"شهر نامشخص" }} · {{ salon.created_at|fa_jalali }} · {{ salon.slug }}</p></div><a href="{% url 'salons_public:landing' slug=salon.slug %}" target="_blank" rel="noopener noreferrer" class="pc-button pc-button--ghost"><i data-lucide="external-link"></i> صفحه عمومی</a></div>
