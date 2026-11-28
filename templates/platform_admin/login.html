@@ -7,7 +7,7 @@
 {% if switch_account %}
 <div class="rounded-xl border p-4 mb-4" role="alert">
   برای ورود به مدیریت مرکزی، ابتدا از حساب سالن خارج شوید و با حساب مدیر اصلی وارد شوید.
-  <a class="btn-primary inline-flex mt-3" href="{% url 'accounts:logout' %}">خروج از حساب فعلی</a>
+  <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit" class="btn-primary mt-3">خروج از حساب فعلی</button></form>
 </div>
 {% else %}
 <form method="post" class="luna-auth-phone-form" aria-label="ورود امن مدیر مرکزی">
