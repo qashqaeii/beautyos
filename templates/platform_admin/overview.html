@@ -15,7 +15,7 @@
   <a href="{% url 'platform_admin:support' %}"><i data-lucide="message-circle-more"></i><span><strong>{{ kpis.tickets_open|fa_num }}</strong> درخواست پشتیبانی باز</span><i data-lucide="arrow-up-left"></i></a>
 </section>
 <div class="pc-command-section"><div><p class="pc-eyebrow">OPERATIONAL WORKSPACE</p><h2>پیگیری و فعالیت‌های اخیر</h2></div><span>عملیات روزمره پلتفرم</span></div>
-<div class="pc-two-col">
+<div class="pc-two-col pc-two-col--overview">
   <section class="pc-panel"><div class="pc-panel__header"><div><p class="pc-eyebrow">RECENT SALONS</p><h2>سالن‌های تازه‌وارد</h2></div><a href="{% url 'platform_admin:salons' %}" class="pc-text-link">مشاهده همه <i data-lucide="arrow-up-left"></i></a></div>
     <div class="pc-list">
       {% for salon in latest_salons %}
@@ -31,16 +31,18 @@
     </div>
   </section>
 </div>
-<section class="pc-panel"><div class="pc-panel__header"><div><p class="pc-eyebrow">RECENT ACTIVITY</p><h2>رویدادهای اخیر</h2></div><a href="{% url 'platform_admin:audit' %}" class="pc-text-link">تمام لاگ‌ها <i data-lucide="arrow-up-left"></i></a></div>
+<section class="pc-panel pc-panel--activity"><div class="pc-panel__header"><div><p class="pc-eyebrow">RECENT ACTIVITY</p><h2>رویدادهای اخیر</h2></div><a href="{% url 'platform_admin:audit' %}" class="pc-text-link">تمام لاگ‌ها <i data-lucide="arrow-up-left"></i></a></div>
   <div class="pc-list">
     {% for event in recent_audit %}
     <div class="pc-list-row"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="activity"></i></span><span class="pc-list-main"><strong>{{ event.message|default:event.entity_type|truncatechars:100 }}</strong><small>{{ event.actor.full_name|default:"رویداد سیستمی" }}{% if event.salon %} · {{ event.salon.name }}{% endif %}</small></span><time class="pc-date">{{ event.created_at|fa_jalali_datetime }}</time></div>
     {% empty %}<div class="pc-empty">هنوز رویدادی ثبت نشده است.</div>{% endfor %}
   </div>
 </section>
-<section class="pc-panel" aria-labelledby="command-heading" style="margin-block:18px">
+<details class="pc-insights" id="platform-insights">
+  <summary class="pc-insights__trigger"><span class="pc-insights__symbol"><i data-lucide="chart-no-axes-combined"></i></span><span><strong>تحلیل‌های پیشرفته پلتفرم</strong><small>نگهداشت سالن‌ها، روند فعالیت، پیگیری و استفاده از قابلیت‌ها</small></span><i data-lucide="chevron-down" class="pc-insights__chevron"></i></summary>
+  <div class="pc-insights__body"><section class="pc-panel" aria-labelledby="command-heading" >
   <div class="pc-panel__header"><div><p class="pc-eyebrow">PLATFORM INTELLIGENCE / ۰۲</p><h2 id="command-heading">فرماندهی و نگهداشت سالن‌ها</h2><p>تحلیل استفاده از محصول در بازه انتخابی؛ مستقل از گردش مالی سالن‌ها</p></div></div>
-  <div class="pc-kpis" style="margin:14px 0">
+  <div class="pc-kpis" >
     <article class="pc-kpi pc-kpi--primary"><div class="pc-kpi__head"><span>سالن‌های فعال در رویدادهای ردیابی‌شده</span><i data-lucide="activity"></i></div><strong>{{ command.usage_active|fa_num }}</strong><p>بازه قبل: {{ command.usage_previous|fa_num }} سالن</p></article>
     <article class="pc-kpi"><div class="pc-kpi__head"><span>نرخ بازگشت استفاده</span><i data-lucide="repeat-2"></i></div><strong>{% if command.cohort_size %}{{ command.retention|fa_num }}٪{% else %}—{% endif %}</strong><p>{{ command.retained|fa_num }} از {{ command.cohort_size|fa_num }} سالن دوره قبل</p></article>
     <article class="pc-kpi"><div class="pc-kpi__head"><span>بدون فعالیت در دوره جدید</span><i data-lucide="alert-triangle"></i></div><strong>{{ command.prior_inactive|fa_num }}</strong><p>فعال در دوره قبل، بدون رویداد در دوره جاری</p></article>
@@ -51,7 +53,7 @@
     <div class="pc-list-row"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="wallet"></i></span><span class="pc-list-main"><strong>درآمد پلتفرم</strong><small>{{ command.revenue_note }}</small></span></div>
   </div>
 </section>
-<section class="pc-panel" aria-labelledby="followup-heading" style="margin-block:18px">
+<section class="pc-panel" aria-labelledby="followup-heading" >
   <div class="pc-panel__header">
     <div><p class="pc-eyebrow">OPERATIONAL FOLLOW-UP</p><h2 id="followup-heading">سالن‌های نیازمند پیگیری</h2><p>{{ followups.total|fa_num }} سالن با حداقل یک نشانه قابل پیگیری · ترتیب براساس اولویت عملیاتی</p></div>
     <a href="{% url 'platform_admin:salons' %}" class="pc-text-link">همه سالن‌ها</a>
@@ -67,7 +69,7 @@
   </div>
   <p class="pc-subtle">این ترتیب یک قاعده عملیاتی است، نه پیش‌بینی ریزش. فعالیت‌های ردیابی‌نشده ممکن است در این گزارش منعکس نشوند.</p>
 </section>
-<section class="pc-panel pc-panel--padded" aria-labelledby="usage-trend-heading" style="margin-block:18px">
+<section class="pc-panel pc-panel--padded" aria-labelledby="usage-trend-heading" >
   <div class="pc-panel__header"><div><p class="pc-eyebrow">ACTIVITY TREND</p><h2 id="usage-trend-heading">روند روزانه فعالیت ثبت‌شده</h2><p>هر ستون تعداد رویدادهای همان روز است؛ روزهای بدون فعالیت نیز نمایش داده می‌شوند.</p></div></div>
   <div role="img" aria-label="نمودار ستونی تعداد رویدادهای روزانه" style="display:flex;align-items:end;gap:3px;height:148px;overflow:hidden;padding:12px 0;border-bottom:1px solid #ddd">
     {% for point in command.trend %}
@@ -76,7 +78,7 @@
   </div>
   <p class="pc-subtle">این نمودار فقط رویدادهای ردیابی‌شده پس از فعال‌سازی ثبت فعالیت را نشان می‌دهد و تاریخچه قدیمی را بازسازی نمی‌کند.</p>
 </section>
-<section class="pc-panel" aria-labelledby="feature-heading" style="margin-block:18px">
+<section class="pc-panel" aria-labelledby="feature-heading" >
   <div class="pc-panel__header"><div><p class="pc-eyebrow">PRODUCT ADOPTION</p><h2 id="feature-heading">استفاده از قابلیت‌ها</h2><p>{{ command.usage_events|fa_num }} رویداد ثبت‌شده در بازه گزارش</p></div></div>
   <div class="pc-list">
     {% for feature in command.features %}
@@ -84,4 +86,6 @@
     {% endfor %}
   </div>
 </section>
+</div>
+</details>
 {% endblock %}
