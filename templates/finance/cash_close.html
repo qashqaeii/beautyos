@@ -5,11 +5,11 @@
 {% block page_actions %}<a href="{% url 'finance:overview' %}?tab=cash" class="cash-close-back"><i data-lucide="arrow-right" aria-hidden="true"></i>بازگشت به صندوق</a>{% endblock %}
 {% block extra_head %}<link rel="stylesheet" href="{% static 'css/luna-finance.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}"><link rel="stylesheet" href="{% static 'css/cash-close-polish.css' %}?v={{ BEAUTYOS_ASSET_VERSION }}">{% endblock %}
 {% block content %}
-<div class="cash-close-page" dir="rtl" x-data="{ confirmClose:false }" @keydown.escape.window="confirmClose=false"><div class="cash-close-datebar"><span>تاریخ گزارش</span><form method="get">{% include "partials/jalali_day_field.html" with iso_day=day|date:'Y-m-d' fallback_jalali=day_jalali %}</form></div><section class="cash-close-summary">
+<div class="cash-close-page" dir="rtl" x-data="{ confirmClose:false }" @keydown.escape.window="confirmClose=false"><section class="cash-close-summary">
     
     <div class="cash-close-metrics"><div class="cash-close-metric cash-close-metric--cash"><span>دریافتی نقدی</span><strong><bdi>{{ totals.cash|fa_money }}</bdi></strong><small>تومان · مؤثر در موجودی صندوق</small></div><div class="cash-close-metric"><span>کارت‌خوان</span><strong><bdi>{{ totals.card|fa_money }}</bdi></strong><small>تومان · خارج از وجه نقد</small></div><div class="cash-close-metric"><span>انتقال بانکی</span><strong><bdi>{{ totals.transfer|fa_money }}</bdi></strong><small>تومان · خارج از وجه نقد</small></div></div>
 
-  </section><div class="cash-close-layout"><main class="cash-close-main">
+  </section><div class="cash-close-datebar"><span>تاریخ گزارش</span><form method="get">{% include "partials/jalali_day_field.html" with iso_day=day|date:'Y-m-d' fallback_jalali=day_jalali %}</form></div><div class="cash-close-layout"><main class="cash-close-main">
   {% if invalid_day %}<p role="alert" class="luna-modal-errors">تاریخ معتبر نیست.</p>{% endif %}
   {% if form.errors %}<div class="luna-modal-errors" role="alert">{{ form.errors }}</div>{% endif %}
   {% if close %}
