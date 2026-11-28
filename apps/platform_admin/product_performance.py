@@ -4,12 +4,13 @@ Counts are aggregated by salon and time window; no personal data is returned.
 """
 from datetime import timedelta
 
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.utils import timezone
 
 from apps.appointments.models import Appointment
 from apps.customers.models import Customer
 from apps.salons.models import Salon
+from apps.platform_admin.models import PlatformActivityEvent
 
 
 def product_performance(days=30, now=None):
@@ -103,3 +104,35 @@ def salon_product_performance(*, salon, days=30, now=None):
         ),
         "coverage_note": "شاخص‌ها براساس تاریخ ایجاد رکورد محاسبه شده‌اند؛ تاریخ انجام نوبت معیار این گزارش نیست.",
     }
+
+
+def salon_feature_adoption(*, salon, days=30, now=None):
+    """Feature adoption by event kind; zero counts are meaningful only for tracked kinds."""
+    if days not in (7, 30, 90):
+        raise ValueError("Unsupported reporting period")
+    now = now or timezone.now()
+    start = now - timedelta(days=days)
+    previous = start - timedelta(days=days)
+    events = PlatformActivityEvent.objects.filter(salon=salon)
+    current = dict(events.filter(
+        occurred_at__gte=start, occurred_at__lt=now,
+    ).values("kind").annotate(total=Sum("count")).values_list("kind", "total"))
+    prior = dict(events.filter(
+        occurred_at__gte=previous, occurred_at__lt=start,
+    ).values("kind").annotate(total=Sum("count")).values_list("kind", "total"))
+    supported = (
+        PlatformActivityEvent.Kind.APPOINTMENT_CREATED,
+        PlatformActivityEvent.Kind.APPOINTMENT_COMPLETED,
+        PlatformActivityEvent.Kind.CUSTOMER_CREATED,
+        PlatformActivityEvent.Kind.STAFF_CREATED,
+        PlatformActivityEvent.Kind.INVOICE_CREATED,
+    )
+    labels = dict(PlatformActivityEvent.Kind.choices)
+    return [
+        {
+            "label": labels[kind], "current": current.get(kind, 0),
+            "previous": prior.get(kind, 0),
+            "difference": current.get(kind, 0) - prior.get(kind, 0),
+        }
+        for kind in supported
+    ]
