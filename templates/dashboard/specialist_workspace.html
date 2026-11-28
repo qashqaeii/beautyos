@@ -35,6 +35,15 @@
 .sw-schedule{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px;min-height:0}
 .sw-schedule>section{max-height:190px;overflow:auto;scrollbar-width:thin}
 .sw-schedule .border-b{padding:6px 0!important;font-size:12px}
+.sw-today-appointment{margin-block:6px;padding:0!important;border:0!important}
+.sw-today-appointment .appt-card--compact{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"person time" "service status";align-items:center;gap:5px 12px;min-width:0;width:100%;padding:10px 12px!important;border:1px solid var(--color-divider);border-radius:12px;background:var(--color-surface,white);text-decoration:none}
+.sw-today-appointment .appt-card__body{display:contents!important}
+.sw-today-appointment .appt-card__body p:first-child{grid-area:person;min-width:0;margin:0!important;font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw-today-appointment .appt-card__body p:last-child{grid-area:service;min-width:0;margin:0!important;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw-today-appointment .appt-card__time{grid-area:time;direction:rtl;white-space:nowrap;font-size:11px;line-height:1.6;color:var(--color-ink-muted,#806f69);text-align:left}
+.sw-today-appointment .appt-card__status{grid-area:status;justify-self:end;max-width:100%;font-size:10px;white-space:nowrap}
+.sw-today-appointment .appt-card--compact:hover{border-color:var(--color-primary);background:var(--color-surface,white)}
+@media(max-width:420px){.sw-today-appointment .appt-card--compact{gap:5px 7px;padding:9px!important}.sw-today-appointment .appt-card__time{font-size:10px}}
 .sw-bottom{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px}
 .sw-bottom>section:only-child{grid-column:1/-1}
 .sw-performance>div:first-of-type{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -65,7 +74,7 @@
     <section class="maison-panel lg:col-span-2">
       <div class="mb-4 flex items-center justify-between gap-3"><h2 class="inline-flex items-center gap-2 font-semibold"><i data-lucide="list-checks" class="h-5 w-5" aria-hidden="true"></i>نوبت‌های امروز</h2><a class="text-sm" href="{% url 'appointments:calendar' %}?staff={{ profile.pk }}">تقویم متخصص</a></div>
       {% for a in today_appointments %}
-      <div class="border-b py-3 last:border-0" style="border-color:var(--color-divider)">{% include "partials/appointment_card_compact.html" with appointment=a %}</div>
+      <div class="sw-today-appointment">{% include "partials/appointment_card_compact.html" with appointment=a %}</div>
       {% empty %}<p class="py-6 text-sm text-ink-muted">برای امروز نوبتی ثبت نشده است.</p>{% endfor %}
     </section>
     <section class="maison-panel">
