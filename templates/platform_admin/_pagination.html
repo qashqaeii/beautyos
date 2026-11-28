@@ -1,11 +1,11 @@
 {% if page.has_other_pages %}
 <nav class="pc-pagination" aria-label="صفحه‌بندی">
   {% if page.has_previous %}
-  <a href="?q={{ q|default:''|urlencode }}&status={{ status|default:''|urlencode }}&action={{ action|default:''|urlencode }}&page={{ page.previous_page_number }}"><i data-lucide="chevron-right"></i> قبلی</a>
+  <a href="?q={{ q|default:''|urlencode }}&status={{ status|default:''|urlencode }}&action={{ action|default:''|urlencode }}{% if sort %}&sort={{ sort|urlencode }}{% endif %}&page={{ page.previous_page_number }}"><i data-lucide="chevron-right"></i> قبلی</a>
   {% else %}<span class="is-disabled">قبلی</span>{% endif %}
   <span>صفحه {{ page.number|fa_num }} از {{ page.paginator.num_pages|fa_num }}</span>
   {% if page.has_next %}
-  <a href="?q={{ q|default:''|urlencode }}&status={{ status|default:''|urlencode }}&action={{ action|default:''|urlencode }}&page={{ page.next_page_number }}">بعدی <i data-lucide="chevron-left"></i></a>
+  <a href="?q={{ q|default:''|urlencode }}&status={{ status|default:''|urlencode }}&action={{ action|default:''|urlencode }}{% if sort %}&sort={{ sort|urlencode }}{% endif %}&page={{ page.next_page_number }}">بعدی <i data-lucide="chevron-left"></i></a>
   {% else %}<span class="is-disabled">بعدی</span>{% endif %}
 </nav>
 {% endif %}
