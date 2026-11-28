@@ -46,7 +46,7 @@ def command_center_snapshot(days=30, now=None):
     counts = {item["day"]: item["total"] for item in series}
     trend = []
     for index in range(days):
-        day = (start + timedelta(days=index)).date()
+        day = timezone.localtime(start + timedelta(days=index)).date()
         trend.append({"date": day, "count": counts.get(day, 0)})
     maximum = max((item["count"] for item in trend), default=0)
     for item in trend:
