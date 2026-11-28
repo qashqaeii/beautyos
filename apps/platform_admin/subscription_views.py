@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from apps.platform_admin.guards import platform_required
 from apps.platform_admin.models import SalonSubscription, SubscriptionPlan
+from apps.platform_admin.subscription_health import subscription_health
 
 
 @platform_required
@@ -24,6 +25,7 @@ def subscriptions(request):
     ).order_by("price_toman", "pk")
     return render(request, "platform_admin/subscriptions.html", {
         "plans": plans,
+        "health": subscription_health(),
         "subscriptions": items[:100],
         "status_filter": status,
         "subscriptions_total": SalonSubscription.objects.count(),
