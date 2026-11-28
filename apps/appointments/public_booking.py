@@ -172,6 +172,8 @@ def finalize_public_booking(
         raise BookingVerificationError("نشست رزرو معتبر نیست.")
     if locked.otp_challenge.consumed_at is None:
         raise BookingVerificationError("کد تأیید هنوز مصرف نشده است.")
+    if locked.otp_challenge.phone != phone or locked.otp_challenge.purpose != OTPChallenge.Purpose.BOOKING_VERIFY:
+        raise BookingVerificationError("کد تأیید متعلق به این شماره و فرایند رزرو نیست.")
 
     from apps.appointments.models import Appointment
 
