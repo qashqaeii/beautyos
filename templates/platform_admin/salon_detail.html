@@ -1,4 +1,29 @@
-{% extends "platform_admin/base.html" %}
+{% extends "platform_admin/base.html" %}{% endblock %}
+{% block control_content %}
+<nav class="pc-breadcrumb"><a href="{% url 'platform_admin:salons' %}">سالن‌ها</a><i data-lucide="chevron-left"></i><span>پرونده سالن</span></nav>
+<div class="pc-heading"><div><p class="pc-eyebrow">SALON 360 / PROFILE</p><h1>{{ salon.name }}</h1><p>{{ salon.city|default:"شهر نامشخص" }} · {{ salon.created_at|fa_jalali }} · {{ salon.slug }}</p></div><a href="{% url 'salons_public:landing' slug=salon.slug %}" target="_blank" rel="noopener noreferrer" class="pc-button pc-button--ghost"><i data-lucide="external-link"></i> صفحه عمومی</a></div>
+<div class="pc-kpis pc-kpis--six">
+  <article class="pc-kpi"><span>مشتریان</span><strong>{{ metrics.customers|fa_num }}</strong></article>
+  <article class="pc-kpi"><span>خدمات</span><strong>{{ metrics.services|fa_num }}</strong></article>
+  <article class="pc-kpi"><span>متخصصان</span><strong>{{ metrics.specialists|fa_num }}</strong></article>
+  <article class="pc-kpi"><span>کل نوبت‌ها</span><strong>{{ metrics.bookings|fa_num }}</strong><small>{{ metrics.online_bookings|fa_num }} رزرو اینترنتی</small></article>
+  <article class="pc-kpi"><span>مجموع دریافتی سالن</span><strong class="pc-kpi__small">{{ metrics.receipts|fa_money }}</strong><small>تومان · بدون استردادی‌ها</small></article>
+  <article class="pc-kpi"><span>هزینه‌های ثبت‌شده</span><strong class="pc-kpi__small">{{ metrics.expenses|fa_money }}</strong><small>تومان</small></article>
+</div>
+<div class="pc-two-col">
+  <section class="pc-panel pc-panel--padded">
+    <div class="pc-panel__header"><h2>وضعیت سالن</h2><span class="pc-status {% if salon.is_active %}pc-status--good{% else %}pc-status--warn{% endif %}">{% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</span></div>
+    <dl class="pc-facts"><div><dt>راه‌اندازی</dt><dd>{% if salon.settings.onboarding_completed_at %}تکمیل‌شده{% else %}در حال تکمیل{% endif %}</dd></div><div><dt>رزرو آنلاین</dt><dd>{% if salon.is_accepting_bookings %}فعال{% else %}غیرفعال{% endif %}</dd></div><div><dt>شماره عمومی</dt><dd dir="ltr">{{ salon.public_phone|default:"ثبت نشده" }}</dd></div><div><dt>آدرس</dt><dd>{{ salon.address|default:"ثبت نشده" }}</dd></div><div><dt>شناسه</dt><dd class="pc-monospace">{{ salon.pk }}</dd></div></dl>
+    <div class="pc-danger-zone"><h3>کنترل دسترسی مجموعه</h3><p>این اقدام فقط وضعیت سالن را تغییر می‌دهد و اجازه رزرو آنلاین را خودکار فعال نمی‌کند. تمام تغییرات ثبت می‌شوند.</p>
+      <form method="post" action="{% url 'platform_admin:salon_status' salon_id=salon.pk %}" class="pc-action-form">{% csrf_token %}<input type="hidden" name="action" value="{% if salon.is_active %}deactivate{% else %}activate{% endif %}"><label for="status-reason">دلیل تغییر وضعیت</label><textarea id="status-reason" name="reason" required minlength="8" maxlength="500" rows="2" placeholder="دلیل تغییر وضعیت را با جزئیات ثبت کنید"></textarea><button type="submit" class="pc-button {% if salon.is_active %}pc-button--danger{% endif %}">{% if salon.is_active %}غیرفعال‌سازی سالن{% else %}فعال‌سازی دوباره{% endif %}</button></form>
+    </div>
+  </section>
+  <section class="pc-panel"><div class="pc-panel__header"><h2>اعضای سالن</h2><span class="pc-subtle">نقش‌های فعال و غیرفعال</span></div><div class="pc-list">{% for member in members %}<a href="{% url 'platform_admin:user_detail' user_id=member.user_id %}" class="pc-list-row"><span class="pc-list-avatar">{{ member.user.full_name|slice:":1"|default:"ک" }}</span><span class="pc-list-main"><strong>{{ member.user.full_name|default:member.user.display_phone }}</strong><small>{{ member.user.display_phone }}</small></span><span class="pc-status {% if member.is_active %}pc-status--info{% else %}pc-status--muted{% endif %}">{{ member.get_role_display }}</span></a>{% empty %}<div class="pc-empty">عضوی ثبت نشده است.</div>{% endfor %}</div></section>
+</div>
+<div class="pc-two-col">
+  <section class="pc-panel"><div class="pc-panel__header"><h2>درخواست‌های پشتیبانی</h2><a class="pc-text-link" href="{% url 'platform_admin:support' %}">صندوق پیام‌ها</a></div><div class="pc-list">{% for ticket in tickets %}<a href="{% url 'platform_admin:ticket_detail' ticket_id=ticket.pk %}" class="pc-list-row"><span class="pc-list-main"><strong>{{ ticket.title }}</strong><small>{{ ticket.last_activity_at|fa_jalali_datetime }}</small></span><span class="pc-status">{{ ticket.get_status_display }}</span></a>{% empty %}<div class="pc-empty">درخواستی ثبت نشده است.</div>{% endfor %}</div></section>
+  <section class="pc-panel"><div class="pc-panel__header"><h2>تاریخچه فعالیت</h2><a class="pc-text-link" href="{% url 'platform_admin:audit' %}">تمام رویدادها</a></div><div class="pc-list">{% for event in audit_logs %}<div class="pc-list-row"><span class="pc-list-main"><strong>{{ event.message|default:event.entity_type|truncatechars:75 }}</strong><small>{{ event.actor.full_name|default:"سیستم" }}</small></span><span class="pc-date">{{ event.created_at|fa_jalali_datetime }}</span></div>{% empty %}<div class="pc-empty">رویدادی ثبت نشده است.</div>{% endfor %}</div></section>
+</div>
 {% block title %}{{ salon.name }} · پرونده سالن
 <div class="pc-two-col">
   <section class="pc-panel pc-panel--padded" aria-labelledby="salon-subscription">
@@ -42,30 +67,4 @@
   </div>
   <p class="pc-subtle">درخواست‌های پشتیبانی باز: {{ unresolved_tickets|fa_num }} · ارزیابی صرفاً برای کمک به اولویت‌بندی پیگیری است.</p>
 </section>
-{% endblock %}
-{% block control_content %}
-<nav class="pc-breadcrumb"><a href="{% url 'platform_admin:salons' %}">سالن‌ها</a><i data-lucide="chevron-left"></i><span>پرونده سالن</span></nav>
-<div class="pc-heading"><div><p class="pc-eyebrow">SALON 360 / PROFILE</p><h1>{{ salon.name }}</h1><p>{{ salon.city|default:"شهر نامشخص" }} · {{ salon.created_at|fa_jalali }} · {{ salon.slug }}</p></div><a href="{% url 'salons_public:landing' slug=salon.slug %}" target="_blank" rel="noopener noreferrer" class="pc-button pc-button--ghost"><i data-lucide="external-link"></i> صفحه عمومی</a></div>
-<div class="pc-kpis pc-kpis--six">
-  <article class="pc-kpi"><span>مشتریان</span><strong>{{ metrics.customers|fa_num }}</strong></article>
-  <article class="pc-kpi"><span>خدمات</span><strong>{{ metrics.services|fa_num }}</strong></article>
-  <article class="pc-kpi"><span>متخصصان</span><strong>{{ metrics.specialists|fa_num }}</strong></article>
-  <article class="pc-kpi"><span>کل نوبت‌ها</span><strong>{{ metrics.bookings|fa_num }}</strong><small>{{ metrics.online_bookings|fa_num }} رزرو اینترنتی</small></article>
-  <article class="pc-kpi"><span>مجموع دریافتی سالن</span><strong class="pc-kpi__small">{{ metrics.receipts|fa_money }}</strong><small>تومان · بدون استردادی‌ها</small></article>
-  <article class="pc-kpi"><span>هزینه‌های ثبت‌شده</span><strong class="pc-kpi__small">{{ metrics.expenses|fa_money }}</strong><small>تومان</small></article>
-</div>
-<div class="pc-two-col">
-  <section class="pc-panel pc-panel--padded">
-    <div class="pc-panel__header"><h2>وضعیت سالن</h2><span class="pc-status {% if salon.is_active %}pc-status--good{% else %}pc-status--warn{% endif %}">{% if salon.is_active %}فعال{% else %}غیرفعال{% endif %}</span></div>
-    <dl class="pc-facts"><div><dt>راه‌اندازی</dt><dd>{% if salon.settings.onboarding_completed_at %}تکمیل‌شده{% else %}در حال تکمیل{% endif %}</dd></div><div><dt>رزرو آنلاین</dt><dd>{% if salon.is_accepting_bookings %}فعال{% else %}غیرفعال{% endif %}</dd></div><div><dt>شماره عمومی</dt><dd dir="ltr">{{ salon.public_phone|default:"ثبت نشده" }}</dd></div><div><dt>آدرس</dt><dd>{{ salon.address|default:"ثبت نشده" }}</dd></div><div><dt>شناسه</dt><dd class="pc-monospace">{{ salon.pk }}</dd></div></dl>
-    <div class="pc-danger-zone"><h3>کنترل دسترسی مجموعه</h3><p>این اقدام فقط وضعیت سالن را تغییر می‌دهد و اجازه رزرو آنلاین را خودکار فعال نمی‌کند. تمام تغییرات ثبت می‌شوند.</p>
-      <form method="post" action="{% url 'platform_admin:salon_status' salon_id=salon.pk %}" class="pc-action-form">{% csrf_token %}<input type="hidden" name="action" value="{% if salon.is_active %}deactivate{% else %}activate{% endif %}"><label for="status-reason">دلیل تغییر وضعیت</label><textarea id="status-reason" name="reason" required minlength="8" maxlength="500" rows="2" placeholder="دلیل تغییر وضعیت را با جزئیات ثبت کنید"></textarea><button type="submit" class="pc-button {% if salon.is_active %}pc-button--danger{% endif %}">{% if salon.is_active %}غیرفعال‌سازی سالن{% else %}فعال‌سازی دوباره{% endif %}</button></form>
-    </div>
-  </section>
-  <section class="pc-panel"><div class="pc-panel__header"><h2>اعضای سالن</h2><span class="pc-subtle">نقش‌های فعال و غیرفعال</span></div><div class="pc-list">{% for member in members %}<a href="{% url 'platform_admin:user_detail' user_id=member.user_id %}" class="pc-list-row"><span class="pc-list-avatar">{{ member.user.full_name|slice:":1"|default:"ک" }}</span><span class="pc-list-main"><strong>{{ member.user.full_name|default:member.user.display_phone }}</strong><small>{{ member.user.display_phone }}</small></span><span class="pc-status {% if member.is_active %}pc-status--info{% else %}pc-status--muted{% endif %}">{{ member.get_role_display }}</span></a>{% empty %}<div class="pc-empty">عضوی ثبت نشده است.</div>{% endfor %}</div></section>
-</div>
-<div class="pc-two-col">
-  <section class="pc-panel"><div class="pc-panel__header"><h2>درخواست‌های پشتیبانی</h2><a class="pc-text-link" href="{% url 'platform_admin:support' %}">صندوق پیام‌ها</a></div><div class="pc-list">{% for ticket in tickets %}<a href="{% url 'platform_admin:ticket_detail' ticket_id=ticket.pk %}" class="pc-list-row"><span class="pc-list-main"><strong>{{ ticket.title }}</strong><small>{{ ticket.last_activity_at|fa_jalali_datetime }}</small></span><span class="pc-status">{{ ticket.get_status_display }}</span></a>{% empty %}<div class="pc-empty">درخواستی ثبت نشده است.</div>{% endfor %}</div></section>
-  <section class="pc-panel"><div class="pc-panel__header"><h2>تاریخچه فعالیت</h2><a class="pc-text-link" href="{% url 'platform_admin:audit' %}">تمام رویدادها</a></div><div class="pc-list">{% for event in audit_logs %}<div class="pc-list-row"><span class="pc-list-main"><strong>{{ event.message|default:event.entity_type|truncatechars:75 }}</strong><small>{{ event.actor.full_name|default:"سیستم" }}</small></span><span class="pc-date">{{ event.created_at|fa_jalali_datetime }}</span></div>{% empty %}<div class="pc-empty">رویدادی ثبت نشده است.</div>{% endfor %}</div></section>
-</div>
 {% endblock %}
