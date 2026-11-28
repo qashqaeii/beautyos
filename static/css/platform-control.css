@@ -524,3 +524,12 @@ a.pc-exec__row:hover{background:#faf7fd}
 @media(prefers-reduced-motion:no-preference){.pc-exec__kpi,.pc-exec__panel{animation:pc-exec-enter .32s ease-out both}.pc-exec__kpi:nth-child(2){animation-delay:35ms}.pc-exec__kpi:nth-child(3){animation-delay:70ms}.pc-exec__kpi:nth-child(4){animation-delay:105ms}}
 @keyframes pc-exec-enter{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.pc-exec *{animation:none!important;transition:none!important}}
+
+
+/* Restore BeautyOS lilac navigation identity on the executive overview only. */
+.pc-shell:has(.pc-exec){--pc-bg:#f8f6fb;--pc-surface:#fffdfc;--pc-ink:#393047;--pc-muted:#857b8d;--pc-border:#e9e2ef;--pc-accent:#76559e;--pc-lavender:#f2eafa;background:var(--pc-bg)}
+.pc-shell:has(.pc-exec) .pc-sidebar,.pc-shell:has(.pc-exec) .pc-topbar{background:#fffdfc;border-color:#e9e2ef}
+.pc-shell:has(.pc-exec) .pc-brand__mark,.pc-shell:has(.pc-exec) .pc-operator__avatar,.pc-shell:has(.pc-exec) .pc-mobile-mark{background:#f2eafa;color:#76559e}
+.pc-shell:has(.pc-exec) .pc-nav-item.is-active{background:#f2eafa;color:#76559e!important;border-color:#e9e2ef;box-shadow:inset -3px 0 #9374b7}
+.pc-shell:has(.pc-exec) .pc-nav-item:hover{background:#f8f3fc;color:#76559e!important}
+.pc-shell:has(.pc-exec) .pc-online-dot{background:#69b48b;box-shadow:0 0 0 4px #e6f4eb}
