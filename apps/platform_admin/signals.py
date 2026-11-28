@@ -52,3 +52,14 @@ def staff_created_event(sender, instance, created, **kwargs):
 def invoice_created_event(sender, instance, created, **kwargs):
     if created:
         _emit_on_commit(instance, PlatformActivityEvent.Kind.INVOICE_CREATED, "invoice-created")
+
+
+@receiver(post_save, sender=Appointment, dispatch_uid="platform_appointment_completed_v1")
+def appointment_completed_event(sender, instance, created, **kwargs):
+    # The idempotency key prevents duplicate counts when a completed
+    # appointment is subsequently edited or saved again.
+    if instance.status == Appointment.Status.COMPLETED:
+        _emit_on_commit(
+            instance, PlatformActivityEvent.Kind.APPOINTMENT_COMPLETED,
+            "appointment-completed",
+        )
