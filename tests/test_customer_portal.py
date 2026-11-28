@@ -333,6 +333,7 @@ def test_customer_upcoming_booking_not_hidden_by_large_history(
             end_at=now - timedelta(minutes=i + 1) + timedelta(minutes=30),
             source=Appointment.Source.PUBLIC,
             status=Appointment.Status.COMPLETED,
+            tracking_code=f"HIST{i:08d}",
         )
         for i in range(260)
     ])
