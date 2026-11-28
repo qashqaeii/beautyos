@@ -84,3 +84,18 @@ def settle_verified_order(*, order_id, verifier):
         source="verified_provider",
     )
     return order, True
+
+
+def settle_from_gateway(*, order_id, provider):
+    """Production entrypoint; provider verification must happen server-side.
+
+    No payment can be accepted while the provider registry is empty.
+    """
+    from apps.platform_admin.payment_gateways import verify_subscription_payment
+
+    return settle_verified_order(
+        order_id=order_id,
+        verifier=lambda order: verify_subscription_payment(
+            provider=provider, order=order,
+        ),
+    )
