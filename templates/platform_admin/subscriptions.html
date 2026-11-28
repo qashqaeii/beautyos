@@ -9,6 +9,21 @@
   <article class="pc-kpi"><span>اشتراک‌های ثبت‌شده</span><strong>{{ subscriptions_total|fa_num }}</strong></article>
   <article class="pc-kpi"><span>سالن‌های بدون اشتراک ثبت‌شده</span><strong>{{ unassigned_count|fa_num }}</strong></article>
 </div>
+<section class="pc-panel pc-panel--padded" aria-labelledby="subscription-health-heading" style="margin-block:16px">
+  <div class="pc-panel__header"><div><p class="pc-eyebrow">SUBSCRIPTION LIFECYCLE</p><h2 id="subscription-health-heading">پایش اعتبار اشتراک‌ها</h2><p>وضعیت ثبت‌شده در کنار اعتبار واقعی تاریخ‌ها؛ بدون فرض پرداخت موفق</p></div></div>
+  <div class="pc-kpis">
+    <article class="pc-kpi pc-kpi--primary"><span>اشتراک فعال و معتبر</span><strong>{{ health.valid_active|fa_num }}</strong></article>
+    <article class="pc-kpi"><span>در آستانه انقضا (۷ روز)</span><strong>{{ health.expiring_soon|fa_num }}</strong></article>
+    <article class="pc-kpi"><span>تاریخ منقضی با وضعیت قدیمی</span><strong>{{ health.expired_dates_unreconciled|fa_num }}</strong></article>
+    <article class="pc-kpi"><span>در انتظار پرداخت</span><strong>{{ health.past_due|fa_num }}</strong></article>
+    <article class="pc-kpi"><span>دوره آزمایشی معتبر</span><strong>{{ health.trial_valid|fa_num }}</strong></article>
+  </div>
+  <div class="pc-two-col">
+    <div><h3>اشتراک‌های نزدیک انقضا</h3><div class="pc-list">{% for item in health.expiring_salons %}<a class="pc-list-row" href="{% url 'platform_admin:salon_detail' salon_id=item.salon_id %}"><span class="pc-list-main"><strong>{{ item.salon.name }}</strong><small>{{ item.plan.name }}</small></span><span class="pc-date">{{ item.ends_at|fa_jalali_datetime }}</span></a>{% empty %}<div class="pc-empty">موردی ثبت نشده است.</div>{% endfor %}</div></div>
+    <div><h3>وضعیت‌های نیازمند بررسی</h3><div class="pc-list">{% for item in health.stale_salons %}<a class="pc-list-row" href="{% url 'platform_admin:salon_detail' salon_id=item.salon_id %}"><span class="pc-list-main"><strong>{{ item.salon.name }}</strong><small>{{ item.get_status_display }}</small></span><span class="pc-date">{{ item.ends_at|fa_jalali_datetime }}</span></a>{% empty %}<div class="pc-empty">موردی ثبت نشده است.</div>{% endfor %}</div></div>
+  </div>
+  <p class="pc-subtle">این گزارش فقط پایش است؛ اشتراک‌ها خودکار تمدید، منقضی یا محدود نمی‌شوند. درآمد پلتفرم تا زمان ثبت پرداخت‌های تأییدشده قابل محاسبه نیست.</p>
+</section>
 <section class="pc-panel pc-subscriptions__plans">
   <div class="pc-panel__header"><h2>پلن‌های پلتفرم</h2><span class="pc-subtle">تعریف پلن فقط توسط مدیر مجاز</span></div>
   <div class="pc-list">
