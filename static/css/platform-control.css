@@ -247,3 +247,50 @@ a.pc-list-row:hover{background:#faf8fc}
 .pc-insights__body .pc-panel .pc-kpis{margin:12px 0}
 @media(max-width:900px){.pc-content:has(.pc-command-hero) .pc-panel--activity .pc-list{grid-template-columns:1fr}.pc-content:has(.pc-command-hero) .pc-panel--activity .pc-list-row:nth-child(odd){border-inline-end:0}}
 @media(max-width:640px){.pc-content:has(.pc-command-hero){padding-top:14px;gap:12px}.pc-content:has(.pc-command-hero) .pc-command-hero{padding:15px}.pc-content:has(.pc-command-hero)>.pc-kpis .pc-kpi{min-height:113px;padding:12px}.pc-insights__trigger{padding:14px 12px}.pc-insights__body{padding:0 9px 9px}}
+
+
+/* Brand alignment: share the actual rose_atelier site palette, not a separate purple scheme.
+   Theme source: static/css/beautyos.css. Applies to the entire platform control panel. */
+.pc-shell{
+  --pc-bg:#f5f0ec;--pc-surface:#fffdfc;--pc-ink:#51443f;
+  --pc-muted:#857771;--pc-border:#e5dcd6;--pc-accent:#9d726e;
+  --pc-lavender:#e9d8d2;
+  background:var(--pc-bg);color:var(--pc-ink)
+}
+.pc-shell :is(h1,h2,h3){color:var(--pc-ink)}
+.pc-shell :is(a,button,input,select,textarea,summary):focus-visible{outline-color:#9d726e}
+.pc-sidebar,.pc-topbar{background:#fffdfc;border-color:#e5dcd6}
+.pc-brand{border-color:#e5dcd6}
+.pc-brand__mark,.pc-operator__avatar,.pc-mobile-mark{background:#e9d8d2;color:#8a635f}
+.pc-nav-label{color:#9a8b85}
+.pc-nav-item{color:#74635c!important}
+.pc-nav-item:hover{background:#faf7f4;color:#8a635f!important}
+.pc-nav-item.is-active{background:#e9d8d2;color:#51443f!important;border-color:#e5dcd6;box-shadow:inset -3px 0 #9d726e}
+.pc-link-muted:hover{color:#8a635f!important}
+.pc-command-hero,.pc-content:has(.pc-command-hero) .pc-command-hero{
+  background:linear-gradient(112deg,#f0e2dc,#fffdfc 75%);
+  border-color:#e5dcd6;box-shadow:0 6px 20px rgba(81,68,63,.05)
+}
+.pc-command-hero .pc-heading h1,.pc-content:has(.pc-command-hero) .pc-command-hero .pc-heading h1{color:#51443f}
+.pc-command-hero .pc-heading .pc-eyebrow,.pc-eyebrow{color:#9d726e}
+.pc-command-hero__meta{border-color:#e5dcd6;color:#857771}
+.pc-kpis .pc-kpi,.pc-content:has(.pc-command-hero) .pc-kpis .pc-kpi{
+  border-color:#e5dcd6;background:#fffdfc;box-shadow:0 4px 14px rgba(81,68,63,.045)
+}
+.pc-kpis .pc-kpi--primary,.pc-content:has(.pc-command-hero) .pc-kpis .pc-kpi--primary{
+  background:linear-gradient(145deg,#9d726e,#b58d89);border-color:#9d726e;color:#fff
+}
+.pc-kpis .pc-kpi--primary :is(strong,p,span,svg){color:#fff}
+.pc-alert-strip{background:#f0e5df;border-color:#e5dcd6}
+.pc-panel,.pc-content:has(.pc-command-hero) .pc-panel,.pc-insights{
+  background:#fffdfc;border-color:#e5dcd6;box-shadow:0 4px 14px rgba(81,68,63,.04)
+}
+.pc-command-section h2,.pc-insights__trigger{color:#51443f}
+.pc-command-section>span,.pc-insights__trigger small{color:#857771}
+.pc-insights__symbol{background:#e9d8d2;color:#8a635f}
+.pc-insights__chevron{color:#9d726e}
+.pc-insights__trigger:focus-visible{outline-color:#9d726e}
+.pc-content:has(.pc-command-hero) .pc-panel--activity .pc-list-row:nth-child(odd){border-color:#e5dcd6}
+.pc-period a.is-active{background:#e9d8d2;color:#51443f}
+.pc-shell .pc-button--ghost{border-color:#e5dcd6;background:#fffdfc;color:#51443f}
+.pc-shell .pc-button--ghost:hover{background:#faf7f4;border-color:#d5cac3}
