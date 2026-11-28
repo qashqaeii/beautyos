@@ -52,7 +52,7 @@ def test_staff_profile_form_has_grouped_controls_and_native_upload():
     assert 'enctype="multipart/form-data"' in source
     assert "luna-form-section" in source
     assert "luna-switch" in source
-    assert "luna-service-section" in source
+    assert 'id="staff-specialty-options"' in source
 
 
 @pytest.mark.django_db
