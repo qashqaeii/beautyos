@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
 
 from apps.platform_admin.guards import platform_required
-from apps.platform_admin.models import SalonSubscription, SubscriptionPlan, SubscriptionChangeLog
+from apps.platform_admin.models import SalonSubscription, SubscriptionPlan, SubscriptionChangeLog, PlatformSubscriptionOrder
 from apps.platform_admin.subscription_health import subscription_health
 from apps.platform_admin.subscription_lifecycle import change_subscription
 
@@ -30,6 +30,8 @@ def subscriptions(request):
     ).order_by("price_toman", "pk")
     return render(request, "platform_admin/subscriptions.html", {
         "plans": plans,
+        "recent_orders": PlatformSubscriptionOrder.objects.select_related("salon", "plan").order_by("-created_at")[:20],
+        "verified_order_count": PlatformSubscriptionOrder.objects.filter(status=PlatformSubscriptionOrder.Status.VERIFIED).count(),
         "health": subscription_health(),
         "recent_changes": SubscriptionChangeLog.objects.select_related("subscription__salon", "actor").order_by("-changed_at")[:15],
         "subscriptions": items[:100],
