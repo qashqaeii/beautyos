@@ -50,6 +50,22 @@
     <div class="pc-list-row"><span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="wallet"></i></span><span class="pc-list-main"><strong>درآمد پلتفرم</strong><small>{{ command.revenue_note }}</small></span></div>
   </div>
 </section>
+<section class="pc-panel" aria-labelledby="followup-heading" style="margin-block:18px">
+  <div class="pc-panel__header">
+    <div><p class="pc-eyebrow">OPERATIONAL FOLLOW-UP</p><h2 id="followup-heading">سالن‌های نیازمند پیگیری</h2><p>{{ followups.total|fa_num }} سالن با حداقل یک نشانه قابل پیگیری · ترتیب براساس اولویت عملیاتی</p></div>
+    <a href="{% url 'platform_admin:salons' %}" class="pc-text-link">همه سالن‌ها</a>
+  </div>
+  <div class="pc-list">
+    {% for item in followups.items %}
+    <a class="pc-list-row" href="{% url 'platform_admin:salon_detail' salon_id=item.salon.pk %}">
+      <span class="pc-list-avatar pc-list-avatar--soft"><i data-lucide="store"></i></span>
+      <span class="pc-list-main"><strong>{{ item.salon.name }}</strong><small>{% for reason in item.reasons %}{{ reason }}{% if not forloop.last %} · {% endif %}{% endfor %}</small></span>
+      <span class="pc-status pc-status--warn">{{ item.open_tickets|fa_num }} تیکت باز</span>
+    </a>
+    {% empty %}<div class="pc-empty">در حال حاضر نشانه‌ای برای پیگیری ثبت نشده است.</div>{% endfor %}
+  </div>
+  <p class="pc-subtle">این ترتیب یک قاعده عملیاتی است، نه پیش‌بینی ریزش. فعالیت‌های ردیابی‌نشده ممکن است در این گزارش منعکس نشوند.</p>
+</section>
 <section class="pc-panel pc-panel--padded" aria-labelledby="usage-trend-heading" style="margin-block:18px">
   <div class="pc-panel__header"><div><p class="pc-eyebrow">ACTIVITY TREND</p><h2 id="usage-trend-heading">روند روزانه فعالیت ثبت‌شده</h2><p>هر ستون تعداد رویدادهای همان روز است؛ روزهای بدون فعالیت نیز نمایش داده می‌شوند.</p></div></div>
   <div role="img" aria-label="نمودار ستونی تعداد رویدادهای روزانه" style="display:flex;align-items:end;gap:3px;height:148px;overflow:hidden;padding:12px 0;border-bottom:1px solid #ddd">
