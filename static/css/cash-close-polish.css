@@ -95,3 +95,38 @@
 @media(min-width:1100px) and (min-height:700px){.cash-close-page{gap:8px}.cash-close-metric{min-height:56px}}
 @media(max-width:900px){.cash-close-layout{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){.cash-close-page .fin-panel{padding:12px}.cash-close-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.cash-close-metric{min-height:72px;padding:7px}}
+
+/* Cash close: branded register illustration on the LEFT of the single shared header. */
+.maison-app .maison-unified-header.cash-close-unified-header {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  min-height:88px;
+  background:linear-gradient(100deg,#f0dfe4 0%,#f9eeea 46%,#fff9f6 100%);
+}
+.maison-app .maison-unified-header.cash-close-unified-header::before {
+  content:"";
+  position:absolute;
+  left:clamp(150px,23%,310px);
+  top:0;
+  bottom:0;
+  width:clamp(155px,23%,275px);
+  background:url("../img/cash-close-register.svg") center bottom / contain no-repeat;
+  pointer-events:none;
+  z-index:-1;
+}
+.maison-app .cash-close-unified-header .maison-unified-header__copy {
+  padding-inline-end:clamp(0px,1vw,12px);
+}
+.maison-app .cash-close-page .cash-close-datebar {
+  width:100%;
+  justify-content:flex-end;
+  direction:rtl;
+}
+@media(max-width:1050px) {
+  .maison-app .maison-unified-header.cash-close-unified-header::before {left:18%;width:175px;opacity:.85}
+}
+@media(max-width:700px) {
+  .maison-app .maison-unified-header.cash-close-unified-header::before {left:6px;width:105px;opacity:.45}
+  .maison-app .maison-unified-header.cash-close-unified-header {min-height:76px}
+}
