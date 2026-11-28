@@ -26,7 +26,7 @@ from apps.finance.models import Payment
 from apps.platform_admin.forms import ArticleForm, MessageForm, TicketForm
 from apps.platform_admin.command_center import command_center_snapshot
 from apps.platform_admin.followups import followup_queue
-from apps.platform_admin.product_performance import product_performance
+from apps.platform_admin.product_performance import product_performance, salon_product_performance
 from apps.platform_admin.guards import platform_required
 from apps.platform_admin.models import SupportMessage, SupportTicket, SalonSubscription, PlatformActivityEvent
 from apps.salons.decorators import salon_required
@@ -141,6 +141,7 @@ def salons(request):
 @platform_required
 def salon_detail(request, salon_id):
     salon = get_object_or_404(Salon.objects.select_related("settings"), pk=salon_id)
+    performance_days = _last_days(request)
     members = SalonMembership.objects.filter(salon=salon).select_related("user").order_by("role", "user__full_name")
     gross = (
         Payment.objects.filter(salon=salon, paid_amount_toman__gt=0)
@@ -186,6 +187,7 @@ def salon_detail(request, salon_id):
 
     return render(request, "platform_admin/salon_detail.html", {
         "salon": salon,
+        "performance": salon_product_performance(salon=salon, days=performance_days),
         "subscription": subscription,
         "salon_signals": signals,
         "unresolved_tickets": unresolved_tickets,
