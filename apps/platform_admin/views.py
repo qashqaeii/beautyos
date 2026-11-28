@@ -161,9 +161,31 @@ def salon_detail(request, salon_id):
     for item in activity_breakdown:
         item["label"] = kind_labels.get(item["kind"], item["kind"])
     subscription = SalonSubscription.objects.filter(salon=salon).select_related("plan").first()
+    # Descriptive signals only: incomplete event instrumentation makes a churn
+    # probability or numerical health score misleading at this stage.
+    unresolved_tickets = SupportTicket.objects.filter(
+        salon=salon, status__in=[SupportTicket.Status.OPEN, SupportTicket.Status.IN_PROGRESS],
+    ).count()
+    onboarding_complete = bool(salon.settings.onboarding_completed_at)
+    current_count = recent_activity.aggregate(total=Sum("count"))["total"] or 0
+    previous_count = previous_activity.aggregate(total=Sum("count"))["total"] or 0
+    signals = []
+    if not onboarding_complete:
+        signals.append(("راه‌اندازی سالن هنوز تکمیل نشده", "تکمیل اطلاعات و خدمات اولیه را بررسی کنید."))
+    if unresolved_tickets:
+        signals.append(("درخواست پشتیبانی باز", "پیگیری درخواست‌های باز این سالن در اولویت قرار گیرد."))
+    if previous_count and not current_count:
+        signals.append(("کاهش فعالیت ثبت‌شده", "در دوره قبل رویداد وجود داشته اما در ۳۰ روز اخیر رویدادی ثبت نشده است."))
+    if subscription and subscription.ends_at <= now:
+        signals.append(("تاریخ اشتراک گذشته", "اعتبار و وضعیت تمدید را بررسی کنید؛ این مورد اثبات عدم پرداخت نیست."))
+    if not signals:
+        signals.append(("هشدار قطعی ثبت نشده", "داده‌های فعالیت هنوز پوشش کامل ندارند؛ این وضعیت به معنی سلامت قطعی سالن نیست."))
+
     return render(request, "platform_admin/salon_detail.html", {
         "salon": salon,
         "subscription": subscription,
+        "salon_signals": signals,
+        "unresolved_tickets": unresolved_tickets,
         "activity_current": recent_activity.aggregate(total=Sum("count"))["total"] or 0,
         "activity_previous": previous_activity.aggregate(total=Sum("count"))["total"] or 0,
         "activity_breakdown": activity_breakdown,
