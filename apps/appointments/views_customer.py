@@ -209,6 +209,12 @@ def customer_reschedule(request, slug, appointment_id):
     allowed, reason = can_customer_manage_appointment(salon, appointment)
     if not salon.is_accepting_bookings:
         allowed, reason = False, "رزرو آنلاین سالن غیرفعال است."
+    elif not (appointment.staff.is_active and appointment.staff.is_bookable and not appointment.staff.is_deleted):
+        allowed, reason = False, "متخصص این نوبت دیگر برای رزرو آنلاین در دسترس نیست."
+    elif not (appointment.service.is_active and appointment.service.is_public and not appointment.service.is_deleted):
+        allowed, reason = False, "خدمت این نوبت دیگر برای رزرو آنلاین فعال نیست."
+    elif not appointment.staff.services.filter(pk=appointment.service_id).exists():
+        allowed, reason = False, "این متخصص دیگر خدمت انتخاب‌شده را ارائه نمی‌دهد."
     if request.method == "POST":
         if not allowed:
             messages.error(request, reason)
