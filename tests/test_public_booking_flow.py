@@ -206,3 +206,33 @@ def test_changing_phone_invalidates_prior_verification(client, salon, public_boo
     confirm_url = reverse("salons_public:booking_confirm", kwargs={"slug": slug})
     client.post(confirm_url)
     assert Appointment.objects.filter(salon=salon, customer__phone="+989129998877").exists()
+
+@pytest.mark.django_db
+def test_verified_phone_cannot_be_reused_with_wrong_otp_purpose(
+    client, salon, public_booking_setup, capture_otp,
+):
+    data = public_booking_setup
+    _seed_booking_session(client, salon, data)
+    slug = salon.slug
+    client.post(
+        reverse("salons_public:booking_contact", kwargs={"slug": slug}),
+        {"full_name": data["name"], "phone": data["phone_input"]},
+    )
+    client.post(
+        reverse("salons_public:booking_verify", kwargs={"slug": slug}),
+        {"code": capture_otp["code"]},
+    )
+    verification = PublicBookingPhoneVerification.objects.get(
+        pk=client.session["booking"]["phone_verification_id"],
+    )
+    challenge = verification.otp_challenge
+    challenge.purpose = OTPChallenge.Purpose.LOGIN
+    challenge.save(update_fields=["purpose"])
+    response = client.post(
+        reverse("salons_public:booking_confirm", kwargs={"slug": slug}),
+        follow=False,
+    )
+    assert response.status_code == 302
+    assert Appointment.objects.filter(salon=salon, source=Appointment.Source.PUBLIC).count() == 0
+    verification.refresh_from_db()
+    assert verification.consumed_at is None
